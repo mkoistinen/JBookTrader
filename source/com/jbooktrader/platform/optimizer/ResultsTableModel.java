@@ -18,11 +18,11 @@ public class ResultsTableModel extends TableDataModel {
         PF("Profit Factor", Double.class);
 
         private final String columnName;
-        private final Class<?> columnClass;
+        //private final Class<?> columnClass;
 
         Column(String columnName, Class<?> columnClass) {
             this.columnName = columnName;
-            this.columnClass = columnClass;
+            //this.columnClass = columnClass;
         }
 
         public String getColumnName() {
