@@ -17,7 +17,7 @@ import java.net.URL;
  * Main application window.
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
-    private JMenuItem exitMenuItem, aboutMenuItem, userGuideMenuItem, discussionMenuItem, projectHomeMenuItem;
+    private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem;
     private JMenuItem tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
     private TradingTableModel tradingTableModel;
     private JTable tradingTable;
@@ -159,9 +159,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic('H');
 
-        userGuideMenuItem = new JMenuItem("User Guide");
-        userGuideMenuItem.setMnemonic('U');
-
         discussionMenuItem = new JMenuItem("Discussion Group");
         discussionMenuItem.setMnemonic('D');
 
@@ -171,7 +168,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         aboutMenuItem = new JMenuItem("About...");
         aboutMenuItem.setMnemonic('A');
 
-        helpMenu.add(userGuideMenuItem);
         helpMenu.add(discussionMenuItem);
         helpMenu.add(projectHomeMenuItem);
         helpMenu.addSeparator();

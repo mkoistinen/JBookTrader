@@ -160,7 +160,7 @@ public class PositionManager {
             int quantity = newPosition - position;
             if (quantity != 0) {
                 orderExecutionPending = true;
-                String action = (quantity > 0)? "BUY" : "SELL";
+                String action = (quantity > 0) ? "BUY" : "SELL";
                 Contract contract = strategy.getContract();
                 traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);
             }

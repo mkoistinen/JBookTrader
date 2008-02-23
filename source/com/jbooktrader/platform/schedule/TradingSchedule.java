@@ -10,13 +10,13 @@ import java.util.*;
  * Trading can start after the "startTime". Open positions will be closed
  * at the "endTime". The "startTime" and "endTime" times must be specified
  * in the military time format.
- *
+ * <p/>
  * Example: A strategy defines the following trading schedule:
  * tradingSchedule = new TradingSchedule("9:35", "15:45", "America/New_York");
  * Then the following trading timeline is formed:
  * -- start trading at 9:35 EST
  * -- close open positions at 15:45 EST
- *
+ * <p/>
  * A particular period of time within the time window between The "startTime" and "endTime"
  * can be set as exclusionary.
  * Example: A strategy defines the following trading interval, along with the exclusion period:
@@ -81,7 +81,7 @@ public class TradingSchedule {
         boolean containsTime;
         if (hasExclusion) {
             containsTime = (minutes >= start && minutes < exclusionStart);
-            containsTime = containsTime ||(minutes >= exclusionEnd && minutes < end);
+            containsTime = containsTime || (minutes >= exclusionEnd && minutes < end);
         } else {
             containsTime = minutes >= start && minutes < end;
         }

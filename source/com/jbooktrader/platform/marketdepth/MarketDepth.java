@@ -94,14 +94,13 @@ public class MarketDepth {
     }
 
 
-
     public void update() {
         time = System.currentTimeMillis();
     }
 
     synchronized public void update(int position, int operation, int side, double price, int size) {
         time = System.currentTimeMillis();
-        List<MarketDepthItem> items = (side == 1)? bids : asks;
+        List<MarketDepthItem> items = (side == 1) ? bids : asks;
         switch (operation) {
             case 0:// insert
                 items.add(position, new MarketDepthItem(size, price));

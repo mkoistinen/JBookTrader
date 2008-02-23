@@ -73,7 +73,7 @@ public class StrategyPerformanceChart {
     }
 
     private void setTimeline() {
-        int timeLineType = timeLineCombo == null? 0 : timeLineCombo.getSelectedIndex();
+        int timeLineType = timeLineCombo == null ? 0 : timeLineCombo.getSelectedIndex();
         MarketBook marketBook = strategy.getMarketBook();
         MarketTimeLine mtl = new MarketTimeLine(marketBook);
         SegmentedTimeline segmentedTimeline = (timeLineType == 0) ? mtl.getAllHours() : mtl.getNormalHours();
@@ -81,7 +81,7 @@ public class StrategyPerformanceChart {
     }
 
     private void setTimeZone() {
-        int timeZoneType = timeZoneCombo == null? 0 : timeZoneCombo.getSelectedIndex();
+        int timeZoneType = timeZoneCombo == null ? 0 : timeZoneCombo.getSelectedIndex();
         TimeZone tz = null;
 
         switch (timeZoneType) {
@@ -113,15 +113,15 @@ public class StrategyPerformanceChart {
         chartOptionsPanel.setBorder(border);
 
         JLabel chartTypeLabel = new JLabel("Chart Type:", JLabel.TRAILING);
-        chartTypeCombo = new JComboBox(new String[] {"Bid/Ask"});
+        chartTypeCombo = new JComboBox(new String[]{"Bid/Ask"});
         chartTypeLabel.setLabelFor(chartTypeCombo);
 
         JLabel timeLineLabel = new JLabel("Timeline:", JLabel.TRAILING);
-        timeLineCombo = new JComboBox(new String[] {"All Hours", "Trading Hours"});
+        timeLineCombo = new JComboBox(new String[]{"All Hours", "Trading Hours"});
         timeLineLabel.setLabelFor(timeLineCombo);
 
         JLabel timeZoneLabel = new JLabel("Time Zone:", JLabel.TRAILING);
-        timeZoneCombo = new JComboBox(new String[] {"Exchange", "Local"});
+        timeZoneCombo = new JComboBox(new String[]{"Exchange", "Local"});
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
         tradesVisibilityCheck = new JCheckBox("Show trades");
@@ -390,7 +390,7 @@ public class StrategyPerformanceChart {
                 pricePlot.setDataset(1, tsCollection);
                 pricePlot.setRenderer(1, new StandardXYItemRenderer());
             } else {
-                String collectionName = (subChart == -1)? "P&L" : "Indicators";
+                String collectionName = (subChart == -1) ? "P&L" : "Indicators";
                 NumberAxis indicatorAxis = new NumberAxis(collectionName);
                 indicatorAxis.setAutoRangeIncludesZero(false);
                 FastXYPlot plot = new FastXYPlot(tsCollection, dateAxis, indicatorAxis, renderer);

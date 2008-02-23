@@ -42,7 +42,7 @@ public class StrategyOptimizerRunner implements Runnable {
         nf2 = NumberFormat.getNumberInstance();
         nf2.setMaximumFractionDigits(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
-        Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
+        Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
     }
 
@@ -131,7 +131,6 @@ public class StrategyOptimizerRunner implements Runnable {
 
             boolean allTasksAssigned = false;
             cancelled = false;
-
 
 
             tasks = new LinkedList<StrategyParams>();

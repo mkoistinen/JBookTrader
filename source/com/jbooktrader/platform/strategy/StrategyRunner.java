@@ -53,7 +53,7 @@ public class StrategyRunner implements Runnable {
 
             if (!marketDepth.isValid())
                 continue;
-            
+
             while (System.currentTimeMillis() - marketDepth.getTime() < 5) {
                 Thread.sleep(5);
             }

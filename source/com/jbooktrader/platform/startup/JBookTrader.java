@@ -11,7 +11,6 @@ import java.nio.channels.FileChannel;
 
 
 /**
- *
  * Application starter.
  */
 public class JBookTrader {

@@ -73,7 +73,6 @@ public abstract class Strategy {
         params = new StrategyParams();
 
 
-
         marketDepth = new MarketDepth();
         marketBook = new MarketBook();
 

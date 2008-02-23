@@ -58,6 +58,6 @@ public class TableDataModel extends AbstractTableModel {
     }
 
     public int getColumnCount() {
-        return (schema == null)? 0 : schema.length;
+        return (schema == null) ? 0 : schema.length;
     }
 }

@@ -35,7 +35,7 @@ public class TraderAssistant {
 
         PropertiesHolder properties = PropertiesHolder.getInstance();
         boolean isAdvisorAccountUsed = Boolean.valueOf(properties.getProperty("connection.use.advisor.account"));
-        advisorAccountID = (isAdvisorAccountUsed)? properties.getProperty("connection.advisor.account.id") : "";
+        advisorAccountID = (isAdvisorAccountUsed) ? properties.getProperty("connection.advisor.account.id") : "";
 
         host = properties.getProperty("connection.host");
         port = Integer.valueOf(properties.getProperty("connection.port"));
@@ -131,7 +131,7 @@ public class TraderAssistant {
                 MarketDepth md = strategy.getMarketBook().getLastMarketDepth();
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
-                execution.m_price = order.m_action.equalsIgnoreCase("BUY")? md.getBestAsk() : md.getBestBid();
+                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getBestAsk() : md.getBestBid();
                 eventReport.report(msg);
                 trader.execDetails(orderID, contract, execution);
             }

@@ -221,14 +221,14 @@ public class OptimizerDialog extends JDialog {
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
         JLabel optimizationMethodLabel = new JLabel("Optimization method: ");
-        JComboBox optimizationMethodCombo = new JComboBox(new String[] {"Brute force"});
+        JComboBox optimizationMethodCombo = new JComboBox(new String[]{"Brute force"});
         optimizationMethodCombo.setMaximumSize(new Dimension(150, 20));
         optimizationMethodLabel.setLabelFor(optimizationMethodCombo);
         optimizationOptionsPanel.add(optimizationMethodLabel);
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[] {"Highest profit factor", "Highest P&L", "Lowest max drawdown"};
+        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown"};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaCombo.setMaximumSize(new Dimension(150, 20));
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);

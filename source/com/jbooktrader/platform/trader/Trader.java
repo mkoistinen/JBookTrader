@@ -7,7 +7,6 @@ import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 /**

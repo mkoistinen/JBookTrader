@@ -14,7 +14,7 @@ public class ParamTableModel extends TableDataModel {
 
     @Override
     public Class<?> getColumnClass(int column) {
-        return column == 0? String.class : Double.class;
+        return column == 0 ? String.class : Double.class;
     }
 
     @Override
