@@ -218,7 +218,8 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         columnModel.getColumn(PF.ordinal()).setCellRenderer(nr2);
 
         // Make some columns wider than the rest, so that the info fits in.
-        columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(180);
+        columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(150);
+        columnModel.getColumn(MarketDepth.ordinal()).setPreferredWidth(100);
         tradingScroll.getViewport().add(tradingTable);
 
         Image appIcon = Toolkit.getDefaultToolkit().getImage(getImageURL("JBookTrader.png"));
