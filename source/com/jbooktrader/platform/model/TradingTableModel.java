@@ -15,7 +15,7 @@ public class TradingTableModel extends TableDataModel {
     // inner class to represent table schema
     public enum Column {
         Strategy("Strategy", String.class),
-        Depth("Depth", String.class),
+        MarketDepth("Market Depth", String.class),
         Bid("Bid", Double.class),
         Ask("Ask", Double.class),
         Position("Position", Integer.class),
@@ -97,7 +97,7 @@ public class TradingTableModel extends TableDataModel {
         if (row >= 0) {
             MarketDepth marketDepth = strategy.getMarketBook().getLastMarketDepth();
             if (marketDepth != null) {
-                setValueAt(marketDepth.toShortString(), row, Column.Depth.ordinal());
+                setValueAt(marketDepth.toShortString(), row, Column.MarketDepth.ordinal());
                 setValueAt(marketDepth.getBestBid(), row, Column.Bid.ordinal());
                 setValueAt(marketDepth.getBestAsk(), row, Column.Ask.ordinal());
             }
