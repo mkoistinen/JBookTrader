@@ -78,8 +78,10 @@ public abstract class Strategy {
 
         nf2 = (DecimalFormat) NumberFormat.getNumberInstance();
         nf2.setMaximumFractionDigits(2);
+        nf2.setGroupingUsed(false);
         nf5 = (DecimalFormat) NumberFormat.getNumberInstance();
         nf5.setMaximumFractionDigits(5);
+        nf5.setGroupingUsed(false);
 
         eventReport = Dispatcher.getReporter();
     }
@@ -130,13 +132,13 @@ public abstract class Strategy {
         strategyReportColumns.clear();
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
         strategyReportColumns.add(positionManager.getTrades());
-        strategyReportColumns.add(marketDepth.getBestBid());
-        strategyReportColumns.add(marketDepth.getBestAsk());
+        strategyReportColumns.add(nf5.format(marketDepth.getBestBid()));
+        strategyReportColumns.add(nf5.format(marketDepth.getBestAsk()));
         strategyReportColumns.add(positionManager.getPosition());
-        strategyReportColumns.add(positionManager.getAvgFillPrice());
-        strategyReportColumns.add(positionManager.getCommission());
-        strategyReportColumns.add(nf5.format(positionManager.getProfitAndLoss()));
-        strategyReportColumns.add(nf5.format(positionManager.getTotalProfitAndLoss()));
+        strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
+        strategyReportColumns.add(nf2.format(positionManager.getCommission()));
+        strategyReportColumns.add(nf2.format(positionManager.getProfitAndLoss()));
+        strategyReportColumns.add(nf2.format(positionManager.getTotalProfitAndLoss()));
 
         for (ChartableIndicator chartableIndicator : indicators) {
             String formattedValue = NOT_APPLICABLE;
