@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
-import com.jbooktrader.indicator.MarketDepthRatio;
+import com.jbooktrader.indicator.DepthBalance;
 import com.jbooktrader.platform.indicator.Indicator;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.StrategyParams;
@@ -15,7 +15,7 @@ import com.jbooktrader.platform.util.ContractFactory;
 public class StockFlipper extends Strategy {
 
     // Technical indicators
-    private final Indicator marketDepthRatioInd;
+    private final Indicator depthBalanceInd;
 
     // Strategy parameters names
     private static final String ENTRY = "Entry";
@@ -31,7 +31,7 @@ public class StockFlipper extends Strategy {
         Contract contract = ContractFactory.makeStockContract("AAPL", "SMART");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("0:05", "23:55", "America/New_York");
-        int multiplier = 1;// contract multiplier
+        int multiplier = 1; // contract multiplier
         double commissionRate = 0.005; // commission per contract
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);
 
@@ -39,15 +39,15 @@ public class StockFlipper extends Strategy {
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 2.75);
-        exit = params.get(EXIT, 1.75);
+        entry = params.get(ENTRY, 77);
+        exit = params.get(EXIT, 70);
 
         // Create technical indicators
-        marketDepthRatioInd = new MarketDepthRatio(marketBook);
+        depthBalanceInd = new DepthBalance(marketBook);
 
         // Specify the title and the chart number for each indicator
         // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
-        addIndicator("Market Depth Ratio", marketDepthRatioInd, 1);
+        addIndicator("Depth Balance", depthBalanceInd, 1);
     }
 
     /**
@@ -57,9 +57,8 @@ public class StockFlipper extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 1, 6, 1);
-        params.add(EXIT, 1, 6, 1);
-        params.add(WEIGHT_FACTOR, 1, 1.5, 0.1);
+        params.add(ENTRY, 50, 100, 1);
+        params.add(EXIT, 0, 100, 1);
         return params;
     }
 
@@ -70,14 +69,14 @@ public class StockFlipper extends Strategy {
     @Override
     public void onBookChange() {
         int currentPosition = getPositionManager().getPosition();
-        double ratio = marketDepthRatioInd.getValue();
-        if (ratio >= entry) {
+        double depthBalance = depthBalanceInd.getValue();
+        if (depthBalance >= entry) {
             setPosition(1);
-        } else if (ratio <= (1.0 / entry)) {
+        } else if (depthBalance <= -entry) {
             setPosition(-1);
         } else {
-            boolean target = (currentPosition > 0 && ratio <= (1.0 / exit));
-            target = target || (currentPosition < 0 && ratio >= exit);
+            boolean target = (currentPosition > 0 && depthBalance <= -exit);
+            target = target || (currentPosition < 0 && depthBalance >= exit);
             if (target) {
                 setPosition(0);
             }

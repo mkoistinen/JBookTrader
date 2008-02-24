@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
-import com.jbooktrader.indicator.MarketDepthRatio;
+import com.jbooktrader.indicator.DepthBalance;
 import com.jbooktrader.platform.indicator.Indicator;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.StrategyParams;
@@ -15,14 +15,13 @@ import com.jbooktrader.platform.util.ContractFactory;
 public class Hoper extends Strategy {
 
     // Technical indicators
-    private final Indicator marketDepthRatioInd;
+    private final Indicator depthBalanceInd;
 
     // Strategy parameters names
     private static final String ENTRY = "Entry";
-    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final double entry, exit;
+    private final double entry;
 
 
     public Hoper(StrategyParams params) throws JBookTraderException {
@@ -30,23 +29,22 @@ public class Hoper extends Strategy {
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 50;// contract multiplier
-        double commissionRate = 2.4;// commission per contract
+        int multiplier = 50; // contract multiplier
+        double commissionRate = 2.4; // commission per contract
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 2);
-        exit = params.get(EXIT, 2);
+        entry = params.get(ENTRY, 66);
 
         // Create technical indicators
-        marketDepthRatioInd = new MarketDepthRatio(marketBook);
+        depthBalanceInd = new DepthBalance(marketBook);
 
         // Specify the title and the chart number for each indicator
         // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
-        addIndicator("Market Depth Ratio", marketDepthRatioInd, 1);
+        addIndicator("Depth Balance", depthBalanceInd, 1);
     }
 
     /**
@@ -56,8 +54,7 @@ public class Hoper extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 1, 6, 1);
-        params.add(EXIT, 1, 6, 1);
+        params.add(ENTRY, 50, 100, 1);
         return params;
     }
 
@@ -67,18 +64,11 @@ public class Hoper extends Strategy {
      */
     @Override
     public void onBookChange() {
-        int currentPosition = getPositionManager().getPosition();
-        double ratio = marketDepthRatioInd.getValue();
-        if (ratio >= entry) {
+        double depthBalance = depthBalanceInd.getValue();
+        if (depthBalance >= entry) {
             setPosition(1);
-        } else if (ratio <= (1.0 / entry)) {
+        } else if (depthBalance <= -entry) {
             setPosition(-1);
-        } else {
-            boolean target = (currentPosition > 0 && ratio <= (1.0 / exit));
-            target = target || (currentPosition < 0 && ratio >= exit);
-            if (target) {
-                setPosition(0);
-            }
         }
     }
 }
