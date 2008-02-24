@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
 
-    private static final int STEPS = 10; //todo: needs to be adjusted: for more accurate zoom-in/out
+    private static final int STEPS = 10000; //todo: needs to be adjusted for more accurate zoom-in/out
     private final DateAxis dateAxis;
     private final Range range;
     private double rangeMin, dateRange, ratio;
