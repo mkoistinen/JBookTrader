@@ -18,9 +18,9 @@ import java.io.IOException;
 
 public class StrategyRunner implements Runnable {
     private final Trader trader;
-    protected final Strategy strategy;
+    private final Strategy strategy;
     protected final Report eventReport;
-    protected final PositionManager positionManager;
+    private final PositionManager positionManager;
 
     public StrategyRunner(Strategy strategy) throws IOException, JBookTraderException {
         this.strategy = strategy;
@@ -38,7 +38,7 @@ public class StrategyRunner implements Runnable {
         eventReport.report(strategy.getName() + ": strategy started");
     }
 
-    public void execute() throws InterruptedException, JBookTraderException {
+    public void execute() throws InterruptedException {
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         TraderAssistant traderAssistant = trader.getAssistant();

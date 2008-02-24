@@ -166,7 +166,7 @@ public class TraderAssistant {
         this.isConnected = isConnected;
     }
 
-    public boolean checkAccountType() throws JBookTraderException {
+    private boolean checkAccountType() throws JBookTraderException {
         boolean isAccepted = true;
         socket.reqAccountUpdates(true, advisorAccountID);
 

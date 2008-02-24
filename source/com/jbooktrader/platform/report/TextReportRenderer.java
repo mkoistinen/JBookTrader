@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.report;
 
 public class TextReportRenderer implements ReportRenderer {
+    private static final String LINE_SEP = System.getProperty("line.separator");
 
     public String getFieldStart() {
         return "";
@@ -27,7 +28,7 @@ public class TextReportRenderer implements ReportRenderer {
     }
 
     public String getFieldBreak() {
-        return "\n";
+        return LINE_SEP;
     }
 
     public String getRootStart() {

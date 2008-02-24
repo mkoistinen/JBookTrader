@@ -2,12 +2,11 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.BackTester;
 import com.jbooktrader.platform.marketdepth.MarketDepth;
-import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.Dispatcher;
 import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.MessageDialog;
 
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -22,7 +21,7 @@ public class OptimizerWorker implements Runnable {
     private final LinkedList<StrategyParams> tasks;
     private final List<MarketDepth> marketDepths;
 
-    public OptimizerWorker(List<MarketDepth> marketDepths, Constructor<?> strategyConstructor, LinkedList<StrategyParams> tasks, List<Result> results, int minTrades, CountDownLatch remainingTasks) throws IOException, JBookTraderException {
+    public OptimizerWorker(List<MarketDepth> marketDepths, Constructor<?> strategyConstructor, LinkedList<StrategyParams> tasks, List<Result> results, int minTrades, CountDownLatch remainingTasks) {
         this.marketDepths = marketDepths;
         this.results = results;
         this.minTrades = minTrades;

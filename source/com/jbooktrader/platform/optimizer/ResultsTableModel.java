@@ -11,8 +11,8 @@ import java.util.*;
  * Optimization results table model
  */
 public class ResultsTableModel extends TableDataModel {
-    private static NumberRenderer nr2 = new NumberRenderer(2);
-    private static NumberRenderer nr0 = new NumberRenderer(0);
+    private static final NumberRenderer nr2 = new NumberRenderer(2);
+    private static final NumberRenderer nr0 = new NumberRenderer(0);
 
     // inner class to represent table schema
     public enum Column {

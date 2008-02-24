@@ -219,7 +219,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         NumberRenderer nr0 = new NumberRenderer(0);
         columnModel.getColumn(KellyCriterion.ordinal()).setCellRenderer(nr0);
 
-
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(150);
         columnModel.getColumn(MarketDepth.ordinal()).setPreferredWidth(100);

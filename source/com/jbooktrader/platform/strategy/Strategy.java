@@ -28,7 +28,7 @@ public abstract class Strategy {
     private int Id;
     private final DecimalFormat nf2, nf5;
     private Report strategyReport;
-    private Report eventReport;
+    private final Report eventReport;
     private final List<Object> strategyReportColumns = new ArrayList<Object>();
 
     private boolean isActive;
@@ -56,7 +56,7 @@ public abstract class Strategy {
      */
     public abstract StrategyParams initParams();
 
-    public Strategy() throws JBookTraderException {
+    public Strategy() {
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
         strategyReportHeaders.add("Trade #");

@@ -12,17 +12,21 @@ import java.util.*;
  * Position manager keeps track of current positions and P&L.
  */
 public class PositionManager {
-    private int multiplier, position, trades, profitableTrades, unprofitableTrades;
-    private double profitAndLoss, totalProfitAndLoss, avgFillPrice;
-    private double grossProfit, grossLoss, profitFactor, peakTotalProfitAndLoss, maxDrawdown;
-    private double totalBought, totalSold, commissionRate, commission, totalCommission;
-    private double kellyCriterion;
+    private final int multiplier;
+    private final double commissionRate;
     private final List<Position> positionsHistory;
     private final Strategy strategy;
-    private volatile boolean orderExecutionPending;
     private final Report eventReport;
     private final ProfitAndLossHistory profitAndLossHistory;
     private final TraderAssistant traderAssistant;
+
+    private int position, trades, profitableTrades, unprofitableTrades;
+    private double profitAndLoss, totalProfitAndLoss, avgFillPrice;
+    private double grossProfit, grossLoss, profitFactor, peakTotalProfitAndLoss, maxDrawdown;
+    private double totalBought, totalSold;
+    private double commission, totalCommission;
+    private double kellyCriterion;
+    private volatile boolean orderExecutionPending;
 
 
     public PositionManager(Strategy strategy, int multiplier, double commissionRate) throws JBookTraderException {

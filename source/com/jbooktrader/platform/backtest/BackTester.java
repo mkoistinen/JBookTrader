@@ -8,7 +8,6 @@ import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -17,7 +16,7 @@ public class BackTester {
     private final Strategy strategy;
     private final List<MarketDepth> marketDepths;
 
-    public BackTester(Strategy strategy, List<MarketDepth> marketDepths) throws IOException, JBookTraderException {
+    public BackTester(Strategy strategy, List<MarketDepth> marketDepths) {
         this.strategy = strategy;
         this.marketDepths = marketDepths;
     }
