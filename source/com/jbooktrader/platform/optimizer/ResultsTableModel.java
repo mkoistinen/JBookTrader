@@ -2,55 +2,52 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.TableDataModel;
 import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.util.NumberRenderer;
 
+import javax.swing.table.TableCellRenderer;
 import java.util.*;
 
 /**
  * Optimization results table model
- * todo: needs refactoring, as it's too whacky
  */
 public class ResultsTableModel extends TableDataModel {
+    private static NumberRenderer nr2 = new NumberRenderer(2);
+
     // inner class to represent table schema
     public enum Column {
-        PL("P&L", Double.class),
-        MaxDD("Max DD", Double.class),
-        Trades("Trades", Integer.class),
-        PF("Profit Factor", Double.class);
+        PL("P&L", nr2),
+        MaxDD("Max DD", nr2),
+        Trades("Trades", nr2),
+        PF("Profit Factor", nr2);
 
-        private final String columnName;
-        //private final Class<?> columnClass;
+        private final String name;
+        private final TableCellRenderer renderer;
 
-        Column(String columnName, Class<?> columnClass) {
-            this.columnName = columnName;
-            //this.columnClass = columnClass;
+        Column(String name, TableCellRenderer renderer) {
+            this.name = name;
+            this.renderer = renderer;
         }
 
-        public String getColumnName() {
-            return columnName;
+        public String getName() {
+            return name;
+        }
+
+        public TableCellRenderer getRenderer() {
+            return renderer;
         }
     }
 
-    public ResultsTableModel() {
-        Column[] columns = Column.values();
-        ArrayList<String> allColumns = new ArrayList<String>();
-        for (Column column : columns) {
-            allColumns.add(column.columnName);
-        }
-
-        setSchema(allColumns.toArray(new String[columns.length]));
-    }
-
-    public void updateSchema(Strategy strategy) {
-        List<String> paramNames = new ArrayList<String>();
+    public ResultsTableModel(Strategy strategy) {
+        List<String> columnNames = new ArrayList<String>();
         for (StrategyParam param : strategy.getParams().getAll()) {
-            paramNames.add(param.getName());
+            columnNames.add(param.getName());
         }
 
-        for (Column column : Column.values()) {
-            paramNames.add(column.getColumnName());
-        }
-
-        setSchema(paramNames.toArray(new String[paramNames.size()]));
+        columnNames.add(Column.PL.getName());
+        columnNames.add(Column.MaxDD.getName());
+        columnNames.add(Column.Trades.getName());
+        columnNames.add(Column.PF.getName());
+        setSchema(columnNames.toArray(new String[columnNames.size()]));
     }
 
 
@@ -70,7 +67,6 @@ public class ResultsTableModel extends TableDataModel {
     }
 
     public synchronized void setResults(List<Result> results) {
-
         removeAllData();
 
         for (Result result : results) {
@@ -83,11 +79,10 @@ public class ResultsTableModel extends TableDataModel {
                 item[++index] = param.getValue();
             }
 
-            int size = params.size();
-            item[Column.PL.ordinal() + size] = result.getTotalProfit();
-            item[Column.MaxDD.ordinal() + size] = result.getMaxDrawdown();
-            item[Column.Trades.ordinal() + size] = result.getTrades();
-            item[Column.PF.ordinal() + size] = result.getProfitFactor();
+            item[++index] = result.getTotalProfit();
+            item[++index] = result.getMaxDrawdown();
+            item[++index] = result.getTrades();
+            item[++index] = result.getProfitFactor();
 
             addRow(item);
         }

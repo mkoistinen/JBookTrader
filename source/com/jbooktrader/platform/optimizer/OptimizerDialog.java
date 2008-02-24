@@ -7,6 +7,7 @@ import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -29,6 +30,7 @@ public class OptimizerDialog extends JDialog {
     private JComboBox selectionCriteriaCombo;
     private JLabel progressLabel;
     private JProgressBar progressBar;
+    private JTable resultsTable;
 
     private ParamTableModel paramTableModel;
     private ResultsTableModel resultsTableModel;
@@ -261,8 +263,7 @@ public class OptimizerDialog extends JDialog {
         centerPanel.add(resultsScrollPane);
         SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 5, 8, 8);
 
-        resultsTableModel = new ResultsTableModel();
-        JTable resultsTable = new JTable(resultsTableModel);
+        resultsTable = new JTable();
         resultsScrollPane.getViewport().add(resultsTable);
 
         progressLabel = new JLabel();
@@ -313,7 +314,17 @@ public class OptimizerDialog extends JDialog {
             strategy = (Strategy) ct.newInstance(new StrategyParams());
             strategy.setParams(strategy.initParams());
             paramTableModel.setParams(strategy.getParams());
-            resultsTableModel.updateSchema(strategy);
+            resultsTableModel = new ResultsTableModel(strategy);
+            resultsTable.setModel(resultsTableModel);
+
+            // set custom column renderers
+            int params = strategy.getParams().size();
+            TableColumnModel columnModel = resultsTable.getColumnModel();
+            for (ResultsTableModel.Column column : ResultsTableModel.Column.values()) {
+                int columnIndex = column.ordinal() + params;
+                TableCellRenderer renderer = column.getRenderer();
+                columnModel.getColumn(columnIndex).setCellRenderer(renderer);
+            }
         } catch (Exception e) {
             MessageDialog.showError(this, e.getMessage());
         }
