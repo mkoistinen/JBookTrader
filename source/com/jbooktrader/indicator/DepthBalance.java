@@ -6,9 +6,9 @@ import com.jbooktrader.platform.marketdepth.*;
 /**
  *
  */
-public class MarketDepthRatio extends Indicator {
+public class DepthBalance extends Indicator {
 
-    public MarketDepthRatio(MarketBook marketBook) {
+    public DepthBalance(MarketBook marketBook) {
         super(marketBook);
     }
 
@@ -25,7 +25,15 @@ public class MarketDepthRatio extends Indicator {
             asks += item.getSize();
         }
 
-        value = ((double) bids) / asks;
+        double totalDepth = (bids + asks);
+
+        if (bids > asks) {
+            value = bids / totalDepth;
+        } else {
+            value = -(asks / totalDepth);
+        }
+
+        value *= 100;
         return value;
     }
 }
