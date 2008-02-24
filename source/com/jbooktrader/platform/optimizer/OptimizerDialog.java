@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class OptimizerDialog extends JDialog {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private static final Dimension MIN_SIZE = new Dimension(800, 600);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(700, 600);// minimum frame size
     private static final String optimizerDataFileNamePref = "optimizer.dataFileName";
     private static final String optimizerMinTradePref = "optimizer.minTrades";
     private static final String optimizerSortBy = "optimizer.sortBy";

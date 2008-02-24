@@ -228,7 +228,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         setIconImage(appIcon);
 
         add(tradingPanel, BorderLayout.CENTER);
-        setPreferredSize(new Dimension(800, 250));
+        setPreferredSize(new Dimension(700, 250));
         setTitle(JBookTrader.APP_NAME);
         pack();
     }
