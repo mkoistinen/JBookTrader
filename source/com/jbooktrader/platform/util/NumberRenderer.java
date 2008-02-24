@@ -4,10 +4,10 @@ import javax.swing.table.DefaultTableCellRenderer;
 import java.text.*;
 
 
-public class DoubleRenderer extends DefaultTableCellRenderer {
+public class NumberRenderer extends DefaultTableCellRenderer {
     private final DecimalFormat df;
 
-    public DoubleRenderer(int precision) {
+    public NumberRenderer(int precision) {
         df = (DecimalFormat) NumberFormat.getNumberInstance();
         df.setMaximumFractionDigits(precision);
         df.setGroupingUsed(false);
@@ -18,7 +18,16 @@ public class DoubleRenderer extends DefaultTableCellRenderer {
     public void setValue(Object value) {
         String text = "";
         if (value != null) {
-            if (!Double.isInfinite((Double) value) && !Double.isNaN((Double) value)) {
+            boolean validNumber;
+            boolean isDouble = (value.getClass() == Double.class);
+            if (isDouble) {
+                Double d = (Double) value;
+                validNumber = !(Double.isInfinite(d) || Double.isNaN(d));
+            } else {
+                validNumber = true;
+            }
+
+            if (validNumber) {
                 text = df.format(value);
             }
         }
