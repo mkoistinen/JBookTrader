@@ -20,7 +20,6 @@ public class StockFlipper extends Strategy {
     // Strategy parameters names
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
-    private static final String WEIGHT_FACTOR = "Weight Factor";
 
     // Strategy parameters values
     private final double entry, exit;
@@ -57,8 +56,8 @@ public class StockFlipper extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 50, 100, 1);
-        params.add(EXIT, 0, 100, 1);
+        params.add(ENTRY, 50, 85, 1);
+        params.add(EXIT, 50, 85, 1);
         return params;
     }
 

@@ -56,8 +56,8 @@ public class Balancer extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 50, 100, 1);
-        params.add(EXIT, 0, 100, 1);
+        params.add(ENTRY, 50, 85, 1);
+        params.add(EXIT, 50, 85, 1);
         return params;
     }
 
