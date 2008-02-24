@@ -14,8 +14,9 @@ import java.util.*;
 public class PositionManager {
     private int multiplier, position, trades, profitableTrades, unprofitableTrades;
     private double profitAndLoss, totalProfitAndLoss, avgFillPrice;
-    private double grossProfit, grossLoss, peakTotalProfitAndLoss, maxDrawdown;
+    private double grossProfit, grossLoss, profitFactor, peakTotalProfitAndLoss, maxDrawdown;
     private double totalBought, totalSold, commissionRate, commission, totalCommission;
+    private double kellyCriterion;
     private final List<Position> positionsHistory;
     private final Strategy strategy;
     private volatile boolean orderExecutionPending;
@@ -42,12 +43,8 @@ public class PositionManager {
         return trades;
     }
 
-    public int getPercentProfitable() {
-        return (int) (((double) profitableTrades / (unprofitableTrades + profitableTrades)) * 100);
-    }
-
     public double getProfitFactor() {
-        return Math.abs(grossProfit / grossLoss);
+        return profitFactor;
     }
 
     public double getMaxDrawdown() {
@@ -80,6 +77,10 @@ public class PositionManager {
 
     public ProfitAndLossHistory getProfitAndLossHistory() {
         return profitAndLossHistory;
+    }
+
+    public double getKellyCriterion() {
+        return kellyCriterion;
     }
 
     public synchronized void update(OpenOrder openOrder) {
@@ -118,13 +119,15 @@ public class PositionManager {
 
         profitAndLoss = totalProfitAndLoss - previousProfitandLoss;
 
-        if (profitAndLoss > 0) {
+        if (profitAndLoss >= 0) {
             profitableTrades++;
             grossProfit += profitAndLoss;
         } else {
             unprofitableTrades++;
             grossLoss += profitAndLoss;
         }
+
+        profitFactor = Math.abs(grossProfit / grossLoss);
 
         if (totalProfitAndLoss > peakTotalProfitAndLoss) {
             peakTotalProfitAndLoss = totalProfitAndLoss;
@@ -133,6 +136,21 @@ public class PositionManager {
         double drawdown = peakTotalProfitAndLoss - totalProfitAndLoss;
         if (drawdown > maxDrawdown) {
             maxDrawdown = drawdown;
+        }
+
+        if (profitableTrades > 0 && unprofitableTrades > 0) {
+            double aveProfit = grossProfit / profitableTrades;
+            double aveLoss = Math.abs(grossLoss) / unprofitableTrades;
+            double winLossRatio = aveProfit / aveLoss;
+            double probabilityOfWin = (double) profitableTrades / trades;
+            double probabilityOfLoss = 1 - probabilityOfWin;
+            kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
+            kellyCriterion *= 100;
+            if (kellyCriterion < 0) {
+                kellyCriterion = 0;
+            }
+        } else {
+            kellyCriterion = 0;
         }
 
         long time = strategy.getTime();

@@ -7,7 +7,7 @@ import java.util.Comparator;
  */
 public class ResultComparator implements Comparator<Result> {
     enum SortKey {
-        TOTAL_PROFIT, PROFIT_FACTOR, DRAWDOWN, TRADES
+        TOTAL_PROFIT, PROFIT_FACTOR, DRAWDOWN, TRADES, KELLY_CRITERION
     }
 
     private final SortKey sortKey;
@@ -36,6 +36,11 @@ public class ResultComparator implements Comparator<Result> {
                 // lowest to highest
                 res = ((Integer) r1.getTrades()).compareTo(r2.getTrades());
                 break;
+            case KELLY_CRITERION:
+                // highest to lowest
+                res = ((Double) r2.getKellyCriterion()).compareTo(r1.getKellyCriterion());
+                break;
+
         }
 
         return res;

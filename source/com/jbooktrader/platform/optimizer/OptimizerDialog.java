@@ -230,7 +230,7 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown"};
+        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest Kelly Criterion"};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaCombo.setMaximumSize(new Dimension(150, 20));
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
@@ -357,6 +357,10 @@ public class OptimizerDialog extends JDialog {
             case 2:
                 sortCriteria = DRAWDOWN;
                 break;
+            case 3:
+                sortCriteria = KELLY_CRITERION;
+                break;
+
         }
 
         return sortCriteria;

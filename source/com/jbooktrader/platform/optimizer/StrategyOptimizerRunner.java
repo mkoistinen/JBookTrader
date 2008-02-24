@@ -78,6 +78,7 @@ public class StrategyOptimizerRunner implements Runnable {
         otpimizerReportHeaders.add("Max Drawdown");
         otpimizerReportHeaders.add("Trades");
         otpimizerReportHeaders.add("Profit Factor");
+        otpimizerReportHeaders.add("Kelly Criterion");
         optimizerReport.report(otpimizerReportHeaders);
 
         for (Result result : results) {
@@ -92,6 +93,7 @@ public class StrategyOptimizerRunner implements Runnable {
             columns.add(nf2.format(result.getMaxDrawdown()));
             columns.add(nf2.format(result.getTrades()));
             columns.add(nf2.format(result.getProfitFactor()));
+            columns.add(nf2.format(result.getKellyCriterion()));
 
             optimizerReport.report(columns);
         }

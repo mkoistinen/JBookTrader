@@ -22,7 +22,8 @@ public class TradingTableModel extends TableDataModel {
         Trades("Trades", Integer.class),
         PL("P&L", Double.class),
         MaxDD("Max DD", Double.class),
-        PF("PF", Double.class);
+        PF("PF", Double.class),
+        KellyCriterion("KC", Double.class);
 
         private final String columnName;
         private final Class<?> columnClass;
@@ -107,6 +108,7 @@ public class TradingTableModel extends TableDataModel {
             setValueAt(positionManager.getTotalProfitAndLoss(), row, Column.PL.ordinal());
             setValueAt(positionManager.getMaxDrawdown(), row, Column.MaxDD.ordinal());
             setValueAt(positionManager.getProfitFactor(), row, Column.PF.ordinal());
+            setValueAt(positionManager.getKellyCriterion(), row, Column.KellyCriterion.ordinal());
         }
     }
 

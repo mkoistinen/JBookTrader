@@ -12,13 +12,15 @@ import java.util.*;
  */
 public class ResultsTableModel extends TableDataModel {
     private static NumberRenderer nr2 = new NumberRenderer(2);
+    private static NumberRenderer nr0 = new NumberRenderer(0);
 
     // inner class to represent table schema
     public enum Column {
         PL("P&L", nr2),
         MaxDD("Max DD", nr2),
         Trades("Trades", nr2),
-        PF("Profit Factor", nr2);
+        PF("Profit Factor", nr2),
+        KellyCriterion("Kelly Criterion", nr0);
 
         private final String name;
         private final TableCellRenderer renderer;
@@ -43,10 +45,10 @@ public class ResultsTableModel extends TableDataModel {
             columnNames.add(param.getName());
         }
 
-        columnNames.add(Column.PL.getName());
-        columnNames.add(Column.MaxDD.getName());
-        columnNames.add(Column.Trades.getName());
-        columnNames.add(Column.PF.getName());
+        for (Column column : Column.values()) {
+            columnNames.add(column.getName());
+        }
+
         setSchema(columnNames.toArray(new String[columnNames.size()]));
     }
 
@@ -83,6 +85,7 @@ public class ResultsTableModel extends TableDataModel {
             item[++index] = result.getMaxDrawdown();
             item[++index] = result.getTrades();
             item[++index] = result.getProfitFactor();
+            item[++index] = result.getKellyCriterion();
 
             addRow(item);
         }

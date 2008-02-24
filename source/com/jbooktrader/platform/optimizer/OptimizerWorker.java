@@ -51,11 +51,7 @@ public class OptimizerWorker implements Runnable {
                 int trades = positionManager.getTrades();
 
                 if (trades >= minTrades) {
-                    double totalPL = positionManager.getTotalProfitAndLoss();
-                    double profitFactor = positionManager.getProfitFactor();
-                    double maxDrawdown = positionManager.getMaxDrawdown();
-
-                    Result result = new Result(params, totalPL, maxDrawdown, trades, profitFactor);
+                    Result result = new Result(params, positionManager);
                     synchronized (results) {
                         results.add(result);
                     }

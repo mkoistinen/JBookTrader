@@ -1,19 +1,22 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.position.PositionManager;
+
 /**
  * Optimization results table model.
  */
 public class Result {
-    private final double totalProfit, maxDrawdown, profitFactor;
+    private final double totalProfit, maxDrawdown, profitFactor, kellyCriterion;
     private final int trades;
     private final StrategyParams params;
 
-    public Result(StrategyParams params, double totalProfit, double maxDrawdown, int trades, double profitFactor) {
+    public Result(StrategyParams params, PositionManager positionManager) {
         this.params = params;
-        this.totalProfit = totalProfit;
-        this.maxDrawdown = maxDrawdown;
-        this.trades = trades;
-        this.profitFactor = profitFactor;
+        this.totalProfit = positionManager.getTotalProfitAndLoss();
+        this.maxDrawdown = positionManager.getMaxDrawdown();
+        this.trades = positionManager.getTrades();
+        this.profitFactor = positionManager.getProfitFactor();
+        this.kellyCriterion = positionManager.getKellyCriterion();
     }
 
     public StrategyParams getParams() {
@@ -35,4 +38,9 @@ public class Result {
     public double getProfitFactor() {
         return profitFactor;
     }
+
+    public double getKellyCriterion() {
+        return kellyCriterion;
+    }
+
 }
