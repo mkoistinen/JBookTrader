@@ -27,7 +27,7 @@ public class Foxy extends Strategy {
 
     public Foxy(StrategyParams params) throws JBookTraderException {
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
+        Contract contract = ContractFactory.makeFutureContract("EUR", "GLOBEX");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 50; // contract multiplier
