@@ -26,14 +26,8 @@ public class DepthBalance extends Indicator {
         }
 
         double totalDepth = (bids + asks);
+        value = 100. * (bids - asks) / totalDepth;
 
-        if (bids > asks) {
-            value = bids / totalDepth;
-        } else {
-            value = -(asks / totalDepth);
-        }
-
-        value *= 100;
         return value;
     }
 }
