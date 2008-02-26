@@ -242,7 +242,7 @@ public class OptimizerDialog extends JDialog {
             selectionCriteriaCombo.setSelectedItem(lastSortBy);
         }
 
-        JLabel minTradesLabel = new JLabel("Minimum trades for strategy inclusion: ");
+        JLabel minTradesLabel = new JLabel("Minimum trades: ");
         minTradesText = new JTextField("50");
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
