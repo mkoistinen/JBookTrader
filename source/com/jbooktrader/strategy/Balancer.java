@@ -38,8 +38,8 @@ public class Balancer extends Strategy {
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 77);
-        exit = params.get(EXIT, 70);
+        entry = params.get(ENTRY, 55);
+        exit = params.get(EXIT, 36);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -56,8 +56,8 @@ public class Balancer extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 50, 85, 1);
-        params.add(EXIT, 50, 85, 1);
+        params.add(ENTRY, 20, 70, 1);
+        params.add(EXIT, 10, 60, 1);
         return params;
     }
 
