@@ -37,9 +37,8 @@ public class MarketDepth {
         asks.clear();
     }
 
-    // todo: forex depth is sometimes less than 5, so this needs refactoring
     public boolean isValid() {
-        return bids.size() >= 5 && asks.size() >= 5;
+        return (!bids.isEmpty() && !asks.isEmpty());
     }
 
 
@@ -99,7 +98,7 @@ public class MarketDepth {
     }
 
     synchronized public void update(int position, int operation, int side, double price, int size) {
-        time = System.currentTimeMillis();
+        update();
         List<MarketDepthItem> items = (side == 1) ? bids : asks;
         switch (operation) {
             case 0:// insert
@@ -117,6 +116,4 @@ public class MarketDepth {
                 break;
         }
     }
-
-
 }

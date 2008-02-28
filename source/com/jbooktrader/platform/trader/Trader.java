@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketdepth.MarketDepth;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.Report;
@@ -99,6 +99,13 @@ public class Trader extends EWrapperAdapter {
                 traderAssistant.getStrategy(id).getMarketDepth().reset();
                 eventReport.report("Market depth data has been reset.");
             }
+
+            boolean isFeedBack = (errorCode == 200 || errorCode == 309);
+            if (isFeedBack) {
+                errorMsg = "IB reported: " + errorMsg;
+                Dispatcher.fireModelChanged(ModelListener.Event.ERROR, errorMsg);
+            }
+
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
@@ -109,13 +116,8 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void updateMktDepth(int strategyId, int position, int operation, int side, double price, int size) {
         try {
-            Strategy strategy = traderAssistant.getStrategy(strategyId);
-            MarketDepth marketDepth = strategy.getMarketDepth();
+            MarketDepth marketDepth = traderAssistant.getStrategy(strategyId).getMarketDepth();
             marketDepth.update(position, operation, side, price, size);
-            MarketBook marketBook = strategy.getMarketBook();
-            synchronized (marketBook) {
-                marketBook.notifyAll();
-            }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);

@@ -4,13 +4,13 @@ package com.jbooktrader.platform.backtest;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.PositionManager;
-import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 
 import java.util.List;
 
 /**
+ * This class is responsible for running the strategy against historical market data
  */
 public class BackTester {
     private final Strategy strategy;
@@ -22,7 +22,6 @@ public class BackTester {
     }
 
     public void execute() {
-        Report eventReport = Dispatcher.getReporter();
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
@@ -36,23 +35,17 @@ public class BackTester {
                 strategy.onBookChange();
             }
 
-            boolean canTrade = tradingSchedule.contains(instant);
-            if (!canTrade && (positionManager.getPosition() != 0)) {
-                canTrade = true;
-                strategy.setPosition(0); // force flat position
-                String msg = "End of trading interval. Closing current position.";
-                eventReport.report(strategy.getName() + ": " + msg);
+            if (!tradingSchedule.contains(instant)) {
+                strategy.closePosition();// force flat position
             }
 
-            if (canTrade) {
-                positionManager.trade();
-            }
+            positionManager.trade();
         }
 
         // go flat at the end of the test period to finalize the run
-        strategy.setPosition(0);
+        strategy.closePosition();
         positionManager.trade();
-        strategy.setIActive(false);
+        strategy.setIsActive(false);
         Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
     }
 

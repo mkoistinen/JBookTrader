@@ -34,6 +34,7 @@ public class MarketBook {
     synchronized public void addMarketDepth(MarketDepth marketDepth) {
         marketDepth = new MarketDepth(marketDepth);
         marketDepths.add(marketDepth);
+        notifyAll();
     }
 
     public void add(MarketDepth marketDepth) {

@@ -17,9 +17,10 @@ public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
     private final Properties properties = new Properties();
-    private final static int BOOK_DEPTH = 5;
-    private final static int COLUMNS = 22;// date, time, 5 bid sizes and prices, 5 ask sizes and prices
-    private long currentTime;
+    // Each line contains at least 6 columns: date, time, 1 bid size and price, 1 ask size and price
+    // If market is deeper than 1 bid and ask, the line will contain more columns
+    private final static int MIN_COLUMNS = 6;
+    private long previousTime;
     private SimpleDateFormat sdf;
 
     public List<MarketDepth> getMarketDepths() {
@@ -53,7 +54,7 @@ public class BackTestFileReader {
                 throw new JBookTraderException(msg);
             }
 
-            sdf = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
+            sdf = new SimpleDateFormat("MMddyy,HH:mm:ss");
             // Enforce strict interpretation of date and time formats
             sdf.setLenient(false);
             sdf.setTimeZone(tz);
@@ -72,7 +73,7 @@ public class BackTestFileReader {
                     MarketDepth marketDepth = toMarketDepth(line);
                     long time = marketDepth.getTime();
                     marketDepths.add(marketDepth);
-                    currentTime = time;
+                    previousTime = time;
                 }
             }
 
@@ -99,38 +100,48 @@ public class BackTestFileReader {
     }
 
     private MarketDepth toMarketDepth(String line) throws ParseException, JBookTraderException {
-        StringTokenizer st = new StringTokenizer(line, ",");
+        StringTokenizer st = new StringTokenizer(line, ",;");
 
         int tokenCount = st.countTokens();
-        if (tokenCount != COLUMNS) {
-            String msg = "The record should contain " + COLUMNS + " columns, but " + tokenCount + " columns have been counted";
+        if (tokenCount < MIN_COLUMNS) {
+            String msg = "The record should contain at least " + MIN_COLUMNS + " columns, but only " + tokenCount + " columns have been counted.";
             throw new JBookTraderException(msg);
         }
 
-        String dateToken = st.nextToken();
-        String timeToken = st.nextToken();
+        StringTokenizer typeTokenizer = new StringTokenizer(line, ";");
+        tokenCount = typeTokenizer.countTokens();
+        if (tokenCount != 3) {
+            String msg = "The record should contain 3" + " columns, but only " + tokenCount + " columns have been counted.";
+            throw new JBookTraderException(msg);
+        }
 
+
+        StringTokenizer dateTimeTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
+        String dateToken = dateTimeTokenizer.nextToken();
+        String timeToken = dateTimeTokenizer.nextToken();
         long time = sdf.parse(dateToken + "," + timeToken).getTime();
 
         LinkedList<MarketDepthItem> bids = new LinkedList<MarketDepthItem>();
         LinkedList<MarketDepthItem> asks = new LinkedList<MarketDepthItem>();
 
-        for (int itemNumber = 0; itemNumber < BOOK_DEPTH; itemNumber++) {
-            int size = Integer.parseInt(st.nextToken());
-            double price = Double.parseDouble(st.nextToken());
+        StringTokenizer bidsTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
+        while (bidsTokenizer.hasMoreTokens()) {
+            int size = Integer.parseInt(bidsTokenizer.nextToken());
+            double price = Double.parseDouble(bidsTokenizer.nextToken());
             MarketDepthItem item = new MarketDepthItem(size, price);
             bids.add(item);
         }
 
-        for (int itemNumber = 0; itemNumber < BOOK_DEPTH; itemNumber++) {
-            int size = Integer.parseInt(st.nextToken());
-            double price = Double.parseDouble(st.nextToken());
+        StringTokenizer asksTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
+        while (asksTokenizer.hasMoreTokens()) {
+            int size = Integer.parseInt(asksTokenizer.nextToken());
+            double price = Double.parseDouble(asksTokenizer.nextToken());
             MarketDepthItem item = new MarketDepthItem(size, price);
             asks.add(item);
         }
 
-        if (currentTime != 0) {
-            if (time <= currentTime) {
+        if (previousTime != 0) {
+            if (time <= previousTime) {
                 String msg = "Timestamp of this record is before or the same as the timestamp of the previous record.";
                 throw new JBookTraderException(msg);
             }
