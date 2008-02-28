@@ -12,8 +12,8 @@ import java.util.List;
 /**
  * Runs a trading strategy in the backtesting mode using a data file containing
  * historical market depth. There is a one-to-one map between the strategy class
- * and the strategy runner. That is, if 5 strategies are selected to run,
- * there will be 5 instances of the StrategyRunner created.
+ * and the strategy runner. That is, if 3 strategies are selected to run,
+ * there will be 3 instances of the StrategyRunner created.
  */
 public class BackTestStrategyRunner extends StrategyRunner {
     private final BackTester backTester;

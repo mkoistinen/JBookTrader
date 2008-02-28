@@ -14,12 +14,11 @@ public abstract class Indicator {
     private final List<IndicatorValue> history;
     protected Indicator parent;
 
-    public abstract double calculate();// must be implemented in subclasses.
+    public abstract double calculate();
 
     public Indicator() {
         history = new ArrayList<IndicatorValue>();
     }
-
 
     public Indicator(MarketBook marketBook) {
         this();
@@ -50,7 +49,6 @@ public abstract class Indicator {
             return parentHistory.get(parentHistory.size() - 1).getTime();
         }
     }
-
 
     public void addToHistory(long date, double value) {
         history.add(new IndicatorValue(date, value));

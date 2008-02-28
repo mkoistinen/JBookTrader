@@ -35,6 +35,7 @@ public class TradingSchedule {
     private final TimeZone tz;
     private boolean hasExclusion;
     private final Calendar instant;
+    private final String text;
 
     public TradingSchedule(String startTime, String endTime, String timeZone) throws JBookTraderException {
         tz = TimeZone.getTimeZone(timeZone);
@@ -51,6 +52,8 @@ public class TradingSchedule {
             String msg = "End time must be after the start time in trading schedule.";
             throw new JBookTraderException(msg);
         }
+
+        text = "Trading schedule: " + startTime + " to " + endTime + " " + timeZone;
     }
 
     public void setExclusion(String startExclusionTime, String endExclusionTime) throws JBookTraderException {
@@ -127,4 +130,9 @@ public class TradingSchedule {
 
         return hours * 60 + minutes;
     }
+
+    public String toString() {
+        return text;
+    }
+
 }
