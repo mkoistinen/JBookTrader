@@ -30,16 +30,16 @@ public class Balancer extends Strategy {
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 50; // contract multiplier
-        double commissionRate = 2.4; // commission per contract
+        int multiplier = 50;// contract multiplier
+        double commissionRate = 2.4;// commission per contract
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 55);
-        exit = params.get(EXIT, 36);
+        entry = params.get(ENTRY, 46);
+        exit = params.get(EXIT, 33);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -57,7 +57,7 @@ public class Balancer extends Strategy {
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
         params.add(ENTRY, 20, 70, 1);
-        params.add(EXIT, 10, 60, 1);
+        params.add(EXIT, 0, 60, 1);
         return params;
     }
 

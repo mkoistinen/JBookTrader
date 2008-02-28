@@ -30,16 +30,16 @@ public class EtfFlipper extends Strategy {
         Contract contract = ContractFactory.makeStockContract("QQQQ", "SMART");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
-        int multiplier = 1; // contract multiplier
-        double commissionRate = 0.005; // commission per share
+        int multiplier = 1;// contract multiplier
+        double commissionRate = 0.005;// commission per share
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 50);
-        exit = params.get(EXIT, 30);
+        entry = params.get(ENTRY, 90);
+        exit = params.get(EXIT, 80);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -57,7 +57,7 @@ public class EtfFlipper extends Strategy {
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
         params.add(ENTRY, 20, 70, 1);
-        params.add(EXIT, 10, 60, 1);
+        params.add(EXIT, 0, 60, 1);
         return params;
     }
 

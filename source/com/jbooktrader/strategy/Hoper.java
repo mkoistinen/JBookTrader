@@ -26,18 +26,18 @@ public class Hoper extends Strategy {
 
     public Hoper(StrategyParams params) throws JBookTraderException {
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
+        Contract contract = ContractFactory.makeFutureContract("YM", "ECBOT");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 50; // contract multiplier
-        double commissionRate = 2.4; // commission per contract
+        int multiplier = 5;// contract multiplier
+        double commissionRate = 2.4;// commission per contract
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 29);
+        entry = params.get(ENTRY, 37);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -54,7 +54,7 @@ public class Hoper extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 20, 70, 1);
+        params.add(ENTRY, 0, 60, 1);
         return params;
     }
 
