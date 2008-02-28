@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.position.PositionManager;
+import com.jbooktrader.platform.performance.PerformanceManager;
 
 /**
  * Optimization results table model.
@@ -10,13 +10,13 @@ public class Result {
     private final int trades;
     private final StrategyParams params;
 
-    public Result(StrategyParams params, PositionManager positionManager) {
+    public Result(StrategyParams params, PerformanceManager performanceManager) {
         this.params = params;
-        this.totalProfit = positionManager.getTotalProfitAndLoss();
-        this.maxDrawdown = positionManager.getMaxDrawdown();
-        this.trades = positionManager.getTrades();
-        this.profitFactor = positionManager.getProfitFactor();
-        this.kellyCriterion = positionManager.getKellyCriterion();
+        this.totalProfit = performanceManager.getTotalProfitAndLoss();
+        this.maxDrawdown = performanceManager.getMaxDrawdown();
+        this.trades = performanceManager.getTrades();
+        this.profitFactor = performanceManager.getProfitFactor();
+        this.kellyCriterion = performanceManager.getKellyCriterion();
     }
 
     public StrategyParams getParams() {

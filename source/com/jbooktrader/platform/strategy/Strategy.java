@@ -5,6 +5,7 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.StrategyParams;
+import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.schedule.TradingSchedule;
@@ -39,10 +40,11 @@ public abstract class Strategy {
     private TradingSchedule tradingSchedule;
     private final List<ChartableIndicator> indicators;
     private PositionManager positionManager;
+    private PerformanceManager performanceManager;
     private final String name;
     private int position;
     private boolean hasValidIndicators;
-    private final SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
+    private final SimpleDateFormat df;
 
 
     /**
@@ -83,6 +85,8 @@ public abstract class Strategy {
         nf5.setMaximumFractionDigits(5);
         nf5.setGroupingUsed(false);
 
+        df = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
+
         eventReport = Dispatcher.getReporter();
     }
 
@@ -98,7 +102,7 @@ public abstract class Strategy {
         return isActive;
     }
 
-    public void setIActive(boolean isActive) {
+    public void setIsActive(boolean isActive) {
         this.isActive = isActive;
     }
 
@@ -113,6 +117,14 @@ public abstract class Strategy {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public void closePosition() {
+        position = 0;
+        if (positionManager.getPosition() != 0) {
+            String msg = "End of trading interval. Closing current position.";
+            eventReport.report(getName() + ": " + msg);
+        }
     }
 
 
@@ -131,14 +143,14 @@ public abstract class Strategy {
     public void report() {
         strategyReportColumns.clear();
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
-        strategyReportColumns.add(positionManager.getTrades());
+        strategyReportColumns.add(performanceManager.getTrades());
         strategyReportColumns.add(nf5.format(marketDepth.getBestBid()));
         strategyReportColumns.add(nf5.format(marketDepth.getBestAsk()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
-        strategyReportColumns.add(nf2.format(positionManager.getCommission()));
-        strategyReportColumns.add(nf2.format(positionManager.getProfitAndLoss()));
-        strategyReportColumns.add(nf2.format(positionManager.getTotalProfitAndLoss()));
+        strategyReportColumns.add(nf2.format(performanceManager.getCommission()));
+        strategyReportColumns.add(nf2.format(performanceManager.getProfitAndLoss()));
+        strategyReportColumns.add(nf2.format(performanceManager.getTotalProfitAndLoss()));
 
         for (ChartableIndicator chartableIndicator : indicators) {
             String formattedValue = NOT_APPLICABLE;
@@ -164,6 +176,10 @@ public abstract class Strategy {
 
     public PositionManager getPositionManager() {
         return positionManager;
+    }
+
+    public PerformanceManager getPerformanceManager() {
+        return performanceManager;
     }
 
     public TradingSchedule getTradingSchedule() {
@@ -193,7 +209,9 @@ public abstract class Strategy {
         this.contract = contract;
         this.tradingSchedule = tradingSchedule;
         df.setTimeZone(tradingSchedule.getTimeZone());
-        positionManager = new PositionManager(this, multiplier, commission);
+        performanceManager = new PerformanceManager(this, multiplier, commission);
+        positionManager = new PositionManager(this);
+
     }
 
     public MarketDepth getLastMarketDepth() {

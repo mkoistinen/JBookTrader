@@ -3,7 +3,7 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.backtest.BackTester;
 import com.jbooktrader.platform.marketdepth.MarketDepth;
 import com.jbooktrader.platform.model.Dispatcher;
-import com.jbooktrader.platform.position.PositionManager;
+import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.MessageDialog;
 
@@ -46,11 +46,11 @@ public class OptimizerWorker implements Runnable {
                 BackTester backTester = new BackTester(strategy, marketDepths);
                 backTester.execute();
 
-                PositionManager positionManager = strategy.getPositionManager();
-                int trades = positionManager.getTrades();
+                PerformanceManager performanceManager = strategy.getPerformanceManager();
+                int trades = performanceManager.getTrades();
 
                 if (trades >= minTrades) {
-                    Result result = new Result(params, positionManager);
+                    Result result = new Result(params, performanceManager);
                     synchronized (results) {
                         results.add(result);
                     }

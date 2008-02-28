@@ -2,6 +2,7 @@ package com.jbooktrader.platform.model;
 
 import com.jbooktrader.platform.marketdepth.MarketDepth;
 import com.jbooktrader.platform.optimizer.StrategyParams;
+import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.strategy.Strategy;
 
@@ -15,6 +16,7 @@ public class TradingTableModel extends TableDataModel {
     // inner class to represent table schema
     public enum Column {
         Strategy("Strategy", String.class),
+        Symbol("Symbol", String.class),
         MarketDepth("Market Depth", String.class),
         Bid("Bid", Double.class),
         Ask("Ask", Double.class),
@@ -103,18 +105,20 @@ public class TradingTableModel extends TableDataModel {
                 setValueAt(marketDepth.getBestAsk(), row, Column.Ask.ordinal());
             }
             PositionManager positionManager = strategy.getPositionManager();
+            PerformanceManager performanceManager = strategy.getPerformanceManager();
             setValueAt(positionManager.getPosition(), row, Column.Position.ordinal());
-            setValueAt(positionManager.getTrades(), row, Column.Trades.ordinal());
-            setValueAt(positionManager.getTotalProfitAndLoss(), row, Column.PL.ordinal());
-            setValueAt(positionManager.getMaxDrawdown(), row, Column.MaxDD.ordinal());
-            setValueAt(positionManager.getProfitFactor(), row, Column.PF.ordinal());
-            setValueAt(positionManager.getKellyCriterion(), row, Column.KellyCriterion.ordinal());
+            setValueAt(performanceManager.getTrades(), row, Column.Trades.ordinal());
+            setValueAt(performanceManager.getTotalProfitAndLoss(), row, Column.PL.ordinal());
+            setValueAt(performanceManager.getMaxDrawdown(), row, Column.MaxDD.ordinal());
+            setValueAt(performanceManager.getProfitFactor(), row, Column.PF.ordinal());
+            setValueAt(performanceManager.getKellyCriterion(), row, Column.KellyCriterion.ordinal());
         }
     }
 
     public void addStrategy(Strategy strategy) {
         Object[] row = new Object[getColumnCount()];
         row[Column.Strategy.ordinal()] = strategy.getName();
+        row[Column.Symbol.ordinal()] = strategy.getContract().m_symbol;
         addRow(row);
         rows.put(getRowCount() - 1, strategy);
     }
