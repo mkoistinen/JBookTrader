@@ -33,9 +33,10 @@ public class StrategyRunner implements Runnable {
         trader = Dispatcher.getTrader();
         trader.getAssistant().addStrategy(strategy);
         positionManager = strategy.getPositionManager();
-        strategy.setIActive(true);
+        strategy.setIsActive(true);
 
-        eventReport.report(strategy.getName() + ": strategy started");
+        String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
+        eventReport.report(msg);
     }
 
     public void execute() throws InterruptedException {
@@ -43,23 +44,13 @@ public class StrategyRunner implements Runnable {
 
         TraderAssistant traderAssistant = trader.getAssistant();
         traderAssistant.requestMarketDepth(strategy, 5);
+        new MarketDepthFactory(strategy);
         MarketBook marketBook = strategy.getMarketBook();
-        MarketDepth marketDepth = strategy.getMarketDepth();
 
         while (strategy.isActive()) {
             synchronized (marketBook) {
                 marketBook.wait();
             }
-
-            if (!marketDepth.isValid())
-                continue;
-
-            while (System.currentTimeMillis() - marketDepth.getTime() < 5) {
-                Thread.sleep(5);
-            }
-            marketDepth.update();
-            marketBook.addMarketDepth(marketDepth);
-
 
             long instant = marketBook.getLastMarketDepth().getTime();
             strategy.setTime(instant);
@@ -68,17 +59,11 @@ public class StrategyRunner implements Runnable {
                 strategy.onBookChange();
             }
 
-            boolean canTrade = tradingSchedule.contains(instant);
-            if (!canTrade && (positionManager.getPosition() != 0)) {
-                canTrade = true;
-                strategy.setPosition(0);// force flat position
-                String msg = "End of trading interval. Closing current position.";
-                eventReport.report(strategy.getName() + ": " + msg);
+            if (!tradingSchedule.contains(instant)) {
+                strategy.closePosition();// force flat position
             }
 
-            if (canTrade && traderAssistant.isConnected()) {
-                positionManager.trade();
-            }
+            positionManager.trade();
             Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
         }
     }

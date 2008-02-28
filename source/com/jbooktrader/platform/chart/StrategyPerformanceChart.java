@@ -3,7 +3,8 @@ package com.jbooktrader.platform.chart;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.position.*;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.position.Position;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
 import org.jfree.chart.JFreeChart;
@@ -23,8 +24,8 @@ import java.util.List;
 
 
 /**
- * Multi-indicator strategy performance chart where indicators can be grouped
- * together and displayed on subplots, one group of indicators per plot.
+ * Multi-plot strategy performance chart which combines price,
+ * indicators, executions, and P&L.
  */
 public class StrategyPerformanceChart {
     private static final int PRICE_PLOT_WEIGHT = 5;
@@ -242,7 +243,7 @@ public class StrategyPerformanceChart {
 
     private TimeSeries createIndicatorSeries(ChartableIndicator chartableIndicator) {
 
-        TimeSeries ts = new TimeSeries(chartableIndicator.getName(), Millisecond.class);
+        TimeSeries ts = new TimeSeries(chartableIndicator.getName(), Second.class);
         ts.setRangeDescription(chartableIndicator.getName());
 
         // make a defensive copy to prevent concurrent modification
@@ -250,7 +251,7 @@ public class StrategyPerformanceChart {
         indicatorValues.addAll(chartableIndicator.getIndicator().getHistory());
 
         for (IndicatorValue indicatorValue : indicatorValues) {
-            ts.add(new Millisecond(new Date(indicatorValue.getTime())), indicatorValue.getValue(), false);
+            ts.add(new Second(new Date(indicatorValue.getTime())), indicatorValue.getValue(), false);
         }
 
         ts.fireSeriesChanged();
@@ -259,7 +260,7 @@ public class StrategyPerformanceChart {
 
     private TimeSeries createProfitAndLossSeries(ProfitAndLossHistory plHistory) {
 
-        TimeSeries ts = new TimeSeries("P&L", Millisecond.class);
+        TimeSeries ts = new TimeSeries("P&L", Second.class);
         ts.setRangeDescription("P&L");
 
         // make a defensive copy to prevent concurrent modification
@@ -267,7 +268,7 @@ public class StrategyPerformanceChart {
         profitAndLossHistory.addAll(plHistory.getHistory());
 
         for (ProfitAndLoss profitAndLoss : profitAndLossHistory) {
-            ts.add(new Millisecond(new Date(profitAndLoss.getDate())), profitAndLoss.getValue(), false);
+            ts.add(new Second(new Date(profitAndLoss.getDate())), profitAndLoss.getValue(), false);
         }
 
         ts.fireSeriesChanged();
@@ -281,20 +282,20 @@ public class StrategyPerformanceChart {
         List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
         marketDepths.addAll(marketBook.getAll());
 
-        TimeSeries bid = new TimeSeries("Bid", Millisecond.class);
+        TimeSeries bid = new TimeSeries("Bid", Second.class);
         bid.setRangeDescription("Bid");
         for (MarketDepth marketDepth : marketDepths) {
-            Millisecond millisecond = new Millisecond(new Date(marketDepth.getTime()));
-            bid.add(millisecond, marketDepth.getBestBid(), false);
+            Second second = new Second(new Date(marketDepth.getTime()));
+            bid.add(second, marketDepth.getBestBid(), false);
         }
         bid.fireSeriesChanged();
         tsc.addSeries(bid);
 
-        TimeSeries ask = new TimeSeries("Ask", Millisecond.class);
+        TimeSeries ask = new TimeSeries("Ask", Second.class);
         ask.setRangeDescription("Ask");
         for (MarketDepth marketDepth : marketDepths) {
-            Millisecond millisecond = new Millisecond(new Date(marketDepth.getTime()));
-            ask.add(millisecond, marketDepth.getBestAsk(), false);
+            Second second = new Second(new Date(marketDepth.getTime()));
+            ask.add(second, marketDepth.getBestAsk(), false);
         }
         ask.fireSeriesChanged();
         tsc.addSeries(ask);
@@ -340,7 +341,7 @@ public class StrategyPerformanceChart {
 
         // create P&L series
         TimeSeriesCollection profitAndLossCollection = new TimeSeriesCollection();
-        ProfitAndLossHistory plHistory = strategy.getPositionManager().getProfitAndLossHistory();
+        ProfitAndLossHistory plHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
         TimeSeries profitAndLoss = createProfitAndLossSeries(plHistory);
         profitAndLossCollection.addSeries(profitAndLoss);
         tsCollections.put(-1, profitAndLossCollection);

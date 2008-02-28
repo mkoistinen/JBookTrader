@@ -14,7 +14,8 @@ import java.awt.event.*;
 import java.net.URL;
 
 /**
- * Main application window.
+ * Main application window. All the system logic is intentionally left out if this class,
+ * which acts as a simple "view" of the undelying model.
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem;
@@ -36,6 +37,10 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
     public void modelChanged(ModelListener.Event event, Object value) {
         switch (event) {
+            case ERROR:
+                String msg = (String) value;
+                MessageDialog.showError(this, msg);
+                break;
             case STRATEGY_UPDATE:
                 Strategy strategy = (Strategy) value;
                 tradingTableModel.update(strategy);
