@@ -115,7 +115,7 @@ public abstract class Strategy {
         return position;
     }
 
-    public void setPosition(int position) {
+    protected void setPosition(int position) {
         this.position = position;
     }
 

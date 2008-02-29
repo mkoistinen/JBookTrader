@@ -100,8 +100,10 @@ public class Trader extends EWrapperAdapter {
                 eventReport.report("Market depth data has been reset.");
             }
 
-            boolean isFeedBack = (errorCode == 200 || errorCode == 309);
-            if (isFeedBack) {
+            // 200: bad contract
+            // 309: market depth requested for more than 3 symbols
+            boolean isInvalidRequest = (errorCode == 200 || errorCode == 309);
+            if (isInvalidRequest) {
                 errorMsg = "IB reported: " + errorMsg;
                 Dispatcher.fireModelChanged(ModelListener.Event.ERROR, errorMsg);
             }

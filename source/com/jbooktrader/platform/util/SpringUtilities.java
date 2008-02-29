@@ -101,7 +101,6 @@ public class SpringUtilities {
         makeCompactGrid(parent, 1, cols, 6, 0, 7, 6);
     }
 
-
     /**
      * Aligns the first <code>rows</code> * <code>cols</code>
      * components of <code>parent</code> in

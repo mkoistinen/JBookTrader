@@ -25,6 +25,7 @@ public class MarketDepthFactory extends TimerTask {
         Timer timer = new Timer(true);
         timer.schedule(this, start, MILLIS_IN_SECOND);
         eventReport.report(strategy.getName() + ": Market depth factory started");
+
     }
 
     @Override
