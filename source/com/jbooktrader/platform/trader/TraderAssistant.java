@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.marketdepth.MarketDepth;
+import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.OpenOrder;
 import com.jbooktrader.platform.report.Report;
@@ -78,6 +78,14 @@ public class TraderAssistant {
 
 
     public void disconnect() {
+        for (int srategyId : strategies.keySet()) {
+            Strategy strategy = strategies.get(srategyId);
+            strategy.setIsActive(false);
+            MarketBook marketBook = strategy.getMarketBook();
+            synchronized (marketBook) {
+                marketBook.notifyAll();
+            }
+        }
         if (socket != null && socket.isConnected()) {
             socket.cancelNewsBulletins();
             socket.eDisconnect();
