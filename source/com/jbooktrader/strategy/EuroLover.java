@@ -29,7 +29,7 @@ public class EuroLover extends Strategy {
         // Specify the contract to trade
         Contract contract = ContractFactory.makeCashContract("EUR", "USD");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("8:55", "15:55", "America/Chicago");
+        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 1;// contract multiplier
         double commissionRate = 0.00002;// commission per contract
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);
@@ -38,8 +38,8 @@ public class EuroLover extends Strategy {
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 30);
-        exit = params.get(EXIT, 15);
+        entry = params.get(ENTRY, 23);
+        exit = params.get(EXIT, 18);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);

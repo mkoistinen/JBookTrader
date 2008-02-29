@@ -54,14 +54,22 @@ public class OptimizerDialog extends JDialog {
         setVisible(true);
     }
 
-    public void setProgress(long count, long iterations, String timeRemaining) {
-        progressLabel.setText(timeRemaining);
+    public void setProgress(long count, long iterations, String text, String label) {
+        progressLabel.setText(label);
         int percent = (int) (100 * (count / (double) iterations));
 
-        String text = "Completed back tests: " + String.valueOf(count) + " of " + String.valueOf(iterations) + " (" + percent + "%)";
+        text += " " + count + " of " + iterations + " (" + percent + "%)";
         progressBar.setValue(percent);
         progressBar.setString(text);
     }
+
+    public void setProgress(long count, long iterations, String text) {
+        int percent = (int) (100 * (count / (double) iterations));
+        text += percent + "%";
+        progressBar.setValue(percent);
+        progressBar.setString(text);
+    }
+
 
     public void showMaxIterationsLimit(long iterations, long maxIterations) {
         String message = "The range of parameters for this optimization run requires " + iterations + " iterations." + LINE_SEP;
@@ -74,7 +82,7 @@ public class OptimizerDialog extends JDialog {
     public void enableProgress() {
         progressLabel.setText("");
         progressBar.setValue(0);
-        progressBar.setString("Initiating optimization run...");
+        progressBar.setString("Starting optimization...");
         progressPanel.setVisible(true);
         optimizeButton.setEnabled(false);
         cancelButton.setEnabled(true);

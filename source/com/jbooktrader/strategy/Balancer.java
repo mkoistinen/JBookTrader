@@ -39,7 +39,7 @@ public class Balancer extends Strategy {
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
         entry = params.get(ENTRY, 46);
-        exit = params.get(EXIT, 33);
+        exit = params.get(EXIT, 37);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);

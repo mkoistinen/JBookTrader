@@ -39,6 +39,7 @@ public final class BackTestFileWriter {
             DecimalFormat nf = (DecimalFormat) NumberFormat.getNumberInstance();
             nf.setGroupingUsed(false);
             nf.setMinimumFractionDigits(0);
+            nf.setMaximumFractionDigits(5);
 
             StringBuilder header = getHeader();
             writer.println(header);

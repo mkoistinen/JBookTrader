@@ -3,7 +3,6 @@ package com.jbooktrader.platform.backtest;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.util.*;
 
 import java.io.*;
 import java.text.*;
@@ -13,26 +12,46 @@ import java.util.*;
  * Reads and validates a data file containing historical market depth records.
  * The data file is used for backtesting and optimization of trading strategies.
  */
-public class BackTestFileReader {
+public class BackTestFileReader extends Thread {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
+    private final List<MarketDepth> marketDepths;
     private final Properties properties = new Properties();
     // Each line contains at least 6 columns: date, time, 1 bid size and price, 1 ask size and price
     // If market is deeper than 1 bid and ask, the line will contain more columns
     private final static int MIN_COLUMNS = 6;
     private long previousTime;
     private SimpleDateFormat sdf;
+    private BufferedReader reader;
+    private final Report report;
+    private int lineNumber, totalLines;
+    private String errorMsg;
+    private volatile boolean cancelled;
 
     public List<MarketDepth> getMarketDepths() {
         return marketDepths;
     }
 
-    public BackTestFileReader(String fileName) throws JBookTraderException {
-        Report report = Dispatcher.getReporter();
-        report.report("Reading back data file");
+    public int getLinesRead() {
+        return lineNumber;
+    }
 
-        String line = null;
-        int lineNumber = 0;
+    public int getLineCount() {
+        return totalLines;
+    }
+
+
+    public String getError() {
+        return errorMsg;
+    }
+
+    public void cancel() {
+        cancelled = true;
+    }
+
+
+    public BackTestFileReader(String fileName) throws JBookTraderException {
+        report = Dispatcher.getReporter();
+        report.report("Loading historical market data file");
 
         try {
             properties.load(new FileInputStream(fileName));
@@ -45,22 +64,44 @@ public class BackTestFileReader {
             throw new JBookTraderException(msg);
         }
 
+
+        String timeZone = getPropAsString("timeZone");
+        TimeZone tz = TimeZone.getTimeZone(timeZone);
+        if (!tz.getID().equals(timeZone)) {
+            String msg = "The specified time zone " + "\"" + timeZone + "\"" + " does not exist." + LINE_SEP;
+            msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
+            throw new JBookTraderException(msg);
+        }
+
+        sdf = new SimpleDateFormat("MMddyy,HH:mm:ss");
+        // Enforce strict interpretation of date and time formats
+        sdf.setLenient(false);
+        sdf.setTimeZone(tz);
+
         try {
-            String timeZone = getPropAsString("timeZone");
-            TimeZone tz = TimeZone.getTimeZone(timeZone);
-            if (!tz.getID().equals(timeZone)) {
-                String msg = "The specified time zone " + "\"" + timeZone + "\"" + " does not exist." + LINE_SEP;
-                msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
-                throw new JBookTraderException(msg);
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+
+            while (reader.readLine() != null && !cancelled) {
+                totalLines++;
             }
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
 
-            sdf = new SimpleDateFormat("MMddyy,HH:mm:ss");
-            // Enforce strict interpretation of date and time formats
-            sdf.setLenient(false);
-            sdf.setTimeZone(tz);
+        } catch (FileNotFoundException fnfe) {
+            throw new JBookTraderException("Could not find file " + fileName);
+        } catch (IOException ioe) {
+            throw new JBookTraderException("Could not read file " + fileName);
+        }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
-            Dispatcher.getReporter().report("Loading historical data file");
+        marketDepths = new ArrayList<MarketDepth>();
+    }
+
+
+    public void run() {
+
+        String line = null;
+
+        try {
+            Dispatcher.getReporter().report("Reading historical market data file");
 
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
@@ -77,27 +118,27 @@ public class BackTestFileReader {
                 }
             }
 
-            reader.close();
-            boolean showNumberOfRecords = PropertiesHolder.getInstance().getProperty("backtest.showNumberOfRecords").equals("true");
-            if (showNumberOfRecords) {
-                String msg = marketDepths.size() + " records have been read successfully.";
-                MessageDialog.showMessage(null, msg);
-            }
+
             report.report("Loaded " + marketDepths.size() + " records from historical data file");
         } catch (Exception e) {
-            String msg = "";
             if (lineNumber > 0) {
-                msg = "Problem parsing line #" + lineNumber + LINE_SEP;
-                msg += line + LINE_SEP;
+                errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
+                errorMsg += line + LINE_SEP;
             }
             String description = e.getMessage();
             if (description == null) {
                 description = e.toString();
             }
-            msg += description;
-            throw new JBookTraderException(msg);
+            errorMsg += description;
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ioe) {
+                report.report(ioe);
+            }
         }
     }
+
 
     private MarketDepth toMarketDepth(String line) throws ParseException, JBookTraderException {
         StringTokenizer st = new StringTokenizer(line, ",;");

@@ -3,7 +3,7 @@ package com.jbooktrader.platform.model;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.chart.StrategyPerformanceChart;
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.optimizer.OptimizerDialog;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.*;
@@ -12,8 +12,6 @@ import com.jbooktrader.platform.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
-import java.util.List;
 
 /**
  * Acts as a controller in the Model-View-Controller pattern
@@ -24,14 +22,11 @@ public class MainFrameController {
     private final MainFrameDialog mainViewDialog;
     private final JTable tradingTable;
     private final TradingTableModel tradingTableModel;
-    private final JFileChooser fileChooser;
 
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
-        fileChooser = new JFileChooser(MARKET_DATA_DIR);
-        fileChooser.setDialogTitle("Select historical market depth data file");
         assignListeners();
     }
 
@@ -83,15 +78,7 @@ public class MainFrameController {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = createSelectedRowStrategy();
                     Dispatcher.setMode(Dispatcher.Mode.BACK_TEST);
-
-                    if (fileChooser.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION) {
-                        File file = fileChooser.getSelectedFile();
-                        String fileName = file.getAbsolutePath();
-                        BackTestFileReader backTestFileReader = new BackTestFileReader(fileName);
-                        List<MarketDepth> marketDepths = backTestFileReader.getMarketDepths();
-                        new Thread(new BackTestStrategyRunner(strategy, marketDepths)).start();
-                    }
-
+                    new BackTestDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
                 } finally {

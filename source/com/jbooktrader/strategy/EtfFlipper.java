@@ -29,7 +29,7 @@ public class EtfFlipper extends Strategy {
         // Specify the contract to trade
         Contract contract = ContractFactory.makeStockContract("QQQQ", "SMART");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 1;// contract multiplier
         double commissionRate = 0.005;// commission per share
         setStrategy(contract, tradingSchedule, multiplier, commissionRate);

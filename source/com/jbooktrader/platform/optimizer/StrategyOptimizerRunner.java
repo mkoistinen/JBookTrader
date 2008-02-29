@@ -30,11 +30,8 @@ public class StrategyOptimizerRunner implements Runnable {
     private ComputationalTimeEstimator timeEstimator;
     private final Constructor<?> strategyConstructor;
     private LinkedList<StrategyParams> tasks;
-    private final List<MarketDepth> marketDepths;
 
-    public StrategyOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy) throws ClassNotFoundException, NoSuchMethodException, JBookTraderException {
-        BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
-        marketDepths = backTestFileReader.getMarketDepths();
+    public StrategyOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy) throws ClassNotFoundException, NoSuchMethodException {
 
         this.optimizerDialog = optimizerDialog;
         this.strategyParams = strategy.getParams();
@@ -48,7 +45,9 @@ public class StrategyOptimizerRunner implements Runnable {
 
     public void cancel() {
         optimizerDialog.showProgress("Stopping running processes...");
-        tasks.clear();
+        if (tasks != null) {
+            tasks.clear();
+        }
         cancelled = true;
     }
 
@@ -114,13 +113,37 @@ public class StrategyOptimizerRunner implements Runnable {
         if (counter >= 50) {
             // Wait until 50 steps completed. Otherwise, the estimated remaining time will be inaccurate.
             String remainingTime = timeEstimator.getTimeLeft(counter);
-            optimizerDialog.setProgress(counter, numberOfTasks, remainingTime);
+            optimizerDialog.setProgress(counter, numberOfTasks, "Completed back tests: ", remainingTime);
         }
+    }
+
+    private void showLoadProgress(long counter, int totalCount) {
+        optimizerDialog.setProgress(counter, totalCount, "Reading historical data file: ");
     }
 
 
     public void run() {
         try {
+
+            optimizerDialog.enableProgress();
+            BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
+            int lineCount = backTestFileReader.getLineCount();
+            backTestFileReader.start();
+
+            while (backTestFileReader.isAlive()) {
+                showLoadProgress(backTestFileReader.getLinesRead(), lineCount);
+                Thread.sleep(500);
+            }
+
+            String errorMsg = backTestFileReader.getError();
+            if (errorMsg != null) {
+                throw new JBookTraderException(errorMsg);
+            }
+
+
+            List<MarketDepth> marketDepths = backTestFileReader.getMarketDepths();
+
+
             Strategy strategy = (Strategy) strategyConstructor.newInstance(new StrategyParams());
 
             for (StrategyParam param : strategyParams.getAll()) {
