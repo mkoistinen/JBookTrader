@@ -2,6 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
 import com.jbooktrader.indicator.DepthBalance;
+import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.Indicator;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.StrategyParams;
@@ -31,15 +32,15 @@ public class EtfFlipper extends Strategy {
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 1;// contract multiplier
-        double commissionRate = 0.005;// commission per share
-        setStrategy(contract, tradingSchedule, multiplier, commissionRate);
+        Commission commission = CommissionFactory.getBundledNorthAmericaStockCommission();
+        setStrategy(contract, tradingSchedule, multiplier, commission);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 90);
-        exit = params.get(EXIT, 80);
+        entry = params.get(ENTRY, 30);
+        exit = params.get(EXIT, 30);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);

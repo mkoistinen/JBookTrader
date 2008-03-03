@@ -2,6 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
 import com.jbooktrader.indicator.DepthBalance;
+import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.Indicator;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.StrategyParams;
@@ -31,8 +32,8 @@ public class EuroLover extends Strategy {
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 1;// contract multiplier
-        double commissionRate = 0.00002;// commission per contract
-        setStrategy(contract, tradingSchedule, multiplier, commissionRate);
+        Commission commission = CommissionFactory.getForexCommission();
+        setStrategy(contract, tradingSchedule, multiplier, commission);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
