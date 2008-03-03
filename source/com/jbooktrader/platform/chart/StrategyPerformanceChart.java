@@ -243,7 +243,7 @@ public class StrategyPerformanceChart {
 
     private TimeSeries createIndicatorSeries(ChartableIndicator chartableIndicator) {
 
-        TimeSeries ts = new TimeSeries(chartableIndicator.getName(), Second.class);
+        TimeSeries ts = new TimeSeries(chartableIndicator.getName(), Millisecond.class);
         ts.setRangeDescription(chartableIndicator.getName());
 
         // make a defensive copy to prevent concurrent modification
@@ -251,7 +251,7 @@ public class StrategyPerformanceChart {
         indicatorValues.addAll(chartableIndicator.getIndicator().getHistory());
 
         for (IndicatorValue indicatorValue : indicatorValues) {
-            ts.add(new Second(new Date(indicatorValue.getTime())), indicatorValue.getValue(), false);
+            ts.add(new Millisecond(new Date(indicatorValue.getTime())), indicatorValue.getValue(), false);
         }
 
         ts.fireSeriesChanged();
@@ -260,7 +260,7 @@ public class StrategyPerformanceChart {
 
     private TimeSeries createProfitAndLossSeries(ProfitAndLossHistory plHistory) {
 
-        TimeSeries ts = new TimeSeries("P&L", Second.class);
+        TimeSeries ts = new TimeSeries("P&L", Millisecond.class);
         ts.setRangeDescription("P&L");
 
         // make a defensive copy to prevent concurrent modification
@@ -268,7 +268,7 @@ public class StrategyPerformanceChart {
         profitAndLossHistory.addAll(plHistory.getHistory());
 
         for (ProfitAndLoss profitAndLoss : profitAndLossHistory) {
-            ts.add(new Second(new Date(profitAndLoss.getDate())), profitAndLoss.getValue(), false);
+            ts.add(new Millisecond(new Date(profitAndLoss.getDate())), profitAndLoss.getValue(), false);
         }
 
         ts.fireSeriesChanged();
@@ -282,20 +282,20 @@ public class StrategyPerformanceChart {
         List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
         marketDepths.addAll(marketBook.getAll());
 
-        TimeSeries bid = new TimeSeries("Bid", Second.class);
+        TimeSeries bid = new TimeSeries("Bid", Millisecond.class);
         bid.setRangeDescription("Bid");
         for (MarketDepth marketDepth : marketDepths) {
-            Second second = new Second(new Date(marketDepth.getTime()));
-            bid.add(second, marketDepth.getBestBid(), false);
+            Millisecond millisecond = new Millisecond(new Date(marketDepth.getTime()));
+            bid.add(millisecond, marketDepth.getBestBid(), false);
         }
         bid.fireSeriesChanged();
         tsc.addSeries(bid);
 
-        TimeSeries ask = new TimeSeries("Ask", Second.class);
+        TimeSeries ask = new TimeSeries("Ask", Millisecond.class);
         ask.setRangeDescription("Ask");
         for (MarketDepth marketDepth : marketDepths) {
-            Second second = new Second(new Date(marketDepth.getTime()));
-            ask.add(second, marketDepth.getBestAsk(), false);
+            Millisecond millisecond = new Millisecond(new Date(marketDepth.getTime()));
+            ask.add(millisecond, marketDepth.getBestAsk(), false);
         }
         ask.fireSeriesChanged();
         tsc.addSeries(ask);
