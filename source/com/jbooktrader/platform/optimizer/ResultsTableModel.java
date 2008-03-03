@@ -12,7 +12,6 @@ import java.util.*;
  */
 public class ResultsTableModel extends TableDataModel {
     private static final NumberRenderer nr2 = new NumberRenderer(2);
-    private static final NumberRenderer nr0 = new NumberRenderer(0);
 
     // inner class to represent table schema
     public enum Column {
@@ -20,7 +19,7 @@ public class ResultsTableModel extends TableDataModel {
         MaxDD("Max DD", nr2),
         Trades("Trades", nr2),
         PF("Profit Factor", nr2),
-        KellyCriterion("Kelly Criterion", nr0);
+        TrueKelly("True Kelly", nr2);
 
         private final String name;
         private final TableCellRenderer renderer;
@@ -85,7 +84,7 @@ public class ResultsTableModel extends TableDataModel {
             item[++index] = result.getMaxDrawdown();
             item[++index] = result.getTrades();
             item[++index] = result.getProfitFactor();
-            item[++index] = result.getKellyCriterion();
+            item[++index] = result.getTrueKelly();
 
             addRow(item);
         }

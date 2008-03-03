@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.performance;
 
+import com.jbooktrader.platform.commission.Commission;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.strategy.Strategy;
 
@@ -9,19 +10,19 @@ import com.jbooktrader.platform.strategy.Strategy;
  */
 public class PerformanceManager {
     private final int multiplier;
-    private final double commissionRate;
+    private final Commission commission;
     private final Strategy strategy;
     private final ProfitAndLossHistory profitAndLossHistory;
 
     private int trades, profitableTrades, unprofitableTrades;
-    private double commission, totalCommission;
-    private double totalBought, totalSold, profitAndLoss, totalProfitAndLoss;
-    private double grossProfit, grossLoss, profitFactor, peakTotalProfitAndLoss, maxDrawdown, kellyCriterion;
+    private double tradeCommission, totalCommission;
+    private double totalBought, totalSold, profitAndLoss, grossProfit, grossLoss, totalProfitAndLoss;
+    private double profitFactor, peakTotalProfitAndLoss, maxDrawdown, trueKelly;
 
-    public PerformanceManager(Strategy strategy, int multiplier, double commissionRate) throws JBookTraderException {
+    public PerformanceManager(Strategy strategy, int multiplier, Commission commission) throws JBookTraderException {
         this.strategy = strategy;
         this.multiplier = multiplier;
-        this.commissionRate = commissionRate;
+        this.commission = commission;
         profitAndLossHistory = new ProfitAndLossHistory();
     }
 
@@ -42,7 +43,7 @@ public class PerformanceManager {
     }
 
     public double getCommission() {
-        return commission;
+        return tradeCommission;
     }
 
     public double getTotalProfitAndLoss() {
@@ -53,8 +54,8 @@ public class PerformanceManager {
         return profitAndLossHistory;
     }
 
-    public double getKellyCriterion() {
-        return kellyCriterion;
+    public double getTrueKelly() {
+        return trueKelly;
     }
 
     public void update(int quantity, double avgFillPrice, int position) {
@@ -67,8 +68,8 @@ public class PerformanceManager {
             totalSold += tradeAmount;
         }
 
-        commission = Math.abs(quantity) * commissionRate;
-        totalCommission += commission;
+        tradeCommission = commission.getCommission(Math.abs(quantity));
+        totalCommission += tradeCommission;
 
 
         double positionValue = position * avgFillPrice * multiplier;
@@ -82,10 +83,10 @@ public class PerformanceManager {
             grossProfit += profitAndLoss;
         } else {
             unprofitableTrades++;
-            grossLoss += profitAndLoss;
+            grossLoss += (-profitAndLoss);
         }
 
-        profitFactor = Math.abs(grossProfit / grossLoss);
+        profitFactor = grossProfit / grossLoss;
 
         if (totalProfitAndLoss > peakTotalProfitAndLoss) {
             peakTotalProfitAndLoss = totalProfitAndLoss;
@@ -98,22 +99,20 @@ public class PerformanceManager {
 
         if (profitableTrades > 0 && unprofitableTrades > 0) {
             double aveProfit = grossProfit / profitableTrades;
-            double aveLoss = Math.abs(grossLoss) / unprofitableTrades;
+            double aveLoss = grossLoss / unprofitableTrades;
             double winLossRatio = aveProfit / aveLoss;
             double probabilityOfWin = (double) profitableTrades / trades;
             double probabilityOfLoss = 1 - probabilityOfWin;
-            kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
-            kellyCriterion *= 100;
-            if (kellyCriterion < 0) {
-                kellyCriterion = 0;
+            double kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
+            double standardError = 1 / Math.sqrt(trades);
+            // 1.64485 corresponds to the 90% confidence
+            trueKelly = (kellyCriterion - 1.64485 * standardError) * 100;
+            if (trueKelly < 0) {
+                trueKelly = 0;
             }
-        } else {
-            kellyCriterion = 0;
         }
 
         long time = strategy.getTime();
         profitAndLossHistory.add(new ProfitAndLoss(time, totalProfitAndLoss));
-
     }
-
 }

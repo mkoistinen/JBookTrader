@@ -114,10 +114,15 @@ public class OptimizerDialog extends JDialog {
             throw new JBookTraderException(msg);
         }
 
-        int minTrades = Integer.parseInt(minTradesText.getText());
-        if (minTrades < 2) {
+        try {
+            int minTrades = Integer.parseInt(minTradesText.getText());
+            if (minTrades < 2) {
+                minTradesText.requestFocus();
+                throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be greater or equal to 2.");
+            }
+        } catch (NumberFormatException nfe) {
             minTradesText.requestFocus();
-            throw new JBookTraderException("\"" + "Min trades" + "\"" + " must be greater or equal to 2.");
+            throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be an integer.");
         }
 
     }
@@ -220,7 +225,6 @@ public class OptimizerDialog extends JDialog {
 
         paramTableModel = new ParamTableModel();
         JTable paramTable = new JTable(paramTableModel);
-        paramTable.getColumnModel().getColumn(0).setPreferredWidth(200);
         paramScrollPane.getViewport().add(paramTable);
         paramScrollPane.setPreferredSize(new Dimension(100, 100));
 
@@ -232,15 +236,13 @@ public class OptimizerDialog extends JDialog {
 
         JLabel optimizationMethodLabel = new JLabel("Optimization method: ");
         JComboBox optimizationMethodCombo = new JComboBox(new String[]{"Brute force"});
-        optimizationMethodCombo.setMaximumSize(new Dimension(150, 20));
         optimizationMethodLabel.setLabelFor(optimizationMethodCombo);
         optimizationOptionsPanel.add(optimizationMethodLabel);
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest Kelly Criterion"};
+        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest True Kelly"};
         selectionCriteriaCombo = new JComboBox(sortFactors);
-        selectionCriteriaCombo.setMaximumSize(new Dimension(150, 20));
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
         optimizationOptionsPanel.add(selectionCriteriaCombo);
@@ -279,7 +281,6 @@ public class OptimizerDialog extends JDialog {
         progressBar = new JProgressBar();
         progressBar.setEnabled(false);
         progressBar.setStringPainted(true);
-        progressBar.setPreferredSize(new Dimension(400, 20));
 
         optimizeButton = new JButton("Optimize");
         optimizeButton.setMnemonic('O');
@@ -294,11 +295,12 @@ public class OptimizerDialog extends JDialog {
         buttonsPanel.add(cancelButton);
         buttonsPanel.add(closeButton);
 
-        progressPanel = new JPanel();
+        progressPanel = new JPanel(new SpringLayout());
         progressPanel.add(progressBar);
         progressPanel.add(new JLabel(" Estimated remaining time: "));
         progressPanel.add(progressLabel);
         progressPanel.setVisible(false);
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 5, 8, 8);
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);
@@ -366,7 +368,7 @@ public class OptimizerDialog extends JDialog {
                 sortCriteria = DRAWDOWN;
                 break;
             case 3:
-                sortCriteria = KELLY_CRITERION;
+                sortCriteria = TRUE_KELLY;
                 break;
 
         }

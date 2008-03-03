@@ -221,8 +221,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         columnModel.getColumn(PL.ordinal()).setCellRenderer(nr2);
         columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr2);
         columnModel.getColumn(PF.ordinal()).setCellRenderer(nr2);
-        NumberRenderer nr0 = new NumberRenderer(0);
-        columnModel.getColumn(KellyCriterion.ordinal()).setCellRenderer(nr0);
+        columnModel.getColumn(TK.ordinal()).setCellRenderer(nr2);
 
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(150);

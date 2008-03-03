@@ -38,6 +38,7 @@ public class StrategyOptimizerRunner implements Runnable {
         results = Collections.synchronizedList(new ArrayList<Result>());
         nf2 = NumberFormat.getNumberInstance();
         nf2.setMaximumFractionDigits(2);
+        nf2.setGroupingUsed(false);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
         Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
@@ -77,7 +78,7 @@ public class StrategyOptimizerRunner implements Runnable {
         otpimizerReportHeaders.add("Max Drawdown");
         otpimizerReportHeaders.add("Trades");
         otpimizerReportHeaders.add("Profit Factor");
-        otpimizerReportHeaders.add("Kelly Criterion");
+        otpimizerReportHeaders.add("True Kelly");
         optimizerReport.report(otpimizerReportHeaders);
 
         for (Result result : results) {
@@ -92,7 +93,7 @@ public class StrategyOptimizerRunner implements Runnable {
             columns.add(nf2.format(result.getMaxDrawdown()));
             columns.add(nf2.format(result.getTrades()));
             columns.add(nf2.format(result.getProfitFactor()));
-            columns.add(nf2.format(result.getKellyCriterion()));
+            columns.add(nf2.format(result.getTrueKelly()));
 
             optimizerReport.report(columns);
         }
@@ -110,11 +111,8 @@ public class StrategyOptimizerRunner implements Runnable {
             optimizerDialog.setResults(results);
         }
 
-        if (counter >= 50) {
-            // Wait until 50 steps completed. Otherwise, the estimated remaining time will be inaccurate.
-            String remainingTime = timeEstimator.getTimeLeft(counter);
-            optimizerDialog.setProgress(counter, numberOfTasks, "Completed back tests: ", remainingTime);
-        }
+        String remainingTime = timeEstimator.getTimeLeft(counter);
+        optimizerDialog.setProgress(counter, numberOfTasks, "Completed back tests: ", remainingTime);
     }
 
     private void showLoadProgress(long counter, int totalCount) {
