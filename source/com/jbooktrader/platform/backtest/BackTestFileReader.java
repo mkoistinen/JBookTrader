@@ -73,7 +73,7 @@ public class BackTestFileReader extends Thread {
             throw new JBookTraderException(msg);
         }
 
-        sdf = new SimpleDateFormat("MMddyy,HH:mm:ss");
+        sdf = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
         // Enforce strict interpretation of date and time formats
         sdf.setLenient(false);
         sdf.setTimeZone(tz);
@@ -145,14 +145,14 @@ public class BackTestFileReader extends Thread {
 
         int tokenCount = st.countTokens();
         if (tokenCount < MIN_COLUMNS) {
-            String msg = "The record should contain at least " + MIN_COLUMNS + " columns, but only " + tokenCount + " columns have been counted.";
+            String msg = "The line should contain at least " + MIN_COLUMNS + " columns, but only " + tokenCount + " columns have been counted.";
             throw new JBookTraderException(msg);
         }
 
         StringTokenizer typeTokenizer = new StringTokenizer(line, ";");
         tokenCount = typeTokenizer.countTokens();
         if (tokenCount != 3) {
-            String msg = "The record should contain 3" + " columns, but only " + tokenCount + " columns have been counted.";
+            String msg = "The line should contain exactly 3 semicolon-separated sections.";
             throw new JBookTraderException(msg);
         }
 
@@ -183,7 +183,7 @@ public class BackTestFileReader extends Thread {
 
         if (previousTime != 0) {
             if (time <= previousTime) {
-                String msg = "Timestamp of this record is before or the same as the timestamp of the previous record.";
+                String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
                 throw new JBookTraderException(msg);
             }
         }

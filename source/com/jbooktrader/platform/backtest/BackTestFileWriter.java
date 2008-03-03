@@ -25,7 +25,7 @@ public final class BackTestFileWriter {
         fileChooser.setDialogTitle("Save historical market depth");
 
         if (fileChooser.showDialog(null, "Save") == JFileChooser.APPROVE_OPTION) {
-            dateFormat = new SimpleDateFormat("MMddyy,HH:mm:ss");
+            dateFormat = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
             dateFormat.setTimeZone(timeZone);
             File file = fileChooser.getSelectedFile();
             String fileName = file.getAbsolutePath();
@@ -80,7 +80,7 @@ public final class BackTestFileWriter {
         header.append("# Each line represents the order book at a particular time and contains 3 sections,:").append(LINE_SEP);
         header.append("# separated by semicolons as follows:").append(LINE_SEP);
         header.append("# {date,time}; {bids}; {asks}").append(LINE_SEP);
-        header.append("# The date is in the MMddyy format, and the time in the HH:mm:ss format").append(LINE_SEP);
+        header.append("# The date is in the MMddyy format, and the time in the HH:mm:ss.SSS format").append(LINE_SEP);
         header.append("# The {bids} section has a variable number of comma-separated columns").append(LINE_SEP);
         header.append("# and contains bids (each defined by bid size and bid price), starting from the highest bid price").append(LINE_SEP);
         header.append("# The {asks} section has a variable number of comma-separated columns").append(LINE_SEP);
