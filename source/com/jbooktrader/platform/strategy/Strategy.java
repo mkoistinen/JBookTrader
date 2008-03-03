@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.strategy;
 
 import com.ib.client.Contract;
+import com.jbooktrader.platform.commission.Commission;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
@@ -205,7 +206,7 @@ public abstract class Strategy {
         return indicators;
     }
 
-    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, double commission) throws JBookTraderException {
+    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) throws JBookTraderException {
         this.contract = contract;
         this.tradingSchedule = tradingSchedule;
         df.setTimeZone(tradingSchedule.getTimeZone());
