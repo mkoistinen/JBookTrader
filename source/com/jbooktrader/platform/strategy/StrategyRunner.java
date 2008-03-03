@@ -6,6 +6,7 @@ import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.trader.*;
+import com.jbooktrader.platform.util.MessageDialog;
 
 import java.io.IOException;
 
@@ -33,19 +34,19 @@ public class StrategyRunner implements Runnable {
         trader = Dispatcher.getTrader();
         trader.getAssistant().addStrategy(strategy);
         positionManager = strategy.getPositionManager();
-        strategy.setIsActive(true);
 
         String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
         eventReport.report(msg);
     }
 
-    public void execute() throws InterruptedException {
+    public void execute() throws InterruptedException, JBookTraderException {
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         TraderAssistant traderAssistant = trader.getAssistant();
         traderAssistant.requestMarketDepth(strategy, 5);
         new MarketDepthFactory(strategy);
         MarketBook marketBook = strategy.getMarketBook();
+        strategy.setIsActive(true);
 
         while (strategy.isActive()) {
             synchronized (marketBook) {
@@ -74,6 +75,7 @@ public class StrategyRunner implements Runnable {
             execute();
         } catch (Throwable t) {
             eventReport.report(t);
+            MessageDialog.showError(null, t.getMessage());
         } finally {
             eventReport.report(strategy.getName() + ": is inactive.");
             Dispatcher.strategyCompleted();
