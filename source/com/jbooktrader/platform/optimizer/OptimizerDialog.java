@@ -149,6 +149,7 @@ public class OptimizerDialog extends JDialog {
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (sor != null) {
+                    closeButton.setEnabled(false);
                     sor.cancel();
                 }
                 dispose();
@@ -158,6 +159,7 @@ public class OptimizerDialog extends JDialog {
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (sor != null) {
+                    cancelButton.setEnabled(false);
                     sor.cancel();
                 }
             }
@@ -196,7 +198,7 @@ public class OptimizerDialog extends JDialog {
 
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setTitle("Strategy Optimizer");
+        setTitle("Strategy Optimizer - " + strategyName);
 
         getContentPane().setLayout(new BorderLayout());
 
@@ -209,6 +211,7 @@ public class OptimizerDialog extends JDialog {
 
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
+        fileNameText.setText(preferences.getProperty(optimizerDataFileNamePref));
         selectFileButton = new JButton("Browse...");
         fileNameLabel.setLabelFor(fileNameText);
 
@@ -216,7 +219,7 @@ public class OptimizerDialog extends JDialog {
         strategyPanel.add(fileNameText);
         strategyPanel.add(selectFileButton);
 
-        SpringUtilities.makeOneLineGrid(strategyPanel, 3);
+        SpringUtilities.makeCompactGrid(strategyPanel, 1, 3, 0, 0, 5, 5);
 
         // strategy parametrs panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
@@ -229,19 +232,19 @@ public class OptimizerDialog extends JDialog {
         paramScrollPane.setPreferredSize(new Dimension(100, 100));
 
         strategyParamPanel.add(paramScrollPane);
-        SpringUtilities.makeOneLineGrid(strategyParamPanel, 1);
+        SpringUtilities.makeCompactGrid(strategyParamPanel, 1, 1, 0, 0, 0, 5);
 
         // optimization options panel and its components
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
         JLabel optimizationMethodLabel = new JLabel("Optimization method: ");
-        JComboBox optimizationMethodCombo = new JComboBox(new String[]{"Brute force"});
+        JComboBox optimizationMethodCombo = new JComboBox(new String[] {"Brute force"});
         optimizationMethodLabel.setLabelFor(optimizationMethodCombo);
         optimizationOptionsPanel.add(optimizationMethodLabel);
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest True Kelly"};
+        String[] sortFactors = new String[] {"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest True Kelly"};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -254,24 +257,24 @@ public class OptimizerDialog extends JDialog {
 
         JLabel minTradesLabel = new JLabel("Minimum trades: ");
         minTradesText = new JTextField("50");
+        minTradesText.setText(preferences.getProperty(optimizerMinTradePref));
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
 
-        SpringUtilities.makeOneLineGrid(optimizationOptionsPanel, 6);
+        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 6, 0, 0, 5, 0);
 
-        northPanel.add(new TitledSeparator(new JLabel("Strategy definition & parameters")));
+        northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
         northPanel.add(strategyPanel);
         northPanel.add(strategyParamPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization options")));
         northPanel.add(optimizationOptionsPanel);
-        northPanel.add(new TitledSeparator(new JLabel("Optimization results")));
-        SpringUtilities.makeCompactGrid(northPanel, 6, 1, 5, 5, 5, 8);
+        SpringUtilities.makeCompactGrid(northPanel, 5, 1, 12, 5, 12, 5);
 
         JScrollPane resultsScrollPane = new JScrollPane();
-
+        centerPanel.add(new TitledSeparator(new JLabel("Optimization results")));
         centerPanel.add(resultsScrollPane);
-        SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 5, 8, 8);
+        SpringUtilities.makeCompactGrid(centerPanel, 2, 1, 12, 5, 12, 5);
 
         resultsTable = new JTable();
         resultsScrollPane.getViewport().add(resultsTable);
@@ -300,7 +303,7 @@ public class OptimizerDialog extends JDialog {
         progressPanel.add(new JLabel(" Estimated remaining time: "));
         progressPanel.add(progressLabel);
         progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 5, 8, 8);
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 5, 12, 5);
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);
@@ -312,8 +315,7 @@ public class OptimizerDialog extends JDialog {
         getRootPane().setDefaultButton(optimizeButton);
         getContentPane().setPreferredSize(MIN_SIZE);
         getContentPane().setMinimumSize(getContentPane().getPreferredSize());
-        fileNameText.setText(preferences.getProperty(optimizerDataFileNamePref));
-        minTradesText.setText(preferences.getProperty(optimizerMinTradePref));
+
     }
 
     private void initParams() {
