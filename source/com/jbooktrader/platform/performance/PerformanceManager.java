@@ -19,7 +19,7 @@ public class PerformanceManager {
     private double totalBought, totalSold, profitAndLoss, grossProfit, grossLoss, totalProfitAndLoss;
     private double profitFactor, peakTotalProfitAndLoss, maxDrawdown, trueKelly;
 
-    public PerformanceManager(Strategy strategy, int multiplier, Commission commission) throws JBookTraderException {
+    public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
@@ -68,7 +68,7 @@ public class PerformanceManager {
             totalSold += tradeAmount;
         }
 
-        tradeCommission = commission.getCommission(Math.abs(quantity));
+        tradeCommission = commission.getCommission(Math.abs(quantity), avgFillPrice);
         totalCommission += tradeCommission;
 
 
@@ -97,6 +97,8 @@ public class PerformanceManager {
             maxDrawdown = drawdown;
         }
 
+        // Calculate "True Kelly", which is Kelly Criterion adjusted
+        // for the number of trades and the confidence interval
         if (profitableTrades > 0 && unprofitableTrades > 0) {
             double aveProfit = grossProfit / profitableTrades;
             double aveLoss = grossLoss / unprofitableTrades;
@@ -105,7 +107,7 @@ public class PerformanceManager {
             double probabilityOfLoss = 1 - probabilityOfWin;
             double kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
             double standardError = 1 / Math.sqrt(trades);
-            // 1.64485 corresponds to the 90% confidence
+            // 1.64485 corresponds to the 90% confidence interval
             trueKelly = (kellyCriterion - 1.64485 * standardError) * 100;
             if (trueKelly < 0) {
                 trueKelly = 0;

@@ -25,7 +25,7 @@ public class TradingTableModel extends TableDataModel {
         PL("P&L", Double.class),
         MaxDD("Max DD", Double.class),
         PF("PF", Double.class),
-        TK("TC", Double.class);
+        TK("TK", Double.class);
 
         private final String columnName;
         private final Class<?> columnClass;

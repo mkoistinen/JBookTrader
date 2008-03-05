@@ -31,6 +31,7 @@ public class NumberRenderer extends DefaultTableCellRenderer {
                 text = df.format(value);
             }
         }
+
         setText(text);
     }
 }

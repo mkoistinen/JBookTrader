@@ -2,6 +2,9 @@ package com.jbooktrader.platform.util;
 
 import com.ib.client.Contract;
 
+/**
+ * Provides convenience methods to create stock, futures, and Forex contracts
+ */
 public class ContractFactory {
 
     public static Contract makeContract(String symbol, String securityType, String exchange, String expiry, String currency) {

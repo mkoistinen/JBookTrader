@@ -40,14 +40,16 @@ public class StrategyOptimizerRunner implements Runnable {
         nf2.setMaximumFractionDigits(2);
         nf2.setGroupingUsed(false);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
-        Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
+        Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
     }
 
     public void cancel() {
         optimizerDialog.showProgress("Stopping running processes...");
         if (tasks != null) {
-            tasks.clear();
+            synchronized (tasks) {
+                tasks.clear();
+            }
         }
         cancelled = true;
     }
@@ -128,9 +130,13 @@ public class StrategyOptimizerRunner implements Runnable {
             int lineCount = backTestFileReader.getLineCount();
             backTestFileReader.start();
 
-            while (backTestFileReader.isAlive()) {
+            while (backTestFileReader.isAlive() && !cancelled) {
                 showLoadProgress(backTestFileReader.getLinesRead(), lineCount);
                 Thread.sleep(500);
+            }
+
+            if (cancelled) {
+                return;
             }
 
             String errorMsg = backTestFileReader.getError();

@@ -63,7 +63,7 @@ public class OptimizerWorker implements Runnable {
             }
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
-            MessageDialog.showError(null, t.getMessage());
+            MessageDialog.showError(null, t.toString());
         }
     }
 }

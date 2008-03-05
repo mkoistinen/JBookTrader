@@ -17,8 +17,6 @@ import java.awt.event.*;
  * Acts as a controller in the Model-View-Controller pattern
  */
 public class MainFrameController {
-    private final static String FILE_SEP = System.getProperty("file.separator");
-    private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";
     private final MainFrameDialog mainViewDialog;
     private final JTable tradingTable;
     private final TradingTableModel tradingTableModel;
