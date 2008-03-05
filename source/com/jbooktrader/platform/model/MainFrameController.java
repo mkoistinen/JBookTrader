@@ -5,7 +5,7 @@ import com.jbooktrader.platform.chart.StrategyPerformanceChart;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.optimizer.OptimizerDialog;
-import com.jbooktrader.platform.startup.JBookTrader;
+//import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 

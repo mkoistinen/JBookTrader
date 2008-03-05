@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.performance;
 
 import com.jbooktrader.platform.commission.Commission;
-import com.jbooktrader.platform.model.JBookTraderException;
+//import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.strategy.Strategy;
 
 /**
