@@ -3,12 +3,26 @@ package com.jbooktrader.platform.commission;
 
 public class CommissionFactory {
 
-    public static Commission getCommission(double min, double rate) {
-        return new Commission(min, rate);
+    private static Commission getCommission(double rate, double min) {
+        return new Commission(rate, min);
     }
 
+    /**
+     * @param rate Commission per contract or per share
+     * @param min Minimum commission per order
+     * @param maxPercent Maximum commission as percent of the trade amount
+     * @return Commission for the trade
+     *
+     * For commissions and fees, see
+     * http://individuals.interactivebrokers.com/en/accounts/fees/commission.php?ib_entity=llc
+     */
+    public static Commission getCommission(double rate, double min, double maxPercent) {
+        return new Commission(rate, min, maxPercent);
+    }
+
+
     public static Commission getBundledNorthAmericaStockCommission() {
-        return getCommission(1, 0.005);
+        return getCommission(0.005, 1, 0.005);
     }
 
     public static Commission getBundledNorthAmericaFutureCommission() {
@@ -17,7 +31,7 @@ public class CommissionFactory {
 
 
     public static Commission getForexCommission() {
-        return getCommission(2.5, 0.00002);
+        return getCommission(0.00002, 2.5);
     }
 
 }
