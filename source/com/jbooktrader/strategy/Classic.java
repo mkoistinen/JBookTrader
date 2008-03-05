@@ -13,24 +13,26 @@ import com.jbooktrader.platform.util.ContractFactory;
 /**
  *
  */
-public class Hoper extends Strategy {
+public class Classic extends Strategy {
 
     // Technical indicators
     private final Indicator depthBalanceInd;
 
     // Strategy parameters names
     private static final String ENTRY = "Entry";
+    private static final String STOP_LOSS = "Stop Loss";
+    private static final String PROFIT_TARGET = "Profit Target";
 
     // Strategy parameters values
-    private final double entry;
+    private final double entry, stopLoss, profitTarget;
 
 
-    public Hoper(StrategyParams params) throws JBookTraderException {
+    public Classic(StrategyParams params) throws JBookTraderException {
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("YM", "ECBOT");
+        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 5;// contract multiplier
+        int multiplier = 50;// contract multiplier
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
@@ -38,7 +40,9 @@ public class Hoper extends Strategy {
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 37);
+        entry = params.get(ENTRY, 43);
+        stopLoss = params.get(STOP_LOSS, 10);
+        profitTarget = params.get(PROFIT_TARGET, 14);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -55,7 +59,9 @@ public class Hoper extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 0, 60, 1);
+        params.add(ENTRY, 20, 50, 1);
+        params.add(STOP_LOSS, 2, 20, 1);
+        params.add(PROFIT_TARGET, 1, 20, 1);
         return params;
     }
 
@@ -65,11 +71,20 @@ public class Hoper extends Strategy {
      */
     @Override
     public void onBookChange() {
+        int currentPosition = getPositionManager().getPosition();
         double depthBalance = depthBalanceInd.getValue();
         if (depthBalance >= entry) {
             setPosition(1);
         } else if (depthBalance <= -entry) {
             setPosition(-1);
+        } else {
+            double lastEntry = getPositionManager().getAvgFillPrice();
+            double currentPrice = getLastMarketDepth().getMidPoint();
+            double loss = (currentPosition > 0) ? (lastEntry - currentPrice) : (currentPrice - lastEntry);
+            double gain = -loss;
+            if (loss >= stopLoss || gain >= profitTarget) {
+                setPosition(0);
+            }
         }
     }
 }

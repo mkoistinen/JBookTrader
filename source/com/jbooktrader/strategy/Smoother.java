@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
-import com.jbooktrader.indicator.DepthBalance;
+import com.jbooktrader.indicator.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.Indicator;
 import com.jbooktrader.platform.model.JBookTraderException;
@@ -13,41 +13,48 @@ import com.jbooktrader.platform.util.ContractFactory;
 /**
  *
  */
-public class EuroLover extends Strategy {
+public class Smoother extends Strategy {
 
     // Technical indicators
-    private final Indicator depthBalanceInd;
+    private final Indicator depthBalanceInd, smoothedDepthBalanceInd;
 
     // Strategy parameters names
+    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
+
     // Strategy parameters values
     private final double entry, exit;
+    private final int period;
 
 
-    public EuroLover(StrategyParams params) throws JBookTraderException {
+    public Smoother(StrategyParams params) throws JBookTraderException {
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeCashContract("EUR", "USD");
+        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("0:20", "23:40", "America/New_York");
-        int multiplier = 1;// contract multiplier
-        Commission commission = CommissionFactory.getForexCommission();
+        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
+        int multiplier = 50;// contract multiplier
+        Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 23);
-        exit = params.get(EXIT, 18);
+        period = (int) params.get(PERIOD, 4);
+        entry = params.get(ENTRY, 32);
+        exit = params.get(EXIT, 32);
+
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
+        smoothedDepthBalanceInd = new SmoothedDepthBalance(marketBook, period);
 
         // Specify the title and the chart number for each indicator
         // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
         addIndicator("Depth Balance", depthBalanceInd, 1);
+        addIndicator("Smoothed Depth Balance", smoothedDepthBalanceInd, 1);
     }
 
     /**
@@ -57,8 +64,9 @@ public class EuroLover extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 20, 70, 1);
-        params.add(EXIT, 0, 60, 1);
+        params.add(PERIOD, 1, 50, 1);
+        params.add(ENTRY, 5, 50, 1);
+        params.add(EXIT, 0, 50, 10);
         return params;
     }
 
@@ -69,14 +77,14 @@ public class EuroLover extends Strategy {
     @Override
     public void onBookChange() {
         int currentPosition = getPositionManager().getPosition();
-        double depthBalance = depthBalanceInd.getValue();
-        if (depthBalance >= entry) {
-            setPosition(125000);
-        } else if (depthBalance <= -entry) {
-            setPosition(-125000);
+        double smoothedDepthBalance = smoothedDepthBalanceInd.getValue();
+        if (smoothedDepthBalance >= entry) {
+            setPosition(1);
+        } else if (smoothedDepthBalance <= -entry) {
+            setPosition(-1);
         } else {
-            boolean target = (currentPosition > 0 && depthBalance <= -exit);
-            target = target || (currentPosition < 0 && depthBalance >= exit);
+            boolean target = (currentPosition > 0 && smoothedDepthBalance <= -exit);
+            target = target || (currentPosition < 0 && smoothedDepthBalance >= exit);
             if (target) {
                 setPosition(0);
             }
