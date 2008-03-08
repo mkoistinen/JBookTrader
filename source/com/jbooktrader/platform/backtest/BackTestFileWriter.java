@@ -36,10 +36,14 @@ public final class BackTestFileWriter {
     public void write(MarketBook marketBook) {
         if (writer != null) {
 
+            DecimalFormatSymbols decimalFormatSeparator = new DecimalFormatSymbols();
+            decimalFormatSeparator.setDecimalSeparator('.');
+            
             DecimalFormat nf = (DecimalFormat) NumberFormat.getNumberInstance();
             nf.setGroupingUsed(false);
             nf.setMinimumFractionDigits(0);
             nf.setMaximumFractionDigits(5);
+            nf.setDecimalFormatSymbols( decimalFormatSeparator );
 
             StringBuilder header = getHeader();
             writer.println(header);
