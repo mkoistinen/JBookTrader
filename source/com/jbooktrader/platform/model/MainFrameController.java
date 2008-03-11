@@ -5,7 +5,6 @@ import com.jbooktrader.platform.chart.StrategyPerformanceChart;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.optimizer.OptimizerDialog;
-//import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -20,9 +19,23 @@ public class MainFrameController {
     private final MainFrameDialog mainViewDialog;
     private final JTable tradingTable;
     private final TradingTableModel tradingTableModel;
+    private static final String MAIN_WINDOW_HEIGHT = "mainwindow.height";
+    private static final String MAIN_WINDOW_WIDTH  = "mainwindow.width";
+    private static final String MAIN_WINDOW_X  = "mainwindow.x";
+    private static final String MAIN_WINDOW_Y  = "mainwindow.y";
+    private final PreferencesHolder preferences = PreferencesHolder.getInstance();
 
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
+        int lastHeight = preferences.getPropertyAsInt(MAIN_WINDOW_HEIGHT);
+        int lastWidth = preferences.getPropertyAsInt(MAIN_WINDOW_WIDTH);
+        int lastX = preferences.getPropertyAsInt(MAIN_WINDOW_X);
+        int lastY = preferences.getPropertyAsInt(MAIN_WINDOW_Y);
+        
+        if(lastHeight>0 && lastWidth>0) {
+            mainViewDialog.setBounds(lastX, lastY, lastWidth, lastHeight);
+        }
+        
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
         assignListeners();
@@ -196,6 +209,15 @@ public class MainFrameController {
         mainViewDialog.exitAction(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                try {
+                    preferences.setProperty(MAIN_WINDOW_HEIGHT, mainViewDialog.getSize().height);
+                    preferences.setProperty(MAIN_WINDOW_WIDTH, mainViewDialog.getSize().width);
+                    preferences.setProperty(MAIN_WINDOW_X, mainViewDialog.getX());
+                    preferences.setProperty(MAIN_WINDOW_Y, mainViewDialog.getY());
+                }
+                catch(JBookTraderException jbtexception) {
+                    Dispatcher.getReporter().report(jbtexception.getMessage());
+                }
                 Dispatcher.exit();
             }
         });
