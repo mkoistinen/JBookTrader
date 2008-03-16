@@ -4,7 +4,7 @@ import com.jbooktrader.platform.backtest.BackTestFileReader;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.position.PositionManager;
+//import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
