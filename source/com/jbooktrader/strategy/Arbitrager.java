@@ -1,15 +1,15 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
-import com.jbooktrader.indicator.*;
+import com.jbooktrader.indicator.TruePrice;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.Indicator;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ContractFactory;
-import com.jbooktrader.platform.marketdepth.MarketBook;
 
 /**
  *

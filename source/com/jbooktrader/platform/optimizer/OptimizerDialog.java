@@ -1,11 +1,11 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.model.JBookTraderException;
 import static com.jbooktrader.platform.optimizer.ResultComparator.SortKey.*;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
-import com.jbooktrader.platform.marketdepth.*;
 
 import javax.swing.*;
 import javax.swing.table.*;
