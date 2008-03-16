@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.marketdepth.MarketDepth;
+import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.Report;
@@ -118,8 +118,13 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void updateMktDepth(int strategyId, int position, int operation, int side, double price, int size) {
         try {
-            MarketDepth marketDepth = traderAssistant.getStrategy(strategyId).getMarketDepth();
+            Strategy strategy = traderAssistant.getStrategy(strategyId);
+            MarketDepth marketDepth = strategy.getMarketDepth();
             marketDepth.update(position, operation, side, price, size);
+            MarketBook marketBook = strategy.getMarketBook();
+            synchronized (marketBook) {
+                marketBook.notifyAll();
+            }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);

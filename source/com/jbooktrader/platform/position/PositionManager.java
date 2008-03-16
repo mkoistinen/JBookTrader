@@ -7,13 +7,13 @@ import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.trader.TraderAssistant;
 
-import java.util.*;
+import java.util.LinkedList;
 
 /**
  * Position manager keeps track of current positions and executions.
  */
 public class PositionManager {
-    private final List<Position> positionsHistory;
+    private final LinkedList<Position> positionsHistory;
     private final Strategy strategy;
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
@@ -26,13 +26,13 @@ public class PositionManager {
 
     public PositionManager(Strategy strategy) throws JBookTraderException {
         this.strategy = strategy;
-        positionsHistory = new ArrayList<Position>();
+        positionsHistory = new LinkedList<Position>();
         eventReport = Dispatcher.getReporter();
         traderAssistant = Dispatcher.getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
     }
 
-    public List<Position> getPositionsHistory() {
+    public LinkedList<Position> getPositionsHistory() {
         return positionsHistory;
     }
 
@@ -67,10 +67,11 @@ public class PositionManager {
         position += quantity;
         avgFillPrice = openOrder.getAvgFillPrice();
 
-        positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
+
         performanceManager.update(quantity, avgFillPrice, position);
 
         if ((Dispatcher.getMode() != Dispatcher.Mode.OPTIMIZATION)) {
+            positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
             StringBuilder msg = new StringBuilder();
             msg.append(strategy.getName()).append(": ");
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");

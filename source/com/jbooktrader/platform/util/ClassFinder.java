@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.util;
 
+import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.strategy.Strategy;
@@ -87,8 +88,9 @@ public class ClassFinder {
 
         for (Class<?> strategyClass : strategyClasses) {
             try {
-                Constructor<?> constructor = strategyClass.getConstructor(StrategyParams.class);
-                Strategy strategy = (Strategy) constructor.newInstance(new StrategyParams());
+                Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+                Constructor<?> constructor = strategyClass.getConstructor(parameterTypes);
+                Strategy strategy = (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());
                 strategies.add(strategy);
             } catch (Exception e) {
                 String msg = "Could not create strategy " + strategyClass.getSimpleName() + ": ";

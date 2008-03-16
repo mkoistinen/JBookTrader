@@ -9,6 +9,7 @@ import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 
 /**
  *
@@ -26,11 +27,12 @@ public class EuroLover extends Strategy {
     private final double entry, exit;
 
 
-    public EuroLover(StrategyParams params) throws JBookTraderException {
+    public EuroLover(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
+        super(marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeCashContract("EUR", "USD");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("0:20", "23:40", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 1;// contract multiplier
         Commission commission = CommissionFactory.getForexCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);

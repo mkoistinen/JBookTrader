@@ -6,13 +6,13 @@ import com.jbooktrader.platform.performance.PerformanceManager;
  * Optimization results table model.
  */
 public class Result {
-    private final double totalProfit, maxDrawdown, profitFactor, trueKelly;
+    private final double netProfit, maxDrawdown, profitFactor, trueKelly;
     private final int trades;
     private final StrategyParams params;
 
     public Result(StrategyParams params, PerformanceManager performanceManager) {
         this.params = params;
-        this.totalProfit = performanceManager.getTotalProfitAndLoss();
+        this.netProfit = performanceManager.getNetProfit();
         this.maxDrawdown = performanceManager.getMaxDrawdown();
         this.trades = performanceManager.getTrades();
         this.profitFactor = performanceManager.getProfitFactor();
@@ -23,8 +23,8 @@ public class Result {
         return params;
     }
 
-    public double getTotalProfit() {
-        return totalProfit;
+    public double getNetProfit() {
+        return netProfit;
     }
 
     public double getMaxDrawdown() {

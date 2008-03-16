@@ -1,8 +1,10 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.BackTestFileReader;
-import com.jbooktrader.platform.marketdepth.MarketDepth;
+import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.performance.PerformanceManager;
+import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
@@ -11,56 +13,50 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
  * historical market depth.
  */
 public class StrategyOptimizerRunner implements Runnable {
+    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L; // 24 hours
+    private static final int SUBTASK_SIZE = 1000;
     private static final long MAX_ITERATIONS = 50000000L;
     private static final int MAX_RESULTS = 5000;
-    private static final long UPDATE_FREQUENCY = 5000L;// milliseconds
+    private static final long UPDATE_FREQUENCY = 1000000L;// lines
     private final List<Result> results;
     private final OptimizerDialog optimizerDialog;
     private final NumberFormat nf2;
     private boolean cancelled;
     private ResultComparator resultComparator;
     private final StrategyParams strategyParams;
+    private final String strategyName;
     private ComputationalTimeEstimator timeEstimator;
     private final Constructor<?> strategyConstructor;
-    private LinkedList<StrategyParams> tasks;
 
     public StrategyOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy) throws ClassNotFoundException, NoSuchMethodException {
 
         this.optimizerDialog = optimizerDialog;
+        this.strategyName = strategy.getName();
         this.strategyParams = strategy.getParams();
         results = Collections.synchronizedList(new ArrayList<Result>());
-        nf2 = NumberFormat.getNumberInstance();
-        nf2.setMaximumFractionDigits(2);
-        nf2.setGroupingUsed(false);
+        nf2 = NumberFormatterFactory.getNumberFormatter(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
-        Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
+        Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
     }
 
     public void cancel() {
-        optimizerDialog.showProgress("Stopping running processes...");
-        if (tasks != null) {
-            synchronized (tasks) {
-                tasks.clear();
-            }
-        }
         cancelled = true;
     }
 
-    private void saveToFile(Strategy strategy) throws IOException, JBookTraderException {
+    private void saveToFile() throws IOException, JBookTraderException {
         if (results.size() == 0) {
             return;
         }
 
         Report.enable();
-        String fileName = strategy.getName() + "Optimizer";
+        String fileName = strategyName + "Optimizer";
         Report optimizerReport = new Report(fileName);
 
         optimizerReport.reportDescription("Strategy parameters:");
@@ -91,7 +87,7 @@ public class StrategyOptimizerRunner implements Runnable {
                 columns.add(nf2.format(param.getValue()));
             }
 
-            columns.add(nf2.format(result.getTotalProfit()));
+            columns.add(nf2.format(result.getNetProfit()));
             columns.add(nf2.format(result.getMaxDrawdown()));
             columns.add(nf2.format(result.getTrades()));
             columns.add(nf2.format(result.getProfitFactor()));
@@ -102,7 +98,7 @@ public class StrategyOptimizerRunner implements Runnable {
         Report.disable();
     }
 
-    private void showProgress(long counter, int numberOfTasks) {
+    private void showProgress(long counter, int numberOfTasks, String text) {
         synchronized (results) {
             Collections.sort(results, resultComparator);
 
@@ -114,26 +110,16 @@ public class StrategyOptimizerRunner implements Runnable {
         }
 
         String remainingTime = timeEstimator.getTimeLeft(counter);
-        optimizerDialog.setProgress(counter, numberOfTasks, "Completed back tests: ", remainingTime);
+        optimizerDialog.setProgress(counter, numberOfTasks, text, remainingTime);
     }
-
-    private void showLoadProgress(long counter, int totalCount) {
-        optimizerDialog.setProgress(counter, totalCount, "Reading historical data file: ");
-    }
-
 
     public void run() {
         try {
 
             optimizerDialog.enableProgress();
+            optimizerDialog.showProgress("Scanning historical data file...");
             BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
-            int lineCount = backTestFileReader.getLineCount();
-            backTestFileReader.start();
-
-            while (backTestFileReader.isAlive() && !cancelled) {
-                showLoadProgress(backTestFileReader.getLinesRead(), lineCount);
-                Thread.sleep(500);
-            }
+            int lineCount = backTestFileReader.getTotalLineCount();
 
             if (cancelled) {
                 return;
@@ -143,12 +129,6 @@ public class StrategyOptimizerRunner implements Runnable {
             if (errorMsg != null) {
                 throw new JBookTraderException(errorMsg);
             }
-
-
-            List<MarketDepth> marketDepths = backTestFileReader.getMarketDepths();
-
-
-            Strategy strategy = (Strategy) strategyConstructor.newInstance(new StrategyParams());
 
             for (StrategyParam param : strategyParams.getAll()) {
                 param.setValue(param.getMin());
@@ -162,7 +142,7 @@ public class StrategyOptimizerRunner implements Runnable {
             cancelled = false;
 
 
-            tasks = new LinkedList<StrategyParams>();
+            LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
             optimizerDialog.showProgress("Distributing the tasks...");
 
             while (!allTasksAssigned) {
@@ -194,32 +174,87 @@ public class StrategyOptimizerRunner implements Runnable {
                 return;
             }
 
-            CountDownLatch remainingTasks = new CountDownLatch(numberOfTasks);
 
-            PropertiesHolder properties = PropertiesHolder.getInstance();
-            int maxThreads = Integer.valueOf(properties.getProperty("optimizer.maxThreads"));
-            for (int thread = 0; thread < maxThreads; thread++) {
-                new Thread(new OptimizerWorker(marketDepths, strategyConstructor, tasks, results, minTrades, remainingTasks)).start();
+            timeEstimator = new ComputationalTimeEstimator(System.currentTimeMillis(), lineCount);
+            optimizerDialog.showProgress("Creating " + tasks.size() + " strategies...");
+
+            ArrayList<ArrayList<Strategy>> subTasks = new ArrayList<ArrayList<Strategy>>();
+            ArrayList<Strategy> subtask = new ArrayList<Strategy>();
+            subTasks.add(subtask);
+            MarketBook marketBook = new MarketBook();
+            for (StrategyParams params : tasks) {
+                if (subtask.size() >= SUBTASK_SIZE) {
+                    subtask = new ArrayList<Strategy>();
+                    subTasks.add(subtask);
+                }
+                Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
+                strategy.setParams(params);
+                subtask.add(strategy);
             }
 
-            optimizerDialog.showProgress("Estimating remaining time...");
+
+            String progressText = "Backtesting " + tasks.size() + " strategies: ";
+            showProgress(0, lineCount * tasks.size(), progressText);
             long startTime = System.currentTimeMillis();
-            timeEstimator = new ComputationalTimeEstimator(startTime, numberOfTasks);
+            timeEstimator = new ComputationalTimeEstimator(startTime, lineCount * tasks.size());
+            long completed = 0;
 
-            long remaining;
-            do {
-                Thread.sleep(UPDATE_FREQUENCY);
-                remaining = remainingTasks.getCount();
-                showProgress(numberOfTasks - remaining, numberOfTasks);// results in progress
-            } while (remaining != 0 && !cancelled);
+            for (ArrayList<Strategy> strategies : subTasks) {
+                backTestFileReader.reset();
+                marketBook.getAll().clear();
 
-            if (!cancelled) {
-                showProgress(numberOfTasks, numberOfTasks);// final results
-                long endTime = System.currentTimeMillis();
-                long totalTimeInSecs = (endTime - startTime) / 1000;
-                saveToFile(strategy);
-                MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
+                MarketDepth marketDepth;
+                while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
+
+                    marketBook.add(marketDepth);
+                    long time = marketDepth.getTime();
+                    boolean inSchedule = strategies.get(0).getTradingSchedule().contains(time);
+
+                    for (Strategy strategy : strategies) {
+
+                        strategy.updateIndicators();
+                        if (strategy.hasValidIndicators()) {
+                            strategy.onBookChange();
+                        }
+
+                        if (!inSchedule) {
+                            strategy.closePosition();// force flat position
+                        }
+
+                        strategy.getPositionManager().trade();
+                        strategy.trim(time - MAX_HISTORY_PERIOD);
+
+                        completed++;
+                        if (completed % UPDATE_FREQUENCY == 0) {
+                            showProgress(completed, lineCount * tasks.size(), progressText);
+                        }
+                        if (cancelled) {
+                            return;
+                        }
+                    }
+                }
+
+                for (Strategy strategy : strategies) {
+                    strategy.closePosition();
+                    strategy.getPositionManager().trade();
+
+                    PerformanceManager performanceManager = strategy.getPerformanceManager();
+                    int trades = performanceManager.getTrades();
+
+                    if (trades >= minTrades) {
+                        Result result = new Result(strategy.getParams(), performanceManager);
+                        results.add(result);
+                        showProgress(completed, lineCount * tasks.size(), progressText);
+                    }
+                }
+
+                strategies.clear();
             }
+
+            showProgress(completed, lineCount * tasks.size(), progressText);
+            long totalTimeInSecs = (System.currentTimeMillis() - startTime) / 1000;
+            saveToFile();
+            MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
             MessageDialog.showError(optimizerDialog, t.toString());

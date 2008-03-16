@@ -134,7 +134,7 @@ public class BackTestDialog extends JDialog {
 
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setTitle("Back Test");
+        setTitle("Back Test - " + strategy.getName());
 
         getContentPane().setLayout(new BorderLayout());
 

@@ -25,11 +25,27 @@ public class Dispatcher {
         eventReport = new Report(eventReportFileName);
     }
 
-    public static void addListener(ModelListener listener) {
+    synchronized public static void addListener(ModelListener listener) {
         listeners.add(listener);
     }
 
-    public static synchronized Trader getTrader() throws JBookTraderException {
+    synchronized public static void removeListener(ModelListener listener) {
+        listeners.remove(listener);
+    }
+
+    synchronized public static void fireModelChanged(ModelListener.Event event, Object value) {
+        if (mode != Mode.OPTIMIZATION) {
+            for (ModelListener listener : listeners) {
+                try {
+                    listener.modelChanged(event, value);
+                } catch (Exception e) {
+                    eventReport.report(e);
+                }
+            }
+        }
+    }
+
+    synchronized public static Trader getTrader() throws JBookTraderException {
         if (trader == null) {
             trader = new Trader();
         }
@@ -68,14 +84,6 @@ public class Dispatcher {
             trader.getAssistant().disconnect();
         }
 
-    }
-
-    public static void fireModelChanged(ModelListener.Event event, Object value) {
-        if (mode != Mode.OPTIMIZATION) {
-            for (ModelListener listener : listeners) {
-                listener.modelChanged(event, value);
-            }
-        }
     }
 
     public static synchronized void strategyStarted() {

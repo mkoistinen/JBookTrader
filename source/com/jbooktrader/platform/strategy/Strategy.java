@@ -6,10 +6,11 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.position.PositionManager;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.schedule.TradingSchedule;
+import com.jbooktrader.platform.util.NumberFormatterFactory;
 
 import java.text.*;
 import java.util.*;
@@ -39,13 +40,14 @@ public abstract class Strategy {
 
 
     private TradingSchedule tradingSchedule;
-    private final List<ChartableIndicator> indicators;
+    private final LinkedList<ChartableIndicator> indicators;
     private PositionManager positionManager;
     private PerformanceManager performanceManager;
     private final String name;
     private int position;
     private boolean hasValidIndicators;
     private final SimpleDateFormat df;
+    private final boolean isOptimizationMode;
 
 
     /**
@@ -59,7 +61,9 @@ public abstract class Strategy {
      */
     public abstract StrategyParams initParams();
 
-    public Strategy() {
+    public Strategy(MarketBook marketBook) {
+        this.marketBook = marketBook;
+
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
         strategyReportHeaders.add("Trade #");
@@ -72,23 +76,16 @@ public abstract class Strategy {
         strategyReportHeaders.add("Total P&L");
 
         name = getClass().getSimpleName();
-        indicators = new ArrayList<ChartableIndicator>();
+        indicators = new LinkedList<ChartableIndicator>();
         params = new StrategyParams();
-
-
         marketDepth = new MarketDepth();
-        marketBook = new MarketBook();
 
-        nf2 = (DecimalFormat) NumberFormat.getNumberInstance();
-        nf2.setMaximumFractionDigits(2);
-        nf2.setGroupingUsed(false);
-        nf5 = (DecimalFormat) NumberFormat.getNumberInstance();
-        nf5.setMaximumFractionDigits(5);
-        nf5.setGroupingUsed(false);
-
+        nf2 = NumberFormatterFactory.getNumberFormatter(2);
+        nf5 = NumberFormatterFactory.getNumberFormatter(5);
         df = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
 
         eventReport = Dispatcher.getReporter();
+        isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.OPTIMIZATION);
     }
 
     public void setReport(Report strategyReport) {
@@ -149,9 +146,9 @@ public abstract class Strategy {
         strategyReportColumns.add(nf5.format(marketDepth.getBestAsk()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
-        strategyReportColumns.add(nf2.format(performanceManager.getCommission()));
-        strategyReportColumns.add(nf2.format(performanceManager.getProfitAndLoss()));
-        strategyReportColumns.add(nf2.format(performanceManager.getTotalProfitAndLoss()));
+        strategyReportColumns.add(nf2.format(performanceManager.getTradeCommission()));
+        strategyReportColumns.add(nf2.format(performanceManager.getTradeProfit()));
+        strategyReportColumns.add(nf2.format(performanceManager.getNetProfit()));
 
         for (ChartableIndicator chartableIndicator : indicators) {
             String formattedValue = NOT_APPLICABLE;
@@ -195,6 +192,29 @@ public abstract class Strategy {
         return time;
     }
 
+    public void trim(long time) {
+        for (ChartableIndicator chartableIndicator : indicators) {
+            LinkedList<IndicatorValue> indicatorHistory = chartableIndicator.getIndicator().getHistory();
+            while (!indicatorHistory.isEmpty() && indicatorHistory.getFirst().getTime() < time) {
+                indicatorHistory.removeFirst();
+            }
+        }
+
+        LinkedList<MarketDepth> marketDepths = marketBook.getAll();
+        while (!marketDepths.isEmpty() && marketDepths.getFirst().getTime() < time) {
+            marketDepths.removeFirst();
+        }
+
+        LinkedList<Position> positionHistory = positionManager.getPositionsHistory();
+        while (!positionHistory.isEmpty() && positionHistory.getFirst().getTime() < time) {
+            positionHistory.removeFirst();
+        }
+
+        LinkedList<ProfitAndLoss> pnlHistory = performanceManager.getProfitAndLossHistory().getHistory();
+        while (!pnlHistory.isEmpty() && pnlHistory.getFirst().getTime() < time) {
+            pnlHistory.removeFirst();
+        }
+    }
 
     protected void addIndicator(String name, Indicator indicator, int chartIndex) {
         ChartableIndicator chartableIndicator = new ChartableIndicator(name, indicator, chartIndex);
@@ -244,20 +264,21 @@ public abstract class Strategy {
         return name;
     }
 
-    public void updateIndicators() {
+    public void updateIndicators() throws JBookTraderException {
         hasValidIndicators = true;
         for (ChartableIndicator chartableIndicator : indicators) {
             Indicator indicator = chartableIndicator.getIndicator();
             try {
                 indicator.calculate();
-                indicator.addToHistory(indicator.getTime(), indicator.getValue());
-            } catch (ArrayIndexOutOfBoundsException aie) {
+                if (!isOptimizationMode) {
+                    indicator.addToHistory(indicator.getTime(), indicator.getValue());
+                }
+            } catch (IndexOutOfBoundsException aie) {
                 hasValidIndicators = false;
                 // This exception will occur if book size is insufficient to calculate
                 // the indicator.
             } catch (Exception e) {
-                hasValidIndicators = false;
-                eventReport.report(e);
+                throw new JBookTraderException(e);
             }
         }
     }

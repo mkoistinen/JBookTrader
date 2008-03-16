@@ -80,7 +80,7 @@ public class ResultsTableModel extends TableDataModel {
                 item[++index] = param.getValue();
             }
 
-            item[++index] = result.getTotalProfit();
+            item[++index] = result.getNetProfit();
             item[++index] = result.getMaxDrawdown();
             item[++index] = result.getTrades();
             item[++index] = result.getProfitFactor();

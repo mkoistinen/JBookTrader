@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.model;
 
-import com.jbooktrader.platform.marketdepth.MarketDepth;
+import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.position.PositionManager;
@@ -17,15 +17,10 @@ public class TradingTableModel extends TableDataModel {
     public enum Column {
         Strategy("Strategy", String.class),
         Symbol("Symbol", String.class),
-        MarketDepth("Market Depth", String.class),
-        Bid("Bid", Double.class),
-        Ask("Ask", Double.class),
+        Book("Book", Integer.class),
         Position("Position", Integer.class),
         Trades("Trades", Integer.class),
-        PL("P&L", Double.class),
-        MaxDD("Max DD", Double.class),
-        PF("PF", Double.class),
-        TK("TK", Double.class);
+        PL("P&L", Double.class);
 
         private final String columnName;
         private final Class<?> columnClass;
@@ -70,8 +65,9 @@ public class TradingTableModel extends TableDataModel {
         }
         try {
             Class<?> clazz = Class.forName(strategy.getClass().getName());
-            Constructor<?> ct = clazz.getConstructor(StrategyParams.class);
-            strategy = (Strategy) ct.newInstance(new StrategyParams());
+            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+            Constructor<?> ct = clazz.getConstructor(parameterTypes);
+            strategy = (Strategy) ct.newInstance(new StrategyParams(), new MarketBook());
             rows.put(row, strategy);
             update(strategy);
             fireTableRowsUpdated(row, row);
@@ -100,18 +96,13 @@ public class TradingTableModel extends TableDataModel {
         if (row >= 0) {
             MarketDepth marketDepth = strategy.getMarketBook().getLastMarketDepth();
             if (marketDepth != null) {
-                setValueAt(marketDepth.toShortString(), row, Column.MarketDepth.ordinal());
-                setValueAt(marketDepth.getBestBid(), row, Column.Bid.ordinal());
-                setValueAt(marketDepth.getBestAsk(), row, Column.Ask.ordinal());
+                setValueAt(marketDepth.getBalance(), row, Column.Book.ordinal());
             }
             PositionManager positionManager = strategy.getPositionManager();
             PerformanceManager performanceManager = strategy.getPerformanceManager();
             setValueAt(positionManager.getPosition(), row, Column.Position.ordinal());
             setValueAt(performanceManager.getTrades(), row, Column.Trades.ordinal());
-            setValueAt(performanceManager.getTotalProfitAndLoss(), row, Column.PL.ordinal());
-            setValueAt(performanceManager.getMaxDrawdown(), row, Column.MaxDD.ordinal());
-            setValueAt(performanceManager.getProfitFactor(), row, Column.PF.ordinal());
-            setValueAt(performanceManager.getTrueKelly(), row, Column.TK.ordinal());
+            setValueAt(performanceManager.getNetProfit(), row, Column.PL.ordinal());
         }
     }
 

@@ -3,7 +3,7 @@ package com.jbooktrader.platform.indicator;
 
 import com.jbooktrader.platform.marketdepth.MarketBook;
 
-import java.util.*;
+import java.util.LinkedList;
 
 /**
  * Base class for all classes implementing technical indicators.
@@ -11,23 +11,13 @@ import java.util.*;
 public abstract class Indicator {
     protected double value;
     protected MarketBook marketBook;
-    private final List<IndicatorValue> history;
-    protected Indicator parent;
+    private final LinkedList<IndicatorValue> history;
 
     public abstract double calculate();
 
-    public Indicator() {
-        history = new ArrayList<IndicatorValue>();
-    }
-
     public Indicator(MarketBook marketBook) {
-        this();
         this.marketBook = marketBook;
-    }
-
-    public Indicator(Indicator parent) {
-        this();
-        this.parent = parent;
+        history = new LinkedList<IndicatorValue>();
     }
 
     @Override
@@ -42,19 +32,14 @@ public abstract class Indicator {
     }
 
     public long getTime() {
-        if (marketBook != null) {
-            return marketBook.getLastMarketDepth().getTime();
-        } else {
-            List<IndicatorValue> parentHistory = parent.getHistory();
-            return parentHistory.get(parentHistory.size() - 1).getTime();
-        }
+        return marketBook.getLastMarketDepth().getTime();
     }
 
     public void addToHistory(long date, double value) {
         history.add(new IndicatorValue(date, value));
     }
 
-    public List<IndicatorValue> getHistory() {
+    public LinkedList<IndicatorValue> getHistory() {
         return history;
     }
 

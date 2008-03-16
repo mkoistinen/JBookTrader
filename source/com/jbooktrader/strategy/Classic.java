@@ -9,6 +9,7 @@ import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 
 /**
  *
@@ -27,7 +28,8 @@ public class Classic extends Strategy {
     private final double entry, stopLoss, profitTarget;
 
 
-    public Classic(StrategyParams params) throws JBookTraderException {
+    public Classic(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
+        super(marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule

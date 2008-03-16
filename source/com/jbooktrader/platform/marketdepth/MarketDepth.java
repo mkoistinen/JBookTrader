@@ -8,6 +8,7 @@ import java.util.*;
 public class MarketDepth {
     private final LinkedList<MarketDepthItem> bids, asks;
     private long time;
+    private long lastUpdateTime;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
@@ -29,7 +30,8 @@ public class MarketDepth {
         for (MarketDepthItem item : marketDepth.asks) {
             asks.add(new MarketDepthItem(item.getSize(), item.getPrice()));
         }
-        time = marketDepth.time;
+
+        time = System.currentTimeMillis();
     }
 
     public synchronized void reset() {
@@ -44,6 +46,15 @@ public class MarketDepth {
 
     public long getTime() {
         return time;
+    }
+
+    public int getBalance() {
+        int cumBidSize = getCumulativeBidSize();
+        int cumAskSize = getCumulativeAskSize();
+
+        double totalDepth = (cumBidSize + cumAskSize);
+        double strength = 100. * (cumBidSize - cumAskSize) / totalDepth;
+        return (int) strength;
     }
 
     public double getBestBid() {
@@ -92,13 +103,32 @@ public class MarketDepth {
         return cumulativeBid + "-" + cumulativeAsk;
     }
 
-
-    public void update() {
-        time = System.currentTimeMillis();
+    public int getCumulativeBidSize() {
+        int cumulativeBid = 0;
+        for (MarketDepthItem item : bids) {
+            cumulativeBid += item.getSize();
+        }
+        return cumulativeBid;
     }
 
+    public int getCumulativeAskSize() {
+        int cumulativeAsk = 0;
+        for (MarketDepthItem item : asks) {
+            cumulativeAsk += item.getSize();
+        }
+        return cumulativeAsk;
+    }
+
+
+    synchronized public long getMillisSinceLastUpdate() {
+        long instant = System.nanoTime();
+        long millisSinceLastUpdate = (instant - lastUpdateTime) / 1000000;
+        return millisSinceLastUpdate;
+    }
+
+
     synchronized public void update(int position, int operation, int side, double price, int size) {
-        update();
+        lastUpdateTime = System.nanoTime();
         List<MarketDepthItem> items = (side == 1) ? bids : asks;
         switch (operation) {
             case 0:// insert

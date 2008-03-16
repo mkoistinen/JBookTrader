@@ -2,7 +2,8 @@ package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.util.MessageDialog;
+import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.io.*;
@@ -19,14 +20,15 @@ public final class BackTestFileWriter {
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
-    public BackTestFileWriter(TimeZone timeZone) throws IOException {
+    public BackTestFileWriter(Strategy strategy) throws IOException {
         String dir = JBookTrader.getAppPath() + FILE_SEP + "marketData";
         JFileChooser fileChooser = new JFileChooser(dir);
-        fileChooser.setDialogTitle("Save historical market depth");
+
+        fileChooser.setDialogTitle("Save historical market depth " + strategy.getName());
 
         if (fileChooser.showDialog(null, "Save") == JFileChooser.APPROVE_OPTION) {
             dateFormat = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
-            dateFormat.setTimeZone(timeZone);
+            dateFormat.setTimeZone(strategy.getTradingSchedule().getTimeZone());
             File file = fileChooser.getSelectedFile();
             String fileName = file.getAbsolutePath();
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, false)));
@@ -36,14 +38,7 @@ public final class BackTestFileWriter {
     public void write(MarketBook marketBook) {
         if (writer != null) {
 
-            DecimalFormatSymbols decimalFormatSeparator = new DecimalFormatSymbols();
-            decimalFormatSeparator.setDecimalSeparator('.');
-            
-            DecimalFormat nf = (DecimalFormat) NumberFormat.getNumberInstance();
-            nf.setGroupingUsed(false);
-            nf.setMinimumFractionDigits(0);
-            nf.setMaximumFractionDigits(5);
-            nf.setDecimalFormatSymbols( decimalFormatSeparator );
+            DecimalFormat nf = NumberFormatterFactory.getNumberFormatter(5);
 
             StringBuilder header = getHeader();
             writer.println(header);
@@ -57,7 +52,6 @@ public final class BackTestFileWriter {
                 sb.append(dateFormat.format(new Date(marketDepth.getTime())));
                 sb.append(";");// separator after data and time
 
-                //double lowestBid = marketDepth.getBids().getLast().getPrice();
                 for (MarketDepthItem item : marketDepth.getBids()) {
                     sb.append(item.getSize()).append(",");
                     sb.append(nf.format(item.getPrice())).append(",");

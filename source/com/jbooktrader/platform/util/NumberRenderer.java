@@ -1,16 +1,14 @@
 package com.jbooktrader.platform.util;
 
 import javax.swing.table.DefaultTableCellRenderer;
-import java.text.*;
+import java.text.DecimalFormat;
 
 
 public class NumberRenderer extends DefaultTableCellRenderer {
     private final DecimalFormat df;
 
     public NumberRenderer(int precision) {
-        df = (DecimalFormat) NumberFormat.getNumberInstance();
-        df.setMaximumFractionDigits(precision);
-        df.setGroupingUsed(false);
+        df = NumberFormatterFactory.getNumberFormatter(precision);
         setHorizontalAlignment(RIGHT);
     }
 

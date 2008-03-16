@@ -12,9 +12,8 @@ import java.util.*;
  * Reads and validates a data file containing historical market depth records.
  * The data file is used for backtesting and optimization of trading strategies.
  */
-public class BackTestFileReader extends Thread {
+public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final List<MarketDepth> marketDepths;
     private final Properties properties = new Properties();
     // Each line contains at least 6 columns: date, time, 1 bid size and price, 1 ask size and price
     // If market is deeper than 1 bid and ask, the line will contain more columns
@@ -22,20 +21,12 @@ public class BackTestFileReader extends Thread {
     private long previousTime;
     private SimpleDateFormat sdf;
     private BufferedReader reader;
-    private final Report report;
     private int lineNumber, totalLines;
     private String errorMsg;
     private volatile boolean cancelled;
+    private final String fileName;
 
-    public List<MarketDepth> getMarketDepths() {
-        return marketDepths;
-    }
-
-    public int getLinesRead() {
-        return lineNumber;
-    }
-
-    public int getLineCount() {
+    public int getTotalLineCount() {
         return totalLines;
     }
 
@@ -50,8 +41,9 @@ public class BackTestFileReader extends Thread {
 
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
-        report = Dispatcher.getReporter();
-        report.report("Loading historical market data file");
+        this.fileName = fileName;
+        Report report = Dispatcher.getReporter();
+        report.report("Reading properties in the historical market data file");
 
         try {
             properties.load(new FileInputStream(fileName));
@@ -78,13 +70,21 @@ public class BackTestFileReader extends Thread {
         sdf.setLenient(false);
         sdf.setTimeZone(tz);
 
+        report.report("Scanning historical market data file");
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
 
-            while (reader.readLine() != null && !cancelled) {
-                totalLines++;
+            String line;
+            while ((line = reader.readLine()) != null && !cancelled) {
+                boolean isComment = line.startsWith("#");
+                boolean isProperty = line.contains("=");
+                boolean isBlankLine = (line.trim().length() == 0);
+                boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
+                if (isMarketDepthLine) {
+                    totalLines++;
+                }
             }
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+
 
         } catch (FileNotFoundException fnfe) {
             throw new JBookTraderException("Could not find file " + fileName);
@@ -92,34 +92,40 @@ public class BackTestFileReader extends Thread {
             throw new JBookTraderException("Could not read file " + fileName);
         }
 
-        marketDepths = new ArrayList<MarketDepth>();
+        report.report("Scanning historical market data file completed");
     }
 
+    public void reset() throws JBookTraderException {
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+        } catch (FileNotFoundException fnfe) {
+            throw new JBookTraderException("Could not find file " + fileName);
+        }
+        previousTime = 0;
+    }
 
-    public void run() {
+    public MarketDepth getNextMarketDepth() throws JBookTraderException {
 
         String line = null;
+        MarketDepth marketDepth = null;
 
         try {
-            Dispatcher.getReporter().report("Reading historical market data file");
-
-            while ((line = reader.readLine()) != null) {
+            boolean isMarketDepthLine = false;
+            do {
+                line = reader.readLine();
                 lineNumber++;
-                boolean isComment = line.startsWith("#");
-                boolean isProperty = line.contains("=");
-                boolean isBlankLine = (line.trim().length() == 0);
-                boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
+                if (line != null) {
+                    boolean isComment = line.startsWith("#");
+                    boolean isProperty = line.contains("=");
+                    boolean isBlankLine = (line.trim().length() == 0);
+                    isMarketDepthLine = !(isComment || isProperty || isBlankLine);
 
-                if (isMarketDepthLine) {
-                    MarketDepth marketDepth = toMarketDepth(line);
-                    long time = marketDepth.getTime();
-                    marketDepths.add(marketDepth);
-                    previousTime = time;
+                    if (isMarketDepthLine) {
+                        marketDepth = toMarketDepth(line);
+                        previousTime = marketDepth.getTime();
+                    }
                 }
-            }
-
-
-            report.report("Loaded " + marketDepths.size() + " records from historical data file");
+            } while (!isMarketDepthLine && line != null);
         } catch (Exception e) {
             if (lineNumber > 0) {
                 errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
@@ -130,13 +136,10 @@ public class BackTestFileReader extends Thread {
                 description = e.toString();
             }
             errorMsg += description;
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ioe) {
-                report.report(ioe);
-            }
+            throw new JBookTraderException(errorMsg);
         }
+
+        return marketDepth;
     }
 
 
@@ -155,7 +158,6 @@ public class BackTestFileReader extends Thread {
             String msg = "The line should contain exactly 3 semicolon-separated sections.";
             throw new JBookTraderException(msg);
         }
-
 
         StringTokenizer dateTimeTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
         String dateToken = dateTimeTokenizer.nextToken();

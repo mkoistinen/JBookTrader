@@ -1,15 +1,15 @@
 package com.jbooktrader.platform.performance;
 
-import java.util.*;
+import java.util.LinkedList;
 
 /**
  * Holds P&L history.
  */
 public class ProfitAndLossHistory {
-    private final List<ProfitAndLoss> history;
+    private final LinkedList<ProfitAndLoss> history;
 
     public ProfitAndLossHistory() {
-        history = new ArrayList<ProfitAndLoss>();
+        history = new LinkedList<ProfitAndLoss>();
     }
 
     public void clear() {
@@ -20,7 +20,7 @@ public class ProfitAndLossHistory {
         history.add(profitAndLoss);
     }
 
-    public List<ProfitAndLoss> getHistory() {
+    public LinkedList<ProfitAndLoss> getHistory() {
         return history;
     }
 

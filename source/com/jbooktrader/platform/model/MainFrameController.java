@@ -20,9 +20,9 @@ public class MainFrameController {
     private final JTable tradingTable;
     private final TradingTableModel tradingTableModel;
     private static final String MAIN_WINDOW_HEIGHT = "mainwindow.height";
-    private static final String MAIN_WINDOW_WIDTH  = "mainwindow.width";
-    private static final String MAIN_WINDOW_X  = "mainwindow.x";
-    private static final String MAIN_WINDOW_Y  = "mainwindow.y";
+    private static final String MAIN_WINDOW_WIDTH = "mainwindow.width";
+    private static final String MAIN_WINDOW_X = "mainwindow.x";
+    private static final String MAIN_WINDOW_Y = "mainwindow.y";
     private final PreferencesHolder preferences = PreferencesHolder.getInstance();
 
     public MainFrameController() throws JBookTraderException {
@@ -31,11 +31,11 @@ public class MainFrameController {
         int lastWidth = preferences.getPropertyAsInt(MAIN_WINDOW_WIDTH);
         int lastX = preferences.getPropertyAsInt(MAIN_WINDOW_X);
         int lastY = preferences.getPropertyAsInt(MAIN_WINDOW_Y);
-        
-        if(lastHeight>0 && lastWidth>0) {
+
+        if (lastHeight > 0 && lastWidth > 0) {
             mainViewDialog.setBounds(lastX, lastY, lastWidth, lastHeight);
         }
-        
+
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
         assignListeners();
@@ -78,6 +78,20 @@ public class MainFrameController {
                     tradingTable.setRowSelectionInterval(selectedRow, selectedRow);
                     mainViewDialog.showPopup(e);
                     tradingTable.setRowSelectionInterval(selectedRow, selectedRow);
+                }
+            }
+        });
+
+        mainViewDialog.informationAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    Strategy strategy = getSelectedRowStrategy();
+                    new StrategyInformationDialog(mainViewDialog, strategy);
+                } catch (Throwable t) {
+                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                } finally {
+                    mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }
         });
@@ -150,7 +164,7 @@ public class MainFrameController {
                     Strategy strategy = getSelectedRowStrategy();
                     MarketBook book = strategy.getMarketBook();
                     if (book.size() != 0) {
-                        BackTestFileWriter backTestFileWriter = new BackTestFileWriter(strategy.getTradingSchedule().getTimeZone());
+                        BackTestFileWriter backTestFileWriter = new BackTestFileWriter(strategy);
                         backTestFileWriter.write(book);
                     } else {
                         String msg = "The book for this strategy is empty. Please run a strategy first.";
@@ -214,9 +228,8 @@ public class MainFrameController {
                     preferences.setProperty(MAIN_WINDOW_WIDTH, mainViewDialog.getSize().width);
                     preferences.setProperty(MAIN_WINDOW_X, mainViewDialog.getX());
                     preferences.setProperty(MAIN_WINDOW_Y, mainViewDialog.getY());
-                }
-                catch(JBookTraderException jbtexception) {
-                    Dispatcher.getReporter().report(jbtexception.getMessage());
+                } catch (JBookTraderException jbte) {
+                    Dispatcher.getReporter().report(jbte);
                 }
                 Dispatcher.exit();
             }

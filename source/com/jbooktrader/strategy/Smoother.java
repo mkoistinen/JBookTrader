@@ -9,6 +9,7 @@ import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 
 /**
  *
@@ -23,13 +24,13 @@ public class Smoother extends Strategy {
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
-
     // Strategy parameters values
     private final double entry, exit;
     private final int period;
 
 
-    public Smoother(StrategyParams params) throws JBookTraderException {
+    public Smoother(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
+        super(marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -45,7 +46,6 @@ public class Smoother extends Strategy {
         period = (int) params.get(PERIOD, 4);
         entry = params.get(ENTRY, 32);
         exit = params.get(EXIT, 32);
-
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);

@@ -2,7 +2,8 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.TradingTableModel.Column.*;
+import static com.jbooktrader.platform.model.TradingTableModel.Column.PL;
+import static com.jbooktrader.platform.model.TradingTableModel.Column.Strategy;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
@@ -19,7 +20,7 @@ import java.net.URL;
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem;
-    private JMenuItem tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
+    private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
     private TradingTableModel tradingTableModel;
     private JTable tradingTable;
     private JPopupMenu popupMenu;
@@ -78,6 +79,10 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
     public void tradingTableAction(MouseAdapter action) {
         tradingTable.addMouseListener(action);
+    }
+
+    public void informationAction(ActionListener action) {
+        infoMenuItem.addActionListener(action);
     }
 
     public void backTestAction(ActionListener action) {
@@ -187,6 +192,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // popup menu
         popupMenu = new JPopupMenu();
 
+        infoMenuItem = new JMenuItem("Information", getImageIcon("information.png"));
         backTestMenuItem = new JMenuItem("Back Test", getImageIcon("backTest.png"));
         optimizeMenuItem = new JMenuItem("Optimize", getImageIcon("optimize.png"));
         forwardTestMenuItem = new JMenuItem("Forward Test", getImageIcon("forwardTest.png"));
@@ -194,6 +200,8 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         chartMenuItem = new JMenuItem("Chart", getImageIcon("chart.png"));
         saveBookMenuItem = new JMenuItem("Save Book", getImageIcon("save.png"));
 
+        popupMenu.add(infoMenuItem);
+        popupMenu.addSeparator();
         popupMenu.add(optimizeMenuItem);
         popupMenu.add(backTestMenuItem);
         popupMenu.add(forwardTestMenuItem);
@@ -214,25 +222,19 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
         // set custom column renderers
         TableColumnModel columnModel = tradingTable.getColumnModel();
-        NumberRenderer nr5 = new NumberRenderer(5);
-        columnModel.getColumn(Bid.ordinal()).setCellRenderer(nr5);
-        columnModel.getColumn(Ask.ordinal()).setCellRenderer(nr5);
         NumberRenderer nr2 = new NumberRenderer(2);
         columnModel.getColumn(PL.ordinal()).setCellRenderer(nr2);
-        columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr2);
-        columnModel.getColumn(PF.ordinal()).setCellRenderer(nr2);
-        columnModel.getColumn(TK.ordinal()).setCellRenderer(nr2);
 
         // Make some columns wider than the rest, so that the info fits in.
-        columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(150);
-        columnModel.getColumn(MarketDepth.ordinal()).setPreferredWidth(100);
+        columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
+
         tradingScroll.getViewport().add(tradingTable);
 
         Image appIcon = Toolkit.getDefaultToolkit().getImage(getImageURL("JBookTrader.png"));
         setIconImage(appIcon);
 
         add(tradingPanel, BorderLayout.CENTER);
-        setPreferredSize(new Dimension(700, 250));
+        setPreferredSize(new Dimension(500, 309));
         setTitle(JBookTrader.APP_NAME);
         pack();
     }

@@ -22,7 +22,7 @@ public class ResultComparator implements Comparator<Result> {
         switch (sortKey) {
             case TOTAL_PROFIT:
                 // highest to lowest
-                res = ((Double) r2.getTotalProfit()).compareTo(r1.getTotalProfit());
+                res = ((Double) r2.getNetProfit()).compareTo(r1.getNetProfit());
                 break;
             case PROFIT_FACTOR:
                 // highest to lowest
@@ -40,7 +40,6 @@ public class ResultComparator implements Comparator<Result> {
                 // highest to lowest
                 res = ((Double) r2.getTrueKelly()).compareTo(r1.getTrueKelly());
                 break;
-
         }
 
         return res;

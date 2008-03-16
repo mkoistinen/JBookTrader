@@ -2,6 +2,7 @@ package com.jbooktrader.platform.strategy;
 
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.schedule.TradingSchedule;
@@ -44,16 +45,33 @@ public class StrategyRunner implements Runnable {
 
         TraderAssistant traderAssistant = trader.getAssistant();
         traderAssistant.requestMarketDepth(strategy, 5);
-        new MarketDepthFactory(strategy);
+        PerformanceManager performanceManager = strategy.getPerformanceManager();
         MarketBook marketBook = strategy.getMarketBook();
+        MarketDepth marketDepth = strategy.getMarketDepth();
         strategy.setIsActive(true);
 
         while (strategy.isActive()) {
             synchronized (marketBook) {
-                marketBook.wait();
+                marketBook.wait(); // wait until notified about the update
             }
 
-            long instant = marketBook.getLastMarketDepth().getTime();
+            // This is a little awkward. We are waiting for 100 milliseconds of
+            // inactivity, so that when we take a snapshot of the book, we know
+            // it's been fully updated.
+            while (true) {
+                synchronized (marketDepth) {
+                    // the getMillisSinceLastUpdate and addMarketDepth must be done atomically
+                    if (marketDepth.getMillisSinceLastUpdate() >= 100) {
+                        marketBook.addMarketDepth(marketDepth);
+                        break;
+                    }
+                }
+                Thread.sleep(50);
+            }
+
+
+            MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
+            long instant = lastMarketDepth.getTime();
             strategy.setTime(instant);
             strategy.updateIndicators();
             if (strategy.hasValidIndicators()) {
@@ -65,6 +83,7 @@ public class StrategyRunner implements Runnable {
             }
 
             positionManager.trade();
+            performanceManager.updateNetProfit(lastMarketDepth.getMidPoint(), positionManager.getPosition());
             Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
         }
     }

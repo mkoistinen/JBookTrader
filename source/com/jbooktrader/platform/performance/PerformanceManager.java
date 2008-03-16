@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.performance;
 
 import com.jbooktrader.platform.commission.Commission;
-//import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.Dispatcher;
 import com.jbooktrader.platform.strategy.Strategy;
 
 /**
@@ -16,8 +16,9 @@ public class PerformanceManager {
 
     private int trades, profitableTrades, unprofitableTrades;
     private double tradeCommission, totalCommission;
-    private double totalBought, totalSold, profitAndLoss, grossProfit, grossLoss, totalProfitAndLoss;
-    private double profitFactor, peakTotalProfitAndLoss, maxDrawdown, trueKelly;
+    private double averageProfitPerTrade, percentProfitableTrades;
+    private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, previousNetProfit;
+    private double profitFactor, peakNetProfit, maxDrawdown, trueKelly;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
@@ -30,6 +31,14 @@ public class PerformanceManager {
         return trades;
     }
 
+    public double getPercentProfitableTrades() {
+        return percentProfitableTrades;
+    }
+
+    public double getAverageProfitPerTrade() {
+        return averageProfitPerTrade;
+    }
+
     public double getProfitFactor() {
         return profitFactor;
     }
@@ -38,16 +47,20 @@ public class PerformanceManager {
         return maxDrawdown;
     }
 
-    public double getProfitAndLoss() {
-        return profitAndLoss;
+    public double getTradeProfit() {
+        return tradeProfit;
     }
 
-    public double getCommission() {
+    public Commission getCommission() {
+        return commission;
+    }
+
+    public double getTradeCommission() {
         return tradeCommission;
     }
 
-    public double getTotalProfitAndLoss() {
-        return totalProfitAndLoss;
+    public double getNetProfit() {
+        return netProfit;
     }
 
     public ProfitAndLossHistory getProfitAndLossHistory() {
@@ -57,6 +70,12 @@ public class PerformanceManager {
     public double getTrueKelly() {
         return trueKelly;
     }
+
+    public void updateNetProfit(double price, int position) {
+        double positionValue = position * price * multiplier;
+        netProfit = totalSold - totalBought + positionValue - totalCommission;
+    }
+
 
     public void update(int quantity, double avgFillPrice, int position) {
         trades++;
@@ -73,26 +92,27 @@ public class PerformanceManager {
 
 
         double positionValue = position * avgFillPrice * multiplier;
-        double previousProfitandLoss = totalProfitAndLoss;
-        totalProfitAndLoss = totalSold - totalBought + positionValue - totalCommission;
+        previousNetProfit = netProfit;
+        netProfit = totalSold - totalBought + positionValue - totalCommission;
 
-        profitAndLoss = totalProfitAndLoss - previousProfitandLoss;
+        tradeProfit = netProfit - previousNetProfit;
+        averageProfitPerTrade = netProfit / trades;
 
-        if (profitAndLoss >= 0) {
+        if (tradeProfit >= 0) {
             profitableTrades++;
-            grossProfit += profitAndLoss;
+            grossProfit += tradeProfit;
         } else {
             unprofitableTrades++;
-            grossLoss += (-profitAndLoss);
+            grossLoss += (-tradeProfit);
         }
 
+        percentProfitableTrades = 100 * (profitableTrades / (double) trades);
         profitFactor = grossProfit / grossLoss;
 
-        if (totalProfitAndLoss > peakTotalProfitAndLoss) {
-            peakTotalProfitAndLoss = totalProfitAndLoss;
-        }
+        peakNetProfit = Math.max(netProfit, peakNetProfit);
 
-        double drawdown = peakTotalProfitAndLoss - totalProfitAndLoss;
+
+        double drawdown = peakNetProfit - netProfit;
         if (drawdown > maxDrawdown) {
             maxDrawdown = drawdown;
         }
@@ -114,7 +134,9 @@ public class PerformanceManager {
             }
         }
 
-        long time = strategy.getTime();
-        profitAndLossHistory.add(new ProfitAndLoss(time, totalProfitAndLoss));
+        if ((Dispatcher.getMode() != Dispatcher.Mode.OPTIMIZATION)) {
+            long time = strategy.getTime();
+            profitAndLossHistory.add(new ProfitAndLoss(time, netProfit));
+        }
     }
 }

@@ -1,19 +1,19 @@
 package com.jbooktrader.platform.marketdepth;
 
-import java.util.*;
+import java.util.LinkedList;
 
 /**
  * Holds market depth history for a strategy.
  */
 public class MarketBook {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final ArrayList<MarketDepth> marketDepths;
+    private final LinkedList<MarketDepth> marketDepths;
 
     public MarketBook() {
-        marketDepths = new ArrayList<MarketDepth>();
+        marketDepths = new LinkedList<MarketDepth>();
     }
 
-    public List<MarketDepth> getAll() {
+    public LinkedList<MarketDepth> getAll() {
         return marketDepths;
     }
 
@@ -32,9 +32,8 @@ public class MarketBook {
     }
 
     synchronized public void addMarketDepth(MarketDepth marketDepth) {
-        marketDepth = new MarketDepth(marketDepth);
-        marketDepths.add(marketDepth);
-        notifyAll();
+        MarketDepth md = new MarketDepth(marketDepth);
+        marketDepths.add(md);
     }
 
     public void add(MarketDepth marketDepth) {

@@ -5,6 +5,7 @@ import static com.jbooktrader.platform.optimizer.ResultComparator.SortKey.*;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.marketdepth.*;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -58,7 +59,7 @@ public class OptimizerDialog extends JDialog {
         progressLabel.setText(label);
         int percent = (int) (100 * (count / (double) iterations));
 
-        text += " " + count + " of " + iterations + " (" + percent + "%)";
+        text += " " + percent + "% completed";
         progressBar.setValue(percent);
         progressBar.setString(text);
     }
@@ -69,7 +70,6 @@ public class OptimizerDialog extends JDialog {
         progressBar.setValue(percent);
         progressBar.setString(text);
     }
-
 
     public void showMaxIterationsLimit(long iterations, long maxIterations) {
         String message = "The range of parameters for this optimization run requires " + iterations + " iterations." + LINE_SEP;
@@ -82,7 +82,7 @@ public class OptimizerDialog extends JDialog {
     public void enableProgress() {
         progressLabel.setText("");
         progressBar.setValue(0);
-        progressBar.setString("Starting optimization...");
+        //progressBar.setString("Starting optimization...");
         progressPanel.setVisible(true);
         optimizeButton.setEnabled(false);
         cancelButton.setEnabled(true);
@@ -238,13 +238,13 @@ public class OptimizerDialog extends JDialog {
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
         JLabel optimizationMethodLabel = new JLabel("Optimization method: ");
-        JComboBox optimizationMethodCombo = new JComboBox(new String[] {"Brute force"});
+        JComboBox optimizationMethodCombo = new JComboBox(new String[]{"Brute force"});
         optimizationMethodLabel.setLabelFor(optimizationMethodCombo);
         optimizationOptionsPanel.add(optimizationMethodLabel);
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[] {"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest True Kelly"};
+        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest True Kelly"};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -322,8 +322,9 @@ public class OptimizerDialog extends JDialog {
         try {
             String className = "com.jbooktrader.strategy." + strategyName;
             Class<?> clazz = Class.forName(className);
-            Constructor<?> ct = clazz.getConstructor(StrategyParams.class);
-            strategy = (Strategy) ct.newInstance(new StrategyParams());
+            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+            Constructor<?> ct = clazz.getConstructor(parameterTypes);
+            strategy = (Strategy) ct.newInstance(new StrategyParams(), new MarketBook());
             strategy.setParams(strategy.initParams());
             paramTableModel.setParams(strategy.getParams());
             resultsTableModel = new ResultsTableModel(strategy);

@@ -1,13 +1,11 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.marketdepth.MarketDepth;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.MessageDialog;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
@@ -44,14 +42,6 @@ public class BackTestStrategyRunner implements Runnable {
         try {
             backTestDialog.enableProgress();
             backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
-            int lineCount = backTestFileReader.getLineCount();
-            backTestFileReader.start();
-
-            while (backTestFileReader.isAlive() && !cancelled) {
-                backTestDialog.setProgress(backTestFileReader.getLinesRead(), lineCount, "Reading historical data file:");
-                Thread.sleep(500);
-            }
-
             if (!cancelled) {
                 String errorMsg = backTestFileReader.getError();
                 if (errorMsg != null) {
@@ -59,8 +49,7 @@ public class BackTestStrategyRunner implements Runnable {
                 }
 
                 backTestDialog.showProgress("Running back test...");
-                List<MarketDepth> marketDepths = backTestFileReader.getMarketDepths();
-                BackTester backTester = new BackTester(strategy, marketDepths);
+                BackTester backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
                 backTester.execute();
             }
         } catch (Throwable t) {

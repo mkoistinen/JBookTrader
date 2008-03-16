@@ -9,6 +9,7 @@ import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 
 /**
  *
@@ -29,7 +30,8 @@ public class Predator extends Strategy {
     private final int period;
 
 
-    public Predator(StrategyParams params) throws JBookTraderException {
+    public Predator(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
+        super(marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -42,10 +44,9 @@ public class Predator extends Strategy {
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        period = (int) params.get(PERIOD, 20);
-        entry = params.get(ENTRY, 29);
-        exit = params.get(EXIT, 29);
-
+        period = (int) params.get(PERIOD, 26);
+        entry = params.get(ENTRY, 27);
+        exit = params.get(EXIT, 27);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);

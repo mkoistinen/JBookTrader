@@ -8,13 +8,13 @@ public class CommissionFactory {
     }
 
     /**
-     * @param rate Commission per contract or per share
-     * @param min Minimum commission per order
-     * @param maxPercent Maximum commission as percent of the trade amount
-     * @return Commission for the trade
-     *
      * For commissions and fees, see
      * http://individuals.interactivebrokers.com/en/accounts/fees/commission.php?ib_entity=llc
+     *
+     * @param rate       Commission per contract or per share
+     * @param min        Minimum commission per order
+     * @param maxPercent Maximum commission as percent of the trade amount
+     * @return Commission for the trade
      */
     public static Commission getCommission(double rate, double min, double maxPercent) {
         return new Commission(rate, min, maxPercent);

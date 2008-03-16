@@ -5,11 +5,11 @@ package com.jbooktrader.platform.position;
  */
 public class Position {
     private final int position;
-    private final long date;
+    private final long time;
     private final double avgFillPrice;
 
-    public Position(long date, int position, double avgFillPrice) {
-        this.date = date;
+    public Position(long time, int position, double avgFillPrice) {
+        this.time = time;
         this.position = position;
         this.avgFillPrice = avgFillPrice;
     }
@@ -18,8 +18,8 @@ public class Position {
         return position;
     }
 
-    public long getDate() {
-        return date;
+    public long getTime() {
+        return time;
     }
 
     public double getAvgFillPrice() {

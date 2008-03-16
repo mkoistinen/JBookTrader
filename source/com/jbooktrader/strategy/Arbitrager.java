@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.Contract;
-import com.jbooktrader.indicator.DepthBalance;
+import com.jbooktrader.indicator.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.Indicator;
 import com.jbooktrader.platform.model.JBookTraderException;
@@ -9,14 +9,15 @@ import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 
 /**
  *
  */
-public class EtfFlipper extends Strategy {
+public class Arbitrager extends Strategy {
 
     // Technical indicators
-    private final Indicator depthBalanceInd;
+    private final Indicator truePriceInd;
 
     // Strategy parameters names
     private static final String ENTRY = "Entry";
@@ -26,28 +27,29 @@ public class EtfFlipper extends Strategy {
     private final double entry, exit;
 
 
-    public EtfFlipper(StrategyParams params) throws JBookTraderException {
+    public Arbitrager(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
+        super(marketBook);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeStockContract("QQQQ", "SMART");
+        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
-        int multiplier = 1;// contract multiplier
-        Commission commission = CommissionFactory.getBundledNorthAmericaStockCommission();
+        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
+        int multiplier = 50;// contract multiplier
+        Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         // Initialize strategy parameter values. If the strategy is running in the optimization
         // mode, the parameter values will be taken from the "params" object. Otherwise, the
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
-        entry = params.get(ENTRY, 30);
-        exit = params.get(EXIT, 30);
+        entry = params.get(ENTRY, 0.7);
+        exit = params.get(EXIT, 0.2);
 
         // Create technical indicators
-        depthBalanceInd = new DepthBalance(marketBook);
+        truePriceInd = new TruePrice(marketBook);
 
         // Specify the title and the chart number for each indicator
         // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
-        addIndicator("Depth Balance", depthBalanceInd, 1);
+        addIndicator("Depth Balance", truePriceInd, 0);
     }
 
     /**
@@ -57,8 +59,8 @@ public class EtfFlipper extends Strategy {
     @Override
     public StrategyParams initParams() {
         StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 20, 70, 1);
-        params.add(EXIT, 0, 60, 1);
+        params.add(ENTRY, 0, 2, 0.1);
+        params.add(EXIT, 0, 2, 0.1);
         return params;
     }
 
@@ -69,14 +71,16 @@ public class EtfFlipper extends Strategy {
     @Override
     public void onBookChange() {
         int currentPosition = getPositionManager().getPosition();
-        double depthBalance = depthBalanceInd.getValue();
-        if (depthBalance >= entry) {
-            setPosition(1000);
-        } else if (depthBalance <= -entry) {
-            setPosition(-1000);
+        double truePrice = truePriceInd.getValue();
+        double price = getLastMarketDepth().getMidPoint();
+        double diff = truePrice - price;
+        if (diff >= entry) {
+            setPosition(1);
+        } else if (diff <= -entry) {
+            setPosition(-1);
         } else {
-            boolean target = (currentPosition > 0 && depthBalance <= -exit);
-            target = target || (currentPosition < 0 && depthBalance >= exit);
+            boolean target = (currentPosition > 0 && truePrice <= -exit);
+            target = target || (currentPosition < 0 && truePrice >= exit);
             if (target) {
                 setPosition(0);
             }

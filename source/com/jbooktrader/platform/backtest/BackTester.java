@@ -7,26 +7,32 @@ import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 
-import java.util.List;
-
 /**
  * This class is responsible for running the strategy against historical market data
  */
 public class BackTester {
+    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L; // 24 hours
     private final Strategy strategy;
-    private final List<MarketDepth> marketDepths;
+    private final BackTestFileReader backTestFileReader;
+    private final BackTestDialog backTestDialog;
 
-    public BackTester(Strategy strategy, List<MarketDepth> marketDepths) {
+    public BackTester(Strategy strategy, BackTestFileReader backTestFileReader, BackTestDialog backTestDialog) {
         this.strategy = strategy;
-        this.marketDepths = marketDepths;
+        this.backTestFileReader = backTestFileReader;
+        this.backTestDialog = backTestDialog;
     }
 
-    public void execute() {
+    public void execute() throws JBookTraderException {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
-        for (MarketDepth marketDepth : marketDepths) {
+        long lineCount = 0;
+        long totalLines = backTestFileReader.getTotalLineCount();
+        backTestFileReader.reset();
+        MarketDepth marketDepth;
+        while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
+            lineCount++;
             marketBook.add(marketDepth);
             long instant = marketBook.getLastMarketDepth().getTime();
             strategy.setTime(instant);
@@ -40,6 +46,8 @@ public class BackTester {
             }
 
             positionManager.trade();
+            strategy.trim(instant - MAX_HISTORY_PERIOD);
+            backTestDialog.setProgress(lineCount, totalLines, "Running back test:");
         }
 
         // go flat at the end of the test period to finalize the run

@@ -6,13 +6,12 @@ public class Commission {
     private final double rate, minimum, maximumPercent;
 
     /**
-     *
-     * @param rate Commission per contract or per share
-     * @param minimum Minimum commission per order
-     * @param maximumPercent Maximum commission as percent of the trade amount
-     *
      * For commissions and fees, see
      * http://individuals.interactivebrokers.com/en/accounts/fees/commission.php?ib_entity=llc
+     *
+     * @param rate           Commission per contract or per share
+     * @param minimum        Minimum commission per order
+     * @param maximumPercent Maximum commission as percent of the trade amount
      */
     public Commission(double rate, double minimum, double maximumPercent) {
         this.rate = rate;
@@ -20,10 +19,14 @@ public class Commission {
         this.maximumPercent = maximumPercent;
     }
 
+    public String toString() {
+        String s = rate + " per share/contract, " + minimum + " minimum per trade";
+        return s;
+    }
+
     public Commission(double rate, double minimum) {
         this(rate, minimum, 0);
     }
-
 
     public double getCommission(int contracts, double price) {
         double commission = rate * contracts;

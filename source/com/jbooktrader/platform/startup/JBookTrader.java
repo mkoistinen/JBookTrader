@@ -35,8 +35,8 @@ public class JBookTrader {
         ColorUIResource color = new ColorUIResource(102, 102, 153);
         UIManager.put("Label.foreground", color);
         UIManager.put("TitledBorder.titleColor", color);
-        Dispatcher.setReporter("EventReport");
 
+        Dispatcher.setReporter("EventReport");
         new MainFrameController();
     }
 
@@ -59,7 +59,7 @@ public class JBookTrader {
                 String msg = "Exactly one argument must be passed. Usage: JBookTrader <JBookTraderDirectory>";
                 throw new JBookTraderException(msg);
             }
-            appPath = args[0];
+            JBookTrader.appPath = args[0];
             new JBookTrader();
         } catch (Throwable t) {
             MessageDialog.showError(null, t.getMessage());
@@ -68,7 +68,7 @@ public class JBookTrader {
     }
 
     public static String getAppPath() {
-        return appPath;
+        return JBookTrader.appPath;
     }
 
 }

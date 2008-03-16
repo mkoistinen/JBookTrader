@@ -268,7 +268,7 @@ public class StrategyPerformanceChart {
         profitAndLossHistory.addAll(plHistory.getHistory());
 
         for (ProfitAndLoss profitAndLoss : profitAndLossHistory) {
-            ts.addOrUpdate(new Second(new Date(profitAndLoss.getDate())), profitAndLoss.getValue());
+            ts.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
         }
 
         ts.fireSeriesChanged();
@@ -349,7 +349,7 @@ public class StrategyPerformanceChart {
         // Plot positions
         for (Position position : strategy.getPositionManager().getPositionsHistory()) {
 
-            Date date = new Date(position.getDate());
+            Date date = new Date(position.getTime());
             double aveFill = position.getAvgFillPrice();
             int pos = position.getPosition();
 

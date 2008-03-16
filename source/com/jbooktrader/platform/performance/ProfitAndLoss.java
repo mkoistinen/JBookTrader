@@ -4,11 +4,11 @@ package com.jbooktrader.platform.performance;
  * Encapsulates P&L information.
  */
 public class ProfitAndLoss {
-    private final long date;
+    private final long time;
     private final double value;
 
-    public ProfitAndLoss(long date, double value) {
-        this.date = date;
+    public ProfitAndLoss(long time, double value) {
+        this.time = time;
         this.value = value;
     }
 
@@ -16,7 +16,7 @@ public class ProfitAndLoss {
         return value;
     }
 
-    public long getDate() {
-        return date;
+    public long getTime() {
+        return time;
     }
 }
