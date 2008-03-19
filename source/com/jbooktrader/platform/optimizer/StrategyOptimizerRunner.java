@@ -4,8 +4,8 @@ import com.jbooktrader.platform.backtest.BackTestFileReader;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.PerformanceManager;
-//import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.report.Report;
+import com.jbooktrader.platform.schedule.TradingSchedule;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
 
@@ -19,7 +19,7 @@ import java.util.*;
  * historical market depth.
  */
 public class StrategyOptimizerRunner implements Runnable {
-    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L; // 24 hours
+    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L;// 24 hours
     private static final int SUBTASK_SIZE = 1000;
     private static final long MAX_ITERATIONS = 50000000L;
     private static final int MAX_RESULTS = 5000;
@@ -33,12 +33,14 @@ public class StrategyOptimizerRunner implements Runnable {
     private final String strategyName;
     private ComputationalTimeEstimator timeEstimator;
     private final Constructor<?> strategyConstructor;
+    private final TradingSchedule tradingSchedule;
 
     public StrategyOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy) throws ClassNotFoundException, NoSuchMethodException {
 
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = strategy.getParams();
+        tradingSchedule = strategy.getTradingSchedule();
         results = Collections.synchronizedList(new ArrayList<Result>());
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
@@ -98,7 +100,7 @@ public class StrategyOptimizerRunner implements Runnable {
         Report.disable();
     }
 
-    private void showProgress(long counter, int numberOfTasks, String text) {
+    private void showProgress(long counter, long numberOfTasks, String text) {
         synchronized (results) {
             Collections.sort(results, resultComparator);
 
@@ -112,6 +114,11 @@ public class StrategyOptimizerRunner implements Runnable {
         String remainingTime = timeEstimator.getTimeLeft(counter);
         optimizerDialog.setProgress(counter, numberOfTasks, text, remainingTime);
     }
+
+    private void showFastProgress(long counter, long numberOfTasks, String text) {
+        optimizerDialog.setProgress(counter, numberOfTasks, text);
+    }
+
 
     public void run() {
         try {
@@ -176,11 +183,12 @@ public class StrategyOptimizerRunner implements Runnable {
 
 
             timeEstimator = new ComputationalTimeEstimator(System.currentTimeMillis(), lineCount);
-            optimizerDialog.showProgress("Creating " + tasks.size() + " strategies...");
+            //optimizerDialog.showProgress("Creating " + tasks.size() + " strategies...");
 
             ArrayList<ArrayList<Strategy>> subTasks = new ArrayList<ArrayList<Strategy>>();
             ArrayList<Strategy> subtask = new ArrayList<Strategy>();
             subTasks.add(subtask);
+            long strategiesCreated = 0;
             MarketBook marketBook = new MarketBook();
             for (StrategyParams params : tasks) {
                 if (subtask.size() >= SUBTASK_SIZE) {
@@ -190,13 +198,18 @@ public class StrategyOptimizerRunner implements Runnable {
                 Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
                 strategy.setParams(params);
                 subtask.add(strategy);
+                strategiesCreated++;
+                if (strategiesCreated % 1000 == 0) {
+                    showFastProgress(strategiesCreated, tasks.size(), "Creating " + tasks.size() + " strategies: ");
+                }
             }
 
 
             String progressText = "Backtesting " + tasks.size() + " strategies: ";
-            showProgress(0, lineCount * tasks.size(), progressText);
+            long totalCount = (long) lineCount * (long) tasks.size();
+            showProgress(0, totalCount, progressText);
             long startTime = System.currentTimeMillis();
-            timeEstimator = new ComputationalTimeEstimator(startTime, lineCount * tasks.size());
+            timeEstimator = new ComputationalTimeEstimator(startTime, totalCount);
             long completed = 0;
 
             for (ArrayList<Strategy> strategies : subTasks) {
@@ -208,7 +221,7 @@ public class StrategyOptimizerRunner implements Runnable {
 
                     marketBook.add(marketDepth);
                     long time = marketDepth.getTime();
-                    boolean inSchedule = strategies.get(0).getTradingSchedule().contains(time);
+                    boolean inSchedule = tradingSchedule.contains(time);
 
                     for (Strategy strategy : strategies) {
 
@@ -226,7 +239,7 @@ public class StrategyOptimizerRunner implements Runnable {
 
                         completed++;
                         if (completed % UPDATE_FREQUENCY == 0) {
-                            showProgress(completed, lineCount * tasks.size(), progressText);
+                            showProgress(completed, totalCount, progressText);
                         }
                         if (cancelled) {
                             return;
@@ -244,14 +257,14 @@ public class StrategyOptimizerRunner implements Runnable {
                     if (trades >= minTrades) {
                         Result result = new Result(strategy.getParams(), performanceManager);
                         results.add(result);
-                        showProgress(completed, lineCount * tasks.size(), progressText);
+                        showProgress(completed, totalCount, progressText);
                     }
                 }
 
                 strategies.clear();
             }
 
-            showProgress(completed, lineCount * tasks.size(), progressText);
+            showProgress(completed, totalCount, progressText);
             long totalTimeInSecs = (System.currentTimeMillis() - startTime) / 1000;
             saveToFile();
             MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
