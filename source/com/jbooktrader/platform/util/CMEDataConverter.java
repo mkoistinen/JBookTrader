@@ -41,9 +41,10 @@ public class CMEDataConverter {
         this.contract = contract;
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         jbtDateFormat = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
+        jbtDateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         cmeDateFormat.setLenient(false);
-        cmeDateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+        cmeDateFormat.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
 
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
@@ -70,7 +71,7 @@ public class CMEDataConverter {
     public void write() {
         StringBuilder sb = new StringBuilder();
         sb.append(jbtDateFormat.format(new Date(time)));
-        sb.append(";"); // separator after date and time
+        sb.append(";");// separator after date and time
 
         for (MarketDepthItem item : bids) {
             if (item != null) {
@@ -79,7 +80,7 @@ public class CMEDataConverter {
             }
         }
         sb.deleteCharAt(sb.length() - 1);
-        sb.append(";"); // separator between bids and asks
+        sb.append(";");// separator between bids and asks
 
         for (MarketDepthItem item : asks) {
             if (item != null) {
