@@ -36,7 +36,7 @@ public class TraderAssistant {
 
         PreferencesHolder prefs = PreferencesHolder.getInstance();
 
-        boolean isAdvisorAccountUsed = Boolean.valueOf(prefs.get(AccountType));
+        boolean isAdvisorAccountUsed = prefs.get(AccountType).equalsIgnoreCase("advisor");
         advisorAccountID = (isAdvisorAccountUsed) ? prefs.get(AdvisorAccount) : "";
 
         host = prefs.get(Host);
