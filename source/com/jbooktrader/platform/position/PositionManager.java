@@ -6,13 +6,17 @@ import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.trader.TraderAssistant;
+import com.jbooktrader.platform.util.*;
 
+import java.text.NumberFormat;
 import java.util.LinkedList;
 
 /**
  * Position manager keeps track of current positions and executions.
  */
 public class PositionManager {
+    private static final String LINE_SEP = System.getProperty("line.separator");
+    private final NumberFormat nf2;
     private final LinkedList<Position> positionsHistory;
     private final Strategy strategy;
     private final Report eventReport;
@@ -22,6 +26,7 @@ public class PositionManager {
     private int position;
     private double avgFillPrice;
     private volatile boolean orderExecutionPending;
+    private final boolean isTradingOrForwardTesting;
 
 
     public PositionManager(Strategy strategy) throws JBookTraderException {
@@ -30,6 +35,9 @@ public class PositionManager {
         eventReport = Dispatcher.getReporter();
         traderAssistant = Dispatcher.getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
+        nf2 = NumberFormatterFactory.getNumberFormatter(2);
+        Dispatcher.Mode mode = Dispatcher.getMode();
+        isTradingOrForwardTesting = (mode == Dispatcher.Mode.TRADE || mode == Dispatcher.Mode.FORWARD_TEST);
     }
 
     public LinkedList<Position> getPositionsHistory() {
@@ -81,9 +89,16 @@ public class PositionManager {
             strategy.report();
         }
 
-
         orderExecutionPending = false;
 
+        if (isTradingOrForwardTesting) {
+            String msg = "Strategy: " + strategy.getName() + LINE_SEP;
+            msg += "Position: " + position + LINE_SEP;
+            msg += "Avg Fill Price: " + avgFillPrice + LINE_SEP;
+            msg += "Trade P&L: " + nf2.format(performanceManager.getTradeProfit()) + LINE_SEP;
+            msg += "Total P&L: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
+            SecureMailSender.getInstance().send(msg);
+        }
     }
 
     public void trade() {

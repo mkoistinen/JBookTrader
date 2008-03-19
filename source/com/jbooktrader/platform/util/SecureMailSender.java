@@ -1,6 +1,8 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.Dispatcher;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -13,7 +15,8 @@ public class SecureMailSender {
 
     private static SecureMailSender instance;
     private final Properties props = new Properties();
-    private final String host, user, password, subject, recipient;
+    private final String user, password, subject, recipient;
+    private final boolean isEnabled;
 
     // inner class
     private class Mailer extends Thread {
@@ -34,18 +37,19 @@ public class SecureMailSender {
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 
                 Transport transport = mailSession.getTransport();
-                transport.connect(host, user, password);
+                transport.connect(user, password);
                 transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
                 transport.close();
-
-            } catch (Exception e) {
-                Dispatcher.getReporter().report(e);
+                Dispatcher.getReporter().report("Email notification sent");
+            } catch (Throwable t) {
+                Dispatcher.getReporter().report("Email notification failed");
+                Dispatcher.getReporter().report(t);
             }
 
         }
     }
 
-    public static synchronized SecureMailSender getInstance() throws JBookTraderException {
+    public static synchronized SecureMailSender getInstance() {
         if (instance == null) {
             instance = new SecureMailSender();
         }
@@ -53,21 +57,26 @@ public class SecureMailSender {
     }
 
     // private constructor for noninstantiability
-    private SecureMailSender() throws JBookTraderException {
+    private SecureMailSender() {
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
+        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
+
         props.put("mail.transport.protocol", "smtps");
         props.put("mail.smtps.auth", "true");
         props.put("mail.smtps.quitwait", "false");
+        props.put("mail.smtps.quitwait", "false");
+        props.put("mail.smtps.host", "smtp.gmail.com");
 
-        PropertiesHolder properties = PropertiesHolder.getInstance();
-        host = properties.getProperty("mail.host");
-        user = properties.getProperty("mail.user");
-        password = properties.getProperty("mail.password");
-        subject = properties.getProperty("mail.subject");
-        recipient = properties.getProperty("mail.recipient");
+        user = recipient = prefs.get(EmailAddress);
+        password = prefs.get(EmailPassword);
+        subject = prefs.get(EmailSubject);
+
     }
 
     public void send(String content) {
-        new Mailer(content).start();
+        if (isEnabled) {
+            new Mailer(content).start();
+        }
     }
 
 }
