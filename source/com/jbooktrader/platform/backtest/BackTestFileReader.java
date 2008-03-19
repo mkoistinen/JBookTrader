@@ -30,7 +30,6 @@ public class BackTestFileReader {
         return totalLines;
     }
 
-
     public String getError() {
         return errorMsg;
     }

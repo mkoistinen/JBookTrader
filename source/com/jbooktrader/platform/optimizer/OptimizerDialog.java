@@ -3,6 +3,8 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.model.JBookTraderException;
 import static com.jbooktrader.platform.optimizer.ResultComparator.SortKey.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
@@ -21,9 +23,6 @@ import java.util.List;
 public class OptimizerDialog extends JDialog {
     private static final String LINE_SEP = System.getProperty("line.separator");
     private static final Dimension MIN_SIZE = new Dimension(700, 600);// minimum frame size
-    private static final String optimizerDataFileNamePref = "optimizer.dataFileName";
-    private static final String optimizerMinTradePref = "optimizer.minTrades";
-    private static final String optimizerSortBy = "optimizer.sortBy";
 
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, closeButton, selectFileButton;
@@ -36,7 +35,7 @@ public class OptimizerDialog extends JDialog {
     private ParamTableModel paramTableModel;
     private ResultsTableModel resultsTableModel;
     private Strategy strategy;
-    private final PreferencesHolder preferences;
+    private final PreferencesHolder prefs;
     private final String strategyName;
 
 
@@ -44,7 +43,7 @@ public class OptimizerDialog extends JDialog {
 
     public OptimizerDialog(JFrame parent, String strategyName) throws JBookTraderException {
         super(parent);
-        preferences = PreferencesHolder.getInstance();
+        prefs = PreferencesHolder.getInstance();
         this.strategyName = strategyName;
         init();
         initParams();
@@ -132,9 +131,9 @@ public class OptimizerDialog extends JDialog {
         optimizeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    preferences.setProperty(optimizerDataFileNamePref, fileNameText.getText());
-                    preferences.setProperty(optimizerMinTradePref, minTradesText.getText());
-                    preferences.setProperty(optimizerSortBy, (String) selectionCriteriaCombo.getSelectedItem());
+                    prefs.set(OptimizerFileName, fileNameText.getText());
+                    prefs.set(OptimizerMinTrades, minTradesText.getText());
+                    prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     setOptions();
                     StrategyParams params = paramTableModel.getParams();
                     strategy.setParams(params);
@@ -211,7 +210,7 @@ public class OptimizerDialog extends JDialog {
 
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
-        fileNameText.setText(preferences.getProperty(optimizerDataFileNamePref));
+        fileNameText.setText(prefs.get(OptimizerFileName));
         selectFileButton = new JButton("Browse...");
         fileNameLabel.setLabelFor(fileNameText);
 
@@ -250,14 +249,14 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(selectionCriteriaLabel);
         optimizationOptionsPanel.add(selectionCriteriaCombo);
 
-        String lastSortBy = preferences.getProperty(optimizerSortBy);
-        if (lastSortBy.length() > 0) {
-            selectionCriteriaCombo.setSelectedItem(lastSortBy);
+        String selectBy = prefs.get(OptimizerSelectBy);
+        if (selectBy.length() > 0) {
+            selectionCriteriaCombo.setSelectedItem(selectBy);
         }
 
         JLabel minTradesLabel = new JLabel("Minimum trades: ");
         minTradesText = new JTextField("50");
-        minTradesText.setText(preferences.getProperty(optimizerMinTradePref));
+        minTradesText.setText(prefs.get(OptimizerMinTrades));
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);

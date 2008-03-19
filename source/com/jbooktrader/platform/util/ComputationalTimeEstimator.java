@@ -24,7 +24,7 @@ public class ComputationalTimeEstimator {
         if (iterationsSoFar > 0) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             double millisPerIteration = (double) elapsedTime / iterationsSoFar;
-            long remainingMillis = (int) (millisPerIteration * (totalIterations - iterationsSoFar));
+            long remainingMillis = (long) (millisPerIteration * (totalIterations - iterationsSoFar));
 
 
             long remainingDays = remainingMillis / MILLIS_IN_DAY;

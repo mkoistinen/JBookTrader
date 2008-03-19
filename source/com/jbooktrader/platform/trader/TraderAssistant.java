@@ -4,10 +4,11 @@ import com.ib.client.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.OpenOrder;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.PropertiesHolder;
 
 import javax.swing.*;
 import java.util.*;
@@ -33,13 +34,14 @@ public class TraderAssistant {
         strategies = new HashMap<Integer, Strategy>();
         openOrders = new HashMap<Integer, OpenOrder>();
 
-        PropertiesHolder properties = PropertiesHolder.getInstance();
-        boolean isAdvisorAccountUsed = Boolean.valueOf(properties.getProperty("connection.use.advisor.account"));
-        advisorAccountID = (isAdvisorAccountUsed) ? properties.getProperty("connection.advisor.account.id") : "";
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
 
-        host = properties.getProperty("connection.host");
-        port = Integer.valueOf(properties.getProperty("connection.port"));
-        clientID = Integer.valueOf(properties.getProperty("connection.clientID"));
+        boolean isAdvisorAccountUsed = Boolean.valueOf(prefs.get(AccountType));
+        advisorAccountID = (isAdvisorAccountUsed) ? prefs.get(AdvisorAccount) : "";
+
+        host = prefs.get(Host);
+        port = Integer.valueOf(prefs.get(Port));
+        clientID = Integer.valueOf(prefs.get(ClientID));
     }
 
     public Map<Integer, OpenOrder> getOpenOrders() {

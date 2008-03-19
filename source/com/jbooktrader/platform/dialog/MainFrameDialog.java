@@ -19,7 +19,7 @@ import java.net.URL;
  * which acts as a simple "view" of the undelying model.
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
-    private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem;
+    private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
     private TradingTableModel tradingTableModel;
     private JTable tradingTable;
@@ -109,6 +109,10 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         chartMenuItem.addActionListener(action);
     }
 
+    public void preferencesAction(ActionListener action) {
+        preferencesMenuItem.addActionListener(action);
+    }
+
     public void exitAction(ActionListener action) {
         exitMenuItem.addActionListener(action);
     }
@@ -165,9 +169,17 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         exitMenuItem.setMnemonic('X');
         sessionMenu.add(exitMenuItem);
 
+        // configure menu
+        JMenu configureMenu = new JMenu("Configure");
+        configureMenu.setMnemonic('C');
+        preferencesMenuItem = new JMenuItem("Preferences");
+        preferencesMenuItem.setMnemonic('P');
+        configureMenu.add(preferencesMenuItem);
+
         // help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic('H');
+
 
         discussionMenuItem = new JMenuItem("Discussion Group");
         discussionMenuItem.setMnemonic('D');
@@ -186,7 +198,9 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // menu bar
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(sessionMenu);
+        menuBar.add(configureMenu);
         menuBar.add(helpMenu);
+
         setJMenuBar(menuBar);
 
         // popup menu

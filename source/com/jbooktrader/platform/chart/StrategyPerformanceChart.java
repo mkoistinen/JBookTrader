@@ -2,11 +2,13 @@ package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
-import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.Position;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.SpringUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.*;
@@ -32,11 +34,6 @@ public class StrategyPerformanceChart {
     private static final int ANNOTATION_RADIUS = 6;
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, 11);
     private static final Paint BACKGROUND_COLOR = new GradientPaint(0, 0, new Color(0, 0, 176), 0, 0, Color.BLACK);
-    private static final String CHART_HEIGHT = "chart.height";
-    private static final String CHART_WIDTH = "chart.width";
-    private static final String CHART_X = "chart.x";
-    private static final String CHART_Y = "chart.y";
-    private static final String CHART_STATE = "chart.state";
 
 
     private JFreeChart chart;
@@ -51,11 +48,11 @@ public class StrategyPerformanceChart {
     private JComboBox chartTypeCombo, timeLineCombo, timeZoneCombo;
     private JCheckBox tradesVisibilityCheck, pnlVisibilityCheck;
     private final ArrayList<CircledTextAnnotation> annotations = new ArrayList<CircledTextAnnotation>();
-    private final PreferencesHolder preferences;
+    private final PreferencesHolder prefs;
 
 
     public StrategyPerformanceChart(Strategy strategy) throws JBookTraderException {
-        preferences = PreferencesHolder.getInstance();
+        prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
         tsCollections = new HashMap<Integer, TimeSeriesCollection>();
         chart = createChart();
@@ -206,11 +203,11 @@ public class StrategyPerformanceChart {
 
         RefineryUtilities.centerFrameOnScreen(chartFrame);
 
-        int chartHeight = preferences.getPropertyAsInt(CHART_HEIGHT);
-        int chartWidth = preferences.getPropertyAsInt(CHART_WIDTH);
-        int chartX = preferences.getPropertyAsInt(CHART_X);
-        int chartY = preferences.getPropertyAsInt(CHART_Y);
-        int chartState = preferences.getPropertyAsInt(CHART_STATE);
+        int chartWidth = prefs.getInt(ChartWidth);
+        int chartHeight = prefs.getInt(ChartHeight);
+        int chartX = prefs.getInt(ChartX);
+        int chartY = prefs.getInt(ChartY);
+        int chartState = prefs.getInt(ChartState);
 
         if (chartX >= 0 && chartY >= 0 && chartHeight > 0 && chartWidth > 0) {
             chartFrame.setBounds(chartX, chartY, chartWidth, chartHeight);
@@ -223,17 +220,12 @@ public class StrategyPerformanceChart {
         chartFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                try {
-                    preferences.setProperty(CHART_HEIGHT, chartFrame.getHeight());
-                    preferences.setProperty(CHART_WIDTH, chartFrame.getWidth());
-                    preferences.setProperty(CHART_X, chartFrame.getX());
-                    preferences.setProperty(CHART_Y, chartFrame.getY());
-                    preferences.setProperty(CHART_STATE, chartFrame.getExtendedState());
-                    chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                } catch (JBookTraderException jbte) {
-                    Dispatcher.getReporter().report(jbte);
-                    MessageDialog.showError(null, jbte.getMessage());
-                }
+                prefs.set(ChartWidth, chartFrame.getWidth());
+                prefs.set(ChartHeight, chartFrame.getHeight());
+                prefs.set(ChartX, chartFrame.getX());
+                prefs.set(ChartY, chartFrame.getY());
+                prefs.set(ChartState, chartFrame.getExtendedState());
+                chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
         });
 

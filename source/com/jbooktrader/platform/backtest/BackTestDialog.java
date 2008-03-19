@@ -1,6 +1,8 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.model.JBookTraderException;
+import static com.jbooktrader.platform.preferences.JBTPreferences.BackTesterFileName;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
@@ -15,7 +17,7 @@ import java.io.File;
  */
 public class BackTestDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(500, 120);// minimum frame size
-    private final String fileName = "backTester.dataFileName";
+
 
     private JPanel progressPanel;
     private JButton cancelButton, backTestButton, selectFileButton;
@@ -23,13 +25,13 @@ public class BackTestDialog extends JDialog {
     private JLabel progressLabel;
     private JProgressBar progressBar;
     private final Strategy strategy;
-    private final PreferencesHolder preferences;
+    private final PreferencesHolder prefs;
     private BackTestStrategyRunner btsr;
 
     public BackTestDialog(JFrame parent, Strategy strategy) throws JBookTraderException {
         super(parent);
         this.strategy = strategy;
-        preferences = PreferencesHolder.getInstance();
+        prefs = PreferencesHolder.getInstance();
         init();
         pack();
         assignListeners();
@@ -82,7 +84,7 @@ public class BackTestDialog extends JDialog {
         backTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    preferences.setProperty(fileName, fileNameText.getText());
+                    prefs.set(BackTesterFileName, fileNameText.getText());
                     setOptions();
                     btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy);
                     new Thread(btsr).start();
@@ -147,7 +149,7 @@ public class BackTestDialog extends JDialog {
 
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
-        fileNameText.setText(preferences.getProperty(fileName));
+        fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
         fileNameLabel.setLabelFor(fileNameText);
 

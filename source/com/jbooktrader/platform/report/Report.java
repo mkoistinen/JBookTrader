@@ -1,8 +1,9 @@
 package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.JBookTraderException;
+import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.util.PropertiesHolder;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -20,7 +21,7 @@ public final class Report {
     private final static String REPORT_DIR = JBookTrader.getAppPath() + FILE_SEP + "reports" + FILE_SEP;
 
     public Report(String fileName) throws IOException, JBookTraderException {
-        String reportRendererClass = PropertiesHolder.getInstance().getProperty("report.renderer");
+        String reportRendererClass = PreferencesHolder.getInstance().get(ReportRenderer);
 
         try {
             Class<? extends ReportRenderer> clazz = Class.forName(reportRendererClass).asSubclass(ReportRenderer.class);

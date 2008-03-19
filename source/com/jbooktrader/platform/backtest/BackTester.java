@@ -11,7 +11,7 @@ import com.jbooktrader.platform.strategy.Strategy;
  * This class is responsible for running the strategy against historical market data
  */
 public class BackTester {
-    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L; // 24 hours
+    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L;// 24 hours
     private final Strategy strategy;
     private final BackTestFileReader backTestFileReader;
     private final BackTestDialog backTestDialog;
