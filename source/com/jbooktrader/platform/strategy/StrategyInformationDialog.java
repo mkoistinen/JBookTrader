@@ -70,9 +70,9 @@ public class StrategyInformationDialog extends JDialog implements ModelListener 
     }
 
 
-//    private void add(JPanel panel, String fieldName, double fieldValue) {
-//        add(panel, fieldName, String.valueOf(fieldValue));
-//    }
+    private void add(JPanel panel, String fieldName, double fieldValue) {
+        add(panel, fieldName, String.valueOf(fieldValue));
+    }
 
     private void add(JPanel panel, String fieldName, int fieldValue) {
         add(panel, fieldName, String.valueOf(fieldValue));

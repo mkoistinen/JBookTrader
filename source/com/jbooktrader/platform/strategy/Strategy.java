@@ -40,7 +40,7 @@ public abstract class Strategy {
 
 
     private TradingSchedule tradingSchedule;
-    private final LinkedList<ChartableIndicator> indicators;
+    private final List<ChartableIndicator> indicators;
     private PositionManager positionManager;
     private PerformanceManager performanceManager;
     private final String name;
@@ -76,7 +76,7 @@ public abstract class Strategy {
         strategyReportHeaders.add("Total P&L");
 
         name = getClass().getSimpleName();
-        indicators = new LinkedList<ChartableIndicator>();
+        indicators = new ArrayList<ChartableIndicator>();
         params = new StrategyParams();
         marketDepth = new MarketDepth();
 
