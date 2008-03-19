@@ -121,9 +121,7 @@ public class MarketDepth {
 
 
     synchronized public long getMillisSinceLastUpdate() {
-        long instant = System.nanoTime();
-        long millisSinceLastUpdate = (instant - lastUpdateTime) / 1000000;
-        return millisSinceLastUpdate;
+        return (System.nanoTime() - lastUpdateTime) / 1000000;
     }
 
 

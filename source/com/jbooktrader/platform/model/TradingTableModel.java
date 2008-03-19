@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.model;
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketdepth.MarketBook;
 import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.position.PositionManager;
@@ -94,9 +94,9 @@ public class TradingTableModel extends TableDataModel {
     public synchronized void update(Strategy strategy) {
         int row = getRow(strategy);
         if (row >= 0) {
-            MarketDepth marketDepth = strategy.getMarketBook().getLastMarketDepth();
-            if (marketDepth != null) {
-                setValueAt(marketDepth.getBalance(), row, Column.Book.ordinal());
+            MarketBook marketBook = strategy.getMarketBook();
+            if (marketBook.size() > 0) {
+                setValueAt(marketBook.getLastMarketDepth().getBalance(), row, Column.Book.ordinal());
             }
             PositionManager positionManager = strategy.getPositionManager();
             PerformanceManager performanceManager = strategy.getPerformanceManager();

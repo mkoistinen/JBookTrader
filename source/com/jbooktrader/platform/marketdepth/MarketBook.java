@@ -31,6 +31,10 @@ public class MarketBook {
         return marketDepths.size();
     }
 
+    public boolean isEmpty() {
+        return marketDepths.size() == 0;
+    }
+
     synchronized public void addMarketDepth(MarketDepth marketDepth) {
         MarketDepth md = new MarketDepth(marketDepth);
         marketDepths.add(md);
@@ -45,19 +49,11 @@ public class MarketBook {
     }
 
     synchronized public MarketDepth getFirstMarketDepth() {
-        MarketDepth marketDepth = null;
-        if (!marketDepths.isEmpty()) {
-            marketDepth = marketDepths.get(0);
-        }
-        return marketDepth;
+        return marketDepths.getFirst();
     }
 
-    synchronized public MarketDepth getLastMarketDepth() {
-        MarketDepth marketDepth = null;
-        if (!marketDepths.isEmpty()) {
-            marketDepth = marketDepths.get(marketDepths.size() - 1);
-        }
-        return marketDepth;
+    public MarketDepth getLastMarketDepth() {
+        return marketDepths.getLast();
     }
 
 

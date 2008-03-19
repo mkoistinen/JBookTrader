@@ -42,7 +42,7 @@ public class Arbitrager extends Strategy {
         // "params" object will be empty and the parameter values will be initialized to the
         // specified default values.
         entry = params.get(ENTRY, 0.7);
-        exit = params.get(EXIT, 0.2);
+        exit = params.get(EXIT, 0.3);
 
         // Create technical indicators
         truePriceInd = new TruePrice(marketBook);
@@ -79,8 +79,8 @@ public class Arbitrager extends Strategy {
         } else if (diff <= -entry) {
             setPosition(-1);
         } else {
-            boolean target = (currentPosition > 0 && truePrice <= -exit);
-            target = target || (currentPosition < 0 && truePrice >= exit);
+            boolean target = (currentPosition > 0 && diff <= -exit);
+            target = target || (currentPosition < 0 && diff >= exit);
             if (target) {
                 setPosition(0);
             }
