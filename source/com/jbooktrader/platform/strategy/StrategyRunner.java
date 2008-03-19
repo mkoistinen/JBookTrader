@@ -52,7 +52,7 @@ public class StrategyRunner implements Runnable {
 
         while (strategy.isActive()) {
             synchronized (marketBook) {
-                marketBook.wait(); // wait until notified about the update
+                marketBook.wait();// wait until notified about the update
             }
 
             // This is a little awkward. We are waiting for 100 milliseconds of
@@ -69,22 +69,23 @@ public class StrategyRunner implements Runnable {
                 Thread.sleep(50);
             }
 
+            if (!marketBook.isEmpty()) {
+                MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
+                long instant = lastMarketDepth.getTime();
+                strategy.setTime(instant);
+                strategy.updateIndicators();
+                if (strategy.hasValidIndicators()) {
+                    strategy.onBookChange();
+                }
 
-            MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
-            long instant = lastMarketDepth.getTime();
-            strategy.setTime(instant);
-            strategy.updateIndicators();
-            if (strategy.hasValidIndicators()) {
-                strategy.onBookChange();
+                if (!tradingSchedule.contains(instant)) {
+                    strategy.closePosition();// force flat position
+                }
+
+                positionManager.trade();
+                performanceManager.updateNetProfit(lastMarketDepth.getMidPoint(), positionManager.getPosition());
+                Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
             }
-
-            if (!tradingSchedule.contains(instant)) {
-                strategy.closePosition();// force flat position
-            }
-
-            positionManager.trade();
-            performanceManager.updateNetProfit(lastMarketDepth.getMidPoint(), positionManager.getPosition());
-            Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
         }
     }
 
