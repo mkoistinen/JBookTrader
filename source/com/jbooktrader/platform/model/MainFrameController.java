@@ -228,7 +228,7 @@ public class MainFrameController {
 
         mainViewDialog.exitAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Dispatcher.exit();
+                exit();
                 mainViewDialog.dispose();
             }
         });
@@ -236,11 +236,7 @@ public class MainFrameController {
         mainViewDialog.exitAction(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                prefs.set(MainWindowWidth, mainViewDialog.getSize().width);
-                prefs.set(MainWindowHeight, mainViewDialog.getSize().height);
-                prefs.set(MainWindowX, mainViewDialog.getX());
-                prefs.set(MainWindowY, mainViewDialog.getY());
-                Dispatcher.exit();
+                exit();
             }
         });
 
@@ -254,4 +250,12 @@ public class MainFrameController {
             }
         });
     }
+    
+    private void exit() {
+        prefs.set(MainWindowWidth, mainViewDialog.getSize().width);
+        prefs.set(MainWindowHeight, mainViewDialog.getSize().height);
+        prefs.set(MainWindowX, mainViewDialog.getX());
+        prefs.set(MainWindowY, mainViewDialog.getY());
+        Dispatcher.exit();
+    }        
 }
