@@ -21,6 +21,7 @@ public enum JBTPreferences {
     OptimizerFileName("optimizer.dataFileName", ""),
     OptimizerMinTrades("optimizer.minTrades", ""),
     OptimizerSelectBy("optimizer.selectBy", ""),
+    OptimizerMethod("optimizer.method", ""),
     // Main window
     MainWindowWidth("mainwindow.width", "-1"),
     MainWindowHeight("mainwindow.height", "-1"),
