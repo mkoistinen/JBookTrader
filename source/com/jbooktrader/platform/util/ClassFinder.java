@@ -21,16 +21,13 @@ public class ClassFinder {
      * JBookTrader will know how to run a trading strategy as long as that
      * strategy is implemented in a class that extends the base Strategy class.
      */
-    private List<Class<?>> getClasses(String packageName, String superClassName) throws URISyntaxException, IOException, ClassNotFoundException {
+    private List<String> getClasses(String packageName) throws URISyntaxException, IOException {
 
         String packagePath = packageName.replace('.', '/');
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
-        List<Class<?>> classes = new ArrayList<Class<?>>();
+        List<String> classNames = new ArrayList<String>();
 
         for (URL url : classpath) {
-            List<String> classNames = new ArrayList<String>();
-
-            ClassLoader classLoader = new URLClassLoader(new URL[]{url});
             URI uri = url.toURI();
             File file = new File(uri);
 
@@ -57,43 +54,40 @@ public class ClassFinder {
                     }
                 }
             }
-
-            // make sure the strategy extends the base Strategy class
-            for (String className : classNames) {
-                Class<?> clazz = classLoader.loadClass(className);
-                if (clazz.getSuperclass().getName().equals(superClassName)) {
-                    classes.add(clazz);
-                }
-            }
         }
 
-        Collections.sort(classes, new Comparator<Class<?>>() {
-            public int compare(Class<?> o1, Class<?> o2) {
-                return o1.getName().compareTo(o2.getName());
-            }
-        });
-        return classes;
+        Collections.sort(classNames);
+        return classNames;
     }
 
+    public static Strategy getInstance(String name) throws JBookTraderException {
+        try {
+            Class<? extends Strategy> clazz = Class.forName(name).asSubclass(Strategy.class);
+            Class[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+            Constructor constructor = clazz.getConstructor(parameterTypes);
+            return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());
+        } catch (ClassCastException cce) {
+            throw new JBookTraderException("Class " + name + " does not extend Strategy.");
+        } catch (Exception e) {
+            throw new JBookTraderException(e.getCause().getMessage());
+        }
+    }
 
     public List<Strategy> getStrategies() throws JBookTraderException {
         List<Strategy> strategies = new ArrayList<Strategy>();
-        List<Class<?>> strategyClasses;
-
+        List<String> strategyNames;
         try {
-            strategyClasses = getClasses("com.jbooktrader.strategy", "com.jbooktrader.platform.strategy.Strategy");
+            strategyNames = getClasses("com.jbooktrader.strategy");
         } catch (Exception e) {
             throw new JBookTraderException(e);
         }
 
-        for (Class<?> strategyClass : strategyClasses) {
+        for (String strategyName : strategyNames) {
             try {
-                Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
-                Constructor<?> constructor = strategyClass.getConstructor(parameterTypes);
-                Strategy strategy = (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());
+                Strategy strategy = getInstance(strategyName);
                 strategies.add(strategy);
             } catch (Exception e) {
-                String msg = "Could not create strategy " + strategyClass.getSimpleName() + ": ";
+                String msg = "Could not create strategy " + strategyName + ": ";
                 msg += (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
                 throw new JBookTraderException(msg);
             }
