@@ -45,7 +45,7 @@ public class Dispatcher {
         }
     }
 
-    synchronized public static Trader getTrader() throws JBookTraderException {
+    synchronized public static Trader getTrader() {
         if (trader == null) {
             trader = new Trader();
         }

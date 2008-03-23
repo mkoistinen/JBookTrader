@@ -2,7 +2,6 @@ package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
-import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.Position;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -51,7 +50,7 @@ public class StrategyPerformanceChart {
     private final PreferencesHolder prefs;
 
 
-    public StrategyPerformanceChart(Strategy strategy) throws JBookTraderException {
+    public StrategyPerformanceChart(Strategy strategy) {
         prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
         tsCollections = new HashMap<Integer, TimeSeriesCollection>();
@@ -306,9 +305,9 @@ public class StrategyPerformanceChart {
         priceAxis.setAutoRangeIncludesZero(false);
         pricePlot = new FastXYPlot(createMarketDepthSeries(strategy.getMarketBook()), dateAxis, priceAxis, null);
         pricePlot.setBackgroundPaint(BACKGROUND_COLOR);
-        AbstractXYItemRenderer r = new StandardXYItemRenderer();
-        r.setBaseStroke(new BasicStroke(1));
-        pricePlot.setRenderer(r);
+        AbstractXYItemRenderer pricePlotRenderer = new StandardXYItemRenderer();
+        pricePlotRenderer.setBaseStroke(new BasicStroke(1));
+        pricePlot.setRenderer(pricePlotRenderer);
 
         // parent plot
         combinedPlot = new CombinedDomainXYPlot(dateAxis);

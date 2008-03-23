@@ -11,16 +11,15 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
 
-public class StrategyInformationDialog extends JDialog implements ModelListener {
+public final class StrategyInformationDialog extends JDialog implements ModelListener {
     private final Strategy strategy;
     private JLabel bidLabel, askLabel, cumulativeBidSizeLabel, cumulativeAskSizeLabel;
     private final DecimalFormat df5;
 
-    public StrategyInformationDialog(JFrame parent, Strategy strategy) throws JBookTraderException {
+    public StrategyInformationDialog(JFrame parent, Strategy strategy) {
         super(parent);
         df5 = NumberFormatterFactory.getNumberFormatter(5);
         this.strategy = strategy;
-        Dispatcher.addListener(this);
         init();
         update();
         pack();
@@ -40,9 +39,9 @@ public class StrategyInformationDialog extends JDialog implements ModelListener 
         }
     }
 
-    public void update() {
+    private void update() {
         MarketBook book = strategy.getMarketBook();
-        if (book != null) {
+        if (!book.isEmpty()) {
             MarketDepth marketDepth = book.getLastMarketDepth();
             if (marketDepth != null) {
                 bidLabel.setText(df5.format(marketDepth.getBestBid()));
@@ -70,16 +69,12 @@ public class StrategyInformationDialog extends JDialog implements ModelListener 
     }
 
 
-//    private void add(JPanel panel, String fieldName, double fieldValue) {
-//        add(panel, fieldName, String.valueOf(fieldValue));
-//    }
-
     private void add(JPanel panel, String fieldName, int fieldValue) {
         add(panel, fieldName, String.valueOf(fieldValue));
     }
 
 
-    private void init() throws JBookTraderException {
+    private void init() {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Information - " + strategy.getName());
@@ -123,18 +118,16 @@ public class StrategyInformationDialog extends JDialog implements ModelListener 
         add(securityPanel, "Cum Bid Size", cumulativeBidSizeLabel);
         add(securityPanel, "Cum Ask Size", cumulativeAskSizeLabel);
 
-        // rows, cols, initX, initY, xPad, yPad
         SpringUtilities.makeCompactGrid(securityPanel, securityPanel.getComponentCount() / 2, 2, 12, 12, 5, 5);
 
         JPanel parametersPanel = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Parameters", parametersPanel);
-        StrategyParams params = strategy.initParams();
+        StrategyParams params = strategy.getParams();
 
         for (StrategyParam param : params.getAll()) {
             add(parametersPanel, param.getName(), param.toString());
         }
 
-        // rows, cols, initX, initY, xPad, yPad
         SpringUtilities.makeCompactGrid(parametersPanel, params.size(), 2, 12, 12, 5, 5);
         getContentPane().setPreferredSize(new Dimension(450, 400));
 

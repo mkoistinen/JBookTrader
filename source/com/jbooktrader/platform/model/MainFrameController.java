@@ -25,6 +25,7 @@ public class MainFrameController {
 
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
+        Dispatcher.addListener(mainViewDialog);
         int lastWidth = prefs.getInt(MainWindowWidth);
         int lastHeight = prefs.getInt(MainWindowHeight);
         int lastX = prefs.getInt(MainWindowX);
@@ -37,6 +38,14 @@ public class MainFrameController {
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
         assignListeners();
+    }
+
+    private void exit() {
+        prefs.set(MainWindowWidth, mainViewDialog.getSize().width);
+        prefs.set(MainWindowHeight, mainViewDialog.getSize().height);
+        prefs.set(MainWindowX, mainViewDialog.getX());
+        prefs.set(MainWindowY, mainViewDialog.getY());
+        Dispatcher.exit();
     }
 
     private Strategy getSelectedRowStrategy() throws JBookTraderException {
@@ -85,7 +94,8 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = getSelectedRowStrategy();
-                    new StrategyInformationDialog(mainViewDialog, strategy);
+                    StrategyInformationDialog sid = new StrategyInformationDialog(mainViewDialog, strategy);
+                    Dispatcher.addListener(sid);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
                 } finally {
@@ -203,8 +213,7 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent e) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    JDialog preferencesDialog = new PreferencesDialog(mainViewDialog);
-                    preferencesDialog.setVisible(true);
+                    new PreferencesDialog(mainViewDialog);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
                 } finally {
@@ -250,12 +259,4 @@ public class MainFrameController {
             }
         });
     }
-    
-    private void exit() {
-        prefs.set(MainWindowWidth, mainViewDialog.getSize().width);
-        prefs.set(MainWindowHeight, mainViewDialog.getSize().height);
-        prefs.set(MainWindowX, mainViewDialog.getX());
-        prefs.set(MainWindowY, mainViewDialog.getY());
-        Dispatcher.exit();
-    }        
 }

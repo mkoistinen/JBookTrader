@@ -21,7 +21,7 @@ import java.io.IOException;
 public class StrategyRunner implements Runnable {
     private final Trader trader;
     private final Strategy strategy;
-    protected final Report eventReport;
+    private final Report eventReport;
     private final PositionManager positionManager;
 
     public StrategyRunner(Strategy strategy) throws IOException, JBookTraderException {
@@ -40,7 +40,7 @@ public class StrategyRunner implements Runnable {
         eventReport.report(msg);
     }
 
-    public void execute() throws InterruptedException, JBookTraderException {
+    private void execute() throws InterruptedException, JBookTraderException {
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         TraderAssistant traderAssistant = trader.getAssistant();

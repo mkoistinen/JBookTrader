@@ -18,7 +18,7 @@ public class TraderAssistant {
     private final String host, advisorAccountID;
     private final int port, clientID;
 
-    private static EClientSocket socket;
+    private EClientSocket socket;
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
     private final Report eventReport;
@@ -27,7 +27,7 @@ public class TraderAssistant {
     private final Trader trader;
     private boolean isConnected;
 
-    public TraderAssistant(Trader trader) throws JBookTraderException {
+    public TraderAssistant(Trader trader) {
         this.trader = trader;
 
         eventReport = Dispatcher.getReporter();
@@ -182,8 +182,7 @@ public class TraderAssistant {
         this.isConnected = isConnected;
     }
 
-    private boolean checkAccountType() throws JBookTraderException {
-        boolean isAccepted = true;
+    private void checkAccountType() throws JBookTraderException {
         socket.reqAccountUpdates(true, advisorAccountID);
 
         try {
@@ -206,12 +205,9 @@ public class TraderAssistant {
             warning += "Are you sure you want to proceed?";
             int response = JOptionPane.showConfirmDialog(null, warning, JBookTrader.APP_NAME, JOptionPane.YES_NO_OPTION);
             if (response == JOptionPane.NO_OPTION) {
-                isAccepted = false;
                 disconnect();
             }
         }
-
-        return isAccepted;
     }
 
 }

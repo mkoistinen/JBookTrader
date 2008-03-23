@@ -11,7 +11,7 @@ public class EWrapperAdapter implements EWrapper {
     public void error(Exception e) {
     }
 
-    public void error(String str) {
+    public void error(String error) {
     }
 
     public void error(int id, int errorCode, String errorMsg) {

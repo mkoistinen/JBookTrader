@@ -16,7 +16,7 @@ public class Trader extends EWrapperAdapter {
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
 
-    public Trader() throws JBookTraderException {
+    public Trader() {
         traderAssistant = new TraderAssistant(this);
         eventReport = Dispatcher.getReporter();
     }
@@ -104,8 +104,7 @@ public class Trader extends EWrapperAdapter {
             // 309: market depth requested for more than 3 symbols
             boolean isInvalidRequest = (errorCode == 200 || errorCode == 309);
             if (isInvalidRequest) {
-                errorMsg = "IB reported: " + errorMsg;
-                Dispatcher.fireModelChanged(ModelListener.Event.ERROR, errorMsg);
+                Dispatcher.fireModelChanged(ModelListener.Event.ERROR, "IB reported: " + errorMsg);
             }
 
         } catch (Throwable t) {

@@ -36,7 +36,7 @@ public class CMEDataConverter {
     }
 
 
-    public CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
+    private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
 
         this.contract = contract;
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
@@ -68,7 +68,7 @@ public class CMEDataConverter {
     }
 
 
-    public void write() {
+    private void write() {
         StringBuilder sb = new StringBuilder();
         sb.append(jbtDateFormat.format(new Date(time)));
         sb.append(";");// separator after date and time
@@ -93,7 +93,7 @@ public class CMEDataConverter {
     }
 
 
-    public void convert(long samplingFrequency) {
+    private void convert(long samplingFrequency) {
 
         String line = null;
 
@@ -136,7 +136,7 @@ public class CMEDataConverter {
     }
 
 
-    private void parse(String line) throws ParseException, JBookTraderException {
+    private void parse(String line) throws ParseException {
 
         // This needs to be investigated deeper. Frost suggested that the lines
         // containing line.charAt(35) == '0' can be skipped

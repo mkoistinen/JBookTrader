@@ -1,12 +1,11 @@
 package com.jbooktrader.platform.model;
 
 import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.position.PositionManager;
 import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.util.ClassFinder;
 
-import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
@@ -63,18 +62,10 @@ public class TradingTableModel extends TableDataModel {
         if (strategy.isActive()) {
             throw new JBookTraderException("Strategy " + strategy + " is already running.");
         }
-        try {
-            Class<?> clazz = Class.forName(strategy.getClass().getName());
-            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
-            Constructor<?> ct = clazz.getConstructor(parameterTypes);
-            strategy = (Strategy) ct.newInstance(new StrategyParams(), new MarketBook());
-            rows.put(row, strategy);
-            update(strategy);
-            fireTableRowsUpdated(row, row);
-        } catch (Exception e) {
-            throw new JBookTraderException(e);
-        }
-
+        strategy = ClassFinder.getInstance(strategy.getClass().getName());
+        rows.put(row, strategy);
+        update(strategy);
+        fireTableRowsUpdated(row, row);
         return strategy;
     }
 

@@ -78,17 +78,18 @@ public class MarketDepth {
     }
 
     public String toString() {
-        String s = "time: " + getTime();
-        s += " bids: ";
+        StringBuilder marketDepth = new StringBuilder();
+        marketDepth.append("time: ").append(getTime());
+        marketDepth.append(" bids: ");
         for (MarketDepthItem item : bids) {
-            s += item.getSize() + "@" + item.getPrice() + ", ";
+            marketDepth.append(item.getSize()).append("@").append(item.getPrice()).append(", ");
         }
-        s += "  asks: ";
+        marketDepth.append("  asks: ");
         for (MarketDepthItem item : asks) {
-            s += item.getSize() + "@" + item.getPrice() + ", ";
+            marketDepth.append(item.getSize()).append("@").append(item.getPrice()).append(", ");
         }
 
-        return s;
+        return marketDepth.toString();
     }
 
     public String toShortString() {

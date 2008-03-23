@@ -43,11 +43,6 @@ public class BackTestStrategyRunner implements Runnable {
             backTestDialog.enableProgress();
             backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
             if (!cancelled) {
-                String errorMsg = backTestFileReader.getError();
-                if (errorMsg != null) {
-                    throw new JBookTraderException(errorMsg);
-                }
-
                 backTestDialog.showProgress("Running back test...");
                 BackTester backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
                 backTester.execute();

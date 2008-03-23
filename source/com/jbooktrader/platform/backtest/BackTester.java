@@ -47,7 +47,9 @@ public class BackTester {
 
             positionManager.trade();
             strategy.trim(instant - MAX_HISTORY_PERIOD);
-            backTestDialog.setProgress(lineCount, totalLines, "Running back test:");
+            if (lineCount % 1000 == 0) {
+                backTestDialog.setProgress(lineCount, totalLines, "Running back test");
+            }
         }
 
         // go flat at the end of the test period to finalize the run

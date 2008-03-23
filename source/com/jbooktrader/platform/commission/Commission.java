@@ -20,8 +20,7 @@ public class Commission {
     }
 
     public String toString() {
-        String s = rate + " per share/contract, " + minimum + " minimum per trade";
-        return s;
+        return (rate + " per share/contract, " + minimum + " minimum per trade");
     }
 
     public Commission(double rate, double minimum) {

@@ -28,7 +28,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
     public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
-        Dispatcher.addListener(this);
         init();
         populateStrategies();
         pack();

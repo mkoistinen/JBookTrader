@@ -17,18 +17,15 @@ import java.io.File;
  */
 public class BackTestDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(500, 120);// minimum frame size
-
-
     private JPanel progressPanel;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
-    private JLabel progressLabel;
     private JProgressBar progressBar;
     private final Strategy strategy;
     private final PreferencesHolder prefs;
     private BackTestStrategyRunner btsr;
 
-    public BackTestDialog(JFrame parent, Strategy strategy) throws JBookTraderException {
+    public BackTestDialog(JFrame parent, Strategy strategy) {
         super(parent);
         this.strategy = strategy;
         prefs = PreferencesHolder.getInstance();
@@ -40,16 +37,13 @@ public class BackTestDialog extends JDialog {
         setVisible(true);
     }
 
-    public void setProgress(long count, long iterations, String label) {
-        progressLabel.setText(label);
+    public void setProgress(long count, long iterations, String text) {
         int percent = (int) (100 * (count / (double) iterations));
-        String text = percent + "%";
         progressBar.setValue(percent);
-        progressBar.setString(text);
+        progressBar.setString(text + ": " + percent + "%");
     }
 
     public void enableProgress() {
-        progressLabel.setText("");
         progressBar.setValue(0);
         progressBar.setString("Starting back test...");
         progressPanel.setVisible(true);
@@ -63,11 +57,9 @@ public class BackTestDialog extends JDialog {
         progressBar.setString(progressText);
     }
 
-
     public void signalCompleted() {
         dispose();
     }
-
 
     private void setOptions() throws JBookTraderException {
         String historicalFileName = fileNameText.getText();
@@ -162,8 +154,6 @@ public class BackTestDialog extends JDialog {
         northPanel.add(strategyPanel);
         SpringUtilities.makeCompactGrid(northPanel, 1, 1, 5, 5, 5, 5);//rows, cols, initX, initY, xPad, yPad
 
-        progressLabel = new JLabel();
-        progressLabel.setForeground(Color.BLACK);
         progressBar = new JProgressBar();
         progressBar.setEnabled(false);
         progressBar.setStringPainted(true);
@@ -178,10 +168,9 @@ public class BackTestDialog extends JDialog {
         buttonsPanel.add(cancelButton);
 
         progressPanel = new JPanel(new SpringLayout());
-        progressPanel.add(progressLabel);
         progressPanel.add(progressBar);
         progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 2, 12, 5, 12, 5);//rows, cols, initX, initY, xPad, yPad
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 1, 12, 5, 12, 5);//rows, cols, initX, initY, xPad, yPad
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);

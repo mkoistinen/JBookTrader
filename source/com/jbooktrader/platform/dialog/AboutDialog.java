@@ -23,7 +23,7 @@ public class AboutDialog extends JDialog {
         }
     }
 
-    public AboutDialog(JFrame parent) throws JBookTraderException {
+    public AboutDialog(JFrame parent) {
         super(parent);
         init();
         pack();
@@ -31,7 +31,7 @@ public class AboutDialog extends JDialog {
         setVisible(true);
     }
 
-    private void init() throws JBookTraderException {
+    private void init() {
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("About " + JBookTrader.APP_NAME);
@@ -56,7 +56,7 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(productValueLabel);
 
         JLabel versionLabel = new JLabel("Version:", JLabel.TRAILING);
-        JLabel versionValueLabel = new JLabel("2.02, March 18, 2008");
+        JLabel versionValueLabel = new JLabel("2.03, March 23, 2008");
         versionValueLabel.setForeground(Color.BLACK);
         versionLabel.setLabelFor(versionValueLabel);
         aboutPanel.add(versionLabel);
@@ -83,7 +83,6 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(licenseLabel);
         aboutPanel.add(licenseValueLabel);
 
-        // rows, cols, initX, initY, xPad, yPad
         SpringUtilities.makeCompactGrid(aboutPanel, 5, 2, 12, 12, 5, 5);
 
         JLabel serverVersionLabel = new JLabel("Server Version:", JLabel.TRAILING);
@@ -108,7 +107,6 @@ public class AboutDialog extends JDialog {
         apiPanel.add(clientVersionLabel);
         apiPanel.add(clientVersionValueLabel);
 
-        // rows, cols, initX, initY, xPad, yPad
         SpringUtilities.makeCompactGrid(apiPanel, 2, 2, 12, 12, 5, 5);
 
         JPanel systemInfoPanel = new JPanel(new BorderLayout(5, 5));

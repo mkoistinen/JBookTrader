@@ -8,7 +8,8 @@ import java.util.*;
  */
 public class ComputationalTimeEstimator {
     private final static long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
-    private final long startTime, totalIterations;
+    private final long startTime;
+    private long totalIterations;
     private final SimpleDateFormat sdf;
 
     public ComputationalTimeEstimator(long startTime, long totalIterations) {
@@ -17,6 +18,11 @@ public class ComputationalTimeEstimator {
         sdf = new SimpleDateFormat("HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
+
+    public void setTotalIterations(long totalIterations) {
+        this.totalIterations = totalIterations;
+    }
+
 
     public String getTimeLeft(long iterationsSoFar) {
         String timeLeft = "";

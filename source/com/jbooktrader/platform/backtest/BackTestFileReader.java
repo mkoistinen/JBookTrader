@@ -22,16 +22,11 @@ public class BackTestFileReader {
     private SimpleDateFormat sdf;
     private BufferedReader reader;
     private int lineNumber, totalLines;
-    private String errorMsg;
     private volatile boolean cancelled;
     private final String fileName;
 
     public int getTotalLineCount() {
         return totalLines;
-    }
-
-    public String getError() {
-        return errorMsg;
     }
 
     public void cancel() {
@@ -84,7 +79,6 @@ public class BackTestFileReader {
                 }
             }
 
-
         } catch (FileNotFoundException fnfe) {
             throw new JBookTraderException("Could not find file " + fileName);
         } catch (IOException ioe) {
@@ -126,6 +120,7 @@ public class BackTestFileReader {
                 }
             } while (!isMarketDepthLine && line != null);
         } catch (Exception e) {
+            String errorMsg = "";
             if (lineNumber > 0) {
                 errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
                 errorMsg += line + LINE_SEP;

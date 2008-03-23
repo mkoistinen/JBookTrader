@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.preferences;
 
-import com.jbooktrader.platform.model.JBookTraderException;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.util.*;
@@ -16,12 +15,13 @@ public class PreferencesDialog extends JDialog {
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
     private final PreferencesHolder prefs;
 
-    public PreferencesDialog(JFrame parent) throws JBookTraderException {
+    public PreferencesDialog(JFrame parent) {
         super(parent);
         prefs = PreferencesHolder.getInstance();
         init();
         pack();
         setLocationRelativeTo(parent);
+        setModal(true);
         setVisible(true);
     }
 
@@ -46,7 +46,7 @@ public class PreferencesDialog extends JDialog {
     }
 
 
-    private void init() throws JBookTraderException {
+    private void init() {
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Preferences");

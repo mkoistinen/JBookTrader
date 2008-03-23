@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.position;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.Dispatcher;
 import com.jbooktrader.platform.performance.PerformanceManager;
 import com.jbooktrader.platform.report.Report;
 import com.jbooktrader.platform.strategy.Strategy;
@@ -29,7 +29,7 @@ public class PositionManager {
     private final boolean isTradingOrForwardTesting;
 
 
-    public PositionManager(Strategy strategy) throws JBookTraderException {
+    public PositionManager(Strategy strategy) {
         this.strategy = strategy;
         positionsHistory = new LinkedList<Position>();
         eventReport = Dispatcher.getReporter();
