@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.ResultComparator.SortKey.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.PreferencesHolder;
@@ -14,7 +13,6 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 /**
@@ -27,10 +25,12 @@ public class OptimizerDialog extends JDialog {
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, closeButton, selectFileButton;
     private JTextField fileNameText, minTradesText;
-    private JComboBox selectionCriteriaCombo;
+    private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
     private JProgressBar progressBar;
     private JTable resultsTable;
+    private TableColumnModel paramTableColumnModel;
+    private TableColumn stepColumn;
 
     private ParamTableModel paramTableModel;
     private ResultsTableModel resultsTableModel;
@@ -39,9 +39,9 @@ public class OptimizerDialog extends JDialog {
     private final String strategyName;
 
 
-    private StrategyOptimizerRunner sor;
+    private OptimizerRunner optimizerRunner;
 
-    public OptimizerDialog(JFrame parent, String strategyName) throws JBookTraderException {
+    public OptimizerDialog(JFrame parent, String strategyName) {
         super(parent);
         prefs = PreferencesHolder.getInstance();
         this.strategyName = strategyName;
@@ -49,7 +49,6 @@ public class OptimizerDialog extends JDialog {
         initParams();
         pack();
         assignListeners();
-
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -57,17 +56,14 @@ public class OptimizerDialog extends JDialog {
     public void setProgress(long count, long iterations, String text, String label) {
         progressLabel.setText(label);
         int percent = (int) (100 * (count / (double) iterations));
-
-        text += " " + percent + "% completed";
         progressBar.setValue(percent);
-        progressBar.setString(text);
+        progressBar.setString(text + ": " + percent + "% completed");
     }
 
     public void setProgress(long count, long iterations, String text) {
         int percent = (int) (100 * (count / (double) iterations));
-        text += percent + "%";
         progressBar.setValue(percent);
-        progressBar.setString(text);
+        progressBar.setString(text + percent + "%");
     }
 
     public void showMaxIterationsLimit(long iterations, long maxIterations) {
@@ -81,7 +77,6 @@ public class OptimizerDialog extends JDialog {
     public void enableProgress() {
         progressLabel.setText("");
         progressBar.setValue(0);
-        //progressBar.setString("Starting optimization...");
         progressPanel.setVisible(true);
         optimizeButton.setEnabled(false);
         cancelButton.setEnabled(true);
@@ -123,7 +118,20 @@ public class OptimizerDialog extends JDialog {
             minTradesText.requestFocus();
             throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be an integer.");
         }
+    }
 
+    private void setParamTableColumns() {
+        int optimizationMethod = optimizationMethodCombo.getSelectedIndex();
+        int columnCount = paramTableColumnModel.getColumnCount();
+        if (optimizationMethod == 0) {
+            if (columnCount == 3) {
+                paramTableColumnModel.addColumn(stepColumn);
+            }
+        } else if (optimizationMethod == 1) {
+            if (columnCount == 4) {
+                paramTableColumnModel.removeColumn(stepColumn);
+            }
+        }
     }
 
     private void assignListeners() {
@@ -134,22 +142,35 @@ public class OptimizerDialog extends JDialog {
                     prefs.set(OptimizerFileName, fileNameText.getText());
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
+                    prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
                     setOptions();
                     StrategyParams params = paramTableModel.getParams();
-                    strategy.setParams(params);
-                    sor = new StrategyOptimizerRunner(OptimizerDialog.this, strategy);
-                    new Thread(sor).start();
+
+                    int optimizationMethod = optimizationMethodCombo.getSelectedIndex();
+                    if (optimizationMethod == 0) {
+                        optimizerRunner = new BruteForceOptimizerRunner(OptimizerDialog.this, strategy, params);
+                    } else if (optimizationMethod == 1) {
+                        optimizerRunner = new DivideAndConquerOptimizerRunner(OptimizerDialog.this, strategy, params);
+                    }
+                    new Thread(optimizerRunner).start();
                 } catch (Exception ex) {
                     MessageDialog.showError(OptimizerDialog.this, ex.getMessage());
                 }
             }
         });
 
+        optimizationMethodCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setParamTableColumns();
+            }
+        });
+
+
         closeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (sor != null) {
+                if (optimizerRunner != null) {
                     closeButton.setEnabled(false);
-                    sor.cancel();
+                    optimizerRunner.cancel();
                 }
                 dispose();
             }
@@ -157,9 +178,9 @@ public class OptimizerDialog extends JDialog {
 
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (sor != null) {
+                if (optimizerRunner != null) {
                     cancelButton.setEnabled(false);
-                    sor.cancel();
+                    optimizerRunner.cancel();
                 }
             }
         });
@@ -167,8 +188,8 @@ public class OptimizerDialog extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (sor != null) {
-                    sor.cancel();
+                if (optimizerRunner != null) {
+                    optimizerRunner.cancel();
                 }
                 dispose();
             }
@@ -227,6 +248,17 @@ public class OptimizerDialog extends JDialog {
 
         paramTableModel = new ParamTableModel();
         JTable paramTable = new JTable(paramTableModel);
+        paramTableColumnModel = paramTable.getColumnModel();
+        stepColumn = paramTableColumnModel.getColumn(3);
+        //tableColumnModel.removeColumn(tc);
+        //tableColumnModel.addColumn(tc);
+
+        TableCellRenderer renderer = new NumberRenderer(0);
+        for (int column = 1; column < paramTableColumnModel.getColumnCount(); column++) {
+            paramTableColumnModel.getColumn(column).setCellRenderer(renderer);
+        }
+
+
         paramScrollPane.getViewport().add(paramTable);
         paramScrollPane.setPreferredSize(new Dimension(100, 100));
 
@@ -236,14 +268,19 @@ public class OptimizerDialog extends JDialog {
         // optimization options panel and its components
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
-        JLabel optimizationMethodLabel = new JLabel("Optimization method: ");
-        JComboBox optimizationMethodCombo = new JComboBox(new String[]{"Brute force"});
+        JLabel optimizationMethodLabel = new JLabel("Search method: ");
+        optimizationMethodCombo = new JComboBox(new String[]{"Brute force", "Divide & Conquer"});
+        String optimizerMethod = prefs.get(OptimizerMethod);
+        if (optimizerMethod.length() > 0) {
+            optimizationMethodCombo.setSelectedItem(optimizerMethod);
+        }
+
         optimizationMethodLabel.setLabelFor(optimizationMethodCombo);
         optimizationOptionsPanel.add(optimizationMethodLabel);
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max drawdown", "Highest True Kelly"};
+        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max DD", "Highest True Kelly"};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -317,27 +354,29 @@ public class OptimizerDialog extends JDialog {
 
     }
 
+    public void showStepColumn(boolean isVisible) {
+
+    }
+
     private void initParams() {
         try {
             String className = "com.jbooktrader.strategy." + strategyName;
-            Class<?> clazz = Class.forName(className);
-            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
-            Constructor<?> ct = clazz.getConstructor(parameterTypes);
-            strategy = (Strategy) ct.newInstance(new StrategyParams(), new MarketBook());
-            strategy.setParams(strategy.initParams());
+            strategy = ClassFinder.getInstance(className);
             paramTableModel.setParams(strategy.getParams());
+            setParamTableColumns();
             resultsTableModel = new ResultsTableModel(strategy);
             resultsTable.setModel(resultsTableModel);
 
             // set custom column renderers
             int params = strategy.getParams().size();
-            TableColumnModel columnModel = resultsTable.getColumnModel();
+            TableColumnModel resultsColumnModel = resultsTable.getColumnModel();
             for (ResultsTableModel.Column column : ResultsTableModel.Column.values()) {
                 int columnIndex = column.ordinal() + params;
                 TableCellRenderer renderer = column.getRenderer();
-                columnModel.getColumn(columnIndex).setCellRenderer(renderer);
+                resultsColumnModel.getColumn(columnIndex).setCellRenderer(renderer);
             }
         } catch (Exception e) {
+            Dispatcher.getReporter().report(e);
             MessageDialog.showError(this, e.getMessage());
         }
     }

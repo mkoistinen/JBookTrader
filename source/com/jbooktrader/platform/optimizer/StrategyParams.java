@@ -1,5 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.model.JBookTraderException;
+
 import java.util.*;
 
 /**
@@ -28,8 +30,8 @@ public class StrategyParams {
         return params;
     }
 
-    public void add(String name, double min, double max, double step) {
-        StrategyParam param = new StrategyParam(name, min, max, step);
+    public void add(String name, int min, int max, int step, int value) {
+        StrategyParam param = new StrategyParam(name, min, max, step, value);
         params.add(param);
         paramsLookUp.put(name, param);
     }
@@ -42,13 +44,28 @@ public class StrategyParams {
         return params.get(index);
     }
 
-    public double get(String name, double defaultValue) {
-        double value = defaultValue;
+    public int get(String name) throws JBookTraderException {
         StrategyParam param = paramsLookUp.get(name);
-        if (param != null) {
-            value = param.getValue();
+        if (param == null) {
+            throw new JBookTraderException("Parameter " + name + " is not defined.");
         }
-
-        return value;
+        return param.getValue();
     }
+
+    public int getMin(String name) throws JBookTraderException {
+        StrategyParam param = paramsLookUp.get(name);
+        if (param == null) {
+            throw new JBookTraderException("Parameter " + name + " is not defined.");
+        }
+        return param.getMin();
+    }
+
+    public int getMax(String name) throws JBookTraderException {
+        StrategyParam param = paramsLookUp.get(name);
+        if (param == null) {
+            throw new JBookTraderException("Parameter " + name + " is not defined.");
+        }
+        return param.getMax();
+    }
+
 }

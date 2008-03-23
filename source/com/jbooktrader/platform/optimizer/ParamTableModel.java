@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.TableDataModel;
+import com.jbooktrader.platform.util.MessageDialog;
 
 /**
  * Strategy parameters table model.
@@ -13,15 +14,20 @@ public class ParamTableModel extends TableDataModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int column) {
-        return column == 0 ? String.class : Double.class;
+    public void setValueAt(Object value, int row, int col) {
+        if (col > 0) {
+            try {
+                super.setValueAt(Integer.parseInt(value.toString()), row, col);
+            } catch (NumberFormatException nfe) {
+                MessageDialog.showError(null, value + " is not an integer.");
+            }
+        }
     }
 
     @Override
     public boolean isCellEditable(int row, int col) {
         // param name column cannot be edited
         return !(col == 0);
-
     }
 
     public void setParams(StrategyParams strategyParams) {
@@ -41,14 +47,14 @@ public class ParamTableModel extends TableDataModel {
         StrategyParams strategyParams = new StrategyParams();
 
         int rows = getRowCount();
-        for (int i = 0; i < rows; i++) {
-            Object[] row = getRow(i);
+        for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
+            Object[] row = getRow(rowIndex);
             String name = (String) row[0];
 
-            double min = (Double) row[1];
-            double max = (Double) row[2];
-            double step = (Double) row[3];
-            strategyParams.add(name, min, max, step);
+            int min = (Integer) row[1];
+            int max = (Integer) row[2];
+            int step = (Integer) row[3];
+            strategyParams.add(name, min, max, step, 0);
         }
 
         return strategyParams;

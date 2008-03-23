@@ -3,20 +3,16 @@ package com.jbooktrader.platform.optimizer;
 /**
  */
 public class StrategyParam {
-    private final double min, max, step;
-    private double value;
+    private int min, max;
+    private int value, step;
     private final String name;
 
-    private StrategyParam(String name, double min, double max, double step, double value) {
+    public StrategyParam(String name, int min, int max, int step, int value) {
         this.name = name;
         this.min = min;
         this.max = max;
         this.step = step;
         this.value = value;
-    }
-
-    public StrategyParam(String name, double min, double max, double step) {
-        this(name, min, max, step, 0);
     }
 
     // copy constructor
@@ -41,23 +37,34 @@ public class StrategyParam {
         return name;
     }
 
-    public double getMin() {
+    public int getMin() {
         return min;
     }
 
-    public double getMax() {
+    public int getMax() {
         return max;
     }
 
-    public double getStep() {
+    public int getStep() {
         return step;
     }
 
-    public double getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(double value) {
+    public void setValue(int value) {
         this.value = value;
     }
+
+    public void setStep(int step) {
+        this.step = step;
+    }
+
+    public void setMinMax(int min, int max) {
+        this.min = min;
+        this.max = max;
+    }
+
+
 }
