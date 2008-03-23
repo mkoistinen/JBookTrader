@@ -23,46 +23,44 @@ public abstract class Strategy {
     private static final String NOT_APPLICABLE = "N/A";
 
     private final List<String> strategyReportHeaders;
-    private StrategyParams params;
-
-
-    protected final MarketBook marketBook;
+    private final StrategyParams params;
+    private final MarketBook marketBook;
     private final MarketDepth marketDepth;
-    private int Id;
     private final DecimalFormat nf2, nf5;
-    private Report strategyReport;
+    private final SimpleDateFormat df;
     private final Report eventReport;
+    private final String name;
+    private final boolean isOptimizationMode;
     private final List<Object> strategyReportColumns = new ArrayList<Object>();
-
-    private boolean isActive;
-    private long time;
-    private Contract contract;
-
-
-    private TradingSchedule tradingSchedule;
     private final List<ChartableIndicator> indicators;
+
+    private Report strategyReport;
+    private Contract contract;
+    private TradingSchedule tradingSchedule;
     private PositionManager positionManager;
     private PerformanceManager performanceManager;
-    private final String name;
-    private int position;
-    private boolean hasValidIndicators;
-    private final SimpleDateFormat df;
-    private final boolean isOptimizationMode;
+    private boolean isActive, hasValidIndicators;
+    private int position, Id;
+    private long time;
 
 
     /**
      * Framework calls this method when order book changes.
      */
-    public void onBookChange() {
-    }
+    abstract public void onBookChange();
 
     /**
-     * Framework calls this method to obtain strategy parameter ranges.
+     * Framework calls this method to set strategy parameter ranges and values.
      */
-    public abstract StrategyParams initParams();
+    abstract protected void setParams();
 
-    public Strategy(MarketBook marketBook) {
+
+    public Strategy(StrategyParams params, MarketBook marketBook) {
+        this.params = params;
         this.marketBook = marketBook;
+        if (params.size() == 0) {
+            setParams();
+        }
 
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
@@ -77,7 +75,6 @@ public abstract class Strategy {
 
         name = getClass().getSimpleName();
         indicators = new ArrayList<ChartableIndicator>();
-        params = new StrategyParams();
         marketDepth = new MarketDepth();
 
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
@@ -164,12 +161,16 @@ public abstract class Strategy {
     }
 
 
-    public void setParams(StrategyParams params) {
-        this.params = params;
-    }
-
     public StrategyParams getParams() {
         return params;
+    }
+
+    protected int getParam(String name) throws JBookTraderException {
+        return params.get(name);
+    }
+
+    protected void addParam(String name, int min, int max, int step, int value) {
+        params.add(name, min, max, step, value);
     }
 
     public PositionManager getPositionManager() {
@@ -226,7 +227,7 @@ public abstract class Strategy {
         return indicators;
     }
 
-    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) throws JBookTraderException {
+    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) {
         this.contract = contract;
         this.tradingSchedule = tradingSchedule;
         df.setTimeZone(tradingSchedule.getTimeZone());
@@ -235,7 +236,7 @@ public abstract class Strategy {
 
     }
 
-    public MarketDepth getLastMarketDepth() {
+    protected MarketDepth getLastMarketDepth() {
         return marketBook.getLastMarketDepth();
     }
 
@@ -271,7 +272,7 @@ public abstract class Strategy {
             try {
                 indicator.calculate();
                 if (!isOptimizationMode) {
-                    indicator.addToHistory(indicator.getTime(), indicator.getValue());
+                    indicator.addToHistory();
                 }
             } catch (IndexOutOfBoundsException aie) {
                 hasValidIndicators = false;

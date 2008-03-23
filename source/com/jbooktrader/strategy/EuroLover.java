@@ -27,8 +27,8 @@ public class EuroLover extends Strategy {
     private final double entry, exit;
 
 
-    public EuroLover(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
-        super(marketBook);
+    public EuroLover(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeCashContract("EUR", "USD");
         // Define trading schedule
@@ -37,12 +37,8 @@ public class EuroLover extends Strategy {
         Commission commission = CommissionFactory.getForexCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        // Initialize strategy parameter values. If the strategy is running in the optimization
-        // mode, the parameter values will be taken from the "params" object. Otherwise, the
-        // "params" object will be empty and the parameter values will be initialized to the
-        // specified default values.
-        entry = params.get(ENTRY, 23);
-        exit = params.get(EXIT, 18);
+        entry = getParam(ENTRY);
+        exit = getParam(EXIT);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -53,15 +49,15 @@ public class EuroLover extends Strategy {
     }
 
     /**
-     * Returns min/max/step values for each strategy parameter. This method is
-     * invoked by the strategy optimizer to obtain the strategy parameter ranges.
+     * Adds parameters to strategy. Each parameter must have 5 values:
+     * name: identifier
+     * min, max, step: range for optimizer
+     * value: used in backtesting and trading
      */
     @Override
-    public StrategyParams initParams() {
-        StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 20, 70, 1);
-        params.add(EXIT, 0, 60, 1);
-        return params;
+    public void setParams() {
+        addParam(ENTRY, 20, 70, 1, 23);
+        addParam(EXIT, 0, 60, 1, 18);
     }
 
     /**

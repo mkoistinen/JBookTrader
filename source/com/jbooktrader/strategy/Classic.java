@@ -28,8 +28,8 @@ public class Classic extends Strategy {
     private final double entry, stopLoss, profitTarget;
 
 
-    public Classic(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
-        super(marketBook);
+    public Classic(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -38,13 +38,9 @@ public class Classic extends Strategy {
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        // Initialize strategy parameter values. If the strategy is running in the optimization
-        // mode, the parameter values will be taken from the "params" object. Otherwise, the
-        // "params" object will be empty and the parameter values will be initialized to the
-        // specified default values.
-        entry = params.get(ENTRY, 43);
-        stopLoss = params.get(STOP_LOSS, 10);
-        profitTarget = params.get(PROFIT_TARGET, 14);
+        entry = getParam(ENTRY);
+        stopLoss = getParam(STOP_LOSS);
+        profitTarget = getParam(PROFIT_TARGET);
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
@@ -55,16 +51,16 @@ public class Classic extends Strategy {
     }
 
     /**
-     * Returns min/max/step values for each strategy parameter. This method is
-     * invoked by the strategy optimizer to obtain the strategy parameter ranges.
+     * Adds parameters to strategy. Each parameter must have 5 values:
+     * name: identifier
+     * min, max, step: range for optimizer
+     * value: used in backtesting and trading
      */
     @Override
-    public StrategyParams initParams() {
-        StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 20, 50, 1);
-        params.add(STOP_LOSS, 2, 20, 1);
-        params.add(PROFIT_TARGET, 1, 20, 1);
-        return params;
+    public void setParams() {
+        addParam(ENTRY, 20, 80, 1, 50);
+        addParam(STOP_LOSS, 1, 10, 1, 5);
+        addParam(PROFIT_TARGET, 5, 25, 5, 16);
     }
 
     /**

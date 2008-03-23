@@ -10,12 +10,12 @@ import java.util.LinkedList;
  */
 public abstract class Indicator {
     protected double value;
-    protected MarketBook marketBook;
+    protected final MarketBook marketBook;
     private final LinkedList<IndicatorValue> history;
 
     public abstract double calculate();
 
-    public Indicator(MarketBook marketBook) {
+    protected Indicator(MarketBook marketBook) {
         this.marketBook = marketBook;
         history = new LinkedList<IndicatorValue>();
     }
@@ -31,12 +31,8 @@ public abstract class Indicator {
         return value;
     }
 
-    public long getTime() {
-        return marketBook.getLastMarketDepth().getTime();
-    }
-
-    public void addToHistory(long date, double value) {
-        history.add(new IndicatorValue(date, value));
+    public void addToHistory() {
+        history.add(new IndicatorValue(marketBook.getLastMarketDepth().getTime(), value));
     }
 
     public LinkedList<IndicatorValue> getHistory() {

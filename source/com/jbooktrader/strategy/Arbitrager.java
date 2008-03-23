@@ -24,11 +24,11 @@ public class Arbitrager extends Strategy {
     private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final double entry, exit;
+    private final int entry, exit;
 
 
-    public Arbitrager(StrategyParams params, MarketBook marketBook) throws JBookTraderException {
-        super(marketBook);
+    public Arbitrager(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -37,12 +37,8 @@ public class Arbitrager extends Strategy {
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        // Initialize strategy parameter values. If the strategy is running in the optimization
-        // mode, the parameter values will be taken from the "params" object. Otherwise, the
-        // "params" object will be empty and the parameter values will be initialized to the
-        // specified default values.
-        entry = params.get(ENTRY, 0.7);
-        exit = params.get(EXIT, 0.3);
+        entry = getParam(ENTRY);
+        exit = getParam(EXIT);
 
         // Create technical indicators
         truePriceInd = new TruePrice(marketBook);
@@ -53,15 +49,15 @@ public class Arbitrager extends Strategy {
     }
 
     /**
-     * Returns min/max/step values for each strategy parameter. This method is
-     * invoked by the strategy optimizer to obtain the strategy parameter ranges.
+     * Adds parameters to strategy. Each parameter must have 5 values:
+     * name: identifier
+     * min, max, step: range for optimizer
+     * value: used in backtesting and trading
      */
     @Override
-    public StrategyParams initParams() {
-        StrategyParams params = new StrategyParams();
-        params.add(ENTRY, 0, 2, 0.1);
-        params.add(EXIT, 0, 2, 0.1);
-        return params;
+    public void setParams() {
+        addParam(ENTRY, 0, 100, 1, 71);
+        addParam(EXIT, 0, 50, 1, 31);
     }
 
     /**
@@ -74,13 +70,13 @@ public class Arbitrager extends Strategy {
         double truePrice = truePriceInd.getValue();
         double price = getLastMarketDepth().getMidPoint();
         double diff = truePrice - price;
-        if (diff >= entry) {
+        if (diff >= (entry / 100.)) {
             setPosition(1);
-        } else if (diff <= -entry) {
+        } else if (diff <= (-entry / 100.)) {
             setPosition(-1);
         } else {
-            boolean target = (currentPosition > 0 && diff <= -exit);
-            target = target || (currentPosition < 0 && diff >= exit);
+            boolean target = (currentPosition > 0 && diff <= (-exit / 100.));
+            target = target || (currentPosition < 0 && diff >= (exit / 100.));
             if (target) {
                 setPosition(0);
             }
