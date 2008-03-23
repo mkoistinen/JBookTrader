@@ -118,7 +118,7 @@ public class PerformanceManager {
         }
 
         // Calculate "True Kelly", which is Kelly Criterion adjusted
-        // for the number of trades and the confidence interval
+        // for the number of trades
         if (profitableTrades > 0 && unprofitableTrades > 0) {
             double aveProfit = grossProfit / profitableTrades;
             double aveLoss = grossLoss / unprofitableTrades;
@@ -126,12 +126,9 @@ public class PerformanceManager {
             double probabilityOfWin = (double) profitableTrades / trades;
             double probabilityOfLoss = 1 - probabilityOfWin;
             double kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
-            double standardError = 1 / Math.sqrt(trades);
-            // 1.64485 corresponds to the 90% confidence interval
-            trueKelly = (kellyCriterion - 1.64485 * standardError) * 100;
-            if (trueKelly < 0) {
-                trueKelly = 0;
-            }
+            double power = -6 + trades / 120.;
+            double sigmoidFunction = 1. / (1. + Math.exp(-power));
+            trueKelly = kellyCriterion * sigmoidFunction * 100;
         }
 
         if ((Dispatcher.getMode() != Dispatcher.Mode.OPTIMIZATION)) {
