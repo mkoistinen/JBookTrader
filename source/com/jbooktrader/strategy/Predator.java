@@ -56,8 +56,8 @@ public class Predator extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 100, 1, 72);
-        addParam(EXIT, 0, 100, 1, 56);
+        addParam(ENTRY, 20, 100, 1, 68);
+        addParam(EXIT, 0, 100, 1, 62);
     }
 
     /**

@@ -58,9 +58,9 @@ public class Classic extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 80, 1, 50);
-        addParam(STOP_LOSS, 1, 10, 1, 5);
-        addParam(PROFIT_TARGET, 5, 25, 5, 16);
+        addParam(ENTRY, 35, 65, 1, 55);
+        addParam(STOP_LOSS, 1, 9, 1, 1);
+        addParam(PROFIT_TARGET, 5, 25, 1, 17);
     }
 
     /**

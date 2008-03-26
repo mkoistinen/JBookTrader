@@ -56,7 +56,7 @@ public class Arbitrager extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 0, 100, 1, 71);
+        addParam(ENTRY, 30, 90, 1, 71);
         addParam(EXIT, 0, 50, 1, 31);
     }
 
