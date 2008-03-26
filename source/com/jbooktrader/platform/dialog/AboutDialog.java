@@ -56,7 +56,7 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(productValueLabel);
 
         JLabel versionLabel = new JLabel("Version:", JLabel.TRAILING);
-        JLabel versionValueLabel = new JLabel("2.03, March 23, 2008");
+        JLabel versionValueLabel = new JLabel("2.04, March 25, 2008");
         versionValueLabel.setForeground(Color.BLACK);
         versionLabel.setLabelFor(versionValueLabel);
         aboutPanel.add(versionLabel);
