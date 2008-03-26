@@ -66,14 +66,6 @@ public class OptimizerDialog extends JDialog {
         progressBar.setString(text + percent + "%");
     }
 
-    public void showMaxIterationsLimit(long iterations, long maxIterations) {
-        String message = "The range of parameters for this optimization run requires " + iterations + " iterations." + LINE_SEP;
-        message += "The maximum number of iterations is " + maxIterations + "." + LINE_SEP;
-        message += "Reduce the number of parameters, reduce the range of parameters, or increase the 'Step'" + "." + LINE_SEP;
-        MessageDialog.showError(this, message);
-    }
-
-
     public void enableProgress() {
         progressLabel.setText("");
         progressBar.setValue(0);

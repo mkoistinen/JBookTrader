@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.strategy.Strategy;
 
 import java.util.*;
@@ -10,95 +11,73 @@ import java.util.*;
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
     private final int divider = 2;
+    private final int populationSize = 3;
 
     public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
         super(optimizerDialog, strategy, params);
     }
 
     public void optimize() throws Exception {
-        StrategyParams newParams = new StrategyParams(strategyParams);
+        StrategyParams bestParams = new StrategyParams(strategyParams);
+        HashSet<StrategyParams> uniqueParams = new HashSet<StrategyParams>();
 
-        int range = 0;
-        for (StrategyParam param : newParams.getAll()) {
-            range = Math.max(range, param.getMax() - param.getMin());
+        int maxRange = 0;
+        for (StrategyParam param : bestParams.getAll()) {
+            maxRange = Math.max(maxRange, param.getMax() - param.getMin());
         }
 
-        int iterationsRemaining = (int) (Math.log(range) / Math.log(2.0));
+        int iterationsRemaining = (int) (Math.log(maxRange) / Math.log(2.0));
         long completedSteps = 0;
 
         boolean allDone = false;
         while (!allDone) {
 
-            for (StrategyParam param : newParams.getAll()) {
+            for (StrategyParam param : bestParams.getAll()) {
+                int step = Math.max(1, (param.getMax() - param.getMin()) / (populationSize));
+                param.setStep(step);
                 param.setValue(param.getMin());
             }
 
-            LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
-            boolean allTasksAssigned = false;
-
-            while (!allTasksAssigned) {
-                StrategyParams strategyParamsCopy = new StrategyParams(newParams);
-                tasks.add(strategyParamsCopy);
-
-                StrategyParam lastParam = newParams.get(newParams.size() - 1);
-                int step = Math.max(1, (lastParam.getMax() - lastParam.getMin()) / divider);
-                lastParam.setValue(lastParam.getValue() + step);
-
-                for (int paramNumber = newParams.size() - 1; paramNumber >= 0; paramNumber--) {
-                    StrategyParam param = newParams.get(paramNumber);
-                    if (param.getValue() > param.getMax()) {
-                        param.setValue(param.getMin());
-                        if (paramNumber == 0) {
-                            allTasksAssigned = true;
-                            break;
-                        } else {
-                            int prevParamNumber = paramNumber - 1;
-                            StrategyParam prevParam = newParams.get(prevParamNumber);
-                            step = Math.max(1, (prevParam.getMax() - prevParam.getMin()) / divider);
-                            prevParam.setValue(prevParam.getValue() + step);
-                        }
-                    }
-                }
-            }
+            LinkedList<StrategyParams> tasks = getTasks(bestParams);
 
             List<Strategy> strategies = new ArrayList<Strategy>();
             for (StrategyParams params : tasks) {
-                Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
-                strategies.add(strategy);
+                if (!uniqueParams.contains(params)) {
+                    uniqueParams.add(params);
+                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
+                    strategies.add(strategy);
+                }
             }
-
 
             long totalSteps = completedSteps + (long) lineCount * iterationsRemaining * strategies.size();
             setTotalSteps(totalSteps);
 
-            execute(strategies);
-            if (cancelled) {
-                return;
-            }
-            iterationsRemaining--;
-            completedSteps += (long) lineCount * strategies.size();
-
-            strategies.clear();
-
-            allDone = true;
-            for (StrategyParam param : newParams.getAll()) {
-                if (param.getMax() - param.getMin() >= 4) {
-                    allDone = false;
-                }
-            }
-
+            allDone = (strategies.size() == 0);
             if (!allDone) {
-                Result bestResult = results.get(0);
-                StrategyParams bestParams = bestResult.getParams();
+                execute(strategies);
+                if (cancelled) {
+                    return;
+                }
 
-                newParams.getAll().clear();
-                for (StrategyParam param : bestParams.getAll()) {
-                    int value = bestResult.getParams().get(param.getName());
-                    range = param.getMax() - param.getMin();
-                    int min = Math.max(strategyParams.getMin(param.getName()), value - range / 4);
-                    int max = Math.min(strategyParams.getMax(param.getName()), value + range / 4);
-                    param.setMinMax(min, max);
-                    newParams.add(param.getName(), min, max, 0, value);
+                iterationsRemaining--;
+                completedSteps += (long) lineCount * strategies.size();
+
+                if (results.size() == 0) {
+                    throw new JBookTraderException("No strategies found within the specified boundaries.");
+                }
+
+                StrategyParams topParams = results.get(0).getParams();
+
+                bestParams.getAll().clear();
+                for (StrategyParam param : topParams.getAll()) {
+                    String name = param.getName();
+                    int value = topParams.get(name);
+                    int range = param.getMax() - param.getMin();
+                    int min = Math.max(strategyParams.getMin(name), value - range / 4);
+                    int max = Math.min(strategyParams.getMax(name), value + range / 4);
+                    param.setMin(min);
+                    param.setMax(max);
+                    bestParams.add(name, min, max, 0, value);
                 }
             }
         }

@@ -15,6 +15,36 @@ public class StrategyParams {
         paramsLookUp = new HashMap<String, StrategyParam>();
     }
 
+
+    public boolean equals(Object o) {
+        if (!(o instanceof StrategyParams)) {
+            return false;
+        }
+
+        StrategyParams that = (StrategyParams) o;
+        boolean allSame = true;
+        for (StrategyParam param : params) {
+            int value = param.getValue();
+            int thatValue = that.get(param.getName());
+            if (value != thatValue) {
+                allSame = false;
+                break;
+            }
+        }
+
+        return allSame;
+    }
+
+    public int hashCode() {
+        int hashCode = 17;
+        for (StrategyParam param : params) {
+            int value = param.getValue();
+            hashCode = 37 * hashCode + value;
+        }
+        return hashCode;
+    }
+
+
     // copy constructor
     public StrategyParams(StrategyParams params) {
         this.params = new ArrayList<StrategyParam>();
@@ -44,10 +74,10 @@ public class StrategyParams {
         return params.get(index);
     }
 
-    public int get(String name) throws JBookTraderException {
+    public int get(String name) {
         StrategyParam param = paramsLookUp.get(name);
         if (param == null) {
-            throw new JBookTraderException("Parameter " + name + " is not defined.");
+            throw new RuntimeException("Parameter " + name + " is not defined.");
         }
         return param.getValue();
     }

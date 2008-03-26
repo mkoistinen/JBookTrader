@@ -26,8 +26,6 @@ public class PositionManager {
     private int position;
     private double avgFillPrice;
     private volatile boolean orderExecutionPending;
-    private final boolean isTradingOrForwardTesting;
-
 
     public PositionManager(Strategy strategy) {
         this.strategy = strategy;
@@ -36,8 +34,6 @@ public class PositionManager {
         traderAssistant = Dispatcher.getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
-        Dispatcher.Mode mode = Dispatcher.getMode();
-        isTradingOrForwardTesting = (mode == Dispatcher.Mode.TRADE || mode == Dispatcher.Mode.FORWARD_TEST);
     }
 
     public LinkedList<Position> getPositionsHistory() {
@@ -78,7 +74,8 @@ public class PositionManager {
 
         performanceManager.update(quantity, avgFillPrice, position);
 
-        if ((Dispatcher.getMode() != Dispatcher.Mode.OPTIMIZATION)) {
+        Dispatcher.Mode mode = Dispatcher.getMode();
+        if ((mode != Dispatcher.Mode.OPTIMIZATION)) {
             positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
             StringBuilder msg = new StringBuilder();
             msg.append(strategy.getName()).append(": ");
@@ -91,9 +88,11 @@ public class PositionManager {
 
         orderExecutionPending = false;
 
-        if (isTradingOrForwardTesting) {
-            String msg = "Strategy: " + strategy.getName() + LINE_SEP;
-            msg += "Position: " + position + LINE_SEP;
+        // remote notification, if enabled
+        if (mode == Dispatcher.Mode.TRADE || mode == Dispatcher.Mode.FORWARD_TEST) {
+            String msg = "Event type: Trade" + LINE_SEP;
+            msg += "Strategy: " + strategy.getName() + LINE_SEP;
+            msg += "New Position: " + position + LINE_SEP;
             msg += "Avg Fill Price: " + avgFillPrice + LINE_SEP;
             msg += "Trade P&L: " + nf2.format(performanceManager.getTradeProfit()) + LINE_SEP;
             msg += "Total P&L: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;

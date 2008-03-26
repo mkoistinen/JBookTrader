@@ -19,8 +19,9 @@ import java.util.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    protected static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L;// 24 hours
-    protected static final long MAX_ITERATIONS = 50000000L;
+    private static final String LINE_SEP = System.getProperty("line.separator");
+    protected static final long MAX_HISTORY_PERIOD = 8 * 60 * 60 * 1000L;// 8 hours
+    protected static final long MAX_STRATEGIES = 50000L;
     protected static final int MAX_RESULTS = 5000;
     protected static final long UPDATE_FREQUENCY = 1000000L;// lines
     public final List<Result> results;
@@ -44,7 +45,7 @@ public abstract class OptimizerRunner implements Runnable {
         this.strategyName = strategy.getName();
         this.strategyParams = params;
         tradingSchedule = strategy.getTradingSchedule();
-        results = Collections.synchronizedList(new ArrayList<Result>());
+        results = new ArrayList<Result>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
         Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
@@ -77,7 +78,7 @@ public abstract class OptimizerRunner implements Runnable {
             boolean inSchedule = tradingSchedule.contains(time);
 
             for (Strategy strategy : strategies) {
-
+                strategy.setTime(time);
                 strategy.updateIndicators();
                 if (strategy.hasValidIndicators()) {
                     strategy.onBookChange();
@@ -88,10 +89,10 @@ public abstract class OptimizerRunner implements Runnable {
                 }
 
                 strategy.getPositionManager().trade();
-                strategy.trim(time - MAX_HISTORY_PERIOD);
 
                 completedSteps++;
                 if (completedSteps % UPDATE_FREQUENCY == 0) {
+                    strategy.trim(time - MAX_HISTORY_PERIOD);
                     showFastProgress(completedSteps, totalSteps, "Optimizing");
                 }
                 if (cancelled) {
@@ -109,11 +110,7 @@ public abstract class OptimizerRunner implements Runnable {
 
             if (trades >= minTrades) {
                 Result result = new Result(strategy.getParams(), performanceManager);
-
-                if (!results.contains(result)) {
-                    results.add(result);
-                }
-
+                results.add(result);
                 showProgress(completedSteps, totalSteps, "Optimizing");
             }
         }
@@ -173,16 +170,11 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     public void showProgress(long counter, long numberOfTasks, String text) {
-        synchronized (results) {
-            Collections.sort(results, resultComparator);
-
-            while (results.size() > MAX_RESULTS) {
-                results.remove(results.size() - 1);
-            }
-
-            optimizerDialog.setResults(results);
+        Collections.sort(results, resultComparator);
+        while (results.size() > MAX_RESULTS) {
+            results.remove(results.size() - 1);
         }
-
+        optimizerDialog.setResults(results);
         String remainingTime = timeEstimator.getTimeLeft(counter);
         optimizerDialog.setProgress(counter, numberOfTasks, text, remainingTime);
     }
@@ -193,9 +185,50 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
 
+    public LinkedList<StrategyParams> getTasks(StrategyParams params) throws Exception {
+        for (StrategyParam param : params.getAll()) {
+            param.setValue(param.getMin());
+        }
+
+        LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
+
+        boolean allTasksAssigned = false;
+        while (!allTasksAssigned) {
+            StrategyParams strategyParamsCopy = new StrategyParams(params);
+            tasks.add(strategyParamsCopy);
+
+            StrategyParam lastParam = params.get(params.size() - 1);
+            lastParam.setValue(lastParam.getValue() + lastParam.getStep());
+
+            for (int paramNumber = params.size() - 1; paramNumber >= 0; paramNumber--) {
+                StrategyParam param = params.get(paramNumber);
+                if (param.getValue() > param.getMax()) {
+                    param.setValue(param.getMin());
+                    if (paramNumber == 0) {
+                        allTasksAssigned = true;
+                        break;
+                    } else {
+                        int prevParamNumber = paramNumber - 1;
+                        StrategyParam prevParam = params.get(prevParamNumber);
+                        prevParam.setValue(prevParam.getValue() + prevParam.getStep());
+                    }
+                }
+            }
+        }
+
+        int numberOfTasks = tasks.size();
+        if (numberOfTasks > MAX_STRATEGIES) {
+            String message = "The range of parameters for this optimization run requires running " + numberOfTasks + " strategies." + LINE_SEP;
+            message += "The maximum number of strategies that can run simultaneously is " + MAX_STRATEGIES + "." + LINE_SEP;
+            message += "Reduce the range of parameters." + LINE_SEP;
+            throw new JBookTraderException(message);
+        }
+
+        return tasks;
+    }
+
     public void run() {
         try {
-
             results.clear();
             optimizerDialog.setResults(results);
             optimizerDialog.enableProgress();
