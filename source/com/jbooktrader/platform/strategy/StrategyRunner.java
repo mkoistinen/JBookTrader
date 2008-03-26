@@ -84,7 +84,7 @@ public class StrategyRunner implements Runnable {
 
                 positionManager.trade();
                 performanceManager.updateNetProfit(lastMarketDepth.getMidPoint(), positionManager.getPosition());
-                Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
+                Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, strategy);
             }
         }
     }

@@ -88,13 +88,13 @@ public class Dispatcher {
 
     public static synchronized void strategyStarted() {
         activeStrategies++;
-        fireModelChanged(ModelListener.Event.STRATEGIES_START, null);
+        fireModelChanged(ModelListener.Event.StrategiesStart, null);
     }
 
     public static synchronized void strategyCompleted() {
         activeStrategies--;
         if (activeStrategies == 0) {
-            fireModelChanged(ModelListener.Event.STRATEGIES_END, null);
+            fireModelChanged(ModelListener.Event.StrategiesEnd, null);
         }
     }
 

@@ -56,7 +56,7 @@ public class BackTester {
         strategy.closePosition();
         positionManager.trade();
         strategy.setIsActive(false);
-        Dispatcher.fireModelChanged(ModelListener.Event.STRATEGY_UPDATE, strategy);
+        Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, strategy);
     }
 
 }

@@ -104,7 +104,7 @@ public class Trader extends EWrapperAdapter {
             // 309: market depth requested for more than 3 symbols
             boolean isInvalidRequest = (errorCode == 200 || errorCode == 309);
             if (isInvalidRequest) {
-                Dispatcher.fireModelChanged(ModelListener.Event.ERROR, "IB reported: " + errorMsg);
+                Dispatcher.fireModelChanged(ModelListener.Event.Error, "IB reported: " + errorMsg);
             }
 
         } catch (Throwable t) {

@@ -37,15 +37,15 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
     public void modelChanged(ModelListener.Event event, Object value) {
         switch (event) {
-            case ERROR:
+            case Error:
                 String msg = (String) value;
                 MessageDialog.showError(this, msg);
                 break;
-            case STRATEGY_UPDATE:
+            case StrategyUpdate:
                 Strategy strategy = (Strategy) value;
                 tradingTableModel.update(strategy);
                 break;
-            case STRATEGIES_START:
+            case StrategiesStart:
                 Dispatcher.Mode mode = Dispatcher.getMode();
                 if (mode == Dispatcher.Mode.TRADE) {
                     forwardTestMenuItem.setEnabled(false);
@@ -59,7 +59,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 saveBookMenuItem.setEnabled(true);
                 chartMenuItem.setEnabled(true);
                 break;
-            case STRATEGIES_END:
+            case StrategiesEnd:
                 forwardTestMenuItem.setEnabled(true);
                 tradeMenuItem.setEnabled(true);
                 backTestMenuItem.setEnabled(true);

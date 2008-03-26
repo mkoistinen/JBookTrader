@@ -29,7 +29,7 @@ public final class StrategyInformationDialog extends JDialog implements ModelLis
 
     public void modelChanged(ModelListener.Event event, Object value) {
         switch (event) {
-            case STRATEGY_UPDATE:
+            case StrategyUpdate:
                 Strategy strategy = (Strategy) value;
                 if (strategy.getName().equals(((Strategy) value).getName())) {
                     update();

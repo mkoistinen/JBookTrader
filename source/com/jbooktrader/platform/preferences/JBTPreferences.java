@@ -19,7 +19,7 @@ public enum JBTPreferences {
     BackTesterFileName("backTester.dataFileName", ""),
     // Optimizer
     OptimizerFileName("optimizer.dataFileName", ""),
-    OptimizerMinTrades("optimizer.minTrades", ""),
+    OptimizerMinTrades("optimizer.minTrades", "20"),
     OptimizerSelectBy("optimizer.selectBy", ""),
     OptimizerMethod("optimizer.method", ""),
     // Main window
