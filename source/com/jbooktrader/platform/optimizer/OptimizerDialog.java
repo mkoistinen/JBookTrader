@@ -19,7 +19,7 @@ import java.util.List;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JDialog {
-    private static final String LINE_SEP = System.getProperty("line.separator");
+    //private static final String LINE_SEP = System.getProperty("line.separator");
     private static final Dimension MIN_SIZE = new Dimension(700, 600);// minimum frame size
 
     private JPanel progressPanel;

@@ -10,7 +10,7 @@ import java.util.*;
  * historical market depth.
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
-    private final int divider = 2;
+    //private final int divider = 2;
     private final int populationSize = 3;
 
     public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
