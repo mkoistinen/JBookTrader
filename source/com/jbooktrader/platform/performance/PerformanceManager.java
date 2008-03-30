@@ -1,8 +1,8 @@
 package com.jbooktrader.platform.performance;
 
-import com.jbooktrader.platform.commission.Commission;
-import com.jbooktrader.platform.model.Dispatcher;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.commission.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.strategy.*;
 
 /**
  * Performance manager evaluates trading strategy performance based on statistics which include
@@ -131,7 +131,7 @@ public class PerformanceManager {
             trueKelly = kellyCriterion * sigmoidFunction * 100;
         }
 
-        if ((Dispatcher.getMode() != Dispatcher.Mode.OPTIMIZATION)) {
+        if ((Dispatcher.getMode() != Dispatcher.Mode.Optimization)) {
             long time = strategy.getTime();
             profitAndLossHistory.add(new ProfitAndLoss(time, netProfit));
         }

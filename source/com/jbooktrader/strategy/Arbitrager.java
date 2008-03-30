@@ -1,15 +1,16 @@
 package com.jbooktrader.strategy;
 
-import com.ib.client.Contract;
-import com.jbooktrader.indicator.TruePrice;
+import com.ib.client.*;
+import com.jbooktrader.indicator.*;
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
-import com.jbooktrader.platform.indicator.Indicator;
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.platform.schedule.TradingSchedule;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 /**
  *
@@ -27,8 +28,8 @@ public class Arbitrager extends Strategy {
     private final int entry, exit;
 
 
-    public Arbitrager(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public Arbitrager(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+        super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -42,10 +43,7 @@ public class Arbitrager extends Strategy {
 
         // Create technical indicators
         truePriceInd = new TruePrice(marketBook);
-
-        // Specify the title and the chart number for each indicator
-        // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
-        addIndicator("Depth Balance", truePriceInd, 0);
+        addIndicator("Depth Balance", truePriceInd);
     }
 
     /**
@@ -56,8 +54,8 @@ public class Arbitrager extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 30, 90, 1, 71);
-        addParam(EXIT, 0, 50, 1, 31);
+        addParam(ENTRY, 30, 90, 1, 56);
+        addParam(EXIT, 0, 50, 1, 30);
     }
 
     /**

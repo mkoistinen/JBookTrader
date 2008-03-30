@@ -1,15 +1,15 @@
 package com.jbooktrader.platform.position;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.model.Dispatcher;
-import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.trader.TraderAssistant;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
-import java.text.NumberFormat;
-import java.util.LinkedList;
+import java.text.*;
+import java.util.*;
 
 /**
  * Position manager keeps track of current positions and executions.
@@ -75,7 +75,7 @@ public class PositionManager {
         performanceManager.update(quantity, avgFillPrice, position);
 
         Dispatcher.Mode mode = Dispatcher.getMode();
-        if ((mode != Dispatcher.Mode.OPTIMIZATION)) {
+        if ((mode != Dispatcher.Mode.Optimization)) {
             positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
             StringBuilder msg = new StringBuilder();
             msg.append(strategy.getName()).append(": ");
@@ -89,7 +89,7 @@ public class PositionManager {
         orderExecutionPending = false;
 
         // remote notification, if enabled
-        if (mode == Dispatcher.Mode.TRADE || mode == Dispatcher.Mode.FORWARD_TEST) {
+        if (mode == Dispatcher.Mode.Trade || mode == Dispatcher.Mode.ForwardTest) {
             String msg = "Event type: Trade" + LINE_SEP;
             msg += "Strategy: " + strategy.getName() + LINE_SEP;
             msg += "New Position: " + position + LINE_SEP;

@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.model.TableDataModel;
-import com.jbooktrader.platform.util.MessageDialog;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.util.*;
 
 /**
  * Strategy parameters table model.

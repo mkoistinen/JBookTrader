@@ -1,12 +1,12 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.model.Dispatcher;
+import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
+import com.jbooktrader.platform.preferences.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Sends SSL Mail

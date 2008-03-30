@@ -1,10 +1,10 @@
 package com.jbooktrader.platform.model;
 
 import com.jbooktrader.platform.backtest.*;
-import com.jbooktrader.platform.chart.StrategyPerformanceChart;
+import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.optimizer.OptimizerDialog;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
@@ -26,6 +26,15 @@ public class MainFrameController {
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
         Dispatcher.addListener(mainViewDialog);
+        int lastWidth = prefs.getInt(MainWindowWidth);
+        int lastHeight = prefs.getInt(MainWindowHeight);
+        int lastX = prefs.getInt(MainWindowX);
+        int lastY = prefs.getInt(MainWindowY);
+
+        if (lastHeight > 0 && lastWidth > 0) {
+            mainViewDialog.setBounds(lastX, lastY, lastWidth, lastHeight);
+        }
+
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
         assignListeners();
@@ -101,7 +110,7 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = createSelectedRowStrategy();
-                    Dispatcher.setMode(Dispatcher.Mode.BACK_TEST);
+                    Dispatcher.setMode(Dispatcher.Mode.BackTest);
                     new BackTestDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
@@ -116,7 +125,7 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = getSelectedRowStrategy();
-                    Dispatcher.setMode(Dispatcher.Mode.OPTIMIZATION);
+                    Dispatcher.setMode(Dispatcher.Mode.Optimization);
                     new OptimizerDialog(mainViewDialog, strategy.getName());
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
@@ -131,7 +140,7 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = createSelectedRowStrategy();
-                    Dispatcher.setMode(Dispatcher.Mode.FORWARD_TEST);
+                    Dispatcher.setMode(Dispatcher.Mode.ForwardTest);
                     new Thread(new StrategyRunner(strategy)).start();
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
@@ -146,7 +155,7 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = createSelectedRowStrategy();
-                    Dispatcher.setMode(Dispatcher.Mode.TRADE);
+                    Dispatcher.setMode(Dispatcher.Mode.Trade);
                     new Thread(new StrategyRunner(strategy)).start();
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());

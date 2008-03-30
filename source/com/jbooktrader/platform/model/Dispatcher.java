@@ -1,10 +1,10 @@
 package com.jbooktrader.platform.model;
 
 
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.trader.Trader;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.trader.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class Dispatcher {
     public enum Mode {
-        TRADE, BACK_TEST, FORWARD_TEST, OPTIMIZATION
+        Trade, BackTest, ForwardTest, Optimization
     }
 
     private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
@@ -34,7 +34,7 @@ public class Dispatcher {
     }
 
     synchronized public static void fireModelChanged(ModelListener.Event event, Object value) {
-        if (mode != Mode.OPTIMIZATION) {
+        if (mode != Mode.Optimization) {
             for (ModelListener listener : listeners) {
                 try {
                     listener.modelChanged(event, value);
@@ -64,6 +64,7 @@ public class Dispatcher {
         if (trader != null) {
             trader.getAssistant().disconnect();
         }
+        System.exit(0);
     }
 
     public static void setMode(Mode mode) throws JBookTraderException {
@@ -72,13 +73,13 @@ public class Dispatcher {
 
         // Disable all reporting when JBT runs in optimization mode. The optimizer runs
         // thousands of strategies, and the amount of data to report would be enormous.
-        if (mode == Mode.OPTIMIZATION) {
+        if (mode == Mode.Optimization) {
             Report.disable();
         } else {
             Report.enable();
         }
 
-        if (mode == Mode.TRADE || mode == Mode.FORWARD_TEST) {
+        if (mode == Mode.Trade || mode == Mode.ForwardTest) {
             trader.getAssistant().connect();
         } else {
             trader.getAssistant().disconnect();

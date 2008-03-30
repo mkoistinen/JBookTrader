@@ -1,8 +1,8 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.marketdepth.MarketDepthItem;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.startup.JBookTrader;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
 import java.text.*;
@@ -22,6 +22,7 @@ public class CMEDataConverter {
     private final String contract;
     private long time;
     private long lineNumber;
+    private final Calendar instant;
 
     public static void main(String[] args) throws JBookTraderException {
 
@@ -45,6 +46,7 @@ public class CMEDataConverter {
         cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         cmeDateFormat.setLenient(false);
         cmeDateFormat.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
+        instant = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
 
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
@@ -65,6 +67,8 @@ public class CMEDataConverter {
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not create file " + jbtFileName);
         }
+
+        System.out.println("Converting " + cmeFileName + " to " + jbtFileName);
     }
 
 
@@ -105,14 +109,23 @@ public class CMEDataConverter {
             System.out.println("Conversion started...");
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
-                if (lineNumber % 50000 == 0) {
+                if (lineNumber % 250000 == 0) {
                     System.out.println(lineNumber + " lines read");
                 }
-                parse(line);
-                if ((time - previousTime) >= samplingFrequency) {
-                    previousTime = time;
-                    write();
 
+                try {
+                    parse(line);
+                    instant.setTimeInMillis(time);
+                    int minutesOfDay = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
+                    boolean inDaySession = (minutesOfDay >= 9 * 60 + 15 && minutesOfDay < 16 * 60 + 15);
+                    if (inDaySession && (time - previousTime) >= samplingFrequency) {
+                        previousTime = time;
+                        write();
+                    }
+                } catch (Exception e) {
+                    String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
+                    System.out.println(errorMsg);
+                    e.printStackTrace();
                 }
             }
             System.out.println("Done: " + lineNumber + " lines read and converted successfully.");
@@ -198,5 +211,4 @@ public class CMEDataConverter {
 
 
 }
-
 

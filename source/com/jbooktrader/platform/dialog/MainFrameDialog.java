@@ -2,22 +2,16 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import static com.jbooktrader.platform.model.TradingTableModel.Column.PL;
-import static com.jbooktrader.platform.model.TradingTableModel.Column.Strategy;
-import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowHeight;
-import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowWidth;
-import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowX;
-import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowY;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.strategy.Strategy;
+import static com.jbooktrader.platform.model.TradingTableModel.Column.*;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.net.URL;
+import java.net.*;
 
 /**
  * Main application window. All the system logic is intentionally left out if this class,
@@ -30,7 +24,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private JTable tradingTable;
     private JPopupMenu popupMenu;
     private final Toolkit toolkit;
-    private final PreferencesHolder prefs = PreferencesHolder.getInstance();
 
     public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
@@ -38,16 +31,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         populateStrategies();
         pack();
         setLocationRelativeTo(null);
-        
-        int lastWidth = prefs.getInt(MainWindowWidth);
-        int lastHeight = prefs.getInt(MainWindowHeight);
-        int lastX = prefs.getInt(MainWindowX);
-        int lastY = prefs.getInt(MainWindowY);
-
-        if (lastHeight > 0 && lastWidth > 0) {
-            setBounds(lastX, lastY, lastWidth, lastHeight);
-        }
-        
         setVisible(true);
     }
 
@@ -63,10 +46,10 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 break;
             case StrategiesStart:
                 Dispatcher.Mode mode = Dispatcher.getMode();
-                if (mode == Dispatcher.Mode.TRADE) {
+                if (mode == Dispatcher.Mode.Trade) {
                     forwardTestMenuItem.setEnabled(false);
                 }
-                if (mode == Dispatcher.Mode.FORWARD_TEST) {
+                if (mode == Dispatcher.Mode.ForwardTest) {
                     tradeMenuItem.setEnabled(false);
                 }
 

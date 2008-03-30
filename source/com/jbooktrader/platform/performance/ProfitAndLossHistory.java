@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.performance;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Holds P&L history.

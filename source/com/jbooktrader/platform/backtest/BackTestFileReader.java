@@ -2,7 +2,7 @@ package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.report.Report;
+import com.jbooktrader.platform.report.*;
 
 import java.io.*;
 import java.text.*;

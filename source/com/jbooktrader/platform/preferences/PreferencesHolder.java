@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.preferences;
 
-import java.util.prefs.Preferences;
+import java.util.prefs.*;
 
 public class PreferencesHolder {
     private static PreferencesHolder instance;

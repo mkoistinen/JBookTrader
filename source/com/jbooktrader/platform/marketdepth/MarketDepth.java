@@ -9,17 +9,37 @@ public class MarketDepth {
     private final LinkedList<MarketDepthItem> bids, asks;
     private long time;
     private long lastUpdateTime;
+    private int cumulativeBidSize, cumulativeAskSize;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
     }
 
+    private void setCumulativeSizes() {
+        for (MarketDepthItem item : bids) {
+            cumulativeBidSize += item.getSize();
+        }
+
+        for (MarketDepthItem item : asks) {
+            cumulativeAskSize += item.getSize();
+        }
+    }
+
+    /**
+     * Used by backtester and optimizer
+     *
+     * @param bids
+     * @param asks
+     * @param time
+     */
     public MarketDepth(LinkedList<MarketDepthItem> bids, LinkedList<MarketDepthItem> asks, long time) {
         this.bids = bids;
         this.asks = asks;
         this.time = time;
+        setCumulativeSizes();
     }
+
 
     public MarketDepth(MarketDepth marketDepth) {
         this();
@@ -31,8 +51,19 @@ public class MarketDepth {
             asks.add(new MarketDepthItem(item.getSize(), item.getPrice()));
         }
 
+        setCumulativeSizes();
         time = System.currentTimeMillis();
     }
+
+
+    public int getCumulativeBidSize() {
+        return cumulativeBidSize;
+    }
+
+    public int getCumulativeAskSize() {
+        return cumulativeAskSize;
+    }
+
 
     public synchronized void reset() {
         bids.clear();
@@ -49,12 +80,9 @@ public class MarketDepth {
     }
 
     public int getBalance() {
-        int cumBidSize = getCumulativeBidSize();
-        int cumAskSize = getCumulativeAskSize();
-
-        double totalDepth = (cumBidSize + cumAskSize);
-        double strength = 100. * (cumBidSize - cumAskSize) / totalDepth;
-        return (int) strength;
+        double totalDepth = (cumulativeBidSize + cumulativeAskSize);
+        double balance = 100. * (cumulativeBidSize - cumulativeAskSize) / totalDepth;
+        return (int) balance;
     }
 
     public double getBestBid() {
@@ -91,35 +119,6 @@ public class MarketDepth {
 
         return marketDepth.toString();
     }
-
-    public String toShortString() {
-        int cumulativeBid = 0;
-        for (MarketDepthItem item : bids) {
-            cumulativeBid += item.getSize();
-        }
-        int cumulativeAsk = 0;
-        for (MarketDepthItem item : asks) {
-            cumulativeAsk += item.getSize();
-        }
-        return cumulativeBid + "-" + cumulativeAsk;
-    }
-
-    public int getCumulativeBidSize() {
-        int cumulativeBid = 0;
-        for (MarketDepthItem item : bids) {
-            cumulativeBid += item.getSize();
-        }
-        return cumulativeBid;
-    }
-
-    public int getCumulativeAskSize() {
-        int cumulativeAsk = 0;
-        for (MarketDepthItem item : asks) {
-            cumulativeAsk += item.getSize();
-        }
-        return cumulativeAsk;
-    }
-
 
     synchronized public long getMillisSinceLastUpdate() {
         return (System.nanoTime() - lastUpdateTime) / 1000000;

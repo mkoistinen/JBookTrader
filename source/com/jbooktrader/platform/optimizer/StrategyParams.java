@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 
 import java.util.*;
 
@@ -14,7 +14,6 @@ public class StrategyParams {
         params = new ArrayList<StrategyParam>();
         paramsLookUp = new HashMap<String, StrategyParam>();
     }
-
 
     public boolean equals(Object o) {
         if (!(o instanceof StrategyParams)) {

@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.position;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.strategy.*;
 
 /**
  * Encapsulates the order execution information.

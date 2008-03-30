@@ -4,10 +4,10 @@ import com.ib.client.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.strategy.*;
 
-import java.util.Map;
+import java.util.*;
 
 /**
  * This class acts as a "wrapper" in the IB's API terminology.

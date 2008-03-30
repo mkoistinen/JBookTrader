@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.model;
 
-import javax.swing.table.AbstractTableModel;
+import javax.swing.table.*;
 import java.util.*;
 
 public class TableDataModel extends AbstractTableModel {

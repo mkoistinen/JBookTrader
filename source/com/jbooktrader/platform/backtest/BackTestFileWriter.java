@@ -1,8 +1,8 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.marketdepth.*;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;

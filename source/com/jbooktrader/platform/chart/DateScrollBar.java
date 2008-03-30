@@ -3,20 +3,20 @@ package com.jbooktrader.platform.chart;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.event.*;
 import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.RendererUtilities;
-import org.jfree.data.Range;
-import org.jfree.data.xy.XYDataset;
+import org.jfree.chart.renderer.*;
+import org.jfree.data.*;
+import org.jfree.data.xy.*;
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.util.List;
+import java.util.*;
 
 /**
  * Scroll bar for a combined chart where the horizontal axis represents dates
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
 
-    private static final int STEPS = 1000;
+    private static final int STEPS = 10000;
     private final DateAxis dateAxis;
     private final Range range;
     private double rangeMin, dateRange, ratio;
@@ -48,15 +48,25 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
                 XYDataset dataset = plot.getDataset(datasetNumber);
                 int seriesCount = dataset.getSeriesCount();
 
+                boolean isOHLC = dataset instanceof OHLCDataset;
+                OHLCDataset ohlcDataset = isOHLC ? (OHLCDataset) dataset : null;
+
                 for (int series = 0; series < seriesCount; series++) {
                     int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, lowerBound, upperBound);
                     int firstItem = itemBounds[0];
                     int lastItem = itemBounds[1];
 
                     for (int item = firstItem; item < lastItem; item++) {
-                        double value = dataset.getYValue(series, item);
-                        max = Math.max(value, max);
-                        min = Math.min(value, min);
+                        double high, low;
+                        if (isOHLC) {
+                            high = ohlcDataset.getHighValue(datasetNumber, item);
+                            low = ohlcDataset.getLowValue(datasetNumber, item);
+                        } else {
+                            high = low = dataset.getYValue(series, item);
+                        }
+
+                        max = Math.max(high, max);
+                        min = Math.min(low, min);
                     }
                 }
             }

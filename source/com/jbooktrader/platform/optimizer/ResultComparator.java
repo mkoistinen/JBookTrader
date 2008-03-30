@@ -1,42 +1,38 @@
 package com.jbooktrader.platform.optimizer;
 
-import java.util.Comparator;
+import java.util.*;
 
 /**
  * Comparator for strategy optimization results.
  */
 public class ResultComparator implements Comparator<Result> {
-    enum SortKey {
-        TOTAL_PROFIT, PROFIT_FACTOR, DRAWDOWN, TRADES, TRUE_KELLY
-    }
+    private final ResultsTableModel.Column sortColumn;
 
-    private final SortKey sortKey;
-
-    public ResultComparator(SortKey sortKey) {
-        this.sortKey = sortKey;
+    public ResultComparator(ResultsTableModel.Column sortColumn) {
+        this.sortColumn = sortColumn;
     }
 
     public int compare(Result r1, Result r2) {
         int res = 0;
 
-        switch (sortKey) {
-            case TOTAL_PROFIT:
+        switch (sortColumn) {
+            case PL:
                 // highest to lowest
                 res = ((Double) r2.getNetProfit()).compareTo(r1.getNetProfit());
                 break;
-            case PROFIT_FACTOR:
+            case PF:
                 // highest to lowest
                 res = ((Double) r2.getProfitFactor()).compareTo(r1.getProfitFactor());
                 break;
-            case DRAWDOWN:
+            case MaxDD:
                 // lowest to highest
                 res = ((Double) r1.getMaxDrawdown()).compareTo(r2.getMaxDrawdown());
                 break;
-            case TRADES:
+            case Trades:
                 // lowest to highest
                 res = ((Integer) r1.getTrades()).compareTo(r2.getTrades());
                 break;
-            case TRUE_KELLY:
+            case TrueKelly:
                 // highest to lowest
                 res = ((Double) r2.getTrueKelly()).compareTo(r1.getTrueKelly());
                 break;

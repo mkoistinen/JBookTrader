@@ -3,12 +3,12 @@ package com.jbooktrader.platform.trader;
 import com.ib.client.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.position.OpenOrder;
+import com.jbooktrader.platform.position.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.strategy.*;
 
 import javax.swing.*;
 import java.util.*;
@@ -80,14 +80,6 @@ public class TraderAssistant {
 
 
     public void disconnect() {
-        for (int srategyId : strategies.keySet()) {
-            Strategy strategy = strategies.get(srategyId);
-            strategy.setIsActive(false);
-            MarketBook marketBook = strategy.getMarketBook();
-            synchronized (marketBook) {
-                marketBook.notifyAll();
-            }
-        }
         if (socket != null && socket.isConnected()) {
             socket.cancelNewsBulletins();
             socket.eDisconnect();
@@ -134,7 +126,7 @@ public class TraderAssistant {
             String msg = strategy.getName() + ": Placed order " + orderID;
             openOrders.put(orderID, new OpenOrder(orderID, order, strategy));
 
-            if (Dispatcher.getMode() == Dispatcher.Mode.TRADE) {
+            if (Dispatcher.getMode() == Dispatcher.Mode.Trade) {
                 socket.placeOrder(orderID, contract, order);
                 eventReport.report(msg);
             } else {
@@ -171,7 +163,7 @@ public class TraderAssistant {
     public boolean isConnected() {
         Dispatcher.Mode mode = Dispatcher.getMode();
 
-        if (mode == Dispatcher.Mode.BACK_TEST || mode == Dispatcher.Mode.OPTIMIZATION) {
+        if (mode == Dispatcher.Mode.BackTest || mode == Dispatcher.Mode.Optimization) {
             return true;
         } else {
             return isConnected;
@@ -196,7 +188,7 @@ public class TraderAssistant {
         }
 
         socket.reqAccountUpdates(false, advisorAccountID);
-        boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getMode() == Dispatcher.Mode.TRADE;
+        boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getMode() == Dispatcher.Mode.Trade;
         if (isRealTrading) {
             String lineSep = System.getProperty("line.separator");
             String warning = "Connected to a real (not simulated) IB account. ";

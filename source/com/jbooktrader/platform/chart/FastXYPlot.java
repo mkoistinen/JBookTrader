@@ -1,16 +1,16 @@
 package com.jbooktrader.platform.chart;
 
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.*;
-import org.jfree.chart.renderer.RendererUtilities;
+import org.jfree.chart.renderer.*;
 import org.jfree.chart.renderer.xy.*;
-import org.jfree.data.general.DatasetUtilities;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.RectangleEdge;
+import org.jfree.data.general.*;
+import org.jfree.data.xy.*;
+import org.jfree.ui.*;
 
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.util.HashSet;
+import java.awt.geom.*;
+import java.util.*;
 
 /**
  * Performs fast rendering of large datasets in nearly constant time.

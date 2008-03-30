@@ -1,10 +1,10 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.model.TableDataModel;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.NumberRenderer;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.*;
 import java.util.*;
 
 /**

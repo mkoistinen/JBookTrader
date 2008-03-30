@@ -1,26 +1,25 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.optimizer.ResultComparator.SortKey.*;
+import static com.jbooktrader.platform.optimizer.ResultsTableModel.Column.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
+import java.io.*;
 import java.util.List;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JDialog {
-    //private static final String LINE_SEP = System.getProperty("line.separator");
-    private static final Dimension MIN_SIZE = new Dimension(700, 600);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(700, 550);// minimum frame size
 
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, closeButton, selectFileButton;
@@ -242,9 +241,6 @@ public class OptimizerDialog extends JDialog {
         JTable paramTable = new JTable(paramTableModel);
         paramTableColumnModel = paramTable.getColumnModel();
         stepColumn = paramTableColumnModel.getColumn(3);
-        //tableColumnModel.removeColumn(tc);
-        //tableColumnModel.addColumn(tc);
-
         TableCellRenderer renderer = new NumberRenderer(0);
         for (int column = 1; column < paramTableColumnModel.getColumnCount(); column++) {
             paramTableColumnModel.getColumn(column).setCellRenderer(renderer);
@@ -387,21 +383,21 @@ public class OptimizerDialog extends JDialog {
     }
 
 
-    public ResultComparator.SortKey getSortCriteria() {
-        ResultComparator.SortKey sortCriteria = PROFIT_FACTOR;
+    public ResultsTableModel.Column getSortCriteria() {
+        ResultsTableModel.Column sortCriteria = PF;
         int selectedIndex = selectionCriteriaCombo.getSelectedIndex();
         switch (selectedIndex) {
             case 0:
-                sortCriteria = PROFIT_FACTOR;
+                sortCriteria = PF;
                 break;
             case 1:
-                sortCriteria = TOTAL_PROFIT;
+                sortCriteria = PL;
                 break;
             case 2:
-                sortCriteria = DRAWDOWN;
+                sortCriteria = MaxDD;
                 break;
             case 3:
-                sortCriteria = TRUE_KELLY;
+                sortCriteria = TrueKelly;
                 break;
 
         }

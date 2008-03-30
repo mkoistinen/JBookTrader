@@ -1,11 +1,12 @@
 package com.jbooktrader.platform.marketdepth;
 
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * Holds market depth history for a strategy.
  */
 public class MarketBook {
+    private static final long MAX_SIZE = 3 * 60 * 60 * 8;
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepth> marketDepths;
 
@@ -35,13 +36,11 @@ public class MarketBook {
         return marketDepths.size() == 0;
     }
 
-    synchronized public void addMarketDepth(MarketDepth marketDepth) {
-        MarketDepth md = new MarketDepth(marketDepth);
-        marketDepths.add(md);
-    }
-
     public void add(MarketDepth marketDepth) {
         marketDepths.add(marketDepth);
+        if (marketDepths.size() > MAX_SIZE) {
+            marketDepths.removeFirst();
+        }
     }
 
     synchronized public MarketDepth getMarketDepth(int index) {

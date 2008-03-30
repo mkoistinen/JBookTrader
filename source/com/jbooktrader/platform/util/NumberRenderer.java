@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.util;
 
-import javax.swing.table.DefaultTableCellRenderer;
-import java.text.DecimalFormat;
+import javax.swing.table.*;
+import java.text.*;
 
 
 public class NumberRenderer extends DefaultTableCellRenderer {

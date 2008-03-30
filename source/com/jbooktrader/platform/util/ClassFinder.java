@@ -1,12 +1,13 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.bar.*;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.platform.strategy.*;
 
 import java.io.*;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 import java.util.jar.*;
@@ -63,9 +64,9 @@ public class ClassFinder {
     public static Strategy getInstance(String name) throws JBookTraderException {
         try {
             Class<? extends Strategy> clazz = Class.forName(name).asSubclass(Strategy.class);
-            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
-            Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-            return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());
+            Class[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
+            Constructor constructor = clazz.getConstructor(parameterTypes);
+            return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook(), new PriceHistory());
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
         } catch (Exception e) {

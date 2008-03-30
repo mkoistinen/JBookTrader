@@ -1,16 +1,16 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.model.JBookTraderException;
-import static com.jbooktrader.platform.preferences.JBTPreferences.BackTesterFileName;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
+import java.io.*;
 
 /**
  * Dialog to specify options for back testing using a historical data file.

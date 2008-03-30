@@ -1,25 +1,25 @@
 package com.jbooktrader.platform.chart;
 
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.position.Position;
+import com.jbooktrader.platform.position.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.SpringUtilities;
-import org.jfree.chart.JFreeChart;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
+import org.jfree.chart.*;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.xy.*;
 import org.jfree.data.time.*;
+import org.jfree.data.xy.*;
 import org.jfree.ui.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Ellipse2D;
 import java.util.*;
 import java.util.List;
 
@@ -34,16 +34,13 @@ public class StrategyPerformanceChart {
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, 11);
     private static final Paint BACKGROUND_COLOR = new GradientPaint(0, 0, new Color(0, 0, 176), 0, 0, Color.BLACK);
 
-
     private JFreeChart chart;
     private CombinedDomainXYPlot combinedPlot;
-
     private DateAxis dateAxis;
     private final Strategy strategy;
-    private final Map<Integer, TimeSeriesCollection> tsCollections;
     private FastXYPlot pricePlot, pnlPlot;
-
-
+    private CandlestickRenderer candleRenderer;
+    private MultiColoredBarRenderer mcbRenderer;
     private JComboBox chartTypeCombo, timeLineCombo, timeZoneCombo;
     private JCheckBox tradesVisibilityCheck, pnlVisibilityCheck;
     private final ArrayList<CircledTextAnnotation> annotations = new ArrayList<CircledTextAnnotation>();
@@ -53,7 +50,6 @@ public class StrategyPerformanceChart {
     public StrategyPerformanceChart(Strategy strategy) {
         prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
-        tsCollections = new HashMap<Integer, TimeSeriesCollection>();
         chart = createChart();
     }
 
@@ -61,18 +57,18 @@ public class StrategyPerformanceChart {
         int chartType = chartTypeCombo.getSelectedIndex();
         switch (chartType) {
             case 0:
-                //pricePlot.setRenderer(candleRenderer);
+                pricePlot.setRenderer(candleRenderer);
                 break;
             case 1:
-                //pricePlot.setRenderer(mcbRenderer);
+                pricePlot.setRenderer(mcbRenderer);
                 break;
         }
     }
 
     private void setTimeline() {
         int timeLineType = timeLineCombo == null ? 0 : timeLineCombo.getSelectedIndex();
-        MarketBook marketBook = strategy.getMarketBook();
-        MarketTimeLine mtl = new MarketTimeLine(marketBook);
+        PriceHistory priceHistory = strategy.getPriceBarHistory();
+        MarketTimeLine mtl = new MarketTimeLine(priceHistory);
         SegmentedTimeline segmentedTimeline = (timeLineType == 0) ? mtl.getAllHours() : mtl.getNormalHours();
         dateAxis.setTimeline(segmentedTimeline);
     }
@@ -100,7 +96,7 @@ public class StrategyPerformanceChart {
         Container contentPane = chartFrame.getContentPane();
 
 
-        final JPanel chartOptionsPanel = new JPanel(new BorderLayout());
+        JPanel chartOptionsPanel = new JPanel(new BorderLayout());
         JPanel chartControlsPanel = new JPanel(new SpringLayout());
         chartOptionsPanel.add(chartControlsPanel, BorderLayout.NORTH);
 
@@ -110,7 +106,7 @@ public class StrategyPerformanceChart {
         chartOptionsPanel.setBorder(border);
 
         JLabel chartTypeLabel = new JLabel("Chart Type:", JLabel.TRAILING);
-        chartTypeCombo = new JComboBox(new String[]{"Bid/Ask"});
+        chartTypeCombo = new JComboBox(new String[]{"Candle", "OHLC"});
         chartTypeLabel.setLabelFor(chartTypeCombo);
 
         JLabel timeLineLabel = new JLabel("Timeline:", JLabel.TRAILING);
@@ -135,7 +131,7 @@ public class StrategyPerformanceChart {
         chartControlsPanel.add(tradesVisibilityCheck);
         chartControlsPanel.add(pnlVisibilityCheck);
 
-        SpringUtilities.makeCompactGrid(chartControlsPanel, 1, 8, 12, 5, 8, 5);//rows, cols, initX, initY, xPad, yPad
+        SpringUtilities.makeCompactGrid(chartControlsPanel, 1, 8, 12, 5, 8, 5);
 
         setRenderer();
 
@@ -162,7 +158,7 @@ public class StrategyPerformanceChart {
             public void actionPerformed(ActionEvent e) {
                 boolean show = pnlVisibilityCheck.isSelected();
                 if (show) {
-                    combinedPlot.add(pnlPlot, 1);
+                    combinedPlot.add(pnlPlot);
                 } else {
                     combinedPlot.remove(pnlPlot);
                 }
@@ -232,23 +228,6 @@ public class StrategyPerformanceChart {
     }
 
 
-    private TimeSeries createIndicatorSeries(ChartableIndicator chartableIndicator) {
-
-        TimeSeries ts = new TimeSeries(chartableIndicator.getName(), Second.class);
-        ts.setRangeDescription(chartableIndicator.getName());
-
-        // make a defensive copy to prevent concurrent modification
-        List<IndicatorValue> indicatorValues = new ArrayList<IndicatorValue>();
-        indicatorValues.addAll(chartableIndicator.getIndicator().getHistory());
-
-        for (IndicatorValue indicatorValue : indicatorValues) {
-            ts.addOrUpdate(new Second(new Date(indicatorValue.getTime())), indicatorValue.getValue());
-        }
-
-        ts.fireSeriesChanged();
-        return ts;
-    }
-
     private TimeSeries createProfitAndLossSeries(ProfitAndLossHistory plHistory) {
 
         TimeSeries ts = new TimeSeries("P&L", Second.class);
@@ -266,80 +245,104 @@ public class StrategyPerformanceChart {
         return ts;
     }
 
-    private TimeSeriesCollection createMarketDepthSeries(MarketBook marketBook) {
-        TimeSeriesCollection tsc = new TimeSeriesCollection();
+    private OHLCDataset createPriceDataset() {
+        PriceHistory priceHistory = strategy.getPriceBarHistory();
+        int size = priceHistory.size();
+        Date[] dates = new Date[size];
 
-        // make a defensive copy to prevent concurrent modification
-        List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
-        marketDepths.addAll(marketBook.getAll());
+        double[] highs = new double[size];
+        double[] lows = new double[size];
+        double[] opens = new double[size];
+        double[] closes = new double[size];
+        double[] volumes = new double[size];
 
-        TimeSeries bid = new TimeSeries("Bid", Second.class);
-        bid.setRangeDescription("Bid");
-        for (MarketDepth marketDepth : marketDepths) {
-            Second second = new Second(new Date(marketDepth.getTime()));
-            bid.addOrUpdate(second, marketDepth.getBestBid());
+        for (int bar = 0; bar < size; bar++) {
+            PriceBar priceBar = priceHistory.getPriceBar(bar);
+
+            dates[bar] = new Date(priceBar.getTime());
+            highs[bar] = priceBar.getHigh();
+            lows[bar] = priceBar.getLow();
+            opens[bar] = priceBar.getOpen();
+            closes[bar] = priceBar.getClose();
         }
-        bid.fireSeriesChanged();
-        tsc.addSeries(bid);
 
-        TimeSeries ask = new TimeSeries("Ask", Second.class);
-        ask.setRangeDescription("Ask");
-        for (MarketDepth marketDepth : marketDepths) {
-            Second second = new Second(new Date(marketDepth.getTime()));
-            ask.addOrUpdate(second, marketDepth.getBestAsk());
-        }
-        ask.fireSeriesChanged();
-        tsc.addSeries(ask);
-
-        return tsc;
+        String ticker = strategy.getContract().m_symbol;
+        return new DefaultHighLowDataset(ticker, dates, highs, lows, opens, closes, volumes);
     }
 
+    private OHLCDataset createIndicatorDataset(ChartableIndicator chartableIndicator) {
+
+        IndicatorHistory indicatorHistory = chartableIndicator.getIndicator().getBarHistory();
+        int size = indicatorHistory.size();
+        Date[] dates = new Date[size];
+
+        double[] highs = new double[size];
+        double[] lows = new double[size];
+        double[] opens = new double[size];
+        double[] closes = new double[size];
+        double[] volumes = new double[size];
+
+        for (int bar = 0; bar < size; bar++) {
+            IndicatorBar indicatorBar = indicatorHistory.getIndicatorBar(bar);
+
+            dates[bar] = new Date(indicatorBar.getTime());
+            highs[bar] = indicatorBar.getHigh();
+            lows[bar] = indicatorBar.getLow();
+            opens[bar] = indicatorBar.getOpen();
+            closes[bar] = indicatorBar.getClose();
+        }
+
+        return new DefaultHighLowDataset("", dates, highs, lows, opens, closes, volumes);
+    }
 
     private JFreeChart createChart() {
+        // create OHLC bar renderer
+        mcbRenderer = new MultiColoredBarRenderer();
+        mcbRenderer.setSeriesPaint(0, Color.WHITE);
+        mcbRenderer.setBaseStroke(new BasicStroke(3));
+        mcbRenderer.setSeriesPaint(0, new Color(250, 240, 150));
+
+        // create candlestick renderer
+        candleRenderer = new CandlestickRenderer(3);
+        candleRenderer.setDrawVolume(false);
+        candleRenderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_AVERAGE);
+        candleRenderer.setUpPaint(Color.GREEN);
+        candleRenderer.setDownPaint(Color.RED);
+        candleRenderer.setSeriesPaint(0, new Color(250, 240, 150));
+        candleRenderer.setBaseStroke(new BasicStroke(1));
+
         dateAxis = new DateAxis();
+
         setTimeline();
         setTimeZone();
-
-        // create price plot
-        NumberAxis priceAxis = new NumberAxis("Price");
-        priceAxis.setAutoRangeIncludesZero(false);
-        pricePlot = new FastXYPlot(createMarketDepthSeries(strategy.getMarketBook()), dateAxis, priceAxis, null);
-        pricePlot.setBackgroundPaint(BACKGROUND_COLOR);
-        AbstractXYItemRenderer pricePlotRenderer = new StandardXYItemRenderer();
-        pricePlotRenderer.setBaseStroke(new BasicStroke(1));
-        pricePlot.setRenderer(pricePlotRenderer);
 
         // parent plot
         combinedPlot = new CombinedDomainXYPlot(dateAxis);
         combinedPlot.setGap(10.0);
         combinedPlot.setOrientation(PlotOrientation.VERTICAL);
+
+        // price plot
+        OHLCDataset priceDataset = createPriceDataset();
+        NumberAxis priceAxis = new NumberAxis("Price");
+        priceAxis.setAutoRangeIncludesZero(false);
+        pricePlot = new FastXYPlot(priceDataset, dateAxis, priceAxis, null);
+        pricePlot.setBackgroundPaint(BACKGROUND_COLOR);
         combinedPlot.add(pricePlot, PRICE_PLOT_WEIGHT);
 
-        // Put all indicators into groups, so that each group is
-        // displayed on its own subplot
+        // indicator plots
         for (ChartableIndicator chartableIndicator : strategy.getIndicators()) {
-            TimeSeries ts = createIndicatorSeries(chartableIndicator);
-            int subChart = chartableIndicator.getChartIndex();
-            if (subChart >= 0) {
-                TimeSeriesCollection tsCollection = tsCollections.get(subChart);
-                if (tsCollection == null) {
-                    tsCollection = new TimeSeriesCollection();
-                    tsCollections.put(subChart, tsCollection);
-                }
-                tsCollection.addSeries(ts);
-            }
+            NumberAxis indicatorAxis = new NumberAxis(chartableIndicator.getName());
+            OHLCDataset ds = createIndicatorDataset(chartableIndicator);
+            int type = chartableIndicator.getIndicator().getType();
+            AbstractXYItemRenderer renderer = (type == 0) ? candleRenderer : new StandardXYItemRenderer();
+
+            FastXYPlot indicatorPlot = new FastXYPlot(ds, dateAxis, indicatorAxis, renderer);
+            indicatorPlot.setBackgroundPaint(BACKGROUND_COLOR);
+            combinedPlot.add(indicatorPlot);
         }
 
-        // create P&L series
-        TimeSeriesCollection profitAndLossCollection = new TimeSeriesCollection();
-        ProfitAndLossHistory plHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
-        TimeSeries profitAndLoss = createProfitAndLossSeries(plHistory);
-        profitAndLossCollection.addSeries(profitAndLoss);
-        tsCollections.put(-1, profitAndLossCollection);
-
-        // Plot positions
+        // positions plot
         for (Position position : strategy.getPositionManager().getPositionsHistory()) {
-
             Date date = new Date(position.getTime());
             double aveFill = position.getAvgFillPrice();
             int pos = position.getPosition();
@@ -361,48 +364,25 @@ public class StrategyPerformanceChart {
 
             pricePlot.addAnnotation(circledText);
             annotations.add(circledText);
-
         }
 
-        // Now that the indicators are grouped, create subplots
-        AbstractXYItemRenderer renderer;
-        for (Map.Entry<Integer, TimeSeriesCollection> mapEntry : tsCollections.entrySet()) {
-            int subChart = mapEntry.getKey();
-            TimeSeriesCollection tsCollection = mapEntry.getValue();
-
-            if (subChart == -1) {
-                renderer = new XYLineAndShapeRenderer();
-                renderer.setSeriesShape(0, new Ellipse2D.Double(-2, -2, 4, 4));
-            } else {
-                renderer = new StandardXYItemRenderer();
-                renderer.setBaseStroke(new BasicStroke(1));
-            }
-
-            if (subChart == 0) {
-                pricePlot.setDataset(1, tsCollection);
-                pricePlot.setRenderer(1, new StandardXYItemRenderer());
-            } else {
-                String collectionName = (subChart == -1) ? "P&L" : "Indicators";
-                NumberAxis indicatorAxis = new NumberAxis(collectionName);
-                indicatorAxis.setAutoRangeIncludesZero(false);
-                FastXYPlot plot = new FastXYPlot(tsCollection, dateAxis, indicatorAxis, renderer);
-                plot.setBackgroundPaint(BACKGROUND_COLOR);
-                int weight = 1;
-                if (subChart == -1) {
-                    pnlPlot = plot;
-                }
-                combinedPlot.add(plot, weight);
-            }
-        }
+        // P&L plot
+        TimeSeriesCollection profitAndLossCollection = new TimeSeriesCollection();
+        ProfitAndLossHistory plHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
+        TimeSeries profitAndLoss = createProfitAndLossSeries(plHistory);
+        profitAndLossCollection.addSeries(profitAndLoss);
+        NumberAxis pnlAxis = new NumberAxis("P&L");
+        pnlAxis.setAutoRangeIncludesZero(false);
+        StandardXYItemRenderer pnlRenderer = new StandardXYItemRenderer();
+        pnlPlot = new FastXYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);
+        pnlPlot.setBackgroundPaint(BACKGROUND_COLOR);
+        combinedPlot.add(pnlPlot);
 
 
         combinedPlot.setDomainAxis(dateAxis);
 
         // Finally, create the chart
-        chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, true);
-        chart.getLegend().setPosition(RectangleEdge.TOP);
-        chart.getLegend().setBackgroundPaint(Color.LIGHT_GRAY);
-
+        chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, false);
         return chart;
     }
 }

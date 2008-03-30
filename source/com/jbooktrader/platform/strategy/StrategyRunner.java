@@ -2,14 +2,14 @@ package com.jbooktrader.platform.strategy;
 
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.position.PositionManager;
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.schedule.TradingSchedule;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.position.*;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.trader.*;
-import com.jbooktrader.platform.util.MessageDialog;
+import com.jbooktrader.platform.util.*;
 
-import java.io.IOException;
+import java.io.*;
 
 
 /**
@@ -62,7 +62,7 @@ public class StrategyRunner implements Runnable {
                 synchronized (marketDepth) {
                     // the getMillisSinceLastUpdate and addMarketDepth must be done atomically
                     if (marketDepth.getMillisSinceLastUpdate() >= 100) {
-                        marketBook.addMarketDepth(marketDepth);
+                        marketBook.add(new MarketDepth(marketDepth));
                         break;
                     }
                 }

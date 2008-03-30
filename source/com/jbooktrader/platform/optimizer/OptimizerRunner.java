@@ -1,17 +1,18 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.backtest.BackTestFileReader;
+import com.jbooktrader.platform.backtest.*;
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.schedule.TradingSchedule;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.text.NumberFormat;
+import java.io.*;
+import java.lang.reflect.*;
+import java.text.*;
 import java.util.*;
 
 /**
@@ -20,7 +21,7 @@ import java.util.*;
  */
 public abstract class OptimizerRunner implements Runnable {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    protected static final long MAX_HISTORY_PERIOD = 8 * 60 * 60 * 1000L;// 8 hours
+    protected static final long MAX_HISTORY_PERIOD = 4 * 60 * 60 * 1000L;// 4 hours
     protected static final long MAX_STRATEGIES = 50000L;
     protected static final int MAX_RESULTS = 5000;
     protected static final long UPDATE_FREQUENCY = 1000000L;// lines
@@ -36,7 +37,8 @@ public abstract class OptimizerRunner implements Runnable {
     protected final TradingSchedule tradingSchedule;
     public BackTestFileReader backTestFileReader;
     protected int lineCount;
-    public MarketBook marketBook;
+    protected MarketBook marketBook;
+    protected PriceHistory priceHistory;
     protected final int minTrades;
     private long completedSteps, totalSteps;
 
@@ -48,10 +50,11 @@ public abstract class OptimizerRunner implements Runnable {
         results = new ArrayList<Result>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
-        Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+        Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
         resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
         marketBook = new MarketBook();
+        priceHistory = new PriceHistory();
         minTrades = optimizerDialog.getMinTrades();
     }
 
@@ -72,7 +75,7 @@ public abstract class OptimizerRunner implements Runnable {
 
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
-
+            priceHistory.update(marketDepth.getTime(), marketDepth.getMidPoint());
             marketBook.add(marketDepth);
             long time = marketDepth.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
@@ -92,7 +95,6 @@ public abstract class OptimizerRunner implements Runnable {
 
                 completedSteps++;
                 if (completedSteps % UPDATE_FREQUENCY == 0) {
-                    strategy.trim(time - MAX_HISTORY_PERIOD);
                     showFastProgress(completedSteps, totalSteps, "Optimizing");
                 }
                 if (cancelled) {

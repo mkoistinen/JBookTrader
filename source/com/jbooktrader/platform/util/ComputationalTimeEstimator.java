@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.util;
 
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 
 /**
@@ -22,7 +22,6 @@ public class ComputationalTimeEstimator {
     public void setTotalIterations(long totalIterations) {
         this.totalIterations = totalIterations;
     }
-
 
     public String getTimeLeft(long iterationsSoFar) {
         String timeLeft = "";

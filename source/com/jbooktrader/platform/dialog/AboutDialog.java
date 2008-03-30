@@ -1,10 +1,10 @@
 package com.jbooktrader.platform.dialog;
 
-import com.ib.client.EClientSocket;
+import com.ib.client.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.trader.Trader;
-import com.jbooktrader.platform.util.SpringUtilities;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.trader.*;
+import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(productValueLabel);
 
         JLabel versionLabel = new JLabel("Version:", JLabel.TRAILING);
-        JLabel versionValueLabel = new JLabel("2.04, March 25, 2008");
+        JLabel versionValueLabel = new JLabel("2.05, March 30, 2008");
         versionValueLabel.setForeground(Color.BLACK);
         versionLabel.setLabelFor(versionValueLabel);
         aboutPanel.add(versionLabel);

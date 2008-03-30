@@ -1,10 +1,10 @@
 package com.jbooktrader.platform.model;
 
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.position.PositionManager;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ClassFinder;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.position.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 import java.util.*;
 

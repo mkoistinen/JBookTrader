@@ -15,20 +15,19 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Predator extends Strategy {
-
+public class Follower extends Strategy {
     // Technical indicators
-    private final Indicator depthBalanceInd;
+    private final Indicator depthVelocityInd;
 
     // Strategy parameters names
+    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
-    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final double entry, exit;
+    private final int entry;
 
 
-    public Predator(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Follower(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
@@ -38,12 +37,12 @@ public class Predator extends Strategy {
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
+        int period = getParam(PERIOD);
         entry = getParam(ENTRY);
-        exit = getParam(EXIT);
 
         // Create technical indicators
-        depthBalanceInd = new DepthBalance(marketBook);
-        addIndicator("Depth Balance", depthBalanceInd);
+        depthVelocityInd = new DepthVelocity(marketBook, period);
+        addIndicator("DepthVelocity", depthVelocityInd);
     }
 
     /**
@@ -54,8 +53,8 @@ public class Predator extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 100, 1, 64);
-        addParam(EXIT, 0, 100, 1, 64);
+        addParam(PERIOD, 1, 10, 1, 5);
+        addParam(ENTRY, 30, 100, 1, 69);
     }
 
     /**
@@ -64,18 +63,11 @@ public class Predator extends Strategy {
      */
     @Override
     public void onBookChange() {
-        int currentPosition = getPositionManager().getPosition();
-        double smoothedDepthBalance = depthBalanceInd.getValue();
-        if (smoothedDepthBalance >= entry) {
-            setPosition(-1);
-        } else if (smoothedDepthBalance <= -entry) {
+        double depthVelocity = depthVelocityInd.getValue();
+        if (depthVelocity >= entry) {
             setPosition(1);
-        } else {
-            boolean target = (currentPosition > 0 && smoothedDepthBalance >= exit);
-            target = target || (currentPosition < 0 && smoothedDepthBalance <= -exit);
-            if (target) {
-                setPosition(0);
-            }
+        } else if (depthVelocity <= -entry) {
+            setPosition(-1);
         }
     }
 }

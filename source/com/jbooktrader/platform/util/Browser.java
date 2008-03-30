@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.util;
 
 import javax.swing.*;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 
 public class Browser {

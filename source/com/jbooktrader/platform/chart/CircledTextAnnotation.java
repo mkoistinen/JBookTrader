@@ -1,10 +1,10 @@
 package com.jbooktrader.platform.chart;
 
-import org.jfree.chart.annotations.XYTextAnnotation;
-import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.annotations.*;
+import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.*;
-import org.jfree.text.TextUtilities;
-import org.jfree.ui.RectangleEdge;
+import org.jfree.text.*;
+import org.jfree.ui.*;
 
 import java.awt.*;
 import java.awt.geom.*;

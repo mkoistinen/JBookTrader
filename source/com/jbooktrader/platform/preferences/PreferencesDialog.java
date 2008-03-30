@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.preferences;
 
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-import com.jbooktrader.platform.startup.JBookTrader;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;

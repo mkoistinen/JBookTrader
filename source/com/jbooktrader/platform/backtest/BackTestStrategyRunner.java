@@ -1,11 +1,11 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.report.Report;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.MessageDialog;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
@@ -21,7 +21,7 @@ public class BackTestStrategyRunner implements Runnable {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
 
-        boolean isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.OPTIMIZATION);
+        boolean isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.Optimization);
 
         if (!isOptimizationMode) {
             Dispatcher.getTrader().getAssistant().addStrategy(strategy);

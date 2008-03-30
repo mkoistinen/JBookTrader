@@ -1,12 +1,12 @@
 package com.jbooktrader.platform.report;
 
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.startup.JBookTrader;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.util.*;
 
 

@@ -3,7 +3,7 @@ package com.jbooktrader.platform.strategy;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
-import com.jbooktrader.platform.performance.PerformanceManager;
+import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;

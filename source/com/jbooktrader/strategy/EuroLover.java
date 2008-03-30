@@ -1,15 +1,16 @@
 package com.jbooktrader.strategy;
 
-import com.ib.client.Contract;
-import com.jbooktrader.indicator.DepthBalance;
+import com.ib.client.*;
+import com.jbooktrader.indicator.*;
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
-import com.jbooktrader.platform.indicator.Indicator;
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.platform.schedule.TradingSchedule;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 /**
  *
@@ -27,8 +28,8 @@ public class EuroLover extends Strategy {
     private final double entry, exit;
 
 
-    public EuroLover(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public EuroLover(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+        super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeCashContract("EUR", "USD");
         // Define trading schedule
@@ -42,10 +43,7 @@ public class EuroLover extends Strategy {
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
-
-        // Specify the title and the chart number for each indicator
-        // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
-        addIndicator("Depth Balance", depthBalanceInd, 1);
+        addIndicator("Depth Balance", depthBalanceInd);
     }
 
     /**

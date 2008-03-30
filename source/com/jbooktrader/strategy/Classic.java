@@ -1,15 +1,16 @@
 package com.jbooktrader.strategy;
 
-import com.ib.client.Contract;
-import com.jbooktrader.indicator.DepthBalance;
+import com.ib.client.*;
+import com.jbooktrader.indicator.*;
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
-import com.jbooktrader.platform.indicator.Indicator;
-import com.jbooktrader.platform.marketdepth.MarketBook;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.platform.schedule.TradingSchedule;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ContractFactory;
+import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 /**
  *
@@ -28,8 +29,8 @@ public class Classic extends Strategy {
     private final double entry, stopLoss, profitTarget;
 
 
-    public Classic(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public Classic(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+        super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -44,10 +45,7 @@ public class Classic extends Strategy {
 
         // Create technical indicators
         depthBalanceInd = new DepthBalance(marketBook);
-
-        // Specify the title and the chart number for each indicator
-        // "0" = the same chart as the price chart; "1+" = separate subchart (below the price chart)
-        addIndicator("Depth Balance", depthBalanceInd, 1);
+        addIndicator("Depth Balance", depthBalanceInd);
     }
 
     /**
@@ -58,8 +56,8 @@ public class Classic extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 35, 65, 1, 55);
-        addParam(STOP_LOSS, 1, 9, 1, 1);
+        addParam(ENTRY, 35, 65, 1, 47);
+        addParam(STOP_LOSS, 1, 9, 1, 5);
         addParam(PROFIT_TARGET, 5, 25, 1, 17);
     }
 

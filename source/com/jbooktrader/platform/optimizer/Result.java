@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.performance.PerformanceManager;
+import com.jbooktrader.platform.performance.*;
 
 /**
  * Optimization result.
@@ -17,7 +17,6 @@ public class Result {
         this.trades = performanceManager.getTrades();
         this.profitFactor = performanceManager.getProfitFactor();
         this.trueKelly = performanceManager.getTrueKelly();
-
     }
 
     public StrategyParams getParams() {

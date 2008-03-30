@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
 
@@ -20,7 +20,7 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         ArrayList<Strategy> strategies = new ArrayList<Strategy>();
         long strategiesCreated = 0;
         for (StrategyParams params : tasks) {
-            Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
+            Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory);
             strategies.add(strategy);
             strategiesCreated++;
             if (strategiesCreated % 100 == 0) {

@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
 
@@ -10,8 +10,7 @@ import java.util.*;
  * historical market depth.
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
-    //private final int divider = 2;
-    private final int populationSize = 3;
+    private final static int POPULATION_SIZE = 3;
 
     public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
         super(optimizerDialog, strategy, params);
@@ -33,7 +32,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         while (!allDone) {
 
             for (StrategyParam param : bestParams.getAll()) {
-                int step = Math.max(1, (param.getMax() - param.getMin()) / (populationSize));
+                int step = Math.max(1, (param.getMax() - param.getMin()) / (POPULATION_SIZE));
                 param.setStep(step);
                 param.setValue(param.getMin());
             }
@@ -44,7 +43,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             for (StrategyParams params : tasks) {
                 if (!uniqueParams.contains(params)) {
                     uniqueParams.add(params);
-                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
+                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory);
                     strategies.add(strategy);
                 }
             }

@@ -1,6 +1,6 @@
 package com.jbooktrader.indicator;
 
-import com.jbooktrader.platform.indicator.Indicator;
+import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
 /**

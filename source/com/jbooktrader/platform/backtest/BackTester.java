@@ -1,17 +1,17 @@
 package com.jbooktrader.platform.backtest;
 
 
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.position.PositionManager;
-import com.jbooktrader.platform.schedule.TradingSchedule;
-import com.jbooktrader.platform.strategy.Strategy;
+import com.jbooktrader.platform.position.*;
+import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.strategy.*;
 
 /**
  * This class is responsible for running the strategy against historical market data
  */
 public class BackTester {
-    private static final long MAX_HISTORY_PERIOD = 24 * 60 * 60 * 1000L;// 24 hours
     private final Strategy strategy;
     private final BackTestFileReader backTestFileReader;
     private final BackTestDialog backTestDialog;
@@ -26,6 +26,8 @@ public class BackTester {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
+        PriceHistory priceHistory = strategy.getPriceBarHistory();
+
 
         long lineCount = 0;
         long totalLines = backTestFileReader.getTotalLineCount();
@@ -33,6 +35,7 @@ public class BackTester {
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
             lineCount++;
+            priceHistory.update(marketDepth.getTime(), marketDepth.getMidPoint());
             marketBook.add(marketDepth);
             long instant = marketBook.getLastMarketDepth().getTime();
             strategy.setTime(instant);
@@ -46,7 +49,6 @@ public class BackTester {
             }
 
             positionManager.trade();
-            strategy.trim(instant - MAX_HISTORY_PERIOD);
             if (lineCount % 1000 == 0) {
                 backTestDialog.setProgress(lineCount, totalLines, "Running back test");
             }
