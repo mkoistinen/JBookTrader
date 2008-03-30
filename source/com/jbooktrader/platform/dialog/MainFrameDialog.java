@@ -2,8 +2,13 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.preferences.PreferencesHolder;
 import static com.jbooktrader.platform.model.TradingTableModel.Column.PL;
 import static com.jbooktrader.platform.model.TradingTableModel.Column.Strategy;
+import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowHeight;
+import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowWidth;
+import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowX;
+import static com.jbooktrader.platform.preferences.JBTPreferences.MainWindowY;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.*;
@@ -25,6 +30,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private JTable tradingTable;
     private JPopupMenu popupMenu;
     private final Toolkit toolkit;
+    private final PreferencesHolder prefs = PreferencesHolder.getInstance();
 
     public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
@@ -32,6 +38,16 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         populateStrategies();
         pack();
         setLocationRelativeTo(null);
+        
+        int lastWidth = prefs.getInt(MainWindowWidth);
+        int lastHeight = prefs.getInt(MainWindowHeight);
+        int lastX = prefs.getInt(MainWindowX);
+        int lastY = prefs.getInt(MainWindowY);
+
+        if (lastHeight > 0 && lastWidth > 0) {
+            setBounds(lastX, lastY, lastWidth, lastHeight);
+        }
+        
         setVisible(true);
     }
 
