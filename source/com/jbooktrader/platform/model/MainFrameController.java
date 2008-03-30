@@ -26,6 +26,15 @@ public class MainFrameController {
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
         Dispatcher.addListener(mainViewDialog);
+        int lastWidth = prefs.getInt(MainWindowWidth);
+        int lastHeight = prefs.getInt(MainWindowHeight);
+        int lastX = prefs.getInt(MainWindowX);
+        int lastY = prefs.getInt(MainWindowY);
+
+        if (lastHeight > 0 && lastWidth > 0) {
+            mainViewDialog.setBounds(lastX, lastY, lastWidth, lastHeight);
+        }
+
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
         assignListeners();
