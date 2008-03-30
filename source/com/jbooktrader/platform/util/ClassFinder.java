@@ -64,8 +64,8 @@ public class ClassFinder {
     public static Strategy getInstance(String name) throws JBookTraderException {
         try {
             Class<? extends Strategy> clazz = Class.forName(name).asSubclass(Strategy.class);
-            Class[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
-            Constructor constructor = clazz.getConstructor(parameterTypes);
+            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
+            Constructor<?> constructor = clazz.getConstructor(parameterTypes);
             return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook(), new PriceHistory());
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
