@@ -15,7 +15,7 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Hybrid extends Strategy {
+public class Hybrid2 extends Strategy {
     // Technical indicators
     private final Indicator depthVelocityInd, rsiInd;
 
@@ -29,7 +29,7 @@ public class Hybrid extends Strategy {
     private final int entry, exit;
 
 
-    public Hybrid(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Hybrid2(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
@@ -59,10 +59,10 @@ public class Hybrid extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(DEPTH_PERIOD, 3, 7, 1, 5);
-        addParam(RSI_PERIOD, 5, 15, 1, 11);
-        addParam(ENTRY, 25, 45, 1, 41);
-        addParam(EXIT, 70, 100, 1, 85);
+        addParam(DEPTH_PERIOD, 2, 8, 1, 5);
+        addParam(RSI_PERIOD, 5, 15, 1, 10);
+        addParam(ENTRY, 55, 120, 1, 68);
+        addParam(EXIT, 25, 50, 1, 42);
     }
 
     /**
@@ -74,12 +74,12 @@ public class Hybrid extends Strategy {
         int currentPosition = getPositionManager().getPosition();
         double depthVelocity = depthVelocityInd.getValue();
         double rsi = rsiInd.getValue() - 50;
-        if (rsi <= -entry) {
+        if (depthVelocity <= -entry) {
             setPosition(-1);
-        } else if (rsi >= entry) {
+        } else if (depthVelocity >= entry) {
             setPosition(1);
         } else {
-            boolean flat = (currentPosition > 0 && depthVelocity <= -exit) || (currentPosition < 0 && depthVelocity >= exit);
+            boolean flat = (currentPosition > 0 && rsi <= -exit) || (currentPosition < 0 && rsi >= exit);
             if (flat) {
                 setPosition(0);
             }
