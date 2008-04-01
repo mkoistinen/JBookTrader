@@ -76,7 +76,7 @@ public abstract class OptimizerRunner implements Runnable {
 
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
-            priceHistory.update(marketDepth.getTime(), marketDepth.getMidPoint());
+            priceHistory.update(marketDepth);
             if (priceHistory.size() > MAX_SIZE) {
                 priceHistory.getAll().removeFirst();
             }

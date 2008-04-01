@@ -74,7 +74,7 @@ public class StrategyRunner implements Runnable {
             if (!marketBook.isEmpty()) {
                 MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
                 long instant = lastMarketDepth.getTime();
-                priceHistory.update(instant, marketDepth.getMidPoint());
+                priceHistory.update(marketDepth);
                 strategy.setTime(instant);
                 strategy.updateIndicators();
                 if (strategy.hasValidIndicators()) {

@@ -35,7 +35,7 @@ public class BackTester {
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
             lineCount++;
-            priceHistory.update(marketDepth.getTime(), marketDepth.getMidPoint());
+            priceHistory.update(marketDepth);
             marketBook.add(marketDepth);
             long instant = marketBook.getLastMarketDepth().getTime();
             strategy.setTime(instant);

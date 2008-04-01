@@ -1,5 +1,7 @@
 package com.jbooktrader.platform.bar;
 
+import com.jbooktrader.platform.marketdepth.*;
+
 import java.util.*;
 
 /**
@@ -17,24 +19,30 @@ public class PriceHistory {
         return priceBars;
     }
 
-    public synchronized void update(long time, double price) {
+    public synchronized void update(MarketDepth marketDepth) {
+        double bid = marketDepth.getBestBid();
+        double ask = marketDepth.getBestAsk();
+        double midPoint = (bid + ask) / 2;
+        long time = marketDepth.getTime();
+
+
         long frequency = 60 * 1000;
         // Integer division gives us the number of whole periods
         long completedPeriods = time / frequency;
         long barTime = (completedPeriods + 1) * frequency;
 
         if (bar == null) {
-            bar = new PriceBar(barTime, price);
+            bar = new PriceBar(barTime, midPoint);
         }
 
         if (barTime > bar.getTime()) {
             priceBars.add(bar);
-            bar = new PriceBar(barTime, price);
+            bar = new PriceBar(barTime, midPoint);
         }
 
-        bar.setClose(price);
-        bar.setLow(Math.min(price, bar.getLow()));
-        bar.setHigh(Math.max(price, bar.getHigh()));
+        bar.setClose(midPoint);
+        bar.setLow(Math.min(bid, bar.getLow()));
+        bar.setHigh(Math.max(ask, bar.getHigh()));
     }
 
     public int size() {
