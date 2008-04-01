@@ -53,7 +53,7 @@ public abstract class Strategy {
     abstract protected void setParams();
 
 
-    public Strategy(StrategyParams params, MarketBook marketBook, PriceHistory priceHistory) {
+    protected Strategy(StrategyParams params, MarketBook marketBook, PriceHistory priceHistory) {
         this.params = params;
         this.marketBook = marketBook;
         this.priceHistory = priceHistory;
@@ -159,8 +159,8 @@ public abstract class Strategy {
         return params;
     }
 
-    protected int getParam(String name) throws JBookTraderException {
-        return params.get(name);
+    protected int getParam(String name) {
+        return params.get(name).getValue();
     }
 
     protected void addParam(String name, int min, int max, int step, int value) {

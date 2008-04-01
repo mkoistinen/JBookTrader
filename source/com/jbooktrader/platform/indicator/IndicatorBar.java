@@ -5,9 +5,10 @@ package com.jbooktrader.platform.indicator;
  */
 public class IndicatorBar {
     private long time;
-    private double open, high, low, close;
+    private final double open;
+    private double high, low, close;
 
-    public IndicatorBar(long time, double open, double high, double low, double close) {
+    private IndicatorBar(long time, double open, double high, double low, double close) {
         this.time = time;
         this.open = open;
         this.high = high;

@@ -5,9 +5,10 @@ package com.jbooktrader.platform.bar;
  */
 public class PriceBar {
     private long time;
-    private double open, high, low, close;
+    private final double open;
+    private double high, low, close;
 
-    public PriceBar(long time, double open, double high, double low, double close) {
+    private PriceBar(long time, double open, double high, double low, double close) {
         this.time = time;
         this.open = open;
         this.high = high;

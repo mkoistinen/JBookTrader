@@ -16,7 +16,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         super(optimizerDialog, strategy, params);
     }
 
-    public void optimize() throws Exception {
+    public void optimize() throws JBookTraderException {
         StrategyParams bestParams = new StrategyParams(strategyParams);
         HashSet<StrategyParams> uniqueParams = new HashSet<StrategyParams>();
 
@@ -32,7 +32,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         while (!allDone) {
 
             for (StrategyParam param : bestParams.getAll()) {
-                int step = Math.max(1, (param.getMax() - param.getMin()) / (POPULATION_SIZE));
+                int step = Math.max(1, (param.getMax() - param.getMin()) / POPULATION_SIZE);
                 param.setStep(step);
                 param.setValue(param.getMin());
             }
@@ -43,8 +43,12 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             for (StrategyParams params : tasks) {
                 if (!uniqueParams.contains(params)) {
                     uniqueParams.add(params);
-                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory);
-                    strategies.add(strategy);
+                    try {
+                        Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory);
+                        strategies.add(strategy);
+                    } catch (Exception e) {
+                        throw new JBookTraderException(e);
+                    }
                 }
             }
 
@@ -70,10 +74,10 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 bestParams.getAll().clear();
                 for (StrategyParam param : topParams.getAll()) {
                     String name = param.getName();
-                    int value = topParams.get(name);
+                    int value = topParams.get(name).getValue();
                     int range = param.getMax() - param.getMin();
-                    int min = Math.max(strategyParams.getMin(name), value - range / 4);
-                    int max = Math.min(strategyParams.getMax(name), value + range / 4);
+                    int min = Math.max(strategyParams.get(name).getMin(), value - range / 4);
+                    int max = Math.min(strategyParams.get(name).getMax(), value + range / 4);
                     param.setMin(min);
                     param.setMax(max);
                     bestParams.add(name, min, max, 0, value);

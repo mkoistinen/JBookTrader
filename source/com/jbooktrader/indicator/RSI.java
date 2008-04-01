@@ -18,8 +18,7 @@ public class RSI extends Indicator {
 
     @Override
     public double calculate() {
-        int size = priceHistory.size();
-        int lastBar = size - 1;
+        int lastBar = priceHistory.size() - 1;
         int firstBar = lastBar - periodLength + 1;
 
         double gains = 0, losses = 0;

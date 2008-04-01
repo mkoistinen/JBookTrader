@@ -342,10 +342,6 @@ public class OptimizerDialog extends JDialog {
 
     }
 
-    public void showStepColumn(boolean isVisible) {
-
-    }
-
     private void initParams() {
         try {
             String className = "com.jbooktrader.strategy." + strategyName;

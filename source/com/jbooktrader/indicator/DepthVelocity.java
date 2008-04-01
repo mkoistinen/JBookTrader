@@ -22,7 +22,7 @@ public class DepthVelocity extends Indicator {
     }
 
 
-    public double getDepthBalance(int timeIndex) {
+    private double getDepthBalance(int timeIndex) {
         MarketDepth marketDepth = marketBook.getMarketDepth(timeIndex);
         int bids = marketDepth.getCumulativeBidSize();
         int asks = marketDepth.getCumulativeAskSize();
