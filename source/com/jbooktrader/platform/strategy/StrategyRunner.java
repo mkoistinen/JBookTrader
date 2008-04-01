@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
@@ -48,6 +49,7 @@ public class StrategyRunner implements Runnable {
         PerformanceManager performanceManager = strategy.getPerformanceManager();
         MarketBook marketBook = strategy.getMarketBook();
         MarketDepth marketDepth = strategy.getMarketDepth();
+        PriceHistory priceHistory = strategy.getPriceBarHistory();
         strategy.setIsActive(true);
 
         while (strategy.isActive()) {
@@ -72,6 +74,7 @@ public class StrategyRunner implements Runnable {
             if (!marketBook.isEmpty()) {
                 MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
                 long instant = lastMarketDepth.getTime();
+                priceHistory.update(instant, marketDepth.getMidPoint());
                 strategy.setTime(instant);
                 strategy.updateIndicators();
                 if (strategy.hasValidIndicators()) {
