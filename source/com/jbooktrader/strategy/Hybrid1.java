@@ -61,8 +61,8 @@ public class Hybrid1 extends Strategy {
     public void setParams() {
         addParam(DEPTH_PERIOD, 3, 7, 1, 5);
         addParam(RSI_PERIOD, 5, 15, 1, 10);
-        addParam(ENTRY, 25, 55, 1, 40);
-        addParam(EXIT, 50, 100, 1, 70);
+        addParam(ENTRY, 25, 55, 1, 41);
+        addParam(EXIT, 50, 100, 1, 53);
     }
 
     /**

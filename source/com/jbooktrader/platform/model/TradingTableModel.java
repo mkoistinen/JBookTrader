@@ -19,6 +19,7 @@ public class TradingTableModel extends TableDataModel {
         Book("Book", Integer.class),
         Position("Position", Integer.class),
         Trades("Trades", Integer.class),
+        MaxDD("Max DD", Double.class),
         PL("P&L", Double.class);
 
         private final String columnName;
@@ -93,6 +94,7 @@ public class TradingTableModel extends TableDataModel {
             PerformanceManager performanceManager = strategy.getPerformanceManager();
             setValueAt(positionManager.getPosition(), row, Column.Position.ordinal());
             setValueAt(performanceManager.getTrades(), row, Column.Trades.ordinal());
+            setValueAt(performanceManager.getMaxDrawdown(), row, Column.MaxDD.ordinal());
             setValueAt(performanceManager.getNetProfit(), row, Column.PL.ordinal());
         }
     }

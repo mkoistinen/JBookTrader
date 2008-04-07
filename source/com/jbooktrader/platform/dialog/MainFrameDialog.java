@@ -236,6 +236,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         TableColumnModel columnModel = tradingTable.getColumnModel();
         NumberRenderer nr2 = new NumberRenderer(2);
         columnModel.getColumn(PL.ordinal()).setCellRenderer(nr2);
+        columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr2);
 
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
