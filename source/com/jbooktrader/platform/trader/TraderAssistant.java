@@ -133,7 +133,7 @@ public class TraderAssistant {
                 MarketDepth md = strategy.getMarketBook().getLastMarketDepth();
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
-                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getBestAsk() : md.getBestBid();
+                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getAsk() : md.getBid();
                 eventReport.report(msg);
                 trader.execDetails(orderID, contract, execution);
             }

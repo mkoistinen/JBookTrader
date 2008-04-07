@@ -14,10 +14,7 @@ import java.util.*;
  */
 public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final Properties properties = new Properties();
-    // Each line contains at least 6 columns: date, time, 1 bid size and price, 1 ask size and price
-    // If market is deeper than 1 bid and ask, the line will contain more columns
-    private final static int MIN_COLUMNS = 6;
+    private final static int COLUMNS = 6;
     private long previousTime;
     private SimpleDateFormat sdf;
     private BufferedReader reader;
@@ -37,32 +34,6 @@ public class BackTestFileReader {
     public BackTestFileReader(String fileName) throws JBookTraderException {
         this.fileName = fileName;
         Report report = Dispatcher.getReporter();
-        report.report("Reading properties in the historical market data file");
-
-        try {
-            properties.load(new FileInputStream(fileName));
-        } catch (IllegalArgumentException e) {
-            String msg = "Problem loading file " + fileName + ": binary format was detected. ";
-            msg += e.getMessage();
-            throw new JBookTraderException(msg);
-        } catch (Exception e) {
-            String msg = "Problem loading file " + fileName + ": " + e.getMessage();
-            throw new JBookTraderException(msg);
-        }
-
-
-        String timeZone = getPropAsString("timeZone");
-        TimeZone tz = TimeZone.getTimeZone(timeZone);
-        if (!tz.getID().equals(timeZone)) {
-            String msg = "The specified time zone " + "\"" + timeZone + "\"" + " does not exist." + LINE_SEP;
-            msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
-            throw new JBookTraderException(msg);
-        }
-
-        sdf = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
-        // Enforce strict interpretation of date and time formats
-        sdf.setLenient(false);
-        sdf.setTimeZone(tz);
 
         report.report("Scanning historical market data file");
         try {
@@ -76,6 +47,25 @@ public class BackTestFileReader {
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
                     totalLines++;
+                }
+
+                if (isProperty) {
+                    if (line.startsWith("timeZone")) {
+                        String timeZone = line.substring(line.indexOf('=') + 1);
+                        TimeZone tz = TimeZone.getTimeZone(timeZone);
+                        if (!tz.getID().equals(timeZone)) {
+                            String msg = "The specified time zone " + "\"" + timeZone + "\"" + " does not exist." + LINE_SEP;
+                            msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
+                            throw new JBookTraderException(msg);
+                        }
+
+
+                        sdf = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
+                        // Enforce strict interpretation of date and time formats
+                        sdf.setLenient(false);
+                        sdf.setTimeZone(tz);
+                    }
+
                 }
             }
 
@@ -141,41 +131,14 @@ public class BackTestFileReader {
         StringTokenizer st = new StringTokenizer(line, ",;");
 
         int tokenCount = st.countTokens();
-        if (tokenCount < MIN_COLUMNS) {
-            String msg = "The line should contain at least " + MIN_COLUMNS + " columns, but only " + tokenCount + " columns have been counted.";
+        if (tokenCount != COLUMNS) {
+            String msg = "The line should contain exactly " + COLUMNS + " comma-separated columns.";
             throw new JBookTraderException(msg);
         }
 
-        StringTokenizer typeTokenizer = new StringTokenizer(line, ";");
-        tokenCount = typeTokenizer.countTokens();
-        if (tokenCount != 3) {
-            String msg = "The line should contain exactly 3 semicolon-separated sections.";
-            throw new JBookTraderException(msg);
-        }
-
-        StringTokenizer dateTimeTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
-        String dateToken = dateTimeTokenizer.nextToken();
-        String timeToken = dateTimeTokenizer.nextToken();
+        String dateToken = st.nextToken();
+        String timeToken = st.nextToken();
         long time = sdf.parse(dateToken + "," + timeToken).getTime();
-
-        LinkedList<MarketDepthItem> bids = new LinkedList<MarketDepthItem>();
-        LinkedList<MarketDepthItem> asks = new LinkedList<MarketDepthItem>();
-
-        StringTokenizer bidsTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
-        while (bidsTokenizer.hasMoreTokens()) {
-            int size = Integer.parseInt(bidsTokenizer.nextToken());
-            double price = Double.parseDouble(bidsTokenizer.nextToken());
-            MarketDepthItem item = new MarketDepthItem(size, price);
-            bids.add(item);
-        }
-
-        StringTokenizer asksTokenizer = new StringTokenizer(typeTokenizer.nextToken(), ",");
-        while (asksTokenizer.hasMoreTokens()) {
-            int size = Integer.parseInt(asksTokenizer.nextToken());
-            double price = Double.parseDouble(asksTokenizer.nextToken());
-            MarketDepthItem item = new MarketDepthItem(size, price);
-            asks.add(item);
-        }
 
         if (previousTime != 0) {
             if (time <= previousTime) {
@@ -184,17 +147,13 @@ public class BackTestFileReader {
             }
         }
 
-        return new MarketDepth(bids, asks, time);
+        int cumulativeBidSize = Integer.parseInt(st.nextToken());
+        int cumulativeAskSize = Integer.parseInt(st.nextToken());
+        double bid = Double.parseDouble(st.nextToken());
+        double ask = Double.parseDouble(st.nextToken());
+
+        return new MarketDepth(time, cumulativeBidSize, cumulativeAskSize, bid, ask);
     }
 
 
-    private String getPropAsString(String property) throws JBookTraderException {
-        String propValue = (String) properties.get(property);
-        if (propValue == null) {
-            String msg = "Property \"" + property + "\" is not defined in the historical data file.";
-            throw new JBookTraderException(msg);
-        }
-
-        return propValue;
-    }
 }

@@ -48,7 +48,7 @@ public class StrategyRunner implements Runnable {
         traderAssistant.requestMarketDepth(strategy, 5);
         PerformanceManager performanceManager = strategy.getPerformanceManager();
         MarketBook marketBook = strategy.getMarketBook();
-        MarketDepth marketDepth = strategy.getMarketDepth();
+        new MarketDepthFactory(marketBook, 10);
         PriceHistory priceHistory = strategy.getPriceBarHistory();
         strategy.setIsActive(true);
 
@@ -57,38 +57,23 @@ public class StrategyRunner implements Runnable {
                 marketBook.wait();// wait until notified about the update
             }
 
-            // This is a little awkward. We are waiting for 100 milliseconds of
-            // inactivity, so that when we take a snapshot of the book, we know
-            // it's been fully updated.
-            while (true) {
-                synchronized (marketDepth) {
-                    // the getMillisSinceLastUpdate and addMarketDepth must be done atomically
-                    if (marketDepth.getMillisSinceLastUpdate() >= 100) {
-                        marketBook.add(new MarketDepth(marketDepth));
-                        break;
-                    }
-                }
-                Thread.sleep(50);
+            MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
+            long instant = lastMarketDepth.getTime();
+            priceHistory.update(lastMarketDepth);
+            strategy.setTime(instant);
+            strategy.updateIndicators();
+            if (strategy.hasValidIndicators()) {
+                strategy.onBookChange();
             }
 
-            if (!marketBook.isEmpty()) {
-                MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
-                long instant = lastMarketDepth.getTime();
-                priceHistory.update(lastMarketDepth);
-                strategy.setTime(instant);
-                strategy.updateIndicators();
-                if (strategy.hasValidIndicators()) {
-                    strategy.onBookChange();
-                }
-
-                if (!tradingSchedule.contains(instant)) {
-                    strategy.closePosition();// force flat position
-                }
-
-                positionManager.trade();
-                performanceManager.updateNetProfit(lastMarketDepth.getMidPoint(), positionManager.getPosition());
-                Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, strategy);
+            if (!tradingSchedule.contains(instant)) {
+                strategy.closePosition();// force flat position
             }
+
+            positionManager.trade();
+            performanceManager.updateNetProfit(lastMarketDepth.getMidPoint(), positionManager.getPosition());
+            Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, strategy);
+
         }
     }
 

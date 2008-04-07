@@ -26,20 +26,20 @@ public abstract class OptimizerRunner implements Runnable {
     private static final long MAX_STRATEGIES = 50000L;
     private static final int MAX_RESULTS = 5000;
     private static final long UPDATE_FREQUENCY = 1000000L;// lines
-    final List<Result> results;
-    final OptimizerDialog optimizerDialog;
+    protected final List<Result> results;
+    protected final OptimizerDialog optimizerDialog;
     private final NumberFormat nf2;
-    boolean cancelled;
+    protected boolean cancelled;
     private ResultComparator resultComparator;
-    final StrategyParams strategyParams;
+    protected final StrategyParams strategyParams;
     private final String strategyName;
     private ComputationalTimeEstimator timeEstimator;
-    final Constructor<?> strategyConstructor;
+    protected final Constructor<?> strategyConstructor;
     private final TradingSchedule tradingSchedule;
     private BackTestFileReader backTestFileReader;
-    int lineCount;
-    MarketBook marketBook;
-    PriceHistory priceHistory;
+    protected int lineCount;
+    protected MarketBook marketBook;
+    protected PriceHistory priceHistory;
     private final int minTrades;
     private long completedSteps, totalSteps;
 

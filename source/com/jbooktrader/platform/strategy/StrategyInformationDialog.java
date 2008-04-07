@@ -44,8 +44,8 @@ public final class StrategyInformationDialog extends JDialog implements ModelLis
         if (!book.isEmpty()) {
             MarketDepth marketDepth = book.getLastMarketDepth();
             if (marketDepth != null) {
-                bidLabel.setText(df5.format(marketDepth.getBestBid()));
-                askLabel.setText(df5.format(marketDepth.getBestAsk()));
+                bidLabel.setText(df5.format(marketDepth.getBid()));
+                askLabel.setText(df5.format(marketDepth.getAsk()));
                 cumulativeBidSizeLabel.setText(df5.format(marketDepth.getCumulativeBidSize()));
                 cumulativeAskSizeLabel.setText(df5.format(marketDepth.getCumulativeAskSize()));
             }

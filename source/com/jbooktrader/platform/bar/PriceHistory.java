@@ -20,8 +20,8 @@ public class PriceHistory {
     }
 
     public synchronized void update(MarketDepth marketDepth) {
-        double bid = marketDepth.getBestBid();
-        double ask = marketDepth.getBestAsk();
+        double bid = marketDepth.getBid();
+        double ask = marketDepth.getAsk();
         double midPoint = (bid + ask) / 2;
         long time = marketDepth.getTime();
 

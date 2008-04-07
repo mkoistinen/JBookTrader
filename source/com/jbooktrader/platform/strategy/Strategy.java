@@ -24,7 +24,6 @@ public abstract class Strategy {
     private final List<String> strategyReportHeaders;
     private final StrategyParams params;
     private final MarketBook marketBook;
-    private final MarketDepth marketDepth;
     private final PriceHistory priceHistory;
     private final DecimalFormat nf2, nf5;
     private final SimpleDateFormat df;
@@ -74,7 +73,6 @@ public abstract class Strategy {
 
         name = getClass().getSimpleName();
         indicators = new ArrayList<ChartableIndicator>();
-        marketDepth = new MarketDepth();
 
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf5 = NumberFormatterFactory.getNumberFormatter(5);
@@ -137,8 +135,8 @@ public abstract class Strategy {
         strategyReportColumns.clear();
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
         strategyReportColumns.add(performanceManager.getTrades());
-        strategyReportColumns.add(nf5.format(marketDepth.getBestBid()));
-        strategyReportColumns.add(nf5.format(marketDepth.getBestAsk()));
+        strategyReportColumns.add(nf5.format(marketDepth.getBid()));
+        strategyReportColumns.add(nf5.format(marketDepth.getAsk()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(nf2.format(performanceManager.getTradeCommission()));
@@ -213,11 +211,6 @@ public abstract class Strategy {
     protected MarketDepth getLastMarketDepth() {
         return marketBook.getLastMarketDepth();
     }
-
-    public MarketDepth getMarketDepth() {
-        return marketDepth;
-    }
-
 
     public MarketBook getMarketBook() {
         return marketBook;

@@ -15,12 +15,7 @@ public class DepthBalance extends Indicator {
     @Override
     public double calculate() {
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
-        int bids = marketDepth.getCumulativeBidSize();
-        int asks = marketDepth.getCumulativeAskSize();
-
-        double totalDepth = (bids + asks);
-        value = 100. * (bids - asks) / totalDepth;
-
+        value = marketDepth.getBalance();
         return value;
     }
 }

@@ -96,7 +96,7 @@ public class Trader extends EWrapperAdapter {
             }
 
             if (errorCode == 317) {// Market depth data has been reset
-                traderAssistant.getStrategy(id).getMarketDepth().reset();
+                traderAssistant.getStrategy(id).getMarketBook().reset();
                 eventReport.report("Market depth data has been reset.");
             }
 
@@ -117,13 +117,8 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void updateMktDepth(int strategyId, int position, int operation, int side, double price, int size) {
         try {
-            Strategy strategy = traderAssistant.getStrategy(strategyId);
-            MarketDepth marketDepth = strategy.getMarketDepth();
-            marketDepth.update(position, operation, side, price, size);
-            MarketBook marketBook = strategy.getMarketBook();
-            synchronized (marketBook) {
-                marketBook.notifyAll();
-            }
+            MarketBook marketBook = traderAssistant.getStrategy(strategyId).getMarketBook();
+            marketBook.update(position, operation, side, price, size);
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);

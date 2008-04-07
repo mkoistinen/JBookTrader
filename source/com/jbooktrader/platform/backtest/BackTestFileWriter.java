@@ -50,20 +50,17 @@ public final class BackTestFileWriter {
             for (MarketDepth marketDepth : marketDepths) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(dateFormat.format(new Date(marketDepth.getTime())));
-                sb.append(";");// separator after data and time
+                sb.append(",");
 
-                for (MarketDepthItem item : marketDepth.getBids()) {
-                    sb.append(item.getSize()).append(",");
-                    sb.append(nf.format(item.getPrice())).append(",");
-                }
-                sb.deleteCharAt(sb.length() - 1);
-                sb.append(";");// separator betweeb bids and asks
+                marketDepth.getCumulativeBidSize();
+                sb.append(marketDepth.getCumulativeBidSize());
+                sb.append(",");
+                sb.append(marketDepth.getCumulativeAskSize());
+                sb.append(",");
+                sb.append(marketDepth.getBid());
+                sb.append(",");
+                sb.append(marketDepth.getAsk());
 
-                for (MarketDepthItem item : marketDepth.getAsks()) {
-                    sb.append(item.getSize()).append(",");
-                    sb.append(nf.format(item.getPrice())).append(",");
-                }
-                sb.deleteCharAt(sb.length() - 1);
                 writer.println(sb);
             }
             writer.flush();
@@ -75,14 +72,14 @@ public final class BackTestFileWriter {
     private StringBuilder getHeader() {
         StringBuilder header = new StringBuilder();
         header.append("# This historical data file is created by " + JBookTrader.APP_NAME).append(LINE_SEP);
-        header.append("# Each line represents the order book at a particular time and contains 3 sections,:").append(LINE_SEP);
-        header.append("# separated by semicolons as follows:").append(LINE_SEP);
-        header.append("# {date, time}; {bids}; {asks}").append(LINE_SEP);
-        header.append("# The date is in the MMddyy format, and the time in the HH:mm:ss.SSS format").append(LINE_SEP);
-        header.append("# The {bids} section has a variable number of comma-separated columns").append(LINE_SEP);
-        header.append("# and contains bids (each defined by bid size and bid price), starting from the highest bid price").append(LINE_SEP);
-        header.append("# The {asks} section has a variable number of comma-separated columns").append(LINE_SEP);
-        header.append("# and contains asks (each defined by ask size and ask price), starting from the lowest ask price").append(LINE_SEP);
+        header.append("# Each line represents the order book at a particular time and contains 6 columns:").append(LINE_SEP);
+        header.append("# date, time, cumulativeBidSize, cumulativeAskSize, bid, ask").append(LINE_SEP);
+        header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
+        header.append("# 2. time is in the HH:mm:ss.SSS format").append(LINE_SEP);
+        header.append("# 3. cumulativeBidSize is the sum of bid sizes for all levels of market depth").append(LINE_SEP);
+        header.append("# 4. cumulativeAskSize is the sum of ask sizes for all levels of market depth").append(LINE_SEP);
+        header.append("# 5. bid is best (highest) bid").append(LINE_SEP);
+        header.append("# 6. ask is best (lowest) ask").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;
