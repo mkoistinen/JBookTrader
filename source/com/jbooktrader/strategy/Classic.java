@@ -76,7 +76,10 @@ public class Classic extends Strategy {
         } else {
             double lastEntry = getPositionManager().getAvgFillPrice();
             double currentPrice = getLastMarketDepth().getMidPoint();
-            double loss = (currentPosition > 0) ? (lastEntry - currentPrice) : (currentPrice - lastEntry);
+            double loss = 0;
+            if (currentPosition != 0) {
+                loss = (currentPosition > 0) ? (lastEntry - currentPrice) : (currentPrice - lastEntry);
+            }
             double gain = -loss;
             if (loss >= stopLoss || gain >= profitTarget) {
                 setPosition(0);

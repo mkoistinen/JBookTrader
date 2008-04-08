@@ -38,8 +38,6 @@ public final class BackTestFileWriter {
     public void write(MarketBook marketBook) {
         if (writer != null) {
 
-            DecimalFormat nf = NumberFormatterFactory.getNumberFormatter(5);
-
             StringBuilder header = getHeader();
             writer.println(header);
 
