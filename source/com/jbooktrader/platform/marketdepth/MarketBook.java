@@ -6,7 +6,7 @@ import java.util.*;
  * Holds market depth history for a strategy.
  */
 public class MarketBook {
-    private static final long MAX_SIZE = 3 * 60 * 60 * 12;
+    private static final long MAX_SIZE = 3 * 60 * 60 * 12; // approximately 12 hours
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
@@ -75,10 +75,9 @@ public class MarketBook {
 
 
     synchronized public void signal() {
-        long instant = System.nanoTime();
-        long millisSinceLastUpdate = (instant - lastUpdateTime) / 1000000;
-        if (hasUpdate && millisSinceLastUpdate > 100) {
-            if (bids.size() > 0 && asks.size() > 0) {
+        long millisSinceLastUpdate = (System.nanoTime() - lastUpdateTime) / 1000000;
+        if (hasUpdate && millisSinceLastUpdate > 150) {
+            if (!bids.isEmpty() && !asks.isEmpty()) {
                 double bid = bids.getFirst().getPrice();
                 double ask = asks.getFirst().getPrice();
                 int cumulativeBid = getCumulativeSize(bids);

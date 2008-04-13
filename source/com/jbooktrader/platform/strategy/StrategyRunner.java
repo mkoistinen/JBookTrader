@@ -48,7 +48,7 @@ public class StrategyRunner implements Runnable {
         traderAssistant.requestMarketDepth(strategy, 5);
         PerformanceManager performanceManager = strategy.getPerformanceManager();
         MarketBook marketBook = strategy.getMarketBook();
-        new MarketDepthFactory(marketBook, 10);
+        new MarketDepthTimer(marketBook);
         PriceHistory priceHistory = strategy.getPriceBarHistory();
         strategy.setIsActive(true);
 
