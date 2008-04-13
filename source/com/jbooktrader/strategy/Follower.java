@@ -54,7 +54,7 @@ public class Follower extends Strategy {
     @Override
     public void setParams() {
         addParam(PERIOD, 1, 10, 1, 5);
-        addParam(ENTRY, 30, 100, 1, 69);
+        addParam(ENTRY, 30, 100, 1, 70);
     }
 
     /**

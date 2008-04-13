@@ -15,7 +15,7 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Hybrid2 extends Strategy {
+public class Hybrid extends Strategy {
     // Technical indicators
     private final Indicator depthVelocityInd, rsiInd;
 
@@ -29,7 +29,7 @@ public class Hybrid2 extends Strategy {
     private final int entry, exit;
 
 
-    public Hybrid2(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Hybrid(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
