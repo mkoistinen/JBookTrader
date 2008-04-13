@@ -14,8 +14,7 @@ public class DepthBalance extends Indicator {
 
     @Override
     public double calculate() {
-        MarketDepth marketDepth = marketBook.getLastMarketDepth();
-        value = marketDepth.getBalance();
+        value = marketBook.getLastMarketDepth().getBalance();
         return value;
     }
 }

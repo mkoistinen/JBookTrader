@@ -29,7 +29,7 @@ import java.util.List;
  * indicators, executions, and P&L.
  */
 public class StrategyPerformanceChart {
-    private static final int PRICE_PLOT_WEIGHT = 5;
+    private static final int PRICE_PLOT_WEIGHT = 3;
     private static final int ANNOTATION_RADIUS = 6;
     private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, 11);
     private static final Paint BACKGROUND_COLOR = new GradientPaint(0, 0, new Color(0, 0, 176), 0, 0, Color.BLACK);
