@@ -76,7 +76,7 @@ public class MarketBook {
 
     synchronized public void signal() {
         long millisSinceLastUpdate = (System.nanoTime() - lastUpdateTime) / 1000000;
-        if (hasUpdate && millisSinceLastUpdate > 150) {
+        if (hasUpdate && millisSinceLastUpdate >= 200) {
             if (!bids.isEmpty() && !asks.isEmpty()) {
                 double bid = bids.getFirst().getPrice();
                 double ask = asks.getFirst().getPrice();

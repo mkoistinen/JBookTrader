@@ -92,8 +92,9 @@ public class PositionManager {
         if (mode == Dispatcher.Mode.Trade || mode == Dispatcher.Mode.ForwardTest) {
             String msg = "Event type: Trade" + LINE_SEP;
             msg += "Strategy: " + strategy.getName() + LINE_SEP;
-            msg += "New Position: " + position + LINE_SEP;
-            msg += "Avg Fill Price: " + avgFillPrice + LINE_SEP;
+            msg += "Position: " + position + LINE_SEP;
+            msg += "Price: " + avgFillPrice + LINE_SEP;
+            msg += "Trades: " + nf2.format(performanceManager.getTrades()) + LINE_SEP;
             msg += "Trade P&L: " + nf2.format(performanceManager.getTradeProfit()) + LINE_SEP;
             msg += "Total P&L: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
             SecureMailSender.getInstance().send(msg);

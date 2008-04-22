@@ -16,7 +16,7 @@ public class DepthVelocity extends Indicator {
 
     public double calculate() {
         int indexNow = marketBook.size() - 1;
-        int indexThen = indexNow - period;
+        int indexThen = indexNow - period + 1;
         value = getDepthBalance(indexNow) - getDepthBalance(indexThen);
         return value;
     }
