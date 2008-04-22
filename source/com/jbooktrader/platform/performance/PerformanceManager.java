@@ -16,8 +16,8 @@ public class PerformanceManager {
 
     private int trades, profitableTrades, unprofitableTrades;
     private double tradeCommission, totalCommission;
-    private double averageProfitPerTrade, percentProfitableTrades;
-    private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, previousNetProfit;
+    private double averageProfitPerTrade, percentProfitableTrades, positionValue;
+    private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit;
     private double profitFactor, peakNetProfit, maxDrawdown, trueKelly;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
@@ -60,7 +60,7 @@ public class PerformanceManager {
     }
 
     public double getNetProfit() {
-        return netProfit;
+        return totalSold - totalBought + positionValue - totalCommission;
     }
 
     public ProfitAndLossHistory getProfitAndLossHistory() {
@@ -71,11 +71,9 @@ public class PerformanceManager {
         return trueKelly;
     }
 
-    public void updateNetProfit(double price, int position) {
-        double positionValue = position * price * multiplier;
-        netProfit = totalSold - totalBought + positionValue - totalCommission;
+    public void updatePositionValue(double price, int position) {
+        positionValue = position * price * multiplier;
     }
-
 
     public void update(int quantity, double avgFillPrice, int position) {
         trades++;
@@ -91,8 +89,8 @@ public class PerformanceManager {
         totalCommission += tradeCommission;
 
 
-        double positionValue = position * avgFillPrice * multiplier;
-        previousNetProfit = netProfit;
+        positionValue = position * avgFillPrice * multiplier;
+        double previousNetProfit = netProfit;
         netProfit = totalSold - totalBought + positionValue - totalCommission;
 
         tradeProfit = netProfit - previousNetProfit;
