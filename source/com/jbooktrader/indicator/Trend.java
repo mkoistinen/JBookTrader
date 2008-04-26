@@ -1,10 +1,10 @@
 package com.jbooktrader.indicator;
 
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
+//import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.bar.*;
 
-import java.util.*;
+//import java.util.*;
 
 /**
  * Slope of any indicator
