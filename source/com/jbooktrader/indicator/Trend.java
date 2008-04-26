@@ -7,7 +7,7 @@ import com.jbooktrader.platform.bar.*;
 //import java.util.*;
 
 /**
- * Slope of any indicator
+ * Slope of the bar close prices
  */
 public class Trend extends Indicator {
     private final int period;

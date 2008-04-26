@@ -6,7 +6,7 @@ import com.jbooktrader.platform.marketdepth.*;
 //import java.util.*;
 
 /**
- * Slope of any indicator
+ * Slope of the market depth balance
  */
 public class Slope extends Indicator {
     private final int period;
