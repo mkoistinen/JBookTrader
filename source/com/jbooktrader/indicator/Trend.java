@@ -1,10 +1,7 @@
 package com.jbooktrader.indicator;
 
-import com.jbooktrader.platform.indicator.*;
-//import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.bar.*;
-
-//import java.util.*;
+import com.jbooktrader.platform.indicator.*;
 
 /**
  * Slope of the bar close prices
@@ -35,11 +32,11 @@ public class Trend extends Indicator {
         for (int index = firstIndex; index <= lastIndex; index++) {
             double y = priceHistory.getPriceBar(index).getClose();
             double residualX = index - meanX;
-            sum += residualX * (y-meanY);
+            sum += residualX * (y - meanY);
             residualXSquared += residualX * residualX;
         }
 
-        value = period * (sum /  residualXSquared);
+        value = period * (sum / residualXSquared);
         return value;
 
     }

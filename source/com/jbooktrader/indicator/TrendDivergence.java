@@ -1,13 +1,10 @@
 package com.jbooktrader.indicator;
 
-import com.jbooktrader.platform.indicator.*;
-//import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.bar.*;
-
-//import java.util.*;
+import com.jbooktrader.platform.indicator.*;
 
 /**
- * Slope of any indicator
+ *
  */
 public class TrendDivergence extends Indicator {
     private final int shorter, longer;
@@ -22,10 +19,9 @@ public class TrendDivergence extends Indicator {
     public double calculate() {
         double shorterTrend = calculate(shorter);
         double longerTrend = calculate(longer);
-        value =  longerTrend - shorterTrend;
+        value = longerTrend - shorterTrend;
         return value;
     }
-
 
 
     public double calculate(int period) {
@@ -45,11 +41,11 @@ public class TrendDivergence extends Indicator {
         for (int index = firstIndex; index <= lastIndex; index++) {
             double y = priceHistory.getPriceBar(index).getClose();
             double residualX = index - meanX;
-            sum += residualX * (y-meanY);
+            sum += residualX * (y - meanY);
             residualXSquared += residualX * residualX;
         }
 
-        return period * (sum /  residualXSquared);
+        return period * (sum / residualXSquared);
 
     }
 }

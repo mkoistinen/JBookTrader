@@ -3,8 +3,6 @@ package com.jbooktrader.indicator;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
-//import java.util.*;
-
 /**
  * Slope of the market depth balance
  */
@@ -35,11 +33,11 @@ public class Slope extends Indicator {
         for (int x = firstIndex; x <= lastIndex; x++) {
             double y = marketBook.getMarketDepth(x).getBalance();
             double residualX = x - meanX;
-            sum += residualX * (y-meanY);
+            sum += residualX * (y - meanY);
             residualXSquared += residualX * residualX;
         }
 
-        value = period * (sum /  residualXSquared);
+        value = period * (sum / residualXSquared);
         return value;
 
     }
