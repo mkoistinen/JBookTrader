@@ -28,7 +28,7 @@ mkdir -p bin
 find bin    -name "*.class" | xargs rm -f
 find source -name "*.java"  | xargs javac -cp "$CLASSPATH" -d bin
 
-JVM_OPTS="-Xmx1024m  -XX:+UseParallelGC -XX:+AggressiveHeap"
+JVM_OPTS="-Xms712M -Xmx712M -XX:+CMSIncrementalMode -XX:+UseConcMarkSweepGC"
 [ -x "$(which uname)" ] && [ "$(uname -m)" == "x86_64" ] && JVM_OPTS="$JVM_OPTS -d64"
 
 exec java -cp "$CLASSPATH:$(pwd)/bin" $JVM_OPTS com.jbooktrader.platform.startup.JBookTrader "$(pwd)"
