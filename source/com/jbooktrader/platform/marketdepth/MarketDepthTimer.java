@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class MarketDepthTimer {
-    private static final long PERIOD = 60000000; // 60 ms
+    private static final long PERIOD = 50000000; // 50 ms
     private final List<MarketBook> marketBooks;
     private static MarketDepthTimer instance;
 
