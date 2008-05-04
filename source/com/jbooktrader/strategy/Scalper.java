@@ -52,7 +52,7 @@ public class Scalper extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 100, 1, 38);
+        addParam(ENTRY, 20, 50, 1, 38);
     }
 
     /**

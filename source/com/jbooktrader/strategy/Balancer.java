@@ -15,21 +15,21 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Hybrid extends Strategy {
+public class Balancer extends Strategy {
+
     // Technical indicators
-    private final Indicator depthVelocityInd, rsiInd;
+    private final Indicator depthBalanceInd, rsiInd;
 
     // Strategy parameters names
-    private static final String DEPTH_PERIOD = "Depth Period";
-    private static final String RSI_PERIOD = "RSI Period";
+    private static final String PERIOD = "Period";
+    private static final String RSI_ENTRY = "RSIEntry";
     private static final String ENTRY = "Entry";
-    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int entry, exit;
+    private final int entry, rsiEntry;
 
 
-    public Hybrid(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Balancer(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
@@ -39,16 +39,15 @@ public class Hybrid extends Strategy {
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        int depthPeriod = getParam(DEPTH_PERIOD);
-        int rsiPeriod = getParam(RSI_PERIOD);
         entry = getParam(ENTRY);
-        exit = getParam(EXIT);
+        rsiEntry = getParam(RSI_ENTRY);
 
         // Create technical indicators
-        depthVelocityInd = new DepthVelocity(marketBook, depthPeriod);
-        rsiInd = new RSI(priceHistory, rsiPeriod);
-        addIndicator("DepthVelocity", depthVelocityInd);
+        rsiInd = new RSI(priceHistory, getParam(PERIOD));
+        depthBalanceInd = new DepthBalance(marketBook);
         addIndicator("RSI", rsiInd);
+        addIndicator("Depth Balance", depthBalanceInd);
+
     }
 
     /**
@@ -59,10 +58,9 @@ public class Hybrid extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(DEPTH_PERIOD, 2, 8, 1, 5);
-        addParam(RSI_PERIOD, 5, 15, 1, 10);
-        addParam(ENTRY, 55, 120, 1, 68);
-        addParam(EXIT, 25, 50, 1, 42);
+        addParam(ENTRY, 20, 45, 5, 30);
+        addParam(RSI_ENTRY, 0, 45, 5, 0);
+        addParam(PERIOD, 5, 40, 5, 17);
     }
 
     /**
@@ -71,18 +69,13 @@ public class Hybrid extends Strategy {
      */
     @Override
     public void onBookChange() {
-        int currentPosition = getPositionManager().getPosition();
-        double depthVelocity = depthVelocityInd.getValue();
         double rsi = rsiInd.getValue() - 50;
-        if (depthVelocity <= -entry) {
-            setPosition(-1);
-        } else if (depthVelocity >= entry) {
+        double depthBalance = depthBalanceInd.getValue();
+        if (depthBalance >= entry && rsi >= rsiEntry) {
             setPosition(1);
-        } else {
-            boolean flat = (currentPosition > 0 && rsi <= -exit) || (currentPosition < 0 && rsi >= exit);
-            if (flat) {
-                setPosition(0);
-            }
+        } else if (depthBalance <= -entry && rsi <= -rsiEntry) {
+            setPosition(-1);
         }
+
     }
 }

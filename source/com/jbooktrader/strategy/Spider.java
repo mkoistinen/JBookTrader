@@ -15,39 +15,33 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Balancer2 extends Strategy {
+public class Spider extends Strategy {
 
     // Technical indicators
-    private final Indicator depthBalanceInd, rsiInd;
+    private final Indicator depthBalanceInd;
 
     // Strategy parameters names
-    private static final String PERIOD = "Period";
-    private static final String RSI_ENTRY = "RSIEntry";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
-    private final int entry, rsiEntry;
+    private final int entry;
 
 
-    public Balancer2(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Spider(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
+        Contract contract = ContractFactory.makeStockContract("SPY", "SMART");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 50;// contract multiplier
-        Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
+        TradingSchedule tradingSchedule = new TradingSchedule("9:30", "16:10", "America/New_York");
+        int multiplier = 1;// contract multiplier
+        Commission commission = CommissionFactory.getBundledNorthAmericaStockCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
-        rsiEntry = getParam(RSI_ENTRY);
 
         // Create technical indicators
-        rsiInd = new RSI(priceHistory, getParam(PERIOD));
         depthBalanceInd = new DepthBalance(marketBook);
-        addIndicator("RSI", rsiInd);
         addIndicator("Depth Balance", depthBalanceInd);
-
     }
 
     /**
@@ -58,9 +52,7 @@ public class Balancer2 extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 45, 5, 30);
-        addParam(RSI_ENTRY, 0, 45, 5, 0);
-        addParam(PERIOD, 5, 40, 5, 17);
+        addParam(ENTRY, 20, 50, 1, 38);
     }
 
     /**
@@ -69,13 +61,11 @@ public class Balancer2 extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double rsi = rsiInd.getValue() - 50;
         double depthBalance = depthBalanceInd.getValue();
-        if (depthBalance >= entry && rsi >= rsiEntry) {
-            setPosition(1);
-        } else if (depthBalance <= -entry && rsi <= -rsiEntry) {
-            setPosition(-1);
+        if (depthBalance >= entry) {
+            setPosition(500);
+        } else if (depthBalance <= -entry) {
+            setPosition(-500);
         }
-
     }
 }
