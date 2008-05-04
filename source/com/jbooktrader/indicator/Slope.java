@@ -4,11 +4,10 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
 /**
- * Slope of the market depth balance
+ * Regressed depth balance
  */
 public class Slope extends Indicator {
     private final int period;
-    private static long counter;
 
     public Slope(MarketBook marketBook, int period) {
         super(marketBook);
@@ -17,27 +16,19 @@ public class Slope extends Indicator {
 
     @Override
     public double calculate() {
-        counter++;
-        int lastIndex = marketBook.size() - 1;
-        int firstIndex = lastIndex - period + 1;
+        int index = marketBook.size() - period - 1;
 
-        double meanX = 0, meanY = 0;
-        for (int x = firstIndex; x <= lastIndex; x++) {
-            meanX += x;
-            meanY += marketBook.getMarketDepth(x).getBalance();
-        }
-        meanX /= period;
-        meanY /= period;
-
-        double residualXSquared = 0, sum = 0;
-        for (int x = firstIndex; x <= lastIndex; x++) {
-            double y = marketBook.getMarketDepth(x).getBalance();
-            double residualX = x - meanX;
-            sum += residualX * (y - meanY);
-            residualXSquared += residualX * residualX;
+        double sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+        for (int x = 1; x <= period; x++) {
+            sumX += x;
+            int y = marketBook.getMarketDepth(++index).getBalance();
+            sumY += y;
+            sumXY += x * y;
+            sumXX += x * x;
         }
 
-        value = period * (sum / residualXSquared);
+        double denom = period * sumXX - sumX * sumX;
+        value = period * (period * sumXY - sumX * sumY) / denom;
         return value;
 
     }
