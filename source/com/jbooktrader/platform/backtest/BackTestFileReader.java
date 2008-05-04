@@ -60,7 +60,7 @@ public class BackTestFileReader {
                         }
 
 
-                        sdf = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
+                        sdf = new SimpleDateFormat("MMddyy,HHmmss");
                         // Enforce strict interpretation of date and time formats
                         sdf.setLenient(false);
                         sdf.setTimeZone(tz);
@@ -141,7 +141,7 @@ public class BackTestFileReader {
         long time = sdf.parse(dateToken + "," + timeToken).getTime();
 
         if (previousTime != 0) {
-            if (time <= previousTime) {
+            if (time < previousTime) {
                 String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
                 throw new JBookTraderException(msg);
             }
