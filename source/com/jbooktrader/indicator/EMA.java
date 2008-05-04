@@ -4,7 +4,7 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
 /**
- * Exponential Moving Average.
+ * Exponential moving average of market depth balance.
  */
 public class EMA extends Indicator {
     private final double multiplier;

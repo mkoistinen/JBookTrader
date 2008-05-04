@@ -37,6 +37,7 @@ public class JBookTrader {
         UIManager.put("TitledBorder.titleColor", color);
 
         Dispatcher.setReporter("EventReport");
+
         new MainFrameController();
     }
 
