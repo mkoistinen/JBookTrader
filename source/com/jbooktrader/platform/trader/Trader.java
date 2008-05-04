@@ -6,6 +6,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 import java.util.*;
 
@@ -85,6 +86,7 @@ public class Trader extends EWrapperAdapter {
 
             if (errorCode == 1100) {// Connectivity between IB and TWS has been lost.
                 traderAssistant.setIsConnected(false);
+                SecureMailSender.getInstance().send("Event type: Connectivity between IB and TWS has been lost");
             }
 
             // handle errors 1101 and 1102
@@ -93,6 +95,7 @@ public class Trader extends EWrapperAdapter {
                 eventReport.report("Checking for executions while TWS was disconnected from the IB server.");
                 traderAssistant.requestExecutions();
                 traderAssistant.setIsConnected(true);
+                SecureMailSender.getInstance().send("Event type: Connectivity between IB and TWS has been restored");
             }
 
             if (errorCode == 317) {// Market depth data has been reset
