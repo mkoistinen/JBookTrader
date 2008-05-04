@@ -205,7 +205,8 @@ public abstract class Strategy {
         df.setTimeZone(tradingSchedule.getTimeZone());
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
-
+        marketBook.setName(name);
+        marketBook.setTimeZone(tradingSchedule.getTimeZone());
     }
 
     protected MarketDepth getLastMarketDepth() {

@@ -1,5 +1,9 @@
 package com.jbooktrader.platform.marketdepth;
 
+import com.jbooktrader.platform.backtest.*;
+import com.jbooktrader.platform.model.*;
+
+import java.io.*;
 import java.util.*;
 
 /**
@@ -12,12 +16,35 @@ public class MarketBook {
     private final LinkedList<MarketDepthItem> bids, asks;
     private long lastUpdateTime;
     private boolean hasUpdate;
+    private BackTestFileWriter backTestFileWriter;
+    private String name;
+    private TimeZone timeZone;
 
     public MarketBook() {
         marketDepths = new LinkedList<MarketDepth>();
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public void save(MarketDepth marketDepth) {
+        try {
+            if (backTestFileWriter == null) {
+                backTestFileWriter = new BackTestFileWriter(name, timeZone);
+            }
+            backTestFileWriter.write(marketDepth, true);
+        } catch (IOException ioe) {
+            Dispatcher.getReporter().report(ioe);
+        }
+    }
+
 
     public LinkedList<MarketDepth> getAll() {
         return marketDepths;
@@ -73,7 +100,6 @@ public class MarketBook {
         return cumulativeSize;
     }
 
-
     synchronized public void signal() {
         long millisSinceLastUpdate = (System.nanoTime() - lastUpdateTime) / 1000000;
         if (hasUpdate && millisSinceLastUpdate >= 200) {
@@ -83,7 +109,9 @@ public class MarketBook {
                 int cumulativeBid = getCumulativeSize(bids);
                 int cumulativeAsk = getCumulativeSize(asks);
                 hasUpdate = false;
-                add(new MarketDepth(System.currentTimeMillis(), cumulativeBid, cumulativeAsk, bid, ask));
+                MarketDepth marketDepth = new MarketDepth(System.currentTimeMillis(), cumulativeBid, cumulativeAsk, bid, ask);
+                add(marketDepth);
+                save(marketDepth);
                 notifyAll();
             }
         }
