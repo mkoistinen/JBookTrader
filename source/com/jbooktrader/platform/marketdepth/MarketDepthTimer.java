@@ -1,19 +1,26 @@
 package com.jbooktrader.platform.marketdepth;
 
+import com.jbooktrader.platform.model.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
 public class MarketDepthTimer {
-    private static final long PERIOD = 50000000; // 50 ms
+    private static final long PERIOD = 25000000; // 25 ms
     private final List<MarketBook> marketBooks;
     private static MarketDepthTimer instance;
 
+
     class Signaller implements Runnable {
         public void run() {
-            synchronized (marketBooks) {
-                for (MarketBook marketBook : marketBooks) {
-                    marketBook.signal();
+            try {
+                synchronized (marketBooks) {
+                    for (MarketBook marketBook : marketBooks) {
+                        marketBook.signal();
+                    }
                 }
+            } catch (Exception e) {
+                Dispatcher.getReporter().report(e);
             }
         }
     }

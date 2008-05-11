@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.backtest.*;
-import com.jbooktrader.platform.model.*;
 
 import java.io.*;
 import java.util.*;
@@ -11,6 +10,7 @@ import java.util.*;
  */
 public class MarketBook {
     private static final long MAX_SIZE = 3 * 60 * 60 * 12; // approximately 12 hours
+    private static final long QUIET_PERIOD = 50000000; // 50 ms
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
@@ -34,15 +34,11 @@ public class MarketBook {
         this.timeZone = timeZone;
     }
 
-    public void save(MarketDepth marketDepth) {
-        try {
-            if (backTestFileWriter == null) {
-                backTestFileWriter = new BackTestFileWriter(name, timeZone);
-            }
-            backTestFileWriter.write(marketDepth, true);
-        } catch (IOException ioe) {
-            Dispatcher.getReporter().report(ioe);
+    public void save(MarketDepth marketDepth) throws IOException {
+        if (backTestFileWriter == null) {
+            backTestFileWriter = new BackTestFileWriter(name, timeZone);
         }
+        backTestFileWriter.write(marketDepth, true);
     }
 
 
@@ -101,17 +97,16 @@ public class MarketBook {
     }
 
     synchronized public void signal() {
-        long millisSinceLastUpdate = (System.nanoTime() - lastUpdateTime) / 1000000;
-        if (hasUpdate && millisSinceLastUpdate >= 200) {
+        long nanosSinceLastUpdate = System.nanoTime() - lastUpdateTime;
+        if (hasUpdate && nanosSinceLastUpdate >= QUIET_PERIOD) {
+            hasUpdate = false;
             if (!bids.isEmpty() && !asks.isEmpty()) {
                 double bid = bids.getFirst().getPrice();
                 double ask = asks.getFirst().getPrice();
                 int cumulativeBid = getCumulativeSize(bids);
                 int cumulativeAsk = getCumulativeSize(asks);
-                hasUpdate = false;
                 MarketDepth marketDepth = new MarketDepth(System.currentTimeMillis(), cumulativeBid, cumulativeAsk, bid, ask);
                 add(marketDepth);
-                save(marketDepth);
                 notifyAll();
             }
         }

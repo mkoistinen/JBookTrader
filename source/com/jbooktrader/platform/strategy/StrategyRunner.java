@@ -41,7 +41,7 @@ public class StrategyRunner implements Runnable {
         eventReport.report(msg);
     }
 
-    private void execute() throws InterruptedException, JBookTraderException {
+    private void execute() throws InterruptedException, IOException, JBookTraderException {
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         TraderAssistant traderAssistant = trader.getAssistant();
@@ -68,6 +68,10 @@ public class StrategyRunner implements Runnable {
 
             if (!tradingSchedule.contains(instant)) {
                 strategy.closePosition();// force flat position
+            }
+
+            if (tradingSchedule.approximatelyContains(instant)) {
+                marketBook.save(lastMarketDepth);
             }
 
             positionManager.trade();
