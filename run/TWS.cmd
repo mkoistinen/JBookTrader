@@ -9,7 +9,7 @@ set cp=%cp%;pluginsupport.jar
 set cp=%cp%;jcommon-1.0.0.jar
 set cp=%cp%;jfreechart-1.0.0.jar
 set cp=%cp%;jhall.jar
-set cp=%cp%;other.jar.jar
+set cp=%cp%;other.jar
 set cp=%cp%;riskfeed.jar
 set cp=%cp%;rss.jar
 
