@@ -56,6 +56,7 @@ public final class Report {
         s.append(emphasisStart).append("New Report Started: ").append(df.format(getDate())).append(emphasisEnd);
         s.append(rootStart);
         reportDescription(s.toString());
+        report("JBT Version: " + JBookTrader.VERSION);
     }
 
     public ReportRenderer getRenderer() {

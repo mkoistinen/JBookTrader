@@ -17,14 +17,14 @@ import java.util.*;
 public final class BackTestFileWriter {
     private final static String FILE_SEP = System.getProperty("file.separator");
     private static final String LINE_SEP = System.getProperty("line.separator");
+    private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
     private final DecimalFormat decimalFormat;
 
     public BackTestFileWriter(Strategy strategy) throws IOException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
-        String dir = JBookTrader.getAppPath() + FILE_SEP + "marketData";
-        JFileChooser fileChooser = new JFileChooser(dir);
+        JFileChooser fileChooser = new JFileChooser(MARKET_DATA_DIR);
         fileChooser.setDialogTitle("Save historical market depth " + strategy.getName());
 
         if (fileChooser.showDialog(null, "Save") == JFileChooser.APPROVE_OPTION) {
@@ -38,7 +38,12 @@ public final class BackTestFileWriter {
 
     public BackTestFileWriter(String fileName, TimeZone timeZone) throws IOException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
-        fileName = JBookTrader.getAppPath() + FILE_SEP + "marketData" + FILE_SEP + fileName + ".txt";
+        File marketDataDir = new File(MARKET_DATA_DIR);
+        if (!marketDataDir.exists()) {
+            marketDataDir.mkdir();
+        }
+
+        fileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
         writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
