@@ -11,7 +11,8 @@ set cp=%cp%;%appHome%/lib/activation.jar
 set cp=%cp%;%appHome%/lib/jcommon-1.0.9.jar
 set cp=%cp%;%appHome%/lib/jfreechart-1.0.6.jar
 
-set javaOptions=-Xms712M -Xmx712M -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -XX:+UseConcMarkSweepGC
+set javaOptions=-Xms512M -Xmx512M -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -XX:+UseConcMarkSweepGC
+@rem set javaOptions=-Xms712M -Xmx712M -XX:+UseParallelGC
 set mainClass=com.jbooktrader.platform.startup.JBookTrader
 
 %javaHome%javaw.exe -cp "%cp%" %javaOptions% %mainClass% "%appHome%"
