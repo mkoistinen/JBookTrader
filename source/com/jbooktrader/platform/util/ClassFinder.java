@@ -10,7 +10,6 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.util.jar.*;
 
 
 public class ClassFinder {
@@ -23,35 +22,19 @@ public class ClassFinder {
      * strategy is implemented in a class that extends the base Strategy class.
      */
     private List<String> getClasses(String packageName) throws URISyntaxException, IOException {
-
-        String packagePath = packageName.replace('.', '/');
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
         List<String> classNames = new ArrayList<String>();
 
         for (URL url : classpath) {
             URI uri = url.toURI();
             File file = new File(uri);
-
-            if (file.getPath().endsWith(".jar")) {
-                if (file.exists()) {
-                    JarFile jarFile = new JarFile(file);
-                    for (Enumeration<JarEntry> entries = jarFile.entries(); entries.hasMoreElements();) {
-                        String entryName = (entries.nextElement()).getName();
-                        if (entryName.matches(packagePath + "/\\w*\\.class")) {// get only class files in package dir
-                            String className = entryName.replace('/', '.').substring(0, entryName.lastIndexOf('.'));
-                            classNames.add(className);
-                        }
-                    }
-                }
-            } else {// directory
-                File packageDirectory = new File(file.getPath() + "/" + packagePath);
-                if (packageDirectory.exists()) {
-                    for (File f : packageDirectory.listFiles()) {
-                        if (f.getPath().endsWith(".class")) {
-                            String className = packageName + "." + f.getName()
-                                    .substring(0, f.getName().lastIndexOf('.'));
-                            classNames.add(className);
-                        }
+            if (file.isDirectory()) {
+                File packageDir = new File(file.getPath() + '/' + packageName);
+                if (packageDir.exists()) {
+                    for (File f : packageDir.listFiles()) {
+                        String className = packageName + f.getName().substring(0, f.getName().lastIndexOf('.'));
+                        className = className.replace('/', '.');
+                        classNames.add(className);
                     }
                 }
             }
@@ -78,7 +61,7 @@ public class ClassFinder {
         List<Strategy> strategies = new ArrayList<Strategy>();
         List<String> strategyNames;
         try {
-            strategyNames = getClasses("com.jbooktrader.strategy");
+            strategyNames = getClasses("com/jbooktrader/strategy/");
         } catch (Exception e) {
             throw new JBookTraderException(e);
         }

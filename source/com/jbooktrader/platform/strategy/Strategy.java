@@ -13,6 +13,7 @@ import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.util.*;
 
+import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -37,7 +38,7 @@ public abstract class Strategy {
     private PositionManager positionManager;
     private PerformanceManager performanceManager;
     private boolean isActive, hasValidIndicators;
-    private int position, Id;
+    private int position, id;
     private long time;
 
 
@@ -201,6 +202,7 @@ public abstract class Strategy {
 
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) {
         this.contract = contract;
+        contract.m_multiplier = String.valueOf(multiplier);
         this.tradingSchedule = tradingSchedule;
         df.setTimeZone(tradingSchedule.getTimeZone());
         performanceManager = new PerformanceManager(this, multiplier, commission);
@@ -217,12 +219,12 @@ public abstract class Strategy {
         return marketBook;
     }
 
-    public void setId(int Id) {
-        this.Id = Id;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public int getId() {
-        return Id;
+        return id;
     }
 
     public Contract getContract() {
@@ -251,6 +253,30 @@ public abstract class Strategy {
         }
     }
 
+
+    public void process(MarketDepth marketDepth) throws InterruptedException, IOException, JBookTraderException {
+        if (isActive()) {
+            long instant = marketDepth.getTime();
+            priceHistory.update(marketDepth);
+            setTime(instant);
+            updateIndicators();
+            if (hasValidIndicators()) {
+                onBookChange();
+            }
+
+            if (!tradingSchedule.contains(instant)) {
+                closePosition(); // force flat position
+            }
+
+            if (tradingSchedule.approximatelyContains(instant)) {
+                marketBook.save(marketDepth);
+            }
+
+            positionManager.trade();
+            performanceManager.updatePositionValue(marketDepth.getMidPoint(), positionManager.getPosition());
+            Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
+        }
+    }
 
     public void report(String message) {
         strategyReportColumns.clear();

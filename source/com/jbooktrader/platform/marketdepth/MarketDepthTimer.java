@@ -1,22 +1,28 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
 import java.util.concurrent.*;
 
 public class MarketDepthTimer {
     private static final long PERIOD = 25000000; // 25 ms
-    private final List<MarketBook> marketBooks;
+    private final List<Strategy> strategies;
     private static MarketDepthTimer instance;
 
 
-    class Signaller implements Runnable {
+    class MarketDepthHandler implements Runnable {
         public void run() {
             try {
-                synchronized (marketBooks) {
-                    for (MarketBook marketBook : marketBooks) {
-                        marketBook.signal();
+                synchronized (strategies) {
+                    for (Strategy strategy : strategies) {
+                        MarketBook marketBook = strategy.getMarketBook();
+                        MarketDepth marketDepth = marketBook.getNewMarketDepth();
+                        if (marketDepth != null) {
+                            marketBook.add(marketDepth);
+                            strategy.process(marketDepth);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -33,14 +39,14 @@ public class MarketDepthTimer {
     }
 
     private MarketDepthTimer() {
-        marketBooks = new ArrayList<MarketBook>();
+        strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new Signaller(), 0, PERIOD, TimeUnit.NANOSECONDS);
+        scheduler.scheduleWithFixedDelay(new MarketDepthHandler(), 0, PERIOD, TimeUnit.NANOSECONDS);
     }
 
-    public void addListener(MarketBook marketBook) {
-        synchronized (marketBooks) {
-            marketBooks.add(marketBook);
+    public void addListener(Strategy strategy) {
+        synchronized (strategies) {
+            strategies.add(strategy);
         }
     }
 

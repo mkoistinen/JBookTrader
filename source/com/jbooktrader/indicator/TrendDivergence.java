@@ -24,7 +24,7 @@ public class TrendDivergence extends Indicator {
     }
 
 
-    public double calculate(int period) {
+    private double calculate(int period) {
 
         int lastIndex = priceHistory.size() - 1;
         int firstIndex = lastIndex - period + 1;

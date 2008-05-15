@@ -2,6 +2,7 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import static com.jbooktrader.platform.model.TradingTableModel.Column.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -20,10 +21,12 @@ import java.net.*;
 public class MainFrameDialog extends JFrame implements ModelListener {
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
+    private JLabel status;
     private TradingTableModel tradingTableModel;
     private JTable tradingTable;
     private JPopupMenu popupMenu;
     private final Toolkit toolkit;
+
 
     public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
@@ -46,10 +49,10 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 break;
             case StrategiesStart:
                 Dispatcher.Mode mode = Dispatcher.getMode();
-                if (mode == Dispatcher.Mode.Trade) {
+                if (mode == Trade) {
                     forwardTestMenuItem.setEnabled(false);
                 }
-                if (mode == Dispatcher.Mode.ForwardTest) {
+                if (mode == ForwardTest) {
                     tradeMenuItem.setEnabled(false);
                 }
 
@@ -157,7 +160,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     }
 
     private void init() throws JBookTraderException {
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
 
         // session menu
@@ -237,6 +240,9 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         NumberRenderer nr2 = new NumberRenderer(2);
         columnModel.getColumn(PL.ordinal()).setCellRenderer(nr2);
         columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr2);
+        NumberRenderer nr5 = new NumberRenderer(5);
+        columnModel.getColumn(Bid.ordinal()).setCellRenderer(nr5);
+        columnModel.getColumn(Ask.ordinal()).setCellRenderer(nr5);
 
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
@@ -247,6 +253,11 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         setIconImage(appIcon);
 
         add(tradingPanel, BorderLayout.CENTER);
+        status = new JLabel(" ");
+        status.setForeground(Color.GRAY);
+        Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
+        status.setFont(font);
+        add(status, BorderLayout.SOUTH);
         setPreferredSize(new Dimension(500, 309));
         setTitle(JBookTrader.APP_NAME);
         pack();

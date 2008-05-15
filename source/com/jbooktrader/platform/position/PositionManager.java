@@ -2,6 +2,7 @@ package com.jbooktrader.platform.position;
 
 import com.ib.client.*;
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
@@ -75,7 +76,7 @@ public class PositionManager {
         performanceManager.update(quantity, avgFillPrice, position);
 
         Dispatcher.Mode mode = Dispatcher.getMode();
-        if ((mode != Dispatcher.Mode.Optimization)) {
+        if ((mode != Optimization)) {
             positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
             StringBuilder msg = new StringBuilder();
             msg.append(strategy.getName()).append(": ");
@@ -88,8 +89,8 @@ public class PositionManager {
 
         orderExecutionPending = false;
 
-        // remote notification, if enabled
-        if (mode == Dispatcher.Mode.Trade || mode == Dispatcher.Mode.ForwardTest) {
+        // remote email notification, if enabled
+        if (mode == Trade || mode == ForwardTest) {
             String msg = "Event type: Trade" + LINE_SEP;
             msg += "Strategy: " + strategy.getName() + LINE_SEP;
             msg += "Position: " + position + LINE_SEP;

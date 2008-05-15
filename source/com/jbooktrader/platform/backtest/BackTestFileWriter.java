@@ -43,8 +43,8 @@ public final class BackTestFileWriter {
             marketDataDir.mkdir();
         }
 
-        fileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
-        writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
+        String fullFileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
+        writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
     }
@@ -52,17 +52,10 @@ public final class BackTestFileWriter {
 
     public void write(MarketDepth marketDepth, boolean flush) {
         StringBuilder sb = new StringBuilder();
-        sb.append(dateFormat.format(new Date(marketDepth.getTime())));
-        sb.append(",");
-
-        marketDepth.getCumulativeBidSize();
-        sb.append(marketDepth.getCumulativeBidSize());
-        sb.append(",");
-        sb.append(marketDepth.getCumulativeAskSize());
-        sb.append(",");
+        sb.append(dateFormat.format(new Date(marketDepth.getTime()))).append(",");
+        sb.append(marketDepth.getLowBalance()).append(",");
+        sb.append(marketDepth.getHighBalance()).append(",");
         sb.append(decimalFormat.format(marketDepth.getBid()));
-        sb.append(",");
-        sb.append(decimalFormat.format(marketDepth.getAsk()));
 
         writer.println(sb);
         if (flush) {
@@ -93,14 +86,13 @@ public final class BackTestFileWriter {
     private StringBuilder getHeader() {
         StringBuilder header = new StringBuilder();
         header.append("# This historical data file is created by " + JBookTrader.APP_NAME).append(LINE_SEP);
-        header.append("# Each line represents the order book at a particular time and contains 6 columns:").append(LINE_SEP);
-        header.append("# date, time, cumulativeBidSize, cumulativeAskSize, bid, ask").append(LINE_SEP);
+        header.append("# Each line represents the order book at a particular time and contains 5 columns:").append(LINE_SEP);
+        header.append("# date, time, lowBalance, highBalance, bid").append(LINE_SEP);
         header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
         header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. cumulativeBidSize is the sum of bid sizes for all levels of market depth").append(LINE_SEP);
-        header.append("# 4. cumulativeAskSize is the sum of ask sizes for all levels of market depth").append(LINE_SEP);
+        header.append("# 3. lowBalance is the period lowest balance between  cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
+        header.append("# 4. highBalance is the period highest balance between  cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
         header.append("# 5. bid is the best (highest) bid price").append(LINE_SEP);
-        header.append("# 6. ask is the best (lowest) ask price").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

@@ -24,8 +24,8 @@ public class BalanceRSI extends Indicator {
         double gains = 0, losses = 0;
 
         for (int bar = firstBar + 1; bar <= lastBar; bar++) {
-            double now = marketBook.getMarketDepth(bar).getBalance() * marketBook.getMarketDepth(bar).getMidPoint();
-            double then = marketBook.getMarketDepth(bar - 1).getBalance() * marketBook.getMarketDepth(bar - 1).getMidPoint();
+            double now = marketBook.getMarketDepth(bar).getMidBalance() * marketBook.getMarketDepth(bar).getMidPoint();
+            double then = marketBook.getMarketDepth(bar - 1).getMidBalance() * marketBook.getMarketDepth(bar - 1).getMidPoint();
             double change = now - then;
             gains += Math.max(0, change);
             losses += Math.max(0, -change);

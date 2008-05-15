@@ -15,10 +15,10 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Scalper extends Strategy {
+public class Scalper2 extends Strategy {
 
     // Technical indicators
-    private final Indicator depthBalanceInd;
+    private final Indicator lowDepthBalanceInd, highDepthBalanceInd;
 
     // Strategy parameters names
     private static final String ENTRY = "Entry";
@@ -27,21 +27,26 @@ public class Scalper extends Strategy {
     private final int entry;
 
 
-    public Scalper(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Scalper2(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
+
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
+        int multiplier = 50;// contract multiplier
+
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 50;// contract multiplier
+
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
 
         // Create technical indicators
-        depthBalanceInd = new DepthBalance(marketBook);
-        addIndicator("Depth Balance", depthBalanceInd);
+        lowDepthBalanceInd = new LowDepthBalance(marketBook);
+        highDepthBalanceInd = new HighDepthBalance(marketBook);
+        addIndicator("Low Depth Balance", lowDepthBalanceInd);
+        addIndicator("High Depth Balance", highDepthBalanceInd);
     }
 
     /**
@@ -52,7 +57,7 @@ public class Scalper extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 50, 1, 38);
+        addParam(ENTRY, 20, 50, 1, 43);
     }
 
     /**
@@ -61,10 +66,11 @@ public class Scalper extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double depthBalance = depthBalanceInd.getValue();
-        if (depthBalance >= entry) {
+        double lowDepthBalance = lowDepthBalanceInd.getValue();
+        double highDepthBalance = highDepthBalanceInd.getValue();
+        if (highDepthBalance >= entry && lowDepthBalance > -entry) {
             setPosition(1);
-        } else if (depthBalance <= -entry) {
+        } else if (lowDepthBalance <= -entry && highDepthBalance < entry) {
             setPosition(-1);
         }
     }

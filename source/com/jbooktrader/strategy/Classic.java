@@ -44,7 +44,7 @@ public class Classic extends Strategy {
         profitTarget = getParam(PROFIT_TARGET);
 
         // Create technical indicators
-        depthBalanceInd = new DepthBalance(marketBook);
+        depthBalanceInd = new LowDepthBalance(marketBook);
         addIndicator("Depth Balance", depthBalanceInd);
     }
 

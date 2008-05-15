@@ -23,6 +23,6 @@ public class DepthVelocity extends Indicator {
 
 
     private double getDepthBalance(int timeIndex) {
-        return marketBook.getMarketDepth(timeIndex).getBalance();
+        return marketBook.getMarketDepth(timeIndex).getMidBalance();
     }
 }

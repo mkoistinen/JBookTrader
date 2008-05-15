@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.indicator;
 
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 
 import java.util.*;
 
@@ -34,7 +35,7 @@ public class IndicatorHistory {
         if (barTime > indicatorBar.getTime()) {
             indicatorBars.add(indicatorBar);
             indicatorBar = new IndicatorBar(barTime, price);
-            if (Dispatcher.getMode() == Dispatcher.Mode.Optimization) {
+            if (Dispatcher.getMode() == Optimization) {
                 if (indicatorBars.size() > MAX_SIZE) {
                     indicatorBars.removeFirst();
                 }

@@ -53,7 +53,7 @@ public class TradingSchedule {
             throw new JBookTraderException(msg);
         }
 
-        text = "Trading schedule: " + startTime + " to " + endTime + " " + timeZone;
+        text = startTime + " to " + endTime + " (" + timeZone + ")";
     }
 
     public void setExclusion(String startExclusionTime, String endExclusionTime) throws JBookTraderException {
@@ -95,7 +95,7 @@ public class TradingSchedule {
     public boolean approximatelyContains(long time) {
         instant.setTimeInMillis(time);
         int minutes = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
-        return minutes >= (start - 1) && minutes < (end + 1);
+        return minutes >= (start - 5) && minutes < (end + 5);
     }
 
 

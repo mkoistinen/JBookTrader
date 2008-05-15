@@ -3,6 +3,7 @@ package com.jbooktrader.platform.trader;
 import com.ib.client.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.position.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
@@ -11,6 +12,7 @@ import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 
 import javax.swing.*;
+import java.io.*;
 import java.util.*;
 
 
@@ -110,10 +112,22 @@ public class TraderAssistant {
         eventReport.report(msg);
     }
 
-    public synchronized void addStrategy(Strategy strategy) {
+    public synchronized void addStrategy(Strategy strategy) throws IOException, JBookTraderException {
         nextStrategyID++;
         strategy.setId(nextStrategyID);
         strategies.put(nextStrategyID, strategy);
+        Dispatcher.Mode mode = Dispatcher.getMode();
+        if (mode == ForwardTest || mode == Trade) {
+            Report strategyReport = new Report(strategy.getName());
+            strategyReport.report(strategy.getStrategyReportHeaders());
+            strategy.setReport(strategyReport);
+            String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
+            eventReport.report(msg);
+            requestMarketDepth(strategy, 5);
+            MarketDepthTimer.getInstance().addListener(strategy);
+            strategy.setIsActive(true);
+            Dispatcher.strategyStarted();
+        }
     }
 
     public void setAccountCode(String accountCode) {
@@ -126,7 +140,7 @@ public class TraderAssistant {
             String msg = strategy.getName() + ": Placed order " + orderID;
             openOrders.put(orderID, new OpenOrder(orderID, order, strategy));
 
-            if (Dispatcher.getMode() == Dispatcher.Mode.Trade) {
+            if (Dispatcher.getMode() == Trade) {
                 socket.placeOrder(orderID, contract, order);
                 eventReport.report(msg);
             } else {
@@ -163,7 +177,7 @@ public class TraderAssistant {
     public boolean isConnected() {
         Dispatcher.Mode mode = Dispatcher.getMode();
 
-        if (mode == Dispatcher.Mode.BackTest || mode == Dispatcher.Mode.Optimization) {
+        if (mode == BackTest || mode == Optimization) {
             return true;
         } else {
             return isConnected;
@@ -188,7 +202,7 @@ public class TraderAssistant {
         }
 
         socket.reqAccountUpdates(false, advisorAccountID);
-        boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getMode() == Dispatcher.Mode.Trade;
+        boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getMode() == Trade;
         if (isRealTrading) {
             String lineSep = System.getProperty("line.separator");
             String warning = "Connected to a real (not simulated) IB account. ";

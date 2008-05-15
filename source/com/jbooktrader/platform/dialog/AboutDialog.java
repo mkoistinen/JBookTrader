@@ -62,6 +62,13 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(versionLabel);
         aboutPanel.add(versionValueLabel);
 
+        JLabel releaseDateLabel = new JLabel("Released:", JLabel.TRAILING);
+        JLabel releaseDateValueLabel = new JLabel(JBookTrader.RELEASE_DATE);
+        releaseDateValueLabel.setForeground(Color.BLACK);
+        releaseDateLabel.setLabelFor(releaseDateValueLabel);
+        aboutPanel.add(releaseDateLabel);
+        aboutPanel.add(releaseDateValueLabel);
+
         JLabel authorLabel = new JLabel("Author:", JLabel.TRAILING);
         JLabel authorValueLabel = new JLabel("Eugene Kononov");
         authorValueLabel.setForeground(Color.BLACK);
@@ -83,7 +90,7 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(licenseLabel);
         aboutPanel.add(licenseValueLabel);
 
-        SpringUtilities.makeCompactGrid(aboutPanel, 5, 2, 12, 12, 5, 5);
+        SpringUtilities.makeCompactGrid(aboutPanel, 6, 2, 12, 12, 5, 5);
 
         JLabel serverVersionLabel = new JLabel("Server Version:", JLabel.TRAILING);
         String serverVersion = "Disconnected from server";

@@ -13,7 +13,7 @@ set cp=%cp%;other.jar
 set cp=%cp%;riskfeed.jar
 set cp=%cp%;rss.jar
 
-set javaOptions=-Dsun.java2d.noddraw=true -Xms256M -Xmx256M -XX:+CMSIncrementalMode -XX:+CMSIncrementalPacing -XX:+UseConcMarkSweepGC
+set javaOptions=-Dsun.java2d.noddraw=true -Xms256M -Xmx256M
 set mainClass=jclient/LoginFrame
 
 %javaHome%javaw.exe -cp "%cp%" %javaOptions% %mainClass% "%ibHome%"

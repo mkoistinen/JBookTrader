@@ -16,7 +16,7 @@ public class CommissionFactory {
      * @param maxPercent Maximum commission as percent of the trade amount
      * @return Commission for the trade
      */
-    public static Commission getCommission(double rate, double min, double maxPercent) {
+    private static Commission getCommission(double rate, double min, double maxPercent) {
         return new Commission(rate, min, maxPercent);
     }
 

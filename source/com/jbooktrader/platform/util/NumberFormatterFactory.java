@@ -4,7 +4,7 @@ import java.text.*;
 
 public class NumberFormatterFactory {
 
-    public static DecimalFormat getNumberFormatter(int minFractionDigits, int maxFractionDigits) {
+    private static DecimalFormat getNumberFormatter(int minFractionDigits, int maxFractionDigits) {
         DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance();
         DecimalFormatSymbols decimalFormatSeparator = new DecimalFormatSymbols();
         decimalFormatSeparator.setDecimalSeparator('.');

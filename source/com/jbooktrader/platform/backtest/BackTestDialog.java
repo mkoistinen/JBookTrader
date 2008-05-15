@@ -170,7 +170,7 @@ public class BackTestDialog extends JDialog {
         progressPanel = new JPanel(new SpringLayout());
         progressPanel.add(progressBar);
         progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 1, 12, 5, 12, 5);//rows, cols, initX, initY, xPad, yPad
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 1, 12, 5, 12, 5);
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);

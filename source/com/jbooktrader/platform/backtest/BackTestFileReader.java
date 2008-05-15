@@ -14,13 +14,15 @@ import java.util.*;
  */
 public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final static int COLUMNS = 6;
+    private final static int COLUMNS = 5;
     private long previousTime;
     private SimpleDateFormat sdf;
     private BufferedReader reader;
     private int lineNumber, totalLines;
     private volatile boolean cancelled;
     private final String fileName;
+    private TimeZone tz;
+    private double bidAskSpread;
 
     public int getTotalLineCount() {
         return totalLines;
@@ -52,22 +54,36 @@ public class BackTestFileReader {
                 if (isProperty) {
                     if (line.startsWith("timeZone")) {
                         String timeZone = line.substring(line.indexOf('=') + 1);
-                        TimeZone tz = TimeZone.getTimeZone(timeZone);
+                        tz = TimeZone.getTimeZone(timeZone);
                         if (!tz.getID().equals(timeZone)) {
                             String msg = "The specified time zone " + "\"" + timeZone + "\"" + " does not exist." + LINE_SEP;
                             msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
                             throw new JBookTraderException(msg);
                         }
-
-
                         sdf = new SimpleDateFormat("MMddyy,HHmmss");
                         // Enforce strict interpretation of date and time formats
                         sdf.setLenient(false);
                         sdf.setTimeZone(tz);
                     }
 
+                    if (line.startsWith("bidAskSpread")) {
+                        bidAskSpread = Double.parseDouble(line.substring(line.indexOf('=') + 1));
+                        if (bidAskSpread <= 0) {
+                            String msg = "\"bidAskSpread\"" + " must be greater than 0." + LINE_SEP;
+                            throw new JBookTraderException(msg);
+                        }
+                    }
                 }
             }
+            if (tz == null) {
+                String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
+                throw new JBookTraderException(msg);
+            }
+            if (bidAskSpread == 0) {
+                String msg = "Property " + "\"bidAskSpread\"" + " is not defined in the data file." + LINE_SEP;
+                throw new JBookTraderException(msg);
+            }
+
 
         } catch (FileNotFoundException fnfe) {
             throw new JBookTraderException("Could not find file " + fileName);
@@ -147,12 +163,12 @@ public class BackTestFileReader {
             }
         }
 
-        int cumulativeBidSize = Integer.parseInt(st.nextToken());
-        int cumulativeAskSize = Integer.parseInt(st.nextToken());
+        int lowBalance = Integer.parseInt(st.nextToken());
+        int highBalance = Integer.parseInt(st.nextToken());
         double bid = Double.parseDouble(st.nextToken());
-        double ask = Double.parseDouble(st.nextToken());
+        double ask = bid + bidAskSpread;
 
-        return new MarketDepth(time, cumulativeBidSize, cumulativeAskSize, bid, ask);
+        return new MarketDepth(time, lowBalance, highBalance, bid, ask);
     }
 
 

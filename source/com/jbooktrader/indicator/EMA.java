@@ -16,7 +16,7 @@ public class EMA extends Indicator {
 
     @Override
     public double calculate() {
-        int balance = marketBook.getLastMarketDepth().getBalance();
+        int balance = marketBook.getLastMarketDepth().getMidBalance();
         if (value == 0) {
             value = balance;
         } else {

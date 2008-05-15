@@ -21,7 +21,7 @@ public class RegressedDepthBalance extends Indicator {
         double sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
         for (int x = 1; x <= period; x++) {
             sumX += x;
-            int y = marketBook.getMarketDepth(++index).getBalance();
+            int y = marketBook.getMarketDepth(++index).getMidBalance();
             sumY += y;
             sumXY += x * y;
             sumXX += x * x;

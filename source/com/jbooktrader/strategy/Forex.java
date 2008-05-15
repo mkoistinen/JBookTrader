@@ -40,7 +40,7 @@ public class Forex extends Strategy {
         entry = getParam(ENTRY);
 
         // Create technical indicators
-        depthBalanceInd = new DepthBalance(marketBook);
+        depthBalanceInd = new LowDepthBalance(marketBook);
         addIndicator("Depth Balance", depthBalanceInd);
     }
 
@@ -52,7 +52,7 @@ public class Forex extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 50, 1, 50);
+        addParam(ENTRY, 20, 50, 1, 30);
     }
 
     /**

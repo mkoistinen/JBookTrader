@@ -2,6 +2,7 @@ package com.jbooktrader.platform.performance;
 
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
 
 /**
@@ -129,7 +130,7 @@ public class PerformanceManager {
             trueKelly = kellyCriterion * sigmoidFunction * 100;
         }
 
-        if ((Dispatcher.getMode() != Dispatcher.Mode.Optimization)) {
+        if ((Dispatcher.getMode() != Optimization)) {
             long time = strategy.getTime();
             profitAndLossHistory.add(new ProfitAndLoss(time, netProfit));
         }
