@@ -18,7 +18,7 @@ public class PerformanceManager {
     private int trades, profitableTrades, unprofitableTrades;
     private double tradeCommission, totalCommission;
     private double averageProfitPerTrade, percentProfitableTrades, positionValue;
-    private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit;
+    private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
     private double profitFactor, peakNetProfit, maxDrawdown, trueKelly;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
@@ -72,8 +72,15 @@ public class PerformanceManager {
         return trueKelly;
     }
 
-    public void updatePositionValue(double price, int position) {
+    public void update(double price, int position) {
         positionValue = position * price * multiplier;
+        netProfit = totalSold - totalBought + positionValue - totalCommission;
+        peakNetProfit = Math.max(netProfit, peakNetProfit);
+        double drawdown = peakNetProfit - netProfit;
+        if (drawdown > maxDrawdown) {
+            maxDrawdown = drawdown;
+        }
+
     }
 
     public void update(int quantity, double avgFillPrice, int position) {
@@ -89,12 +96,10 @@ public class PerformanceManager {
         tradeCommission = commission.getCommission(Math.abs(quantity), avgFillPrice);
         totalCommission += tradeCommission;
 
+        update(avgFillPrice, position);
 
-        positionValue = position * avgFillPrice * multiplier;
-        double previousNetProfit = netProfit;
-        netProfit = totalSold - totalBought + positionValue - totalCommission;
-
-        tradeProfit = netProfit - previousNetProfit;
+        tradeProfit = netProfit - netProfitAsOfPreviousTrade;
+        netProfitAsOfPreviousTrade = netProfit;
         averageProfitPerTrade = netProfit / trades;
 
         if (tradeProfit >= 0) {
@@ -107,14 +112,6 @@ public class PerformanceManager {
 
         percentProfitableTrades = 100 * (profitableTrades / (double) trades);
         profitFactor = grossProfit / grossLoss;
-
-        peakNetProfit = Math.max(netProfit, peakNetProfit);
-
-
-        double drawdown = peakNetProfit - netProfit;
-        if (drawdown > maxDrawdown) {
-            maxDrawdown = drawdown;
-        }
 
         // Calculate "True Kelly", which is Kelly Criterion adjusted
         // for the number of trades
