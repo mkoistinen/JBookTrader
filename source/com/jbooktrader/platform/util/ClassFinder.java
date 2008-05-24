@@ -26,8 +26,7 @@ public class ClassFinder {
         List<String> classNames = new ArrayList<String>();
 
         for (URL url : classpath) {
-            URI uri = url.toURI();
-            File file = new File(uri);
+            File file = new File(url.toURI());
             if (file.isDirectory()) {
                 File packageDir = new File(file.getPath() + '/' + packageName);
                 if (packageDir.exists()) {

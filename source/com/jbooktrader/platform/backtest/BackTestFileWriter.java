@@ -90,8 +90,8 @@ public final class BackTestFileWriter {
         header.append("# date, time, lowBalance, highBalance, bid").append(LINE_SEP);
         header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
         header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. lowBalance is the period lowest balance between  cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
-        header.append("# 4. highBalance is the period highest balance between  cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
+        header.append("# 3. lowBalance is the period's lowest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
+        header.append("# 4. highBalance is the period's highest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
         header.append("# 5. bid is the best (highest) bid price").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
