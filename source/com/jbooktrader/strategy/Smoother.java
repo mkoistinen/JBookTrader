@@ -15,19 +15,20 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Scalper3 extends Strategy {
+public class Smoother extends Strategy {
 
     // Technical indicators
-    private final Indicator lowDepthBalanceInd, highDepthBalanceInd;
+    private final Indicator balanceRSIInd;
 
     // Strategy parameters names
+    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
     private final int entry;
 
 
-    public Scalper3(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Smoother(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
 
         // Specify the contract to trade
@@ -41,12 +42,10 @@ public class Scalper3 extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
-
         // Create technical indicators
-        lowDepthBalanceInd = new LowDepthBalance(marketBook);
-        highDepthBalanceInd = new HighDepthBalance(marketBook);
-        addIndicator("Low Depth Balance", lowDepthBalanceInd);
-        addIndicator("High Depth Balance", highDepthBalanceInd);
+        balanceRSIInd = new BalanceRSI(marketBook, getParam(PERIOD));
+        addIndicator("BalanceRSI", balanceRSIInd);
+
     }
 
     /**
@@ -57,7 +56,8 @@ public class Scalper3 extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 50, 1, 48);
+        addParam(PERIOD, 80, 90, 1, 84);
+        addParam(ENTRY, 35, 45, 1, 40);
     }
 
     /**
@@ -66,11 +66,11 @@ public class Scalper3 extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double lowDepthBalance = lowDepthBalanceInd.getValue();
-        double highDepthBalance = highDepthBalanceInd.getValue();
-        if (highDepthBalance >= entry && lowDepthBalance > -entry) {
+        double rsi = balanceRSIInd.getValue() - 50;
+
+        if (rsi >= entry) {
             setPosition(1);
-        } else if (lowDepthBalance <= -entry && highDepthBalance < entry) {
+        } else if (rsi <= -entry) {
             setPosition(-1);
         }
     }

@@ -15,7 +15,7 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Scalper2 extends Strategy {
+public class Scalper extends Strategy {
 
     // Technical indicators
     private final Indicator lowDepthBalanceInd, highDepthBalanceInd;
@@ -27,7 +27,7 @@ public class Scalper2 extends Strategy {
     private final int entry;
 
 
-    public Scalper2(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Scalper(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
 
         // Specify the contract to trade
@@ -57,7 +57,7 @@ public class Scalper2 extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 20, 50, 1, 43);
+        addParam(ENTRY, 30, 70, 1, 52);
     }
 
     /**
