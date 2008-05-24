@@ -84,6 +84,7 @@ public class Dispatcher {
         } else {
             trader.getAssistant().disconnect();
         }
+        fireModelChanged(ModelListener.Event.ModeChanged, null);
 
     }
 
