@@ -13,6 +13,8 @@ import java.util.*;
  * The created data file can be used for backtesting and optimization of trading strategies.
  */
 public class CMEDataConverter {
+    private static final long RECORDING_START = 9 * 60 * 60 + 10 * 60; // 9:10:00 EDT
+    private static final long RECORDING_END = 16 * 60 * 60 + 15 * 60; // 16:15:00 EDT
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepthItem> bids, asks;
     private final PrintWriter writer;
@@ -23,6 +25,7 @@ public class CMEDataConverter {
     private long time;
     private long lineNumber;
     private final Calendar instant;
+    private int lowBalance, highBalance;
 
     public static void main(String[] args) throws JBookTraderException {
 
@@ -41,11 +44,14 @@ public class CMEDataConverter {
 
         this.contract = contract;
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
-        jbtDateFormat = new SimpleDateFormat("MMddyy,HH:mm:ss.SSS");
+
+        jbtDateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         jbtDateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+
         cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         cmeDateFormat.setLenient(false);
         cmeDateFormat.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
+
         instant = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
 
         bids = new LinkedList<MarketDepthItem>();
@@ -55,6 +61,9 @@ public class CMEDataConverter {
             bids.add(null);
             asks.add(null);
         }
+
+        lowBalance = 100;
+        highBalance = -100;
 
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(cmeFileName)));
@@ -74,31 +83,40 @@ public class CMEDataConverter {
 
     private void write() {
         StringBuilder sb = new StringBuilder();
-        sb.append(jbtDateFormat.format(new Date(time)));
-        sb.append(";");// separator after date and time
+        sb.append(jbtDateFormat.format(new Date(time))).append(",");
+        sb.append(lowBalance).append(",");
+        sb.append(highBalance).append(",");
+        sb.append(decimalFormat.format(bids.getFirst().getPrice()));
 
-        for (MarketDepthItem item : bids) {
-            if (item != null) {
-                sb.append(item.getSize()).append(",");
-                sb.append(decimalFormat.format(item.getPrice())).append(",");
-            }
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append(";");// separator between bids and asks
-
-        for (MarketDepthItem item : asks) {
-            if (item != null) {
-                sb.append(item.getSize()).append(",");
-                sb.append(decimalFormat.format(item.getPrice())).append(",");
-            }
-        }
-        sb.deleteCharAt(sb.length() - 1);
         writer.println(sb);
+    }
+
+    private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
+        int cumulativeSize = 0;
+        for (MarketDepthItem item : items) {
+            if (item != null) {
+                cumulativeSize += item.getSize();
+            }
+        }
+        return cumulativeSize;
+    }
+
+    private void updateMinMaxBalance() {
+        int cumulativeBid = getCumulativeSize(bids);
+        int cumulativeAsk = getCumulativeSize(asks);
+        double totalDepth = cumulativeBid + cumulativeAsk;
+        int balance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
+        lowBalance = Math.min(balance, lowBalance);
+        highBalance = Math.max(balance, highBalance);
+    }
+
+    private boolean isRecordable(Calendar instant) {
+        int secondsOfDay = instant.get(Calendar.HOUR_OF_DAY) * 60 * 60 + instant.get(Calendar.MINUTE) * 60 + instant.get(Calendar.SECOND);
+        return secondsOfDay >= RECORDING_START && secondsOfDay <= RECORDING_END;
     }
 
 
     private void convert(long samplingFrequency) {
-
         String line = null;
 
         try {
@@ -110,17 +128,20 @@ public class CMEDataConverter {
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
                 if (lineNumber % 250000 == 0) {
-                    System.out.println(lineNumber + " lines read");
+                    System.out.println(lineNumber + " lines converted");
                 }
 
                 try {
                     parse(line);
+                    updateMinMaxBalance();
                     instant.setTimeInMillis(time);
-                    int minutesOfDay = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
-                    boolean inDaySession = (minutesOfDay >= 9 * 60 + 15 && minutesOfDay < 16 * 60 + 15);
-                    if (inDaySession && (time - previousTime) >= samplingFrequency) {
+                    if ((time - previousTime) >= samplingFrequency) {
+                        if (isRecordable(instant)) {
+                            write();
+                        }
+                        lowBalance = 100;
+                        highBalance = -100;
                         previousTime = time;
-                        write();
                     }
                 } catch (Exception e) {
                     String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
@@ -128,7 +149,7 @@ public class CMEDataConverter {
                     e.printStackTrace();
                 }
             }
-            System.out.println("Done: " + lineNumber + " lines read and converted successfully.");
+            System.out.println("Done: " + lineNumber + " lines converted successfully.");
         } catch (Exception e) {
             String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
             errorMsg += line + LINE_SEP;
@@ -151,15 +172,10 @@ public class CMEDataConverter {
 
     private void parse(String line) throws ParseException {
 
-        // This needs to be investigated deeper. Frost suggested that the lines
-        // containing line.charAt(35) == '0' can be skipped
-        boolean isValidLine = (line.charAt(35) != '0');
-
         boolean isSpecifiedContract = (line.substring(49, 54).trim().equals(contract));
-
         boolean isLimitOrderMessage = line.substring(33, 35).equals("MA");
-        if (isLimitOrderMessage && isValidLine && isSpecifiedContract) {
 
+        if (isLimitOrderMessage && isSpecifiedContract) {
             String centiseconds = line.substring(14, 16);
             int millis = Integer.valueOf(centiseconds) * 10;
             String date = line.substring(17, 29) + line.substring(12, 14) + millis;
@@ -172,16 +188,13 @@ public class CMEDataConverter {
                     int bidSize = Integer.parseInt(line.substring(position, position + 12));
 
                     position += 16;
-                    //int bidPriceDecimalLocator = Integer.valueOf(line.substring(position, position + 1));
                     double bidPrice = Integer.valueOf(line.substring(position + 1, position + 19)) / 100d;
 
                     position += 19;
-                    //int askPriceDecimalLocator = Integer.valueOf(line.substring(position, position + 1));
                     double askPrice = Integer.valueOf(line.substring(position + 1, position + 19)) / 100d;
 
                     position += 23;
                     int askSize = Integer.parseInt(line.substring(position, position + 12));
-
 
                     bids.set(level, new MarketDepthItem(bidSize, bidPrice));
                     asks.set(level, new MarketDepthItem(askSize, askPrice));
@@ -192,20 +205,19 @@ public class CMEDataConverter {
         }
     }
 
-
     private StringBuilder getHeader() {
         StringBuilder header = new StringBuilder();
         header.append("# This historical data file is created by " + JBookTrader.APP_NAME).append(LINE_SEP);
-        header.append("# Each line represents the order book at a particular time and contains 3 sections,:").append(LINE_SEP);
-        header.append("# separated by semicolons as follows:").append(LINE_SEP);
-        header.append("# {date, time}; {bids}; {asks}").append(LINE_SEP);
-        header.append("# The date is in the MMddyy format, and the time in the HH:mm:ss.SSS format").append(LINE_SEP);
-        header.append("# The {bids} section has a variable number of comma-separated columns").append(LINE_SEP);
-        header.append("# and contains bids (each defined by bid size and bid price), starting from the highest bid price").append(LINE_SEP);
-        header.append("# The {asks} section has a variable number of comma-separated columns").append(LINE_SEP);
-        header.append("# and contains asks (each defined by ask size and ask price), starting from the lowest ask price").append(LINE_SEP);
+        header.append("# Each line represents the order book at a particular time and contains 5 columns:").append(LINE_SEP);
+        header.append("# date, time, lowBalance, highBalance, bid").append(LINE_SEP);
+        header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
+        header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
+        header.append("# 3. lowBalance is the period's lowest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
+        header.append("# 4. highBalance is the period's highest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
+        header.append("# 5. bid is the best (highest) bid price").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(jbtDateFormat.getTimeZone().getID()).append(LINE_SEP);
+        header.append("bidAskSpread=0.25").append(LINE_SEP);
         return header;
     }
 
