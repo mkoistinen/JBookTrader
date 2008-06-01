@@ -16,10 +16,9 @@ public class TradingTableModel extends TableDataModel {
     public enum Column {
         Strategy("Strategy", String.class),
         Symbol("Symbol", String.class),
-        LowBalance("Low Bal", Integer.class),
-        HighBalance("High Bal", Integer.class),
-        Bid("Bid", Double.class),
-        Ask("Ask", Double.class),
+        Balance("Balance", Integer.class),
+        LowPrice("Low Price", Double.class),
+        HighPrice("High Price", Double.class),
         Position("Position", Integer.class),
         Trades("Trades", Integer.class),
         MaxDD("Max DD", Double.class),
@@ -91,10 +90,9 @@ public class TradingTableModel extends TableDataModel {
         if (row >= 0) {
             MarketBook marketBook = strategy.getMarketBook();
             if (marketBook.size() > 0) {
-                setValueAt(marketBook.getLastMarketDepth().getLowBalance(), row, Column.LowBalance.ordinal());
-                setValueAt(marketBook.getLastMarketDepth().getHighBalance(), row, Column.HighBalance.ordinal());
-                setValueAt(marketBook.getLastMarketDepth().getBid(), row, Column.Bid.ordinal());
-                setValueAt(marketBook.getLastMarketDepth().getAsk(), row, Column.Ask.ordinal());
+                setValueAt(marketBook.getLastMarketDepth().getMidBalance(), row, Column.Balance.ordinal());
+                setValueAt(marketBook.getLastMarketDepth().getLowPrice(), row, Column.LowPrice.ordinal());
+                setValueAt(marketBook.getLastMarketDepth().getHighPrice(), row, Column.HighPrice.ordinal());
             }
             PositionManager positionManager = strategy.getPositionManager();
             PerformanceManager performanceManager = strategy.getPerformanceManager();

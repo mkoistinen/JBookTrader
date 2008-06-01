@@ -7,10 +7,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class MarketDepthTimer {
-    private static final long PERIOD = 25000000; // 25 ms
     private final List<Strategy> strategies;
     private static MarketDepthTimer instance;
-
 
     class MarketDepthHandler implements Runnable {
         public void run() {
@@ -41,7 +39,7 @@ public class MarketDepthTimer {
     private MarketDepthTimer() {
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new MarketDepthHandler(), 0, PERIOD, TimeUnit.NANOSECONDS);
+        scheduler.scheduleWithFixedDelay(new MarketDepthHandler(), 0, 1, TimeUnit.SECONDS);
     }
 
     public void addListener(Strategy strategy) {

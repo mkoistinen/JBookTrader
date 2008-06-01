@@ -20,9 +20,12 @@ public class PriceHistory {
     }
 
     public synchronized void update(MarketDepth marketDepth) {
-        double bid = marketDepth.getBid();
-        double ask = marketDepth.getAsk();
-        double midPoint = (bid + ask) / 2;
+
+        double midPrice = marketDepth.getMidPrice();
+        double highPrice = marketDepth.getHighPrice();
+        double lowPrice = marketDepth.getLowPrice();
+
+
         long time = marketDepth.getTime();
 
 
@@ -32,17 +35,17 @@ public class PriceHistory {
         long barTime = (completedPeriods + 1) * frequency;
 
         if (bar == null) {
-            bar = new PriceBar(barTime, midPoint);
+            bar = new PriceBar(barTime, midPrice);
         }
 
         if (barTime > bar.getTime()) {
             priceBars.add(bar);
-            bar = new PriceBar(barTime, midPoint);
+            bar = new PriceBar(barTime, midPrice);
         }
 
-        bar.setClose(midPoint);
-        bar.setLow(Math.min(bid, bar.getLow()));
-        bar.setHigh(Math.max(ask, bar.getHigh()));
+        bar.setClose(midPrice);
+        bar.setLow(Math.min(lowPrice, bar.getLow()));
+        bar.setHigh(Math.max(highPrice, bar.getHigh()));
     }
 
     public int size() {

@@ -14,13 +14,13 @@ import java.util.*;
 public class SecureMailSender {
 
     private static SecureMailSender instance;
-    private final Properties props = new Properties();
+    private final Properties props;
     private final String user, password, subject, recipient;
     private final boolean isEnabled;
 
     // inner class
     private class Mailer extends Thread {
-        final String content;
+        private final String content;
 
         Mailer(String content) {
             this.content = content;
@@ -40,6 +40,7 @@ public class SecureMailSender {
                 transport.connect(user, password);
                 transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
                 transport.close();
+
                 Dispatcher.getReporter().report("Email notification sent");
             } catch (Throwable t) {
                 Dispatcher.getReporter().report("Email notification failed");
@@ -61,16 +62,14 @@ public class SecureMailSender {
         PreferencesHolder prefs = PreferencesHolder.getInstance();
         isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
 
+        props = new Properties();
         props.put("mail.transport.protocol", "smtps");
-        props.put("mail.smtps.auth", "true");
-        props.put("mail.smtps.quitwait", "false");
-        props.put("mail.smtps.quitwait", "false");
         props.put("mail.smtps.host", "smtp.gmail.com");
+        props.put("mail.smtps.auth", "true");
 
         user = recipient = prefs.get(EmailAddress);
         password = prefs.get(EmailPassword);
         subject = prefs.get(EmailSubject);
-
     }
 
     public void send(String content) {

@@ -44,7 +44,7 @@ public class Classic extends Strategy {
         profitTarget = getParam(PROFIT_TARGET);
 
         // Create technical indicators
-        depthBalanceInd = new LowDepthBalance(marketBook);
+        depthBalanceInd = new DepthBalance(marketBook);
         addIndicator("Depth Balance", depthBalanceInd);
     }
 
@@ -56,9 +56,9 @@ public class Classic extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 35, 65, 1, 46);
-        addParam(STOP_LOSS, 1, 9, 1, 7);
-        addParam(PROFIT_TARGET, 5, 25, 1, 15);
+        addParam(ENTRY, 35, 65, 1, 45);
+        addParam(STOP_LOSS, 1, 9, 1, 6);
+        addParam(PROFIT_TARGET, 5, 25, 1, 30);
     }
 
     /**
@@ -75,7 +75,7 @@ public class Classic extends Strategy {
             setPosition(-1);
         } else {
             double lastEntry = getPositionManager().getAvgFillPrice();
-            double currentPrice = getLastMarketDepth().getMidPoint();
+            double currentPrice = getLastMarketDepth().getMidPrice();
             double loss = 0;
             if (currentPosition != 0) {
                 loss = (currentPosition > 0) ? (lastEntry - currentPrice) : (currentPrice - lastEntry);

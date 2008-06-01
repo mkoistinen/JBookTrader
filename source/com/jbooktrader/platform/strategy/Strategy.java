@@ -64,8 +64,8 @@ public abstract class Strategy {
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
         strategyReportHeaders.add("Trade #");
-        strategyReportHeaders.add("Bid");
-        strategyReportHeaders.add("Ask");
+        strategyReportHeaders.add("Low Price");
+        strategyReportHeaders.add("High Price");
         strategyReportHeaders.add("Position");
         strategyReportHeaders.add("Avg Fill Price");
         strategyReportHeaders.add("Commission");
@@ -136,8 +136,8 @@ public abstract class Strategy {
         strategyReportColumns.clear();
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
         strategyReportColumns.add(performanceManager.getTrades());
-        strategyReportColumns.add(nf5.format(marketDepth.getBid()));
-        strategyReportColumns.add(nf5.format(marketDepth.getAsk()));
+        strategyReportColumns.add(nf5.format(marketDepth.getLowPrice()));
+        strategyReportColumns.add(nf5.format(marketDepth.getHighPrice()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(nf2.format(performanceManager.getTradeCommission()));
@@ -273,7 +273,7 @@ public abstract class Strategy {
             }
 
             positionManager.trade();
-            performanceManager.update(marketDepth.getMidPoint(), positionManager.getPosition());
+            performanceManager.update(marketDepth.getMidPrice(), positionManager.getPosition());
             Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
         }
     }

@@ -1,8 +1,8 @@
 package com.jbooktrader.platform.util;
 
+import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
 import java.text.*;
@@ -17,15 +17,16 @@ public class CMEDataConverter {
     private static final long RECORDING_END = 16 * 60 * 60 + 15 * 60; // 16:15:00 EDT
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepthItem> bids, asks;
-    private final PrintWriter writer;
+    private final BackTestFileWriter backTestFileWriter;
     private final BufferedReader reader;
-    private final SimpleDateFormat jbtDateFormat, cmeDateFormat;
-    private final DecimalFormat decimalFormat;
+    private final SimpleDateFormat cmeDateFormat;
     private final String contract;
     private long time;
     private long lineNumber;
     private final Calendar instant;
-    private int lowBalance, highBalance;
+    private int openBalance, highBalance, lowBalance, closeBalance;
+    private double highPrice, lowPrice;
+
 
     public static void main(String[] args) throws JBookTraderException {
 
@@ -43,10 +44,6 @@ public class CMEDataConverter {
     private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
 
         this.contract = contract;
-        decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
-
-        jbtDateFormat = new SimpleDateFormat("MMddyy,HHmmss");
-        jbtDateFormat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
 
         cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         cmeDateFormat.setLenient(false);
@@ -62,9 +59,6 @@ public class CMEDataConverter {
             asks.add(null);
         }
 
-        lowBalance = 100;
-        highBalance = -100;
-
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(cmeFileName)));
         } catch (FileNotFoundException fnfe) {
@@ -72,23 +66,12 @@ public class CMEDataConverter {
         }
 
         try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(jbtFileName, false)));
+            backTestFileWriter = new BackTestFileWriter(jbtFileName, TimeZone.getTimeZone("America/New_York"), false);
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not create file " + jbtFileName);
         }
 
         System.out.println("Converting " + cmeFileName + " to " + jbtFileName);
-    }
-
-
-    private void write() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(jbtDateFormat.format(new Date(time))).append(",");
-        sb.append(lowBalance).append(",");
-        sb.append(highBalance).append(",");
-        sb.append(decimalFormat.format(bids.getFirst().getPrice()));
-
-        writer.println(sb);
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
@@ -101,13 +84,15 @@ public class CMEDataConverter {
         return cumulativeSize;
     }
 
-    private void updateMinMaxBalance() {
+    private void update() {
         int cumulativeBid = getCumulativeSize(bids);
         int cumulativeAsk = getCumulativeSize(asks);
         double totalDepth = cumulativeBid + cumulativeAsk;
-        int balance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
-        lowBalance = Math.min(balance, lowBalance);
-        highBalance = Math.max(balance, highBalance);
+        closeBalance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
+        highBalance = Math.max(closeBalance, highBalance);
+        lowBalance = Math.min(closeBalance, lowBalance);
+        highPrice = Math.max(highPrice, asks.getFirst().getPrice());
+        lowPrice = Math.min(lowPrice, bids.getFirst().getPrice());
     }
 
     private boolean isRecordable(Calendar instant) {
@@ -121,26 +106,28 @@ public class CMEDataConverter {
 
         try {
             long previousTime = 0;
-            StringBuilder header = getHeader();
-            writer.println(header);
+            backTestFileWriter.writeHeader();
 
             System.out.println("Conversion started...");
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
-                if (lineNumber % 250000 == 0) {
+                if (lineNumber % 500000 == 0) {
                     System.out.println(lineNumber + " lines converted");
                 }
 
                 try {
                     parse(line);
-                    updateMinMaxBalance();
+                    update();
                     instant.setTimeInMillis(time);
                     if ((time - previousTime) >= samplingFrequency) {
                         if (isRecordable(instant)) {
-                            write();
+                            MarketDepth marketDepth = new MarketDepth(time, openBalance, highBalance, lowBalance, closeBalance, highPrice, lowPrice);
+                            backTestFileWriter.write(marketDepth, true);
                         }
-                        lowBalance = 100;
-                        highBalance = -100;
+
+                        openBalance = highBalance = lowBalance = closeBalance;
+                        highPrice = asks.getFirst().getPrice();
+                        lowPrice = bids.getFirst().getPrice();
                         previousTime = time;
                     }
                 } catch (Exception e) {
@@ -162,7 +149,7 @@ public class CMEDataConverter {
         } finally {
             try {
                 reader.close();
-                writer.close();
+                backTestFileWriter.close();
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }
@@ -204,23 +191,6 @@ public class CMEDataConverter {
             }
         }
     }
-
-    private StringBuilder getHeader() {
-        StringBuilder header = new StringBuilder();
-        header.append("# This historical data file is created by " + JBookTrader.APP_NAME).append(LINE_SEP);
-        header.append("# Each line represents the order book at a particular time and contains 5 columns:").append(LINE_SEP);
-        header.append("# date, time, lowBalance, highBalance, bid").append(LINE_SEP);
-        header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
-        header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. lowBalance is the period's lowest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
-        header.append("# 4. highBalance is the period's highest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
-        header.append("# 5. bid is the best (highest) bid price").append(LINE_SEP);
-        header.append(LINE_SEP);
-        header.append("timeZone=").append(jbtDateFormat.getTimeZone().getID()).append(LINE_SEP);
-        header.append("bidAskSpread=0.25").append(LINE_SEP);
-        return header;
-    }
-
 
 }
 

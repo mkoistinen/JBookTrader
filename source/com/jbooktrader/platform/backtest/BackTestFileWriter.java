@@ -36,14 +36,17 @@ public final class BackTestFileWriter {
         }
     }
 
-    public BackTestFileWriter(String fileName, TimeZone timeZone) throws IOException {
+    public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws IOException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {
             marketDataDir.mkdir();
         }
 
-        String fullFileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
+        String fullFileName = fileName;
+        if (isAutoSave) {
+            fullFileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
+        }
         writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
@@ -53,9 +56,12 @@ public final class BackTestFileWriter {
     public void write(MarketDepth marketDepth, boolean flush) {
         StringBuilder sb = new StringBuilder();
         sb.append(dateFormat.format(new Date(marketDepth.getTime()))).append(",");
-        sb.append(marketDepth.getLowBalance()).append(",");
+        sb.append(marketDepth.getOpenBalance()).append(",");
         sb.append(marketDepth.getHighBalance()).append(",");
-        sb.append(decimalFormat.format(marketDepth.getBid()));
+        sb.append(marketDepth.getLowBalance()).append(",");
+        sb.append(marketDepth.getCloseBalance()).append(",");
+        sb.append(decimalFormat.format(marketDepth.getLowPrice())).append(",");
+        sb.append(decimalFormat.format(marketDepth.getHighPrice()));
 
         writer.println(sb);
         if (flush) {
@@ -63,12 +69,20 @@ public final class BackTestFileWriter {
         }
     }
 
+    public void close() {
+        writer.close();
+    }
+
+
+    public void writeHeader() {
+        StringBuilder header = getHeader();
+        writer.println(header);
+    }
 
     public void write(MarketBook marketBook) {
         if (writer != null) {
 
-            StringBuilder header = getHeader();
-            writer.println(header);
+            writeHeader();
 
             // make a defensive copy to prevent concurrent modification
             List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
@@ -78,7 +92,7 @@ public final class BackTestFileWriter {
                 write(marketDepth, false);
             }
             writer.flush();
-            writer.close();
+            close();
             MessageDialog.showMessage(null, "Historical market depth data has been saved.");
         }
     }
@@ -86,13 +100,16 @@ public final class BackTestFileWriter {
     private StringBuilder getHeader() {
         StringBuilder header = new StringBuilder();
         header.append("# This historical data file is created by " + JBookTrader.APP_NAME).append(LINE_SEP);
-        header.append("# Each line represents the order book at a particular time and contains 5 columns:").append(LINE_SEP);
-        header.append("# date, time, lowBalance, highBalance, bid").append(LINE_SEP);
+        header.append("# Each line represents the order book at a particular time and contains 8 columns:").append(LINE_SEP);
+        header.append("# date, time, openBalance, highBalance, lowBalance, closeBalance, lowPrice, highPrice").append(LINE_SEP);
         header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
         header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. lowBalance is the period's lowest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
-        header.append("# 4. highBalance is the period's highest balance between cumulativeBidSize and cumulativeAskSize as percentage").append(LINE_SEP);
-        header.append("# 5. bid is the best (highest) bid price").append(LINE_SEP);
+        header.append("# 3. openBalance is the period's opening book balance").append(LINE_SEP);
+        header.append("# 4. highBalance is the period's highest book balance").append(LINE_SEP);
+        header.append("# 5. lowBalance is the period's lowest book balance").append(LINE_SEP);
+        header.append("# 6. closeBalance is the period's close book balance").append(LINE_SEP);
+        header.append("# 7. lowPrice is the period's lowest bid price").append(LINE_SEP);
+        header.append("# 8. highPrice is the period's highest ask price").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

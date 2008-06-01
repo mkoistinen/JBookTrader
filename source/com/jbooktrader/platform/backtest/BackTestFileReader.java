@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final static int COLUMNS = 5;
+    private final static int COLUMNS = 8;
     private long previousTime;
     private SimpleDateFormat sdf;
     private BufferedReader reader;
@@ -22,7 +22,6 @@ public class BackTestFileReader {
     private volatile boolean cancelled;
     private final String fileName;
     private TimeZone tz;
-    private double bidAskSpread;
 
     public int getTotalLineCount() {
         return totalLines;
@@ -66,25 +65,12 @@ public class BackTestFileReader {
                         sdf.setTimeZone(tz);
                     }
 
-                    if (line.startsWith("bidAskSpread")) {
-                        bidAskSpread = Double.parseDouble(line.substring(line.indexOf('=') + 1));
-                        if (bidAskSpread <= 0) {
-                            String msg = "\"bidAskSpread\"" + " must be greater than 0." + LINE_SEP;
-                            throw new JBookTraderException(msg);
-                        }
-                    }
                 }
             }
             if (tz == null) {
                 String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
                 throw new JBookTraderException(msg);
             }
-            if (bidAskSpread == 0) {
-                String msg = "Property " + "\"bidAskSpread\"" + " is not defined in the data file." + LINE_SEP;
-                throw new JBookTraderException(msg);
-            }
-
-
         } catch (FileNotFoundException fnfe) {
             throw new JBookTraderException("Could not find file " + fileName);
         } catch (IOException ioe) {
@@ -163,12 +149,15 @@ public class BackTestFileReader {
             }
         }
 
-        int lowBalance = Integer.parseInt(st.nextToken());
-        int highBalance = Integer.parseInt(st.nextToken());
-        double bid = Double.parseDouble(st.nextToken());
-        double ask = bid + bidAskSpread;
+        int open = Integer.parseInt(st.nextToken());
+        int high = Integer.parseInt(st.nextToken());
+        int low = Integer.parseInt(st.nextToken());
+        int close = Integer.parseInt(st.nextToken());
 
-        return new MarketDepth(time, lowBalance, highBalance, bid, ask);
+        double lowPrice = Double.parseDouble(st.nextToken());
+        double highPrice = Double.parseDouble(st.nextToken());
+
+        return new MarketDepth(time, open, high, low, close, highPrice, lowPrice);
     }
 
 

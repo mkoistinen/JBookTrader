@@ -10,17 +10,15 @@ import java.util.*;
  */
 public class MarketBook {
     private final static int INSERT = 0, UPDATE = 1, DELETE = 2;
-    private static final long MAX_SIZE = 3 * 60 * 60 * 12; // approximately 12 hours
-    private static final long QUIET_PERIOD = 100000000; // 100 ms
+    private static final long MAX_SIZE = 60 * 60; // 1 hour
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
-    private long lastUpdateTime;
-    private boolean hasUpdate;
     private BackTestFileWriter backTestFileWriter;
     private String name;
     private TimeZone timeZone;
-    private int lowBalance, highBalance;
+    private int openBalance, highBalance, lowBalance, closeBalance;
+    private double highPrice, lowPrice;
 
     public MarketBook() {
         marketDepths = new LinkedList<MarketDepth>();
@@ -38,7 +36,7 @@ public class MarketBook {
 
     public void save(MarketDepth marketDepth) throws IOException {
         if (backTestFileWriter == null) {
-            backTestFileWriter = new BackTestFileWriter(name, timeZone);
+            backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
         }
         backTestFileWriter.write(marketDepth, true);
     }
@@ -88,6 +86,7 @@ public class MarketBook {
     synchronized public void reset() {
         bids.clear();
         asks.clear();
+        highPrice = lowPrice = openBalance = highBalance = lowBalance = closeBalance = 0;
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
@@ -100,17 +99,12 @@ public class MarketBook {
 
     synchronized public MarketDepth getNewMarketDepth() {
         MarketDepth marketDepth = null;
-        long nanosSinceLastUpdate = System.nanoTime() - lastUpdateTime;
-
-        if (hasUpdate && nanosSinceLastUpdate >= QUIET_PERIOD) {
-            hasUpdate = false;
-            if (!bids.isEmpty() && !asks.isEmpty()) {
-                double bid = bids.getFirst().getPrice();
-                double ask = asks.getFirst().getPrice();
-                marketDepth = new MarketDepth(lowBalance, highBalance, bid, ask);
-                lowBalance = 100;
-                highBalance = -100;
-            }
+        if (lowPrice != 0 && highPrice != 0) {
+            marketDepth = new MarketDepth(openBalance, highBalance, lowBalance, closeBalance, highPrice, lowPrice);
+            // initialize next market depth values
+            openBalance = highBalance = lowBalance = closeBalance;
+            highPrice = asks.getFirst().getPrice();
+            lowPrice = bids.getFirst().getPrice();
         }
 
         return marketDepth;
@@ -135,14 +129,17 @@ public class MarketBook {
         }
 
         if (operation == UPDATE) {
-            lastUpdateTime = System.nanoTime();
-            hasUpdate = true;
             int cumulativeBid = getCumulativeSize(bids);
             int cumulativeAsk = getCumulativeSize(asks);
             double totalDepth = cumulativeBid + cumulativeAsk;
-            int balance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
-            lowBalance = Math.min(balance, lowBalance);
-            highBalance = Math.max(balance, highBalance);
+            closeBalance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
+            highBalance = Math.max(closeBalance, highBalance);
+            lowBalance = Math.min(closeBalance, lowBalance);
+
+            double bestBid = bids.getFirst().getPrice();
+            double bestAsk = asks.getFirst().getPrice();
+            highPrice = (highPrice == 0) ? bestAsk : Math.max(highPrice, bestAsk);
+            lowPrice = (lowPrice == 0) ? bestBid : Math.min(lowPrice, bestBid);
         }
     }
 }

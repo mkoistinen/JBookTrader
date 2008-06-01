@@ -15,19 +15,20 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Scalper extends Strategy {
+public class Scalper5 extends Strategy {
 
     // Technical indicators
-    private final Indicator lowDepthBalanceInd, highDepthBalanceInd;
+    private final Indicator regressedDepthBalanceInd;
 
     // Strategy parameters names
+    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
     private final int entry;
 
 
-    public Scalper(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Scalper5(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
 
         // Specify the contract to trade
@@ -41,12 +42,10 @@ public class Scalper extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
-
         // Create technical indicators
-        lowDepthBalanceInd = new LowDepthBalance(marketBook);
-        highDepthBalanceInd = new HighDepthBalance(marketBook);
-        addIndicator("Low Depth Balance", lowDepthBalanceInd);
-        addIndicator("High Depth Balance", highDepthBalanceInd);
+        regressedDepthBalanceInd = new RegressedDepthBalance(marketBook, getParam(PERIOD));
+        addIndicator("regressedDepthBalance", regressedDepthBalanceInd);
+
     }
 
     /**
@@ -57,7 +56,8 @@ public class Scalper extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 30, 70, 1, 52);
+        addParam(PERIOD, 1, 35, 1, 23);
+        addParam(ENTRY, 20, 45, 1, 34);
     }
 
     /**
@@ -66,11 +66,11 @@ public class Scalper extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double lowDepthBalance = lowDepthBalanceInd.getValue();
-        double highDepthBalance = highDepthBalanceInd.getValue();
-        if (highDepthBalance >= entry && lowDepthBalance > -entry) {
+        double regressedDepthBalance = regressedDepthBalanceInd.getValue();
+
+        if (regressedDepthBalance >= entry) {
             setPosition(1);
-        } else if (lowDepthBalance <= -entry && highDepthBalance < entry) {
+        } else if (regressedDepthBalance <= -entry) {
             setPosition(-1);
         }
     }

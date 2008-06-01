@@ -15,10 +15,10 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Smoother extends Strategy {
+public class Scalper2 extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceRSIInd;
+    private final Indicator balanceEMAInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
@@ -28,7 +28,7 @@ public class Smoother extends Strategy {
     private final int entry;
 
 
-    public Smoother(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Scalper2(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
 
         // Specify the contract to trade
@@ -43,8 +43,8 @@ public class Smoother extends Strategy {
 
         entry = getParam(ENTRY);
         // Create technical indicators
-        balanceRSIInd = new BalanceRSI(marketBook, getParam(PERIOD));
-        addIndicator("BalanceRSI", balanceRSIInd);
+        balanceEMAInd = new EMA(marketBook, getParam(PERIOD));
+        addIndicator("balanceEMA", balanceEMAInd);
 
     }
 
@@ -56,8 +56,9 @@ public class Smoother extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 80, 90, 1, 84);
-        addParam(ENTRY, 35, 45, 1, 40);
+        // optimized for highest P&L
+        addParam(PERIOD, 1, 35, 1, 10);
+        addParam(ENTRY, 20, 45, 1, 26);
     }
 
     /**
@@ -66,11 +67,11 @@ public class Smoother extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double rsi = balanceRSIInd.getValue() - 50;
+        double balanceEMA = balanceEMAInd.getValue();
 
-        if (rsi >= entry) {
+        if (balanceEMA >= entry) {
             setPosition(1);
-        } else if (rsi <= -entry) {
+        } else if (balanceEMA <= -entry) {
             setPosition(-1);
         }
     }

@@ -6,15 +6,15 @@ import com.jbooktrader.platform.marketdepth.*;
 /**
  *
  */
-public class HighDepthBalance extends Indicator {
+public class DepthBalance extends Indicator {
 
-    public HighDepthBalance(MarketBook marketBook) {
+    public DepthBalance(MarketBook marketBook) {
         super(marketBook);
     }
 
     @Override
     public double calculate() {
-        value = marketBook.getLastMarketDepth().getHighBalance();
+        value = marketBook.getLastMarketDepth().getMidBalance();
         return value;
     }
 }
