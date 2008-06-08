@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class MarketBook {
     private final static int INSERT = 0, UPDATE = 1, DELETE = 2;
-    private static final long MAX_SIZE = 60 * 60; // 1 hour
+//    private static final long MAX_SIZE = 60 * 60; // 1 hour
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
