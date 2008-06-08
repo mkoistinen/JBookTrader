@@ -1,7 +1,8 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.*;
-import com.jbooktrader.indicator.*;
+import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
@@ -15,20 +16,13 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Scalper5 extends Strategy {
-
-    // Technical indicators
-    private final Indicator regressedDepthBalanceInd;
+public class IndicatorDemo extends Strategy {
 
     // Strategy parameters names
+    private static final String LOOK_BACK = "LookBack";
     private static final String PERIOD = "Period";
-    private static final String ENTRY = "Entry";
 
-    // Strategy parameters values
-    private final int entry;
-
-
-    public Scalper5(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public IndicatorDemo(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
 
         // Specify the contract to trade
@@ -41,11 +35,17 @@ public class Scalper5 extends Strategy {
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        entry = getParam(ENTRY);
         // Create technical indicators
-        regressedDepthBalanceInd = new RegressedDepthBalance(marketBook, getParam(PERIOD));
-        addIndicator("regressedDepthBalance", regressedDepthBalanceInd);
-
+        Indicator scaledBalanceInd = new BalanceScaled(marketBook, getParam(PERIOD));
+        Indicator displacementInd = new Displacement(scaledBalanceInd, getParam(LOOK_BACK));
+        Indicator balanceVelocityInd = new Velocity(scaledBalanceInd, getParam(LOOK_BACK));
+        Indicator balanceAccelerationInd = new Acceleration(scaledBalanceInd, getParam(LOOK_BACK));
+        Indicator balanceJerkInd = new Jerk(scaledBalanceInd, getParam(LOOK_BACK));
+        addIndicator("ScaledBal", scaledBalanceInd);
+        addIndicator("Displacement", displacementInd);
+        addIndicator("Velocity", balanceVelocityInd);
+        addIndicator("Acceleration", balanceAccelerationInd);
+        addIndicator("Jerk", balanceJerkInd);
     }
 
     /**
@@ -56,8 +56,8 @@ public class Scalper5 extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 1, 35, 1, 23);
-        addParam(ENTRY, 20, 45, 1, 34);
+        addParam(LOOK_BACK, 1, 10, 1, 10);
+        addParam(PERIOD, 200, 500, 1, 600);
     }
 
     /**
@@ -66,12 +66,5 @@ public class Scalper5 extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double regressedDepthBalance = regressedDepthBalanceInd.getValue();
-
-        if (regressedDepthBalance >= entry) {
-            setPosition(1);
-        } else if (regressedDepthBalance <= -entry) {
-            setPosition(-1);
-        }
     }
 }

@@ -274,8 +274,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         add(tradingPanel, BorderLayout.CENTER);
         status = new JLabel(" ");
         status.setForeground(Color.GRAY);
-        Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);
-        status.setFont(font);
         add(status, BorderLayout.SOUTH);
         setPreferredSize(new Dimension(500, 309));
         setTitle(JBookTrader.APP_NAME);

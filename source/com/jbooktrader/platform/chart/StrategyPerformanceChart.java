@@ -272,8 +272,8 @@ public class StrategyPerformanceChart {
 
     private OHLCDataset createIndicatorDataset(ChartableIndicator chartableIndicator) {
 
-        IndicatorHistory indicatorHistory = chartableIndicator.getIndicator().getBarHistory();
-        int size = indicatorHistory.size();
+        IndicatorBarHistory indicatorBarHistory = chartableIndicator.getIndicator().getIndicatorBarHistory();
+        int size = indicatorBarHistory.size();
         Date[] dates = new Date[size];
 
         double[] highs = new double[size];
@@ -283,7 +283,7 @@ public class StrategyPerformanceChart {
         double[] volumes = new double[size];
 
         for (int bar = 0; bar < size; bar++) {
-            IndicatorBar indicatorBar = indicatorHistory.getIndicatorBar(bar);
+            IndicatorBar indicatorBar = indicatorBarHistory.getIndicatorBar(bar);
 
             dates[bar] = new Date(indicatorBar.getTime());
             highs[bar] = indicatorBar.getHigh();

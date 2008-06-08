@@ -242,7 +242,7 @@ public abstract class Strategy {
             try {
                 double value = indicator.calculate();
                 long time = marketBook.getLastMarketDepth().getTime();
-                indicator.getBarHistory().update(time, value);
+                indicator.getIndicatorBarHistory().update(time, value);
             } catch (IndexOutOfBoundsException aie) {
                 hasValidIndicators = false;
                 // This exception will occur if book size is insufficient to calculate

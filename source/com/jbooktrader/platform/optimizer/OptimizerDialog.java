@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class OptimizerDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(700, 550);// minimum frame size
-
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, closeButton, selectFileButton;
     private JTextField fileNameText, minTradesText;
@@ -87,9 +86,7 @@ public class OptimizerDialog extends JDialog {
         getRootPane().setDefaultButton(optimizeButton);
     }
 
-
     private void setOptions() throws JBookTraderException {
-
         String historicalFileName = fileNameText.getText();
 
         File file = new File(historicalFileName);
@@ -206,7 +203,6 @@ public class OptimizerDialog extends JDialog {
 
 
     private void init() {
-
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Strategy Optimizer - " + strategyName);

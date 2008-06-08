@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.*;
-import com.jbooktrader.indicator.*;
+import com.jbooktrader.indicator.balance.*;
 import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
@@ -15,9 +15,10 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Follower extends Strategy {
+public class Scalper extends Strategy {
+
     // Technical indicators
-    private final Indicator depthVelocityInd;
+    private final Indicator balanceEMAInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
@@ -27,22 +28,24 @@ public class Follower extends Strategy {
     private final int entry;
 
 
-    public Follower(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public Scalper(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
+
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
+        int multiplier = 50;// contract multiplier
+
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-        int multiplier = 50;// contract multiplier
+
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        int period = getParam(PERIOD);
         entry = getParam(ENTRY);
-
         // Create technical indicators
-        depthVelocityInd = new DepthVelocity(marketBook, period);
-        addIndicator("DepthVelocity", depthVelocityInd);
+        balanceEMAInd = new BalanceEMA(marketBook, getParam(PERIOD));
+        addIndicator("balanceEMA", balanceEMAInd);
+
     }
 
     /**
@@ -53,8 +56,8 @@ public class Follower extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 1, 10, 1, 5);
-        addParam(ENTRY, 30, 100, 1, 70);
+        addParam(PERIOD, 1, 35, 1, 10);
+        addParam(ENTRY, 20, 45, 1, 26);
     }
 
     /**
@@ -63,10 +66,11 @@ public class Follower extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double depthVelocity = depthVelocityInd.getValue();
-        if (depthVelocity >= entry) {
+        double balanceEMA = balanceEMAInd.getValue();
+
+        if (balanceEMA >= entry) {
             setPosition(1);
-        } else if (depthVelocity <= -entry) {
+        } else if (balanceEMA <= -entry) {
             setPosition(-1);
         }
     }

@@ -11,30 +11,38 @@ public abstract class Indicator {
     protected double value;
     protected final MarketBook marketBook;
     protected final PriceHistory priceHistory;
-    private final IndicatorHistory indicatorHistory;
+    private final IndicatorBarHistory indicatorBarHistory;
+    protected final Indicator parentIndicator;
     private int type;
 
 
     public abstract double calculate();
 
 
-    private Indicator(MarketBook marketBook, PriceHistory priceHistory) {
+    private Indicator(MarketBook marketBook, PriceHistory priceHistory, Indicator parentIndicator) {
         this.marketBook = marketBook;
         this.priceHistory = priceHistory;
-        indicatorHistory = new IndicatorHistory();
+        this.parentIndicator = parentIndicator;
+        indicatorBarHistory = new IndicatorBarHistory();
     }
 
 
     protected Indicator(PriceHistory priceHistory) {
-        this(null, priceHistory);
+        this(null, priceHistory, null);
         type = 1;
     }
 
 
     protected Indicator(MarketBook marketBook) {
-        this(marketBook, null);
+        this(marketBook, null, null);
         type = 0;
     }
+
+    protected Indicator(Indicator parentIndicator) {
+        this(null, null, parentIndicator);
+        type = 1;
+    }
+
 
     @Override
     public String toString() {
@@ -51,7 +59,7 @@ public abstract class Indicator {
         return type;
     }
 
-    public IndicatorHistory getBarHistory() {
-        return indicatorHistory;
+    public IndicatorBarHistory getIndicatorBarHistory() {
+        return indicatorBarHistory;
     }
 }

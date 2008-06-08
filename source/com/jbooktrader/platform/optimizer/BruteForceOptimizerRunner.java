@@ -15,7 +15,6 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
     }
 
     public void optimize() throws JBookTraderException {
-
         LinkedList<StrategyParams> tasks = getTasks(strategyParams);
 
         ArrayList<Strategy> strategies = new ArrayList<Strategy>();

@@ -21,8 +21,8 @@ import java.util.*;
  */
 public abstract class OptimizerRunner implements Runnable {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    protected static final long MAX_HISTORY_PERIOD = 4 * 60 * 60 * 1000L;// 4 hours
-    private static final int MAX_SIZE = 24 * 60;
+    private static final int MAX_PRICE_HISTORY_SIZE = 2 * 60; // 2 hours of 1-minute bars
+    private static final int MAX_BOOK_SIZE = 6 * 60 * 60; // 6 hours of 1-second bars
     private static final long MAX_STRATEGIES = 50000L;
     private static final int MAX_RESULTS = 5000;
     private static final long UPDATE_FREQUENCY = 1000000L;// lines
@@ -77,11 +77,15 @@ public abstract class OptimizerRunner implements Runnable {
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
             priceHistory.update(marketDepth);
-            if (priceHistory.size() > MAX_SIZE) {
+            if (priceHistory.size() > MAX_PRICE_HISTORY_SIZE) {
                 priceHistory.getAll().removeFirst();
             }
 
             marketBook.add(marketDepth);
+            if (marketBook.size() > MAX_BOOK_SIZE) {
+                marketBook.getAll().removeFirst();
+            }
+
             long time = marketDepth.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
 
@@ -192,7 +196,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
 
-    LinkedList<StrategyParams> getTasks(StrategyParams params) throws JBookTraderException {
+    protected LinkedList<StrategyParams> getTasks(StrategyParams params) throws JBookTraderException {
         for (StrategyParam param : params.getAll()) {
             param.setValue(param.getMin());
         }

@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator;
+package com.jbooktrader.indicator.balance;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -6,9 +6,9 @@ import com.jbooktrader.platform.marketdepth.*;
 /**
  *
  */
-public class DepthBalance extends Indicator {
+public class Balance extends Indicator {
 
-    public DepthBalance(MarketBook marketBook) {
+    public Balance(MarketBook marketBook) {
         super(marketBook);
     }
 

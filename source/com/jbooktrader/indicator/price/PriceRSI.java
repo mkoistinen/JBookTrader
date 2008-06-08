@@ -1,33 +1,30 @@
-package com.jbooktrader.indicator;
+package com.jbooktrader.indicator.price;
 
+import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
 
 
 /**
  * Relative Strength Index. Implemented up to this specification:
  * http://en.wikipedia.org/wiki/Relative_strength
  */
-public class BalanceRSI extends Indicator {
+public class PriceRSI extends Indicator {
     private final int periodLength;
 
-    public BalanceRSI(MarketBook marketBook, int periodLength) {
-        super(marketBook);
+    public PriceRSI(PriceHistory priceHistory, int periodLength) {
+        super(priceHistory);
         this.periodLength = periodLength;
     }
 
-
     @Override
     public double calculate() {
-        int lastBar = marketBook.size() - 1;
+        int lastBar = priceHistory.size() - 1;
         int firstBar = lastBar - periodLength + 1;
 
         double gains = 0, losses = 0;
 
         for (int bar = firstBar + 1; bar <= lastBar; bar++) {
-            double now = marketBook.getMarketDepth(bar).getMidBalance();
-            double then = marketBook.getMarketDepth(bar - 1).getMidBalance();
-            double change = now - then;
+            double change = priceHistory.getPriceBar(bar).getClose() - priceHistory.getPriceBar(bar - 1).getClose();
             gains += Math.max(0, change);
             losses += Math.max(0, -change);
         }

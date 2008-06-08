@@ -8,12 +8,12 @@ import java.util.*;
 /**
  * Holds and validates the priceBar history for a strategy.
  */
-public class IndicatorHistory {
-    private static final int MAX_SIZE = 24 * 60;
+public class IndicatorBarHistory {
+    private static final int MAX_SIZE = 2 * 60; // 2 hours of 1-minute bars
     private final LinkedList<IndicatorBar> indicatorBars;
     private IndicatorBar indicatorBar;
 
-    public IndicatorHistory() {
+    public IndicatorBarHistory() {
         indicatorBars = new LinkedList<IndicatorBar>();
     }
 
@@ -59,11 +59,8 @@ public class IndicatorHistory {
         return indicatorBars.size();
     }
 
-    public IndicatorBar getLastPriceBar() {
+    public IndicatorBar getLastIndicatorBar() {
         return indicatorBars.getLast();
     }
 
-    public IndicatorBar getFirstPriceBar() {
-        return indicatorBars.getFirst();
-    }
 }

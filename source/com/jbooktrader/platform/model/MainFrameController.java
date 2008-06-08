@@ -28,18 +28,19 @@ public class MainFrameController {
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
         Dispatcher.addListener(mainViewDialog);
-        int lastWidth = prefs.getInt(MainWindowWidth);
-        int lastHeight = prefs.getInt(MainWindowHeight);
-        int lastX = prefs.getInt(MainWindowX);
-        int lastY = prefs.getInt(MainWindowY);
+        int width = prefs.getInt(MainWindowWidth);
+        int height = prefs.getInt(MainWindowHeight);
+        int x = prefs.getInt(MainWindowX);
+        int y = prefs.getInt(MainWindowY);
 
-        if (lastHeight > 0 && lastWidth > 0) {
-            mainViewDialog.setBounds(lastX, lastY, lastWidth, lastHeight);
+        if (width > 0 && height > 0) {
+            mainViewDialog.setBounds(x, y, width, height);
         }
 
         tradingTable = mainViewDialog.getTradingTable();
         tradingTableModel = mainViewDialog.getTradingTableModel();
         assignListeners();
+        new HeartBeatSender();
     }
 
     private void exit() {

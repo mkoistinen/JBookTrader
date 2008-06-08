@@ -66,9 +66,6 @@ public class MarketBook {
 
     synchronized public void add(MarketDepth marketDepth) {
         marketDepths.add(marketDepth);
-        if (marketDepths.size() > MAX_SIZE) {
-            marketDepths.removeFirst();
-        }
     }
 
     synchronized public MarketDepth getMarketDepth(int index) {

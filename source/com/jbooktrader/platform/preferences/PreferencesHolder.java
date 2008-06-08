@@ -6,7 +6,6 @@ public class PreferencesHolder {
     private static PreferencesHolder instance;
     private final Preferences prefs;
 
-
     public static synchronized PreferencesHolder getInstance() {
         if (instance == null) {
             instance = new PreferencesHolder();

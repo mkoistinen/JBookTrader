@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator;
+package com.jbooktrader.indicator.balance;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -6,10 +6,10 @@ import com.jbooktrader.platform.marketdepth.*;
 /**
  * Regressed depth balance
  */
-public class RegressedDepthBalance extends Indicator {
+public class BalanceSlope extends Indicator {
     private final int period;
 
-    public RegressedDepthBalance(MarketBook marketBook, int period) {
+    public BalanceSlope(MarketBook marketBook, int period) {
         super(marketBook);
         this.period = period;
     }
@@ -28,9 +28,7 @@ public class RegressedDepthBalance extends Indicator {
         }
 
         double denom = period * sumXX - sumX * sumX;
-        double intercept = (sumXX * sumY - sumX * sumXY) / denom;
-        double slope = (period * sumXY - sumX * sumY) / denom;
-        value = intercept + slope * period;
+        value = period * (period * sumXY - sumX * sumY) / denom;
         return value;
 
     }

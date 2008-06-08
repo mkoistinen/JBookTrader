@@ -49,7 +49,6 @@ public class TradingTableModel extends TableDataModel {
         return false;
     }
 
-
     @Override
     public Class<?> getColumnClass(int col) {
         Column column = Column.values()[col];
@@ -71,7 +70,6 @@ public class TradingTableModel extends TableDataModel {
         fireTableRowsUpdated(row, row);
         return strategy;
     }
-
 
     private int getRow(Strategy strategy) {
         int row = -1;

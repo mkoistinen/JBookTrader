@@ -67,7 +67,8 @@ public class SecureMailSender {
         props.put("mail.smtps.host", "smtp.gmail.com");
         props.put("mail.smtps.auth", "true");
 
-        user = recipient = prefs.get(EmailAddress);
+        user = prefs.get(From);
+        recipient = prefs.get(To);
         password = prefs.get(EmailPassword);
         subject = prefs.get(EmailSubject);
     }

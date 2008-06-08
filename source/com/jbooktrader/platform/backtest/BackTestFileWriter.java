@@ -108,8 +108,8 @@ public final class BackTestFileWriter {
         header.append("# 4. highBalance is the period's highest book balance").append(LINE_SEP);
         header.append("# 5. lowBalance is the period's lowest book balance").append(LINE_SEP);
         header.append("# 6. closeBalance is the period's close book balance").append(LINE_SEP);
-        header.append("# 7. lowPrice is the period's lowest bid price").append(LINE_SEP);
-        header.append("# 8. highPrice is the period's highest ask price").append(LINE_SEP);
+        header.append("# 7. lowPrice is the period's lowest price").append(LINE_SEP);
+        header.append("# 8. highPrice is the period's highest price").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

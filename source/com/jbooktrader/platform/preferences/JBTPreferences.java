@@ -12,8 +12,10 @@ public enum JBTPreferences {
     ReportRecycling("Report recycling", "Append"),
     // Remote monitoring
     EmailMonitoring("Monitoring", "disabled"),
-    EmailAddress("Email Address", "@gmail.com"),
+    HeartBeatInterval("Heartbeat Interval", "30"),
+    From("From", "@gmail.com"),
     EmailPassword("Password", ""),
+    To("To", "@anyprovider.com"),
     EmailSubject("Email Subject", "[JBT Remote Notification]"),
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),

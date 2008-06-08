@@ -16,7 +16,6 @@ public class MarketTimeLine {
 
     public MarketTimeLine(PriceHistory priceHistory) {
         this.priceHistory = priceHistory;
-
     }
 
     public SegmentedTimeline getNormalHours() {

@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator;
+package com.jbooktrader.indicator.balance;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -6,18 +6,22 @@ import com.jbooktrader.platform.marketdepth.*;
 /**
  * Exponential moving average of market depth balance.
  */
-public class EMA extends Indicator {
+public class BalanceScaled extends Indicator {
     private final double multiplier;
+    private final int length;
+    private double ema;
 
-    public EMA(MarketBook marketBook, int length) {
+    public BalanceScaled(MarketBook marketBook, int length) {
         super(marketBook);
+        this.length = length;
         multiplier = 2. / (length + 1.);
     }
 
     @Override
     public double calculate() {
         int balance = marketBook.getLastMarketDepth().getMidBalance();
-        value += (balance - value) * multiplier;
+        ema += (balance - ema) * multiplier;
+        value = ema * Math.sqrt(Math.sqrt(length));
 
         return value;
     }

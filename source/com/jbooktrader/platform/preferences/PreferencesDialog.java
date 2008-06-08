@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.preferences;
 
+import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
@@ -10,7 +11,7 @@ import java.awt.event.*;
 
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
-    private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, emailAddressText, emailSubjectText;
+    private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText;
     private JPasswordField emailPasswordField;
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
     private final PreferencesHolder prefs;
@@ -47,7 +48,6 @@ public class PreferencesDialog extends JDialog {
 
 
     private void init() {
-
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Preferences");
 
@@ -92,18 +92,31 @@ public class PreferencesDialog extends JDialog {
         JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
         emailMonitoringCombo = new JComboBox(new String[]{"disabled", "enabled"});
-        emailAddressText = new JTextField();
+        fromText = new JTextField();
         emailPasswordField = new JPasswordField();
+        toText = new JTextField();
         emailSubjectText = new JTextField();
+        heartBeatIntervalText = new JTextField();
         add(remoteMonitoringTab, EmailMonitoring, emailMonitoringCombo);
-        add(remoteMonitoringTab, EmailAddress, emailAddressText);
+        add(remoteMonitoringTab, From, fromText);
         add(remoteMonitoringTab, EmailPassword, emailPasswordField);
+        add(remoteMonitoringTab, To, toText);
         add(remoteMonitoringTab, EmailSubject, emailSubjectText);
-        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 4, 2, 12, 12, 8, 5);
+        add(remoteMonitoringTab, HeartBeatInterval, heartBeatIntervalText);
+        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 6, 2, 12, 12, 8, 5);
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    try {
+                        int minutes = Integer.parseInt(heartBeatIntervalText.getText());
+                        if (minutes < 1) {
+                            throw new JBookTraderException(HeartBeatInterval.getName() + " must be a positive number number.");
+                        }
+                    } catch (NumberFormatException nfe) {
+                        throw new JBookTraderException(HeartBeatInterval.getName() + " must be a number.");
+                    }
+
                     prefs.set(Host, hostText.getText());
                     prefs.set(Port, portText.getText());
                     prefs.set(ClientID, clientIDText.getText());
@@ -112,9 +125,11 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(ReportRenderer, reportRendererText.getText());
                     prefs.set(ReportRecycling, (String) reportRecyclingCombo.getSelectedItem());
                     prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
-                    prefs.set(EmailAddress, emailAddressText.getText());
+                    prefs.set(From, fromText.getText());
                     prefs.set(EmailPassword, new String(emailPasswordField.getPassword()));
+                    prefs.set(To, toText.getText());
                     prefs.set(EmailSubject, emailSubjectText.getText());
+                    prefs.set(HeartBeatInterval, heartBeatIntervalText.getText());
                     String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
                     MessageDialog.showMessage(PreferencesDialog.this, msg);
                     dispose();
@@ -131,7 +146,7 @@ public class PreferencesDialog extends JDialog {
         });
 
 
-        setPreferredSize(new Dimension(500, 250));
+        setPreferredSize(new Dimension(500, 280));
 
     }
 }

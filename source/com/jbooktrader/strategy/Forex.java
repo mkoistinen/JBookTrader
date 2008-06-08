@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.*;
-import com.jbooktrader.indicator.*;
+import com.jbooktrader.indicator.balance.*;
 import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
@@ -40,7 +40,7 @@ public class Forex extends Strategy {
         entry = getParam(ENTRY);
 
         // Create technical indicators
-        depthBalanceInd = new DepthBalance(marketBook);
+        depthBalanceInd = new Balance(marketBook);
         addIndicator("Depth Balance", depthBalanceInd);
     }
 

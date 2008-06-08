@@ -1,15 +1,15 @@
-package com.jbooktrader.indicator;
+package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Slope of the bar close prices
+ * BalanceSlope of the bar close prices
  */
-public class Trend extends Indicator {
+public class PriceTrend extends Indicator {
     private final int period;
 
-    public Trend(PriceHistory priceHistory, int period) {
+    public PriceTrend(PriceHistory priceHistory, int period) {
         super(priceHistory);
         this.period = period;
     }
