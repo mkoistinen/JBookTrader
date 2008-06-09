@@ -279,6 +279,9 @@ public abstract class Strategy {
     }
 
     public void report(String message) {
+        if(strategyReport==null)
+        	return;
+
         strategyReportColumns.clear();
         strategyReportColumns.add(message);
         strategyReport.report(strategyReportColumns, df.format(getTime()));
