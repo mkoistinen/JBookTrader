@@ -73,7 +73,6 @@ public final class BackTestFileWriter {
         writer.close();
     }
 
-
     public void writeHeader() {
         StringBuilder header = getHeader();
         writer.println(header);
@@ -114,6 +113,4 @@ public final class BackTestFileWriter {
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;
     }
-
-
 }

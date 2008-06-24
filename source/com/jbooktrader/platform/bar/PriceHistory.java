@@ -24,10 +24,7 @@ public class PriceHistory {
         double midPrice = marketDepth.getMidPrice();
         double highPrice = marketDepth.getHighPrice();
         double lowPrice = marketDepth.getLowPrice();
-
-
         long time = marketDepth.getTime();
-
 
         long frequency = 60 * 1000;
         // Integer division gives us the number of whole periods

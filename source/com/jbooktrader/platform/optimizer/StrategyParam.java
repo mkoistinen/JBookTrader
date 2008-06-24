@@ -68,6 +68,4 @@ public class StrategyParam {
     public void setMax(int max) {
         this.max = max;
     }
-
-
 }

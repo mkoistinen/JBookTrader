@@ -10,9 +10,8 @@ import java.util.*;
  */
 public class MarketBook {
     private final static int INSERT = 0, UPDATE = 1, DELETE = 2;
-//    private static final long MAX_SIZE = 60 * 60; // 1 hour
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final LinkedList<MarketDepth> marketDepths;
+    private final List<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
     private BackTestFileWriter backTestFileWriter;
     private String name;
@@ -21,7 +20,7 @@ public class MarketBook {
     private double highPrice, lowPrice;
 
     public MarketBook() {
-        marketDepths = new LinkedList<MarketDepth>();
+        marketDepths = new ArrayList<MarketDepth>();
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
     }
@@ -42,7 +41,7 @@ public class MarketBook {
     }
 
 
-    public LinkedList<MarketDepth> getAll() {
+    public List<MarketDepth> getAll() {
         return marketDepths;
     }
 
@@ -72,12 +71,8 @@ public class MarketBook {
         return marketDepths.get(index);
     }
 
-    synchronized public MarketDepth getFirstMarketDepth() {
-        return marketDepths.getFirst();
-    }
-
     public MarketDepth getLastMarketDepth() {
-        return marketDepths.getLast();
+        return marketDepths.get(marketDepths.size() - 1);
     }
 
     synchronized public void reset() {

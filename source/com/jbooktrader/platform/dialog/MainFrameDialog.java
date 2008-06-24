@@ -21,7 +21,6 @@ import java.net.*;
 public class MainFrameDialog extends JFrame implements ModelListener {
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
-    private JLabel status;
     private TradingTableModel tradingTableModel;
     private JTable tradingTable;
     private JPopupMenu popupMenu;
@@ -32,8 +31,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         toolkit = Toolkit.getDefaultToolkit();
         init();
         populateStrategies();
-        pack();
-        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -199,17 +196,12 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic('H');
-
-
         discussionMenuItem = new JMenuItem("Discussion Group");
         discussionMenuItem.setMnemonic('D');
-
         projectHomeMenuItem = new JMenuItem("Project Home");
         projectHomeMenuItem.setMnemonic('P');
-
         aboutMenuItem = new JMenuItem("About...");
         aboutMenuItem.setMnemonic('A');
-
         helpMenu.add(discussionMenuItem);
         helpMenu.add(projectHomeMenuItem);
         helpMenu.addSeparator();
@@ -220,7 +212,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         menuBar.add(sessionMenu);
         menuBar.add(configureMenu);
         menuBar.add(helpMenu);
-
         setJMenuBar(menuBar);
 
         // popup menu
@@ -245,10 +236,11 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         popupMenu.addSeparator();
         popupMenu.add(tradeMenuItem);
 
-        JScrollPane tradingScroll = new JScrollPane();
-        tradingScroll.setAutoscrolls(true);
-        JPanel tradingPanel = new JPanel(new BorderLayout());
-        tradingPanel.add(tradingScroll, BorderLayout.CENTER);
+        JScrollPane tradingTableScrollPane = new JScrollPane();
+        tradingTableScrollPane.setAutoscrolls(true);
+        JPanel tradingPanel = new JPanel(new SpringLayout());
+        tradingPanel.add(tradingTableScrollPane, BorderLayout.CENTER);
+        SpringUtilities.makeOneLineGrid(tradingPanel);
 
         tradingTableModel = new TradingTableModel();
         tradingTable = new JTable(tradingTableModel);
@@ -266,17 +258,18 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
 
-        tradingScroll.getViewport().add(tradingTable);
+        tradingTableScrollPane.getViewport().add(tradingTable);
 
         Image appIcon = Toolkit.getDefaultToolkit().getImage(getImageURL("JBookTrader.png"));
         setIconImage(appIcon);
 
         add(tradingPanel, BorderLayout.CENTER);
-        status = new JLabel(" ");
+        JLabel status = new JLabel(" ");
         status.setForeground(Color.GRAY);
         add(status, BorderLayout.SOUTH);
         setPreferredSize(new Dimension(500, 309));
         setTitle(JBookTrader.APP_NAME);
         pack();
+        setLocationRelativeTo(null);
     }
 }

@@ -21,9 +21,8 @@ public class CMEDataConverter {
     private final BufferedReader reader;
     private final SimpleDateFormat cmeDateFormat;
     private final String contract;
-    private long time;
-    private long lineNumber;
     private final Calendar instant;
+    private long time, lineNumber;
     private int openBalance, highBalance, lowBalance, closeBalance;
     private double highPrice, lowPrice;
 

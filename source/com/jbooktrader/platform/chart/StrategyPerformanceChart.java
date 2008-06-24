@@ -198,11 +198,11 @@ public class StrategyPerformanceChart {
 
         RefineryUtilities.centerFrameOnScreen(chartFrame);
 
-        int chartWidth = prefs.getInt(ChartWidth);
-        int chartHeight = prefs.getInt(ChartHeight);
-        int chartX = prefs.getInt(ChartX);
-        int chartY = prefs.getInt(ChartY);
-        int chartState = prefs.getInt(ChartState);
+        int chartWidth = prefs.getInt(PerformanceChartWidth);
+        int chartHeight = prefs.getInt(PerformanceChartHeight);
+        int chartX = prefs.getInt(PerformanceChartX);
+        int chartY = prefs.getInt(PerformanceChartY);
+        int chartState = prefs.getInt(PerformanceChartState);
 
         if (chartX >= 0 && chartY >= 0 && chartHeight > 0 && chartWidth > 0) {
             chartFrame.setBounds(chartX, chartY, chartWidth, chartHeight);
@@ -215,11 +215,11 @@ public class StrategyPerformanceChart {
         chartFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                prefs.set(ChartWidth, chartFrame.getWidth());
-                prefs.set(ChartHeight, chartFrame.getHeight());
-                prefs.set(ChartX, chartFrame.getX());
-                prefs.set(ChartY, chartFrame.getY());
-                prefs.set(ChartState, chartFrame.getExtendedState());
+                prefs.set(PerformanceChartWidth, chartFrame.getWidth());
+                prefs.set(PerformanceChartHeight, chartFrame.getHeight());
+                prefs.set(PerformanceChartX, chartFrame.getX());
+                prefs.set(PerformanceChartY, chartFrame.getY());
+                prefs.set(PerformanceChartState, chartFrame.getExtendedState());
                 chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             }
         });
@@ -377,8 +377,6 @@ public class StrategyPerformanceChart {
         pnlPlot = new FastXYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);
         pnlPlot.setBackgroundPaint(BACKGROUND_COLOR);
         combinedPlot.add(pnlPlot);
-
-
         combinedPlot.setDomainAxis(dateAxis);
 
         // Finally, create the chart

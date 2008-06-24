@@ -21,7 +21,7 @@ public class BalanceScaled extends Indicator {
     public double calculate() {
         int balance = marketBook.getLastMarketDepth().getMidBalance();
         ema += (balance - ema) * multiplier;
-        value = ema * Math.sqrt(Math.sqrt(length));
+        value = ema * Math.sqrt(length);
 
         return value;
     }

@@ -31,7 +31,6 @@ public class BackTestFileReader {
         cancelled = true;
     }
 
-
     public BackTestFileReader(String fileName) throws JBookTraderException {
         this.fileName = fileName;
         Report report = Dispatcher.getReporter();
@@ -159,6 +158,4 @@ public class BackTestFileReader {
 
         return new MarketDepth(time, open, high, low, close, highPrice, lowPrice);
     }
-
-
 }

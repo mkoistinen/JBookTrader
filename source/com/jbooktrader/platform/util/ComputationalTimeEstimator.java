@@ -9,8 +9,8 @@ import java.util.*;
 public class ComputationalTimeEstimator {
     private final static long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
     private final long startTime;
-    private long totalIterations;
     private final SimpleDateFormat sdf;
+    private long totalIterations;
 
     public ComputationalTimeEstimator(long startTime, long totalIterations) {
         this.startTime = startTime;

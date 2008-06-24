@@ -97,9 +97,19 @@ public class SpringUtilities {
         return layout.getConstraints(c);
     }
 
-    public static void makeOneLineGrid(Container parent, int cols) {
-        makeCompactGrid(parent, 1, cols, 6, 0, 7, 6);
+    //public static void makeOneLineGrid(Container parent, int cols) {
+      //  makeCompactGrid(parent, 1, cols, 6, 0, 7, 6);
+    //}
+
+    public static void makeOneLineGrid(Container parent) {
+        makeCompactGrid(parent, 1, parent.getComponentCount(), 7, 0, 7, 7);
     }
+
+    public static void makeTopOneLineGrid(Container parent) {
+        makeCompactGrid(parent, 1, parent.getComponentCount(), 7, 7, 7, 7);
+    }
+
+
 
     /**
      * Aligns the first <code>rows</code> * <code>cols</code>
