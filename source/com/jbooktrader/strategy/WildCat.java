@@ -2,7 +2,6 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
@@ -16,21 +15,22 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class ReversalPicker extends Strategy {
+public class WildCat extends Strategy {
 
     // Technical indicators
-    private final Indicator scaledBalanceInd, balanceAccelerationInd;
+    private final Indicator balanceMACDInd;
 
     // Strategy parameters names
-    private static final String LOOK_BACK = "LookBack";
-    private static final String PERIOD = "Period";
+    private static final String PERIOD1 = "Period1";
+    private static final String PERIOD2 = "Period2";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, exit;
 
 
-    public ReversalPicker(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
+    public WildCat(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
         super(optimizationParams, marketBook, priceHistory);
 
         // Specify the contract to trade
@@ -44,12 +44,11 @@ public class ReversalPicker extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
+        exit = getParam(EXIT);
+        balanceMACDInd = new BalanceMACD(marketBook, getParam(PERIOD1), getParam(PERIOD2));
+        addIndicator("balanceMACD", balanceMACDInd);
 
-        // Create technical indicators
-        scaledBalanceInd = new BalanceEMA(marketBook, getParam(PERIOD));
-        balanceAccelerationInd = new Displacement(scaledBalanceInd, getParam(LOOK_BACK));
-        addIndicator("BalanceScaled", scaledBalanceInd);
-        addIndicator("Acceleration", balanceAccelerationInd);
+
     }
 
     /**
@@ -60,9 +59,11 @@ public class ReversalPicker extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(LOOK_BACK, 20, 40, 1, 28);
-        addParam(PERIOD, 180, 300, 1, 230);
-        addParam(ENTRY, 10, 20, 1, 12);
+        addParam(PERIOD1, 100, 200, 10, 145);
+        addParam(PERIOD2, 400, 600, 10, 525);
+        addParam(ENTRY, 5, 30, 1, 14);
+        addParam(EXIT, 1, 20, 1, 8);
+
     }
 
     /**
@@ -71,13 +72,19 @@ public class ReversalPicker extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double balanceEMA = scaledBalanceInd.getValue();
-        double balanceAcceleration = balanceAccelerationInd.getValue();
-
-        if (balanceEMA >= entry && balanceAcceleration < 0) {
+        double balanceMACD = balanceMACDInd.getValue();
+        if (balanceMACD >= entry) {
             setPosition(1);
-        } else if (balanceEMA <= -entry && balanceAcceleration > 0) {
+        } else if (balanceMACD <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && balanceMACD <= -exit) {
+                setPosition(0);
+            }
+            if (currentPosition < 0 && balanceMACD >= exit) {
+                setPosition(0);
+            }
         }
     }
 }
