@@ -19,7 +19,8 @@ public class PerformanceManager {
     private double tradeCommission, totalCommission;
     private double averageProfitPerTrade, percentProfitableTrades, positionValue;
     private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
-    private double profitFactor, peakNetProfit, maxDrawdown, trueKelly;
+    private double profitFactor, peakNetProfit, maxDrawdown;
+    private double sumTradeProfit, sumTradeProfitSquared, riskAdjustedProfitPerTrade;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
@@ -69,8 +70,29 @@ public class PerformanceManager {
     }
 
     public double getTrueKelly() {
+        // "True Kelly" is Kelly Criterion adjusted for the number of trades
+        double trueKelly = 0;
+        if (profitableTrades > 0 && unprofitableTrades > 0) {
+            double aveProfit = grossProfit / profitableTrades;
+            double aveLoss = grossLoss / unprofitableTrades;
+            double winLossRatio = aveProfit / aveLoss;
+            double probabilityOfWin = (double) profitableTrades / trades;
+            double probabilityOfLoss = 1 - probabilityOfWin;
+            double kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
+            double power = -6 + trades / 120.;
+            double sigmoidFunction = 1. / (1. + Math.exp(-power));
+            trueKelly = kellyCriterion * sigmoidFunction * 100;
+        }
+
         return trueKelly;
     }
+
+    public double getPerformanceIndex() {
+        double stdev = (trades - 1) * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit;
+        stdev = Math.sqrt(stdev) / (trades - 1);
+        return averageProfitPerTrade / stdev;
+    }
+
 
     public void update(double price, int position) {
         positionValue = position * price * multiplier;
@@ -99,9 +121,15 @@ public class PerformanceManager {
         update(avgFillPrice, position);
 
         tradeProfit = netProfit - netProfitAsOfPreviousTrade;
+        if (trades > 1) {
+            sumTradeProfit += tradeProfit;
+            sumTradeProfitSquared += (tradeProfit * tradeProfit);
+        }
+
         netProfitAsOfPreviousTrade = netProfit;
         averageProfitPerTrade = netProfit / trades;
 
+        // todo: dont count the trade if previous position is 0
         if (tradeProfit >= 0) {
             profitableTrades++;
             grossProfit += tradeProfit;
@@ -112,20 +140,6 @@ public class PerformanceManager {
 
         percentProfitableTrades = 100 * (profitableTrades / (double) trades);
         profitFactor = grossProfit / grossLoss;
-
-        // Calculate "True Kelly", which is Kelly Criterion adjusted
-        // for the number of trades
-        if (profitableTrades > 0 && unprofitableTrades > 0) {
-            double aveProfit = grossProfit / profitableTrades;
-            double aveLoss = grossLoss / unprofitableTrades;
-            double winLossRatio = aveProfit / aveLoss;
-            double probabilityOfWin = (double) profitableTrades / trades;
-            double probabilityOfLoss = 1 - probabilityOfWin;
-            double kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
-            double power = -6 + trades / 120.;
-            double sigmoidFunction = 1. / (1. + Math.exp(-power));
-            trueKelly = kellyCriterion * sigmoidFunction * 100;
-        }
 
         if ((Dispatcher.getMode() != Optimization)) {
             long time = strategy.getTime();

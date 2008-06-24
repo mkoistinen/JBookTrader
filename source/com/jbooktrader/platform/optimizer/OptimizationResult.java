@@ -5,18 +5,19 @@ import com.jbooktrader.platform.performance.*;
 /**
  * Optimization result.
  */
-public class Result {
-    private final double netProfit, maxDrawdown, profitFactor, trueKelly;
+public class OptimizationResult {
+    private final double netProfit, maxDrawdown, profitFactor, performanceIndex, trueKelly;
     private final int trades;
     private final StrategyParams params;
 
-    public Result(StrategyParams params, PerformanceManager performanceManager) {
+    public OptimizationResult(StrategyParams params, PerformanceManager performanceManager) {
         this.params = params;
         this.netProfit = performanceManager.getNetProfit();
         this.maxDrawdown = performanceManager.getMaxDrawdown();
         this.trades = performanceManager.getTrades();
         this.profitFactor = performanceManager.getProfitFactor();
         this.trueKelly = performanceManager.getTrueKelly();
+        this.performanceIndex = performanceManager.getPerformanceIndex();
     }
 
     public StrategyParams getParams() {
@@ -38,6 +39,11 @@ public class Result {
     public double getProfitFactor() {
         return profitFactor;
     }
+
+    public double getPerformanceIndex() {
+        return performanceIndex;
+    }
+
 
     public double getTrueKelly() {
         return trueKelly;

@@ -3,19 +3,19 @@ package com.jbooktrader.platform.optimizer;
 import java.util.*;
 
 /**
- * Comparator for strategy optimization results.
+ * Comparator for strategy optimization optimizationResults.
  */
-public class ResultComparator implements Comparator<Result> {
-    private final ResultsTableModel.Column sortColumn;
+public class ResultComparator implements Comparator<OptimizationResult> {
+    private final PerformanceMetric sortPerformanceMetric;
 
-    public ResultComparator(ResultsTableModel.Column sortColumn) {
-        this.sortColumn = sortColumn;
+    public ResultComparator(PerformanceMetric sortPerformanceMetric) {
+        this.sortPerformanceMetric = sortPerformanceMetric;
     }
 
-    public int compare(Result r1, Result r2) {
+    public int compare(OptimizationResult r1, OptimizationResult r2) {
         int res = 0;
 
-        switch (sortColumn) {
+        switch (sortPerformanceMetric) {
             case PL:
                 // highest to lowest
                 res = ((Double) r2.getNetProfit()).compareTo(r1.getNetProfit());
@@ -35,6 +35,10 @@ public class ResultComparator implements Comparator<Result> {
             case TrueKelly:
                 // highest to lowest
                 res = ((Double) r2.getTrueKelly()).compareTo(r1.getTrueKelly());
+                break;
+            case PI:
+                // highest to lowest
+                res = ((Double) r2.getPerformanceIndex()).compareTo(r1.getPerformanceIndex());
                 break;
         }
 

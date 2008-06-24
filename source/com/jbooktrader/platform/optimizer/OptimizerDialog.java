@@ -1,7 +1,8 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.optimizer.ResultsTableModel.Column.*;
+import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
@@ -19,9 +20,9 @@ import java.util.List;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JDialog {
-    private static final Dimension MIN_SIZE = new Dimension(700, 550);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
     private JPanel progressPanel;
-    private JButton cancelButton, optimizeButton, closeButton, selectFileButton;
+    private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
     private JTextField fileNameText, minTradesText;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
@@ -35,6 +36,7 @@ public class OptimizerDialog extends JDialog {
     private Strategy strategy;
     private final PreferencesHolder prefs;
     private final String strategyName;
+    private List<OptimizationResult> optimizationResults;
 
 
     private OptimizerRunner optimizerRunner;
@@ -83,7 +85,7 @@ public class OptimizerDialog extends JDialog {
         progressPanel.setVisible(false);
         optimizeButton.setEnabled(true);
         cancelButton.setEnabled(false);
-        getRootPane().setDefaultButton(optimizeButton);
+        getRootPane().setDefaultButton(optimizationMapButton);
     }
 
     private void setOptions() throws JBookTraderException {
@@ -146,6 +148,25 @@ public class OptimizerDialog extends JDialog {
                 }
             }
         });
+
+        optimizationMapButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (optimizationResults == null || optimizationResults.isEmpty()) {
+                        MessageDialog.showMessage(OptimizerDialog.this, "No optimization optimizationResults to map.");
+                        return;
+                    }
+
+                    OptimizationMap optimizationMap = new OptimizationMap(OptimizerDialog.this, strategy,
+                            optimizationResults, getSortCriteria());
+                    JDialog chartFrame = optimizationMap.getChartFrame();
+                    chartFrame.setVisible(true);
+                } catch (Exception ex) {
+                    MessageDialog.showError(OptimizerDialog.this, ex.getMessage());
+                }
+            }
+        });
+
 
         optimizationMethodCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -228,6 +249,7 @@ public class OptimizerDialog extends JDialog {
 
         SpringUtilities.makeCompactGrid(strategyPanel, 1, 3, 0, 0, 5, 5);
 
+
         // strategy parametrs panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
 
@@ -264,7 +286,7 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{"Highest profit factor", "Highest P&L", "Lowest max DD", "Highest True Kelly"};
+        String[] sortFactors = new String[]{PF.getName(), PL.getName(), TrueKelly.getName(), PI.getName()};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -292,7 +314,7 @@ public class OptimizerDialog extends JDialog {
         SpringUtilities.makeCompactGrid(northPanel, 5, 1, 12, 5, 12, 5);
 
         JScrollPane resultsScrollPane = new JScrollPane();
-        centerPanel.add(new TitledSeparator(new JLabel("Optimization results")));
+        centerPanel.add(new TitledSeparator(new JLabel("Optimization optimizationResults")));
         centerPanel.add(resultsScrollPane);
         SpringUtilities.makeCompactGrid(centerPanel, 2, 1, 12, 5, 12, 5);
 
@@ -302,19 +324,25 @@ public class OptimizerDialog extends JDialog {
         progressLabel = new JLabel();
         progressLabel.setForeground(Color.BLACK);
         progressBar = new JProgressBar();
-        progressBar.setEnabled(false);
         progressBar.setStringPainted(true);
 
         optimizeButton = new JButton("Optimize");
         optimizeButton.setMnemonic('O');
+
+        optimizationMapButton = new JButton("Optimization Map");
+        optimizationMapButton.setMnemonic('M');
+
+
         cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic('C');
         cancelButton.setEnabled(false);
+
         closeButton = new JButton("Close");
         closeButton.setMnemonic('S');
 
         JPanel buttonsPanel = new JPanel();
         buttonsPanel.add(optimizeButton);
+        buttonsPanel.add(optimizationMapButton);
         buttonsPanel.add(cancelButton);
         buttonsPanel.add(closeButton);
 
@@ -348,12 +376,12 @@ public class OptimizerDialog extends JDialog {
             resultsTable.setModel(resultsTableModel);
 
             // set custom column renderers
+            NumberRenderer nr2 = new NumberRenderer(2);
             int params = strategy.getParams().size();
             TableColumnModel resultsColumnModel = resultsTable.getColumnModel();
-            for (ResultsTableModel.Column column : ResultsTableModel.Column.values()) {
-                int columnIndex = column.ordinal() + params;
-                TableCellRenderer renderer = column.getRenderer();
-                resultsColumnModel.getColumn(columnIndex).setCellRenderer(renderer);
+            for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
+                int columnIndex = performanceMetric.ordinal() + params;
+                resultsColumnModel.getColumn(columnIndex).setCellRenderer(nr2);
             }
         } catch (Exception e) {
             Dispatcher.getReporter().report(e);
@@ -361,8 +389,9 @@ public class OptimizerDialog extends JDialog {
         }
     }
 
-    public void setResults(List<Result> results) {
-        resultsTableModel.setResults(results);
+    public void setResults(List<OptimizationResult> optimizationResults) {
+        this.optimizationResults = optimizationResults;
+        resultsTableModel.setResults(optimizationResults);
     }
 
 
@@ -375,25 +404,8 @@ public class OptimizerDialog extends JDialog {
     }
 
 
-    public ResultsTableModel.Column getSortCriteria() {
-        ResultsTableModel.Column sortCriteria = PF;
-        int selectedIndex = selectionCriteriaCombo.getSelectedIndex();
-        switch (selectedIndex) {
-            case 0:
-                sortCriteria = PF;
-                break;
-            case 1:
-                sortCriteria = PL;
-                break;
-            case 2:
-                sortCriteria = MaxDD;
-                break;
-            case 3:
-                sortCriteria = TrueKelly;
-                break;
-
-        }
-
-        return sortCriteria;
+    public PerformanceMetric getSortCriteria() {
+        String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
+        return PerformanceMetric.getColumn(selectedItem);
     }
 }

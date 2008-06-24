@@ -21,34 +21,34 @@ import java.util.*;
  */
 public abstract class OptimizerRunner implements Runnable {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private static final int MAX_PRICE_HISTORY_SIZE = 2 * 60; // 2 hours of 1-minute bars
-    private static final int MAX_BOOK_SIZE = 6 * 60 * 60; // 6 hours of 1-second bars
     private static final long MAX_STRATEGIES = 50000L;
     private static final int MAX_RESULTS = 5000;
-    private static final long UPDATE_FREQUENCY = 1000000L;// lines
-    protected final List<Result> results;
-    protected final OptimizerDialog optimizerDialog;
+    private static final long UPDATE_FREQUENCY = 2000000L; // lines
+
     private final NumberFormat nf2;
-    protected boolean cancelled;
-    private ResultComparator resultComparator;
-    protected final StrategyParams strategyParams;
     private final String strategyName;
-    private ComputationalTimeEstimator timeEstimator;
-    protected final Constructor<?> strategyConstructor;
     private final TradingSchedule tradingSchedule;
+    private final int minTrades;
+    private ResultComparator resultComparator;
+    private ComputationalTimeEstimator timeEstimator;
     private BackTestFileReader backTestFileReader;
+    private long completedSteps, totalSteps;
+
+    protected final List<OptimizationResult> optimizationResults;
+    protected final OptimizerDialog optimizerDialog;
+    protected final StrategyParams strategyParams;
+    protected final Constructor<?> strategyConstructor;
+    protected boolean cancelled;
     protected int lineCount;
     protected MarketBook marketBook;
     protected PriceHistory priceHistory;
-    private final int minTrades;
-    private long completedSteps, totalSteps;
 
     OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
         tradingSchedule = strategy.getTradingSchedule();
-        results = new ArrayList<Result>();
+        optimizationResults = new ArrayList<OptimizationResult>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
         Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
@@ -76,16 +76,7 @@ public abstract class OptimizerRunner implements Runnable {
 
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
-            priceHistory.update(marketDepth);
-            if (priceHistory.size() > MAX_PRICE_HISTORY_SIZE) {
-                priceHistory.getAll().removeFirst();
-            }
-
             marketBook.add(marketDepth);
-            if (marketBook.size() > MAX_BOOK_SIZE) {
-                marketBook.getAll().removeFirst();
-            }
-
             long time = marketDepth.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
 
@@ -120,8 +111,8 @@ public abstract class OptimizerRunner implements Runnable {
             int trades = performanceManager.getTrades();
 
             if (trades >= minTrades) {
-                Result result = new Result(strategy.getParams(), performanceManager);
-                results.add(result);
+                OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
+                optimizationResults.add(optimizationResult);
                 showProgress(completedSteps, totalSteps, "Optimizing");
             }
         }
@@ -133,7 +124,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     private void saveToFile() throws IOException, JBookTraderException {
-        if (results.size() == 0) {
+        if (optimizationResults.size() == 0) {
             return;
         }
 
@@ -149,31 +140,33 @@ public abstract class OptimizerRunner implements Runnable {
         optimizerReport.reportDescription("Back data file: " + optimizerDialog.getFileName());
 
         List<String> otpimizerReportHeaders = new ArrayList<String>();
-        StrategyParams params = results.iterator().next().getParams();
+        StrategyParams params = optimizationResults.iterator().next().getParams();
         for (StrategyParam param : params.getAll()) {
             otpimizerReportHeaders.add(param.getName());
         }
 
         otpimizerReportHeaders.add("Total P&L");
-        otpimizerReportHeaders.add("Max Drawdown");
+        otpimizerReportHeaders.add("Max DD");
         otpimizerReportHeaders.add("Trades");
         otpimizerReportHeaders.add("Profit Factor");
         otpimizerReportHeaders.add("True Kelly");
+        otpimizerReportHeaders.add("Perf Index");
         optimizerReport.report(otpimizerReportHeaders);
 
-        for (Result result : results) {
-            params = result.getParams();
+        for (OptimizationResult optimizationResult : optimizationResults) {
+            params = optimizationResult.getParams();
 
             List<String> columns = new ArrayList<String>();
             for (StrategyParam param : params.getAll()) {
                 columns.add(nf2.format(param.getValue()));
             }
 
-            columns.add(nf2.format(result.getNetProfit()));
-            columns.add(nf2.format(result.getMaxDrawdown()));
-            columns.add(nf2.format(result.getTrades()));
-            columns.add(nf2.format(result.getProfitFactor()));
-            columns.add(nf2.format(result.getTrueKelly()));
+            columns.add(nf2.format(optimizationResult.getNetProfit()));
+            columns.add(nf2.format(optimizationResult.getMaxDrawdown()));
+            columns.add(nf2.format(optimizationResult.getTrades()));
+            columns.add(nf2.format(optimizationResult.getProfitFactor()));
+            columns.add(nf2.format(optimizationResult.getTrueKelly()));
+            columns.add(nf2.format(optimizationResult.getPerformanceIndex()));
 
             optimizerReport.report(columns);
         }
@@ -181,11 +174,11 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     private void showProgress(long counter, long numberOfTasks, String text) {
-        Collections.sort(results, resultComparator);
-        while (results.size() > MAX_RESULTS) {
-            results.remove(results.size() - 1);
+        Collections.sort(optimizationResults, resultComparator);
+        while (optimizationResults.size() > MAX_RESULTS) {
+            optimizationResults.remove(optimizationResults.size() - 1);
         }
-        optimizerDialog.setResults(results);
+        optimizerDialog.setResults(optimizationResults);
         String remainingTime = timeEstimator.getTimeLeft(counter);
         optimizerDialog.setProgress(counter, numberOfTasks, text, remainingTime);
     }
@@ -240,8 +233,8 @@ public abstract class OptimizerRunner implements Runnable {
 
     public void run() {
         try {
-            results.clear();
-            optimizerDialog.setResults(results);
+            optimizationResults.clear();
+            optimizerDialog.setResults(optimizationResults);
             optimizerDialog.enableProgress();
             optimizerDialog.showProgress("Scanning historical data file...");
             backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
