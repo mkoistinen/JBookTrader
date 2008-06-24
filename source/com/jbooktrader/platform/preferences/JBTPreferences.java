@@ -21,7 +21,7 @@ public enum JBTPreferences {
     BackTesterFileName("backTester.dataFileName", ""),
     // Optimizer
     OptimizerFileName("optimizer.dataFileName", ""),
-    OptimizerMinTrades("optimizer.minTrades", "20"),
+    OptimizerMinTrades("optimizer.minTrades", "50"),
     OptimizerSelectBy("optimizer.selectBy", ""),
     OptimizerMethod("optimizer.method", ""),
     // Main window
@@ -29,12 +29,17 @@ public enum JBTPreferences {
     MainWindowHeight("mainwindow.height", "-1"),
     MainWindowX("mainwindow.x", "-1"),
     MainWindowY("mainwindow.y", "-1"),
-    // Chart
-    ChartWidth("chart.width", "-1"),
-    ChartHeight("chart.height", "-1"),
-    ChartX("chart.x", "-1"),
-    ChartY("chart.y", "-1"),
-    ChartState("chart.state", "-1");
+    // Performance chart
+    PerformanceChartWidth("performance.chart.width", "-1"),
+    PerformanceChartHeight("performance.chart.height", "-1"),
+    PerformanceChartX("performance.chart.x", "-1"),
+    PerformanceChartY("performance.chart.y", "-1"),
+    PerformanceChartState("performance.chart.state", "-1"),
+    // Optimization Map
+    OptimizationMapWidth("optimization.map.width", "-1"),
+    OptimizationMapHeight("optimization.map.height", "-1"),
+    OptimizationMapX("optimization.map.x", "-1"),
+    OptimizationMapY("optimization.map.y", "-1");
 
     private final String name, defaultValue;
 
