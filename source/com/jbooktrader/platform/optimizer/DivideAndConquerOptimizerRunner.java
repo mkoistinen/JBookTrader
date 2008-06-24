@@ -10,10 +10,10 @@ import java.util.*;
  * historical market depth.
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
-    private final static int POPULATION_SIZE = 5;
-    private final static int PREFERRED_RUNNING_LIST_SIZE = 100;
+    private final static int TARGET_STRATEGIES_SIZE = 100;
 
-    public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
+    public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params)
+            throws ClassNotFoundException, NoSuchMethodException {
         super(optimizerDialog, strategy, params);
     }
 
@@ -22,9 +22,6 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         StrategyParams startingParams = new StrategyParams(strategyParams);
         bestParamsList.add(startingParams);
         int dimensions = strategyParams.size();
-        int hyperCubes = (int) Math.pow(POPULATION_SIZE, dimensions);
-        int topSize = PREFERRED_RUNNING_LIST_SIZE / hyperCubes;
-
         HashSet<StrategyParams> uniqueParams = new HashSet<StrategyParams>();
 
         int maxRange = 0;
@@ -37,15 +34,15 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
         List<Strategy> strategies = new ArrayList<Strategy>();
         List<StrategyParams> topParams = new ArrayList<StrategyParams>();
+        int numberOfCandidates = (int) Math.min(Math.sqrt(TARGET_STRATEGIES_SIZE), bestParamsList.size());
 
-        boolean allDone = false;
-        while (!allDone) {
+        do {
 
             tasks.clear();
-
+            int partsPerDimension = (int) Math.max(3, Math.pow(TARGET_STRATEGIES_SIZE / numberOfCandidates, 1. / dimensions));
             for (StrategyParams params : bestParamsList) {
                 for (StrategyParam param : params.getAll()) {
-                    int step = Math.max(1, (param.getMax() - param.getMin()) / (POPULATION_SIZE - 1));
+                    int step = Math.max(1, (param.getMax() - param.getMin()) / (partsPerDimension - 1));
                     param.setStep(step);
                 }
                 tasks.addAll(getTasks(params));
@@ -57,56 +54,49 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 if (!uniqueParams.contains(params)) {
                     uniqueParams.add(params);
                     try {
-                        Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory);
-                        strategies.add(strategy);
+                        strategies.add((Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory));
                     } catch (Exception e) {
                         throw new JBookTraderException(e);
                     }
                 }
             }
 
-            long totalSteps = completedSteps + (long) lineCount * iterationsRemaining * (PREFERRED_RUNNING_LIST_SIZE / 3);
+            long totalSteps = completedSteps + (long) lineCount * iterationsRemaining * strategies.size();
             setTotalSteps(totalSteps);
 
-            allDone = (strategies.size() == 0);
-            if (!allDone) {
-                execute(strategies);
-                if (cancelled) {
-                    return;
-                }
+            execute(strategies);
 
-                iterationsRemaining--;
-                completedSteps += (long) lineCount * strategies.size();
+            iterationsRemaining--;
+            completedSteps += (long) lineCount * strategies.size();
 
-                if (results.size() == 0) {
-                    throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
-                }
-
-
-                topParams.clear();
-                long maxIndex = Math.min(results.size(), Math.max(1, topSize));
-                for (int index = 0; index < maxIndex; index++) {
-                    topParams.add(results.get(index).getParams());
-                }
-
-
-                bestParamsList.clear();
-                for (StrategyParams params : topParams) {
-                    StrategyParams bestParams = new StrategyParams();
-                    for (StrategyParam param : params.getAll()) {
-                        String name = param.getName();
-                        int value = params.get(name).getValue();
-                        int displacement = (param.getMax() - param.getMin()) / 4;
-                        StrategyParam originalParam = strategyParams.get(name);
-                        int min = Math.max(originalParam.getMin(), value - displacement);
-                        int max = Math.min(originalParam.getMax(), value + displacement);
-                        param.setMin(min);
-                        param.setMax(max);
-                        bestParams.add(name, min, max, 0, value);
-                    }
-                    bestParamsList.add(bestParams);
-                }
+            if (optimizationResults.size() == 0 && !cancelled) {
+                throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
             }
-        }
+
+
+            topParams.clear();
+            numberOfCandidates = (int) Math.min(Math.sqrt(TARGET_STRATEGIES_SIZE), optimizationResults.size());
+            for (int index = 0; index < numberOfCandidates; index++) {
+                topParams.add(optimizationResults.get(index).getParams());
+            }
+
+
+            bestParamsList.clear();
+            for (StrategyParams params : topParams) {
+                StrategyParams bestParams = new StrategyParams();
+                for (StrategyParam param : params.getAll()) {
+                    String name = param.getName();
+                    int value = params.get(name).getValue();
+                    int displacement = (param.getMax() - param.getMin()) / 4;
+                    StrategyParam originalParam = strategyParams.get(name);
+                    int min = Math.max(originalParam.getMin(), value - displacement);
+                    int max = Math.min(originalParam.getMax(), value + displacement);
+                    param.setMin(min);
+                    param.setMax(max);
+                    bestParams.add(name, min, max, 0, value);
+                }
+                bestParamsList.add(bestParams);
+            }
+        } while (strategies.size() > 0 && !cancelled);
     }
 }
