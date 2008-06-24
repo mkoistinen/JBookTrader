@@ -16,13 +16,12 @@ import java.io.*;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JDialog {
-    private static final Dimension MIN_SIZE = new Dimension(500, 120);// minimum frame size
-    private JPanel progressPanel;
+    private static final Dimension MIN_SIZE = new Dimension(550, 120);// minimum frame size
+    private final Strategy strategy;
+    private final PreferencesHolder prefs;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JProgressBar progressBar;
-    private final Strategy strategy;
-    private final PreferencesHolder prefs;
     private BackTestStrategyRunner btsr;
 
     public BackTestDialog(JFrame parent, Strategy strategy) {
@@ -46,7 +45,7 @@ public class BackTestDialog extends JDialog {
     public void enableProgress() {
         progressBar.setValue(0);
         progressBar.setString("Starting back test...");
-        progressPanel.setVisible(true);
+        progressBar.setVisible(true);
         backTestButton.setEnabled(false);
         cancelButton.setEnabled(true);
         getRootPane().setDefaultButton(cancelButton);
@@ -129,51 +128,33 @@ public class BackTestDialog extends JDialog {
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Back Test - " + strategy.getName());
-
-        getContentPane().setLayout(new BorderLayout());
+        setLayout(new BorderLayout());
 
         JPanel northPanel = new JPanel(new SpringLayout());
-        JPanel centerPanel = new JPanel(new SpringLayout());
-        JPanel southPanel = new JPanel(new BorderLayout());
-
-        // strategy panel and its components
-        JPanel strategyPanel = new JPanel(new SpringLayout());
-
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
         fileNameLabel.setLabelFor(fileNameText);
+        northPanel.add(fileNameLabel);
+        northPanel.add(fileNameText);
+        northPanel.add(selectFileButton);
+        SpringUtilities.makeTopOneLineGrid(northPanel);
 
-        strategyPanel.add(fileNameLabel);
-        strategyPanel.add(fileNameText);
-        strategyPanel.add(selectFileButton);
-
-        SpringUtilities.makeOneLineGrid(strategyPanel, 3);
-
-        northPanel.add(strategyPanel);
-        SpringUtilities.makeCompactGrid(northPanel, 1, 1, 5, 5, 5, 5);//rows, cols, initX, initY, xPad, yPad
-
+        JPanel centerPanel = new JPanel(new SpringLayout());
         progressBar = new JProgressBar();
-        progressBar.setEnabled(false);
+        progressBar.setVisible(false);
         progressBar.setStringPainted(true);
+        centerPanel.add(progressBar);
+        SpringUtilities.makeOneLineGrid(centerPanel);
 
+        JPanel southPanel = new JPanel();
         backTestButton = new JButton("Back Test");
         backTestButton.setMnemonic('B');
         cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic('C');
-
-        JPanel buttonsPanel = new JPanel();
-        buttonsPanel.add(backTestButton);
-        buttonsPanel.add(cancelButton);
-
-        progressPanel = new JPanel(new SpringLayout());
-        progressPanel.add(progressBar);
-        progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 1, 12, 5, 12, 5);
-
-        southPanel.add(progressPanel, BorderLayout.NORTH);
-        southPanel.add(buttonsPanel, BorderLayout.SOUTH);
+        southPanel.add(backTestButton);
+        southPanel.add(cancelButton);
 
         add(northPanel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
