@@ -2,50 +2,21 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
 
-import javax.swing.table.*;
 import java.util.*;
 
 /**
- * Optimization results table model
+ * Optimization optimizationResults table model
  */
 public class ResultsTableModel extends TableDataModel {
-    private static final NumberRenderer nr2 = new NumberRenderer(2);
-
-    // inner class to represent table schema
-    public enum Column {
-        PL("P&L", nr2),
-        MaxDD("Max DD", nr2),
-        Trades("Trades", nr2),
-        PF("Profit Factor", nr2),
-        TrueKelly("True Kelly", nr2);
-
-        private final String name;
-        private final TableCellRenderer renderer;
-
-        Column(String name, TableCellRenderer renderer) {
-            this.name = name;
-            this.renderer = renderer;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public TableCellRenderer getRenderer() {
-            return renderer;
-        }
-    }
-
     public ResultsTableModel(Strategy strategy) {
         List<String> columnNames = new ArrayList<String>();
         for (StrategyParam param : strategy.getParams().getAll()) {
             columnNames.add(param.getName());
         }
 
-        for (Column column : Column.values()) {
-            columnNames.add(column.getName());
+        for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
+            columnNames.add(performanceMetric.getName());
         }
 
         setSchema(columnNames.toArray(new String[columnNames.size()]));
@@ -67,24 +38,25 @@ public class ResultsTableModel extends TableDataModel {
         return super.getValueAt(row, column);
     }
 
-    public synchronized void setResults(List<Result> results) {
+    public synchronized void setResults(List<OptimizationResult> optimizationResults) {
         removeAllData();
 
-        for (Result result : results) {
+        for (OptimizationResult optimizationResult : optimizationResults) {
             Object[] item = new Object[getColumnCount() + 1];
 
-            StrategyParams params = result.getParams();
+            StrategyParams params = optimizationResult.getParams();
 
             int index = -1;
             for (StrategyParam param : params.getAll()) {
                 item[++index] = param.getValue();
             }
 
-            item[++index] = result.getNetProfit();
-            item[++index] = result.getMaxDrawdown();
-            item[++index] = result.getTrades();
-            item[++index] = result.getProfitFactor();
-            item[++index] = result.getTrueKelly();
+            item[++index] = optimizationResult.getNetProfit();
+            item[++index] = optimizationResult.getMaxDrawdown();
+            item[++index] = optimizationResult.getTrades();
+            item[++index] = optimizationResult.getProfitFactor();
+            item[++index] = optimizationResult.getTrueKelly();
+            item[++index] = optimizationResult.getPerformanceIndex();
 
             addRow(item);
         }
