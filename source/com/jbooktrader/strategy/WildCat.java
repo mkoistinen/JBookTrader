@@ -2,7 +2,6 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -30,8 +29,8 @@ public class WildCat extends Strategy {
     private final int entry, exit;
 
 
-    public WildCat(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
-        super(optimizationParams, marketBook, priceHistory);
+    public WildCat(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
 
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
@@ -59,10 +58,21 @@ public class WildCat extends Strategy {
      */
     @Override
     public void setParams() {
+        /*
         addParam(PERIOD1, 100, 200, 10, 145);
         addParam(PERIOD2, 400, 600, 10, 525);
         addParam(ENTRY, 5, 30, 1, 14);
         addParam(EXIT, 1, 20, 1, 8);
+        */
+
+        // 145-525-14-8
+        // 156-741-16-8
+
+        addParam(PERIOD1, 100, 200, 5, 156);
+        addParam(PERIOD2, 400, 800, 5, 741);
+        addParam(ENTRY, 9, 18, 1, 16);
+        addParam(EXIT, 5, 10, 1, 8);
+
 
     }
 

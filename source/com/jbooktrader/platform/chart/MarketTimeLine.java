@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.chart;
 
-
-import com.jbooktrader.platform.bar.*;
+import com.jbooktrader.platform.marketdepth.*;
 import org.jfree.chart.axis.*;
 
 
@@ -12,23 +11,23 @@ public class MarketTimeLine {
     private static final long MAX_GAP = 12 * 60 * 60 * 1000;// 12 hours
     private static final long SEGMENT_SIZE = SegmentedTimeline.FIFTEEN_MINUTE_SEGMENT_SIZE;
     private static final long GAP_BUFFER = SEGMENT_SIZE;
-    private final PriceHistory priceHistory;
+    private final MarketBook marketBook;
 
-    public MarketTimeLine(PriceHistory priceHistory) {
-        this.priceHistory = priceHistory;
+    public MarketTimeLine(MarketBook marketBook) {
+        this.marketBook = marketBook;
     }
 
     public SegmentedTimeline getNormalHours() {
         SegmentedTimeline timeline = new SegmentedTimeline(SEGMENT_SIZE, 1, 0);
-        long previousTime = priceHistory.getFirstPriceBar().getTime();
+        long previousTime = marketBook.getAll().get(0).getTime();
 
-        for (PriceBar bar : priceHistory.getAll()) {
-            long barTime = bar.getTime();
-            long difference = barTime - previousTime;
+        for (MarketDepth marketDepth : marketBook.getAll()) {
+            long marketDepthTime = marketDepth.getTime();
+            long difference = marketDepthTime - previousTime;
             if (difference > MAX_GAP) {
-                timeline.addException(previousTime + GAP_BUFFER, barTime - GAP_BUFFER);
+                timeline.addException(previousTime + GAP_BUFFER, marketDepthTime - GAP_BUFFER);
             }
-            previousTime = barTime;
+            previousTime = marketDepthTime;
         }
 
         return timeline;

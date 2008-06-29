@@ -3,7 +3,7 @@ package com.jbooktrader.platform.dialog;
 
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
-import static com.jbooktrader.platform.model.TradingTableModel.Column.*;
+import static com.jbooktrader.platform.model.StrategyTableModel.Column.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -21,8 +21,8 @@ import java.net.*;
 public class MainFrameDialog extends JFrame implements ModelListener {
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
-    private TradingTableModel tradingTableModel;
-    private JTable tradingTable;
+    private StrategyTableModel strategyTableModel;
+    private JTable strategyTable;
     private JPopupMenu popupMenu;
     private final Toolkit toolkit;
 
@@ -61,7 +61,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 break;
             case StrategyUpdate:
                 Strategy strategy = (Strategy) value;
-                tradingTableModel.update(strategy);
+                strategyTableModel.update(strategy);
                 break;
             case StrategiesStart:
                 Dispatcher.Mode mode = Dispatcher.getMode();
@@ -94,8 +94,8 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         projectHomeMenuItem.addActionListener(action);
     }
 
-    public void tradingTableAction(MouseAdapter action) {
-        tradingTable.addMouseListener(action);
+    public void strategyTableAction(MouseAdapter action) {
+        strategyTable.addMouseListener(action);
     }
 
     public void informationAction(ActionListener action) {
@@ -159,20 +159,20 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private void populateStrategies() throws JBookTraderException {
         ClassFinder classFinder = new ClassFinder();
         for (Strategy strategy : classFinder.getStrategies()) {
-            tradingTableModel.addStrategy(strategy);
+            strategyTableModel.addStrategy(strategy);
         }
     }
 
-    public TradingTableModel getTradingTableModel() {
-        return tradingTableModel;
+    public StrategyTableModel getStrategyTableModel() {
+        return strategyTableModel;
     }
 
-    public JTable getTradingTable() {
-        return tradingTable;
+    public JTable getStrategyTable() {
+        return strategyTable;
     }
 
     public void showPopup(MouseEvent mouseEvent) {
-        popupMenu.show(tradingTable, mouseEvent.getX(), mouseEvent.getY());
+        popupMenu.show(strategyTable, mouseEvent.getX(), mouseEvent.getY());
     }
 
     private void init() throws JBookTraderException {
@@ -236,18 +236,14 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         popupMenu.addSeparator();
         popupMenu.add(tradeMenuItem);
 
-        JScrollPane tradingTableScrollPane = new JScrollPane();
-        tradingTableScrollPane.setAutoscrolls(true);
-        JPanel tradingPanel = new JPanel(new SpringLayout());
-        tradingPanel.add(tradingTableScrollPane, BorderLayout.CENTER);
-        SpringUtilities.makeOneLineGrid(tradingPanel);
-
-        tradingTableModel = new TradingTableModel();
-        tradingTable = new JTable(tradingTableModel);
-        tradingTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane strategyTableScrollPane = new JScrollPane();
+        strategyTableScrollPane.setAutoscrolls(true);
+        strategyTableModel = new StrategyTableModel();
+        strategyTable = new JTable(strategyTableModel);
+        strategyTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // set custom column renderers
-        TableColumnModel columnModel = tradingTable.getColumnModel();
+        TableColumnModel columnModel = strategyTable.getColumnModel();
         NumberRenderer nr2 = new NumberRenderer(2);
         columnModel.getColumn(PL.ordinal()).setCellRenderer(nr2);
         columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr2);
@@ -258,12 +254,12 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
 
-        tradingTableScrollPane.getViewport().add(tradingTable);
+        strategyTableScrollPane.getViewport().add(strategyTable);
 
         Image appIcon = Toolkit.getDefaultToolkit().getImage(getImageURL("JBookTrader.png"));
         setIconImage(appIcon);
 
-        add(tradingPanel, BorderLayout.CENTER);
+        add(strategyTableScrollPane, BorderLayout.CENTER);
         JLabel status = new JLabel(" ");
         status.setForeground(Color.GRAY);
         add(status, BorderLayout.SOUTH);

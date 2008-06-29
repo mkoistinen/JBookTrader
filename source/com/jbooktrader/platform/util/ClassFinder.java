@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -21,7 +20,7 @@ public class ClassFinder {
      * JBookTrader will know how to run a trading strategy as long as that
      * strategy is implemented in a class that extends the base Strategy class.
      */
-    private List<String> getClasses(String packageName) throws URISyntaxException, IOException {
+    private List<String> getClasses(String packageName) throws URISyntaxException {
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
         List<String> classNames = new ArrayList<String>();
 
@@ -46,9 +45,9 @@ public class ClassFinder {
     public static Strategy getInstance(String name) throws JBookTraderException {
         try {
             Class<? extends Strategy> clazz = Class.forName(name).asSubclass(Strategy.class);
-            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
+            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
             Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-            return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook(), new PriceHistory());
+            return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
         } catch (Exception e) {

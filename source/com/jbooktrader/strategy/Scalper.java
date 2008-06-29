@@ -2,7 +2,6 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -28,8 +27,8 @@ public class Scalper extends Strategy {
     private final int entry;
 
 
-    public Scalper(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
-        super(optimizationParams, marketBook, priceHistory);
+    public Scalper(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
 
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
@@ -42,7 +41,6 @@ public class Scalper extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
-        // Create technical indicators
         balanceEMAInd = new BalanceEMA(marketBook, getParam(PERIOD));
         addIndicator("balanceEMA", balanceEMAInd);
 
@@ -56,8 +54,8 @@ public class Scalper extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 1, 35, 1, 10);
-        addParam(ENTRY, 20, 45, 1, 26);
+        addParam(PERIOD, 200, 300, 1, 209);
+        addParam(ENTRY, 9, 15, 1, 14);
     }
 
     /**
@@ -67,7 +65,6 @@ public class Scalper extends Strategy {
     @Override
     public void onBookChange() {
         double balanceEMA = balanceEMAInd.getValue();
-
         if (balanceEMA >= entry) {
             setPosition(1);
         } else if (balanceEMA <= -entry) {

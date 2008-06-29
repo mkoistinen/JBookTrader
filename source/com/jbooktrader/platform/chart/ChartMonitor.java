@@ -5,8 +5,8 @@ import org.jfree.chart.*;
 import java.awt.*;
 
 public class ChartMonitor extends ChartPanel {
-    public ChartMonitor(JFreeChart chart, boolean useBuffer) {
-        super(chart, useBuffer);
+    public ChartMonitor(JFreeChart chart) {
+        super(chart, true);
     }
 
     @Override

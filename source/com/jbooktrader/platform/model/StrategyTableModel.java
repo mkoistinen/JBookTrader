@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  */
-public class TradingTableModel extends TableDataModel {
+public class StrategyTableModel extends TableDataModel {
 
     // inner class to represent table schema
     public enum Column {
@@ -35,7 +35,7 @@ public class TradingTableModel extends TableDataModel {
 
     private final Map<Integer, Strategy> rows = new HashMap<Integer, Strategy>();
 
-    public TradingTableModel() {
+    public StrategyTableModel() {
         Column[] columns = Column.values();
         ArrayList<String> allColumns = new ArrayList<String>();
         for (Column column : columns) {

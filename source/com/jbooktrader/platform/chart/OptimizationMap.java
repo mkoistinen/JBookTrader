@@ -2,7 +2,6 @@ package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.OptimizationMapY;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -82,7 +81,7 @@ public class OptimizationMap {
 
 
         JLabel colorMapLabel = new JLabel("Color map:", JLabel.TRAILING);
-        colorMapCombo = new JComboBox(new String[] {"Heat", "Grey"});
+        colorMapCombo = new JComboBox(new String[]{"Heat", "Grey"});
         colorMapLabel.setLabelFor(colorMapCombo);
 
         chartOptionsPanel.add(horizontalLabel);
@@ -156,7 +155,7 @@ public class OptimizationMap {
         return chartFrame;
     }
 
-    public void repaint() {
+    private void repaint() {
         chart = createChart();
         chartPanel.setChart(chart);
     }
@@ -171,11 +170,8 @@ public class OptimizationMap {
             case PF:
                 metric = optimizationResult.getProfitFactor();
                 break;
-            case MaxDD:
-                metric = optimizationResult.getMaxDrawdown();
-                break;
-            case TrueKelly:
-                metric = optimizationResult.getTrueKelly();
+            case Kelly:
+                metric = optimizationResult.getKellyCriterion();
                 break;
             case PI:
                 metric = optimizationResult.getPerformanceIndex();
@@ -194,8 +190,8 @@ public class OptimizationMap {
         Map<String, Double> values = new HashMap<String, Double>();
 
 
-        int xParameterIndex = (horizontalCombo == null)? 0 : horizontalCombo.getSelectedIndex();
-        int yParameterIndex = (verticalCombo == null)? 1 : verticalCombo.getSelectedIndex();
+        int xParameterIndex = (horizontalCombo == null) ? 0 : horizontalCombo.getSelectedIndex();
+        int yParameterIndex = (verticalCombo == null) ? 1 : verticalCombo.getSelectedIndex();
 
         int index = 0;
         min = max = getMetric(optimizationResults.get(index));
@@ -208,7 +204,7 @@ public class OptimizationMap {
 
             String key = x[index] + "," + y[index];
             Double value = values.get(key);
-            
+
 
             if (value != null) {
                 z[index] = Math.max(value, z[index]);
@@ -223,7 +219,7 @@ public class OptimizationMap {
         }
 
         DefaultXYZDataset dataset = new DefaultXYZDataset();
-        dataset.addSeries("optimization", new double[][] {x, y, z});
+        dataset.addSeries("optimization", new double[][]{x, y, z});
 
         return dataset;
     }
@@ -274,12 +270,12 @@ public class OptimizationMap {
         NumberAxis yAxis = new NumberAxis();
         yAxis.setAutoRangeIncludesZero(false);
 
-        xAxis.setLabel(horizontalCombo == null? null : (String) horizontalCombo.getSelectedItem());
-        yAxis.setLabel(verticalCombo == null? null : (String) verticalCombo.getSelectedItem());
+        xAxis.setLabel(horizontalCombo == null ? null : (String) horizontalCombo.getSelectedItem());
+        yAxis.setLabel(verticalCombo == null ? null : (String) verticalCombo.getSelectedItem());
 
 
         XYBlockRenderer renderer = new XYBlockRenderer();
-        int paintScaleIndex = (colorMapCombo == null)? 0 : colorMapCombo.getSelectedIndex();
+        int paintScaleIndex = (colorMapCombo == null) ? 0 : colorMapCombo.getSelectedIndex();
         PaintScale paintScale = null;
         switch (paintScaleIndex) {
             case 0:

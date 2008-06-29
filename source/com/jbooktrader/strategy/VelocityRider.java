@@ -2,7 +2,6 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -29,8 +28,8 @@ public class VelocityRider extends Strategy {
     private final int entry;
 
 
-    public VelocityRider(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
-        super(optimizationParams, marketBook, priceHistory);
+    public VelocityRider(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
 
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");

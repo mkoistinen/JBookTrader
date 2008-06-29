@@ -98,17 +98,16 @@ public class SpringUtilities {
     }
 
     //public static void makeOneLineGrid(Container parent, int cols) {
-      //  makeCompactGrid(parent, 1, cols, 6, 0, 7, 6);
+    //  makeCompactGrid(parent, 1, cols, 6, 0, 7, 6);
     //}
 
     public static void makeOneLineGrid(Container parent) {
-        makeCompactGrid(parent, 1, parent.getComponentCount(), 7, 0, 7, 7);
+        makeCompactGrid(parent, 1, parent.getComponentCount(), 10, 0, 10, 10);
     }
 
     public static void makeTopOneLineGrid(Container parent) {
-        makeCompactGrid(parent, 1, parent.getComponentCount(), 7, 7, 7, 7);
+        makeCompactGrid(parent, 1, parent.getComponentCount(), 10, 10, 10, 10);
     }
-
 
 
     /**

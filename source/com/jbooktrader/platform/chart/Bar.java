@@ -1,14 +1,14 @@
-package com.jbooktrader.platform.bar;
+package com.jbooktrader.platform.chart;
 
 /**
- * Encapsulates the price bar information.
+ * Encapsulates the price/indicator bar information.
  */
-public class PriceBar {
-    private long time;
+public class Bar {
+    private final long time;
     private final double open;
     private double high, low, close;
 
-    private PriceBar(long time, double open, double high, double low, double close) {
+    public Bar(long time, double open, double high, double low, double close) {
         this.time = time;
         this.open = open;
         this.high = high;
@@ -16,8 +16,8 @@ public class PriceBar {
         this.close = close;
     }
 
-    public PriceBar(long time, double price) {
-        this(time, price, price, price, price);
+    public Bar(long time, double value) {
+        this(time, value, value, value, value);
     }
 
     @Override
@@ -57,10 +57,6 @@ public class PriceBar {
 
     public void setClose(double close) {
         this.close = close;
-    }
-
-    public void setTime(long time) {
-        this.time = time;
     }
 
     public long getTime() {

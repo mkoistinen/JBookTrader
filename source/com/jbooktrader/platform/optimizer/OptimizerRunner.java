@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
@@ -20,8 +19,6 @@ import java.util.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    private static final String LINE_SEP = System.getProperty("line.separator");
-    private static final long MAX_STRATEGIES = 50000L;
     private static final int MAX_RESULTS = 5000;
     private static final long UPDATE_FREQUENCY = 2000000L; // lines
 
@@ -35,13 +32,12 @@ public abstract class OptimizerRunner implements Runnable {
     private long completedSteps, totalSteps;
 
     protected final List<OptimizationResult> optimizationResults;
-    protected final OptimizerDialog optimizerDialog;
+    private final OptimizerDialog optimizerDialog;
     protected final StrategyParams strategyParams;
     protected final Constructor<?> strategyConstructor;
     protected boolean cancelled;
     protected int lineCount;
     protected MarketBook marketBook;
-    protected PriceHistory priceHistory;
 
     OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
         this.optimizerDialog = optimizerDialog;
@@ -51,11 +47,10 @@ public abstract class OptimizerRunner implements Runnable {
         optimizationResults = new ArrayList<OptimizationResult>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
-        Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class, PriceHistory.class};
+        Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
         resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
         marketBook = new MarketBook();
-        priceHistory = new PriceHistory();
         minTrades = optimizerDialog.getMinTrades();
     }
 
@@ -70,13 +65,19 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
 
-    void execute(List<Strategy> strategies) throws JBookTraderException {
+    void execute(List<Strategy> strategies, int count) throws JBookTraderException {
+        String progressText = "Optimizing";
+        if (count > 0) {
+            progressText += " " + count + " strategies";
+        }
+
         backTestFileReader.reset();
         marketBook.getAll().clear();
 
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
             marketBook.add(marketDepth);
+
             long time = marketDepth.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
 
@@ -95,7 +96,7 @@ public abstract class OptimizerRunner implements Runnable {
 
                 completedSteps++;
                 if (completedSteps % UPDATE_FREQUENCY == 0) {
-                    showFastProgress(completedSteps, totalSteps, "Optimizing");
+                    showFastProgress(completedSteps, totalSteps, progressText);
                 }
                 if (cancelled) {
                     return;
@@ -149,7 +150,7 @@ public abstract class OptimizerRunner implements Runnable {
         otpimizerReportHeaders.add("Max DD");
         otpimizerReportHeaders.add("Trades");
         otpimizerReportHeaders.add("Profit Factor");
-        otpimizerReportHeaders.add("True Kelly");
+        otpimizerReportHeaders.add("Kelly");
         otpimizerReportHeaders.add("Perf Index");
         optimizerReport.report(otpimizerReportHeaders);
 
@@ -165,7 +166,7 @@ public abstract class OptimizerRunner implements Runnable {
             columns.add(nf2.format(optimizationResult.getMaxDrawdown()));
             columns.add(nf2.format(optimizationResult.getTrades()));
             columns.add(nf2.format(optimizationResult.getProfitFactor()));
-            columns.add(nf2.format(optimizationResult.getTrueKelly()));
+            columns.add(nf2.format(optimizationResult.getKellyCriterion()));
             columns.add(nf2.format(optimizationResult.getPerformanceIndex()));
 
             optimizerReport.report(columns);
@@ -189,7 +190,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
 
-    protected LinkedList<StrategyParams> getTasks(StrategyParams params) throws JBookTraderException {
+    protected LinkedList<StrategyParams> getTasks(StrategyParams params) {
         for (StrategyParam param : params.getAll()) {
             param.setValue(param.getMin());
         }
@@ -218,14 +219,6 @@ public abstract class OptimizerRunner implements Runnable {
                     }
                 }
             }
-        }
-
-        int numberOfTasks = tasks.size();
-        if (numberOfTasks > MAX_STRATEGIES) {
-            String message = "The range of parameters for this optimization run requires running " + numberOfTasks + " strategies." + LINE_SEP;
-            message += "The maximum number of strategies that can run simultaneously is " + MAX_STRATEGIES + "." + LINE_SEP;
-            message += "Reduce the range of parameters." + LINE_SEP;
-            throw new JBookTraderException(message);
         }
 
         return tasks;

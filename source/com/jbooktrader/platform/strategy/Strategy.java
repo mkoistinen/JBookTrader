@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -25,12 +24,11 @@ public abstract class Strategy {
     private final List<String> strategyReportHeaders;
     private final StrategyParams params;
     private final MarketBook marketBook;
-    private final PriceHistory priceHistory;
     private final DecimalFormat nf2, nf5;
     private final SimpleDateFormat df;
     private final Report eventReport;
     private final String name;
-    private final List<Object> strategyReportColumns = new ArrayList<Object>();
+    private final List<Object> strategyReportColumns;
     private final List<ChartableIndicator> indicators;
     private Report strategyReport;
     private Contract contract;
@@ -40,6 +38,7 @@ public abstract class Strategy {
     private boolean isActive, hasValidIndicators;
     private int position, id;
     private long time;
+    private final boolean isOptimizationMode;
 
 
     /**
@@ -53,14 +52,14 @@ public abstract class Strategy {
     abstract protected void setParams();
 
 
-    protected Strategy(StrategyParams params, MarketBook marketBook, PriceHistory priceHistory) {
+    protected Strategy(StrategyParams params, MarketBook marketBook) {
         this.params = params;
         this.marketBook = marketBook;
-        this.priceHistory = priceHistory;
         if (params.size() == 0) {
             setParams();
         }
 
+        strategyReportColumns = new ArrayList<Object>();
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
         strategyReportHeaders.add("Trade #");
@@ -80,6 +79,7 @@ public abstract class Strategy {
         df = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
 
         eventReport = Dispatcher.getReporter();
+        isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.Optimization);
     }
 
     public void setReport(Report strategyReport) {
@@ -133,15 +133,18 @@ public abstract class Strategy {
 
 
     public void report() {
+        boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
         strategyReportColumns.clear();
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
-        strategyReportColumns.add(performanceManager.getTrades());
+        int trades = isCompletedTrade ? performanceManager.getTrades() : performanceManager.getTrades() + 1;
+        strategyReportColumns.add(trades);
         strategyReportColumns.add(nf5.format(marketDepth.getLowPrice()));
         strategyReportColumns.add(nf5.format(marketDepth.getHighPrice()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(nf2.format(performanceManager.getTradeCommission()));
-        strategyReportColumns.add(nf2.format(performanceManager.getTradeProfit()));
+        String tradeProfit = isCompletedTrade ? nf2.format(performanceManager.getTradeProfit()) : "N/A";
+        strategyReportColumns.add(tradeProfit);
         strategyReportColumns.add(nf2.format(performanceManager.getNetProfit()));
 
         for (ChartableIndicator chartableIndicator : indicators) {
@@ -176,10 +179,6 @@ public abstract class Strategy {
 
     public TradingSchedule getTradingSchedule() {
         return tradingSchedule;
-    }
-
-    public PriceHistory getPriceBarHistory() {
-        return priceHistory;
     }
 
     public void setTime(long time) {
@@ -242,7 +241,9 @@ public abstract class Strategy {
             try {
                 double value = indicator.calculate();
                 long time = marketBook.getLastMarketDepth().getTime();
-                indicator.getIndicatorBarHistory().update(time, value);
+                if (!isOptimizationMode) {
+                    chartableIndicator.add(time, value);
+                }
             } catch (IndexOutOfBoundsException aie) {
                 hasValidIndicators = false;
                 // This exception will occur if book size is insufficient to calculate
@@ -254,10 +255,9 @@ public abstract class Strategy {
     }
 
 
-    public void process(MarketDepth marketDepth) throws InterruptedException, IOException, JBookTraderException {
+    public void process(MarketDepth marketDepth) throws IOException, JBookTraderException {
         if (isActive()) {
             long instant = marketDepth.getTime();
-            priceHistory.update(marketDepth);
             setTime(instant);
             updateIndicators();
             if (hasValidIndicators()) {

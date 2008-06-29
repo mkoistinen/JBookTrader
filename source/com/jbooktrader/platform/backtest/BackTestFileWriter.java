@@ -98,7 +98,8 @@ public final class BackTestFileWriter {
 
     private StringBuilder getHeader() {
         StringBuilder header = new StringBuilder();
-        header.append("# This historical data file is created by " + JBookTrader.APP_NAME).append(LINE_SEP);
+        String appInfo = JBookTrader.APP_NAME + ", version " + JBookTrader.VERSION;
+        header.append("# This historical data file was created by ").append(appInfo).append(LINE_SEP);
         header.append("# Each line represents the order book at a particular time and contains 8 columns:").append(LINE_SEP);
         header.append("# date, time, openBalance, highBalance, lowBalance, closeBalance, lowPrice, highPrice").append(LINE_SEP);
         header.append("# 1. date is in the MMddyy format").append(LINE_SEP);

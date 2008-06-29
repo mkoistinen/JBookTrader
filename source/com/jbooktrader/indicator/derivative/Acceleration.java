@@ -6,21 +6,25 @@ import com.jbooktrader.platform.indicator.*;
  *
  */
 public class Acceleration extends Indicator {
-    private final int halfPeriod;
+    private final double fastMultiplier, slowMultiplier, velocityMultiplier;
+    private double fast, slow, velocity;
 
-    public Acceleration(Indicator parentIndicator, int halfPeriod) {
+    public Acceleration(Indicator parentIndicator, int fastPeriod, int slowPeriod, int velocityPeriod) {
         super(parentIndicator);
-        this.halfPeriod = halfPeriod;
+        fastMultiplier = 2. / (fastPeriod + 1.);
+        slowMultiplier = 2. / (slowPeriod + 1.);
+        velocityMultiplier = 2. / (velocityPeriod + 1.);
     }
 
     @Override
     public double calculate() {
-        IndicatorBarHistory indicatorBarHistory = parentIndicator.getIndicatorBarHistory();
-        int lastIndex = indicatorBarHistory.size() - 1;
-        double valueNow = indicatorBarHistory.getIndicatorBar(lastIndex).getClose();
-        double valueHalfPeriodAgo = indicatorBarHistory.getIndicatorBar(lastIndex - halfPeriod).getClose();
-        double valueTwoHalfPeriodsAgo = indicatorBarHistory.getIndicatorBar(lastIndex - 2 * halfPeriod).getClose();
-        value = (valueNow - 2 * valueHalfPeriodAgo + valueTwoHalfPeriodsAgo) / (2 * halfPeriod);
+        double parentValue = parentIndicator.getValue();
+        fast += (parentValue - fast) * fastMultiplier;
+        slow += (parentValue - slow) * slowMultiplier;
+        double currentVelocity = fast - slow;
+        velocity += (currentVelocity - velocity) * velocityMultiplier;
+        value = currentVelocity - velocity;
+
         return value;
     }
 }

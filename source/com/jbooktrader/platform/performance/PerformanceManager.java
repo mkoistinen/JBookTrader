@@ -15,12 +15,13 @@ public class PerformanceManager {
     private final Strategy strategy;
     private final ProfitAndLossHistory profitAndLossHistory;
 
-    private int trades, profitableTrades, unprofitableTrades;
+    private int trades, profitableTrades, previousPosition;
     private double tradeCommission, totalCommission;
-    private double averageProfitPerTrade, percentProfitableTrades, positionValue;
+    private double positionValue;
     private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
-    private double profitFactor, peakNetProfit, maxDrawdown;
+    private double peakNetProfit, maxDrawdown;
     private double sumTradeProfit, sumTradeProfitSquared, riskAdjustedProfitPerTrade;
+    private boolean isCompletedTrade;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
@@ -33,16 +34,20 @@ public class PerformanceManager {
         return trades;
     }
 
+    public boolean getIsCompletedTrade() {
+        return isCompletedTrade;
+    }
+
     public double getPercentProfitableTrades() {
-        return percentProfitableTrades;
+        return (100d * profitableTrades / trades);
     }
 
     public double getAverageProfitPerTrade() {
-        return averageProfitPerTrade;
+        return netProfit / trades;
     }
 
     public double getProfitFactor() {
-        return profitFactor;
+        return grossProfit / grossLoss;
     }
 
     public double getMaxDrawdown() {
@@ -69,28 +74,25 @@ public class PerformanceManager {
         return profitAndLossHistory;
     }
 
-    public double getTrueKelly() {
-        // "True Kelly" is Kelly Criterion adjusted for the number of trades
-        double trueKelly = 0;
+    public double getKellyCriterion() {
+        int unprofitableTrades = trades - profitableTrades;
+        double kellyCriterion = 0;
         if (profitableTrades > 0 && unprofitableTrades > 0) {
             double aveProfit = grossProfit / profitableTrades;
             double aveLoss = grossLoss / unprofitableTrades;
             double winLossRatio = aveProfit / aveLoss;
-            double probabilityOfWin = (double) profitableTrades / trades;
+            double probabilityOfWin = profitableTrades / (double) trades;
             double probabilityOfLoss = 1 - probabilityOfWin;
-            double kellyCriterion = probabilityOfWin - (probabilityOfLoss / winLossRatio);
-            double power = -6 + trades / 120.;
-            double sigmoidFunction = 1. / (1. + Math.exp(-power));
-            trueKelly = kellyCriterion * sigmoidFunction * 100;
+            kellyCriterion = 100 * (probabilityOfWin - (probabilityOfLoss / winLossRatio));
         }
 
-        return trueKelly;
+        return kellyCriterion;
     }
 
     public double getPerformanceIndex() {
         double stdev = (trades - 1) * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit;
         stdev = Math.sqrt(stdev) / (trades - 1);
-        return averageProfitPerTrade / stdev;
+        return getAverageProfitPerTrade() / stdev;
     }
 
 
@@ -98,15 +100,10 @@ public class PerformanceManager {
         positionValue = position * price * multiplier;
         netProfit = totalSold - totalBought + positionValue - totalCommission;
         peakNetProfit = Math.max(netProfit, peakNetProfit);
-        double drawdown = peakNetProfit - netProfit;
-        if (drawdown > maxDrawdown) {
-            maxDrawdown = drawdown;
-        }
-
+        maxDrawdown = Math.max(maxDrawdown, peakNetProfit - netProfit);
     }
 
     public void update(int quantity, double avgFillPrice, int position) {
-        trades++;
 
         double tradeAmount = avgFillPrice * Math.abs(quantity) * multiplier;
         if (quantity > 0) {
@@ -120,30 +117,33 @@ public class PerformanceManager {
 
         update(avgFillPrice, position);
 
-        tradeProfit = netProfit - netProfitAsOfPreviousTrade;
-        if (trades > 1) {
+
+        isCompletedTrade = false;
+        if (previousPosition != 0) {
+            isCompletedTrade = true;
+            trades++;
+            tradeProfit = netProfit - netProfitAsOfPreviousTrade;
+
             sumTradeProfit += tradeProfit;
             sumTradeProfitSquared += (tradeProfit * tradeProfit);
+
+
+            netProfitAsOfPreviousTrade = netProfit;
+
+
+            if (tradeProfit >= 0) {
+                profitableTrades++;
+                grossProfit += tradeProfit;
+            } else {
+                grossLoss += (-tradeProfit);
+            }
         }
-
-        netProfitAsOfPreviousTrade = netProfit;
-        averageProfitPerTrade = netProfit / trades;
-
-        // todo: dont count the trade if previous position is 0
-        if (tradeProfit >= 0) {
-            profitableTrades++;
-            grossProfit += tradeProfit;
-        } else {
-            unprofitableTrades++;
-            grossLoss += (-tradeProfit);
-        }
-
-        percentProfitableTrades = 100 * (profitableTrades / (double) trades);
-        profitFactor = grossProfit / grossLoss;
 
         if ((Dispatcher.getMode() != Optimization)) {
             long time = strategy.getTime();
             profitAndLossHistory.add(new ProfitAndLoss(time, netProfit));
         }
+
+        previousPosition = position;
     }
 }

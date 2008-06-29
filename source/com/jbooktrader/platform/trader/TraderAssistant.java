@@ -19,14 +19,14 @@ import java.util.*;
 public class TraderAssistant {
     private final String host, advisorAccountID;
     private final int port, clientID;
-
-    private EClientSocket socket;
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
     private final Report eventReport;
+    private final Trader trader;
+
+    private EClientSocket socket;
     private int nextStrategyID, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
-    private final Trader trader;
     private boolean isConnected;
 
     public TraderAssistant(Trader trader) {

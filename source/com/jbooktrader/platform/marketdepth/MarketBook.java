@@ -64,6 +64,7 @@ public class MarketBook {
     }
 
     synchronized public void add(MarketDepth marketDepth) {
+        //todo: reset book and indicators at the start of the day for backtesting and optimization purposes
         marketDepths.add(marketDepth);
     }
 

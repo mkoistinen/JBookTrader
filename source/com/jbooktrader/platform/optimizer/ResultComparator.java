@@ -24,17 +24,9 @@ public class ResultComparator implements Comparator<OptimizationResult> {
                 // highest to lowest
                 res = ((Double) r2.getProfitFactor()).compareTo(r1.getProfitFactor());
                 break;
-            case MaxDD:
-                // lowest to highest
-                res = ((Double) r1.getMaxDrawdown()).compareTo(r2.getMaxDrawdown());
-                break;
-            case Trades:
-                // lowest to highest
-                res = ((Integer) r1.getTrades()).compareTo(r2.getTrades());
-                break;
-            case TrueKelly:
+            case Kelly:
                 // highest to lowest
-                res = ((Double) r2.getTrueKelly()).compareTo(r1.getTrueKelly());
+                res = ((Double) r2.getKellyCriterion()).compareTo(r1.getKellyCriterion());
                 break;
             case PI:
                 // highest to lowest

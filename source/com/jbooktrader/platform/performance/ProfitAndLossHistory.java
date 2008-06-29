@@ -6,7 +6,7 @@ import java.util.*;
  * Holds P&L history.
  */
 public class ProfitAndLossHistory {
-    private final LinkedList<ProfitAndLoss> history;
+    private final List<ProfitAndLoss> history;
 
     public ProfitAndLossHistory() {
         history = new LinkedList<ProfitAndLoss>();
@@ -20,7 +20,7 @@ public class ProfitAndLossHistory {
         history.add(profitAndLoss);
     }
 
-    public LinkedList<ProfitAndLoss> getHistory() {
+    public List<ProfitAndLoss> getHistory() {
         return history;
     }
 

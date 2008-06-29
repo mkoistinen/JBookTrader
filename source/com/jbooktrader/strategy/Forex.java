@@ -2,7 +2,6 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -27,8 +26,8 @@ public class Forex extends Strategy {
     private final int entry;
 
 
-    public Forex(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
-        super(optimizationParams, marketBook, priceHistory);
+    public Forex(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeCashContract("EUR", "USD");
         // Define trading schedule

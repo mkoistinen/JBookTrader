@@ -3,7 +3,6 @@ package com.jbooktrader.strategy;
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
 import com.jbooktrader.indicator.price.*;
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -31,8 +30,8 @@ public class Balancer extends Strategy {
     private final int entry, rsiEntry;
 
 
-    public Balancer(StrategyParams optimizationParams, MarketBook marketBook, PriceHistory priceHistory) throws JBookTraderException {
-        super(optimizationParams, marketBook, priceHistory);
+    public Balancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+        super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
@@ -45,7 +44,7 @@ public class Balancer extends Strategy {
         rsiEntry = getParam(RSI_ENTRY);
 
         // Create technical indicators
-        rsiInd = new PriceRSI(priceHistory, getParam(PERIOD));
+        rsiInd = new PriceRSI(marketBook, getParam(PERIOD));
         depthBalanceInd = new BalanceEMA(marketBook, getParam(EMA_PERIOD));
         addIndicator("PriceRSI", rsiInd);
         addIndicator("Depth Balance", depthBalanceInd);

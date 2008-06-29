@@ -159,3 +159,4 @@ public class BackTestFileReader {
         return new MarketDepth(time, open, high, low, close, highPrice, lowPrice);
     }
 }
+

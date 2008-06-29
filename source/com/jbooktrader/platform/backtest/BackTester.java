@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.backtest;
 
 
-import com.jbooktrader.platform.bar.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
@@ -26,8 +25,6 @@ public class BackTester {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
-        PriceHistory priceHistory = strategy.getPriceBarHistory();
-
 
         long lineCount = 0;
         long totalLines = backTestFileReader.getTotalLineCount();
@@ -35,7 +32,6 @@ public class BackTester {
         MarketDepth marketDepth;
         while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
             lineCount++;
-            priceHistory.update(marketDepth);
             marketBook.add(marketDepth);
             long instant = marketBook.getLastMarketDepth().getTime();
             strategy.setTime(instant);

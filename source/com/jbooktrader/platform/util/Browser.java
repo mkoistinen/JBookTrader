@@ -1,5 +1,7 @@
 package com.jbooktrader.platform.util;
 
+import com.jbooktrader.platform.model.*;
+
 import javax.swing.*;
 import java.lang.reflect.*;
 
@@ -29,7 +31,7 @@ public class Browser {
                 }
 
                 if (selectedBrowser == null) {
-                    throw new Exception("Could not find web browser");
+                    throw new JBookTraderException("Could not find web browser");
                 } else {
                     Runtime.getRuntime().exec(new String[]{selectedBrowser, url});
                 }

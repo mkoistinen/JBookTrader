@@ -6,7 +6,7 @@ import com.jbooktrader.platform.strategy.*;
 import java.util.*;
 
 /**
- * Optimization optimizationResults table model
+ * Optimization results table model
  */
 public class ResultsTableModel extends TableDataModel {
     public ResultsTableModel(Strategy strategy) {
@@ -55,7 +55,7 @@ public class ResultsTableModel extends TableDataModel {
             item[++index] = optimizationResult.getMaxDrawdown();
             item[++index] = optimizationResult.getTrades();
             item[++index] = optimizationResult.getProfitFactor();
-            item[++index] = optimizationResult.getTrueKelly();
+            item[++index] = optimizationResult.getKellyCriterion();
             item[++index] = optimizationResult.getPerformanceIndex();
 
             addRow(item);

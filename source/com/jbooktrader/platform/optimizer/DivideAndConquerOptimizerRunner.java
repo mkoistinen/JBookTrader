@@ -54,7 +54,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 if (!uniqueParams.contains(params)) {
                     uniqueParams.add(params);
                     try {
-                        strategies.add((Strategy) strategyConstructor.newInstance(params, marketBook, priceHistory));
+                        strategies.add((Strategy) strategyConstructor.newInstance(params, marketBook));
                     } catch (Exception e) {
                         throw new JBookTraderException(e);
                     }
@@ -64,7 +64,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             long totalSteps = completedSteps + (long) lineCount * iterationsRemaining * strategies.size();
             setTotalSteps(totalSteps);
 
-            execute(strategies);
+            execute(strategies, 0);
 
             iterationsRemaining--;
             completedSteps += (long) lineCount * strategies.size();

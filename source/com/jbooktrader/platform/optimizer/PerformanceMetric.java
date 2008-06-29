@@ -5,7 +5,7 @@ public enum PerformanceMetric {
     MaxDD("Max DD"),
     Trades("Trades"),
     PF("Profit Factor"),
-    TrueKelly("True Kelly"),
+    Kelly("Kelly Criterion"),
     PI("Performance Index");
 
     private final String name;

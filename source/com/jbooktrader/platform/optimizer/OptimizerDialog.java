@@ -21,6 +21,8 @@ import java.util.List;
  */
 public class OptimizerDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
+    private final PreferencesHolder prefs;
+    private final String strategyName;
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
     private JTextField fileNameText, minTradesText;
@@ -34,8 +36,6 @@ public class OptimizerDialog extends JDialog {
     private ParamTableModel paramTableModel;
     private ResultsTableModel resultsTableModel;
     private Strategy strategy;
-    private final PreferencesHolder prefs;
-    private final String strategyName;
     private List<OptimizationResult> optimizationResults;
 
 
@@ -142,6 +142,7 @@ public class OptimizerDialog extends JDialog {
                     } else if (optimizationMethod == 1) {
                         optimizerRunner = new DivideAndConquerOptimizerRunner(OptimizerDialog.this, strategy, params);
                     }
+
                     new Thread(optimizerRunner).start();
                 } catch (Exception ex) {
                     MessageDialog.showError(OptimizerDialog.this, ex.getMessage());
@@ -153,7 +154,7 @@ public class OptimizerDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (optimizationResults == null || optimizationResults.isEmpty()) {
-                        MessageDialog.showMessage(OptimizerDialog.this, "No optimization optimizationResults to map.");
+                        MessageDialog.showMessage(OptimizerDialog.this, "No optimization results to map.");
                         return;
                     }
 
@@ -240,15 +241,15 @@ public class OptimizerDialog extends JDialog {
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(OptimizerFileName));
-        selectFileButton = new JButton("Browse...");
+        selectFileButton = new JButton("...");
+        selectFileButton.setPreferredSize(new Dimension(23, 23));
         fileNameLabel.setLabelFor(fileNameText);
 
         strategyPanel.add(fileNameLabel);
         strategyPanel.add(fileNameText);
         strategyPanel.add(selectFileButton);
 
-        SpringUtilities.makeCompactGrid(strategyPanel, 1, 3, 0, 0, 5, 5);
-
+        SpringUtilities.makeCompactGrid(strategyPanel, 1, 3, 0, 0, 12, 0);
 
         // strategy parametrs panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
@@ -266,10 +267,10 @@ public class OptimizerDialog extends JDialog {
 
 
         paramScrollPane.getViewport().add(paramTable);
-        paramScrollPane.setPreferredSize(new Dimension(100, 100));
+        paramScrollPane.setPreferredSize(new Dimension(0, 90));
 
         strategyParamPanel.add(paramScrollPane);
-        SpringUtilities.makeCompactGrid(strategyParamPanel, 1, 1, 0, 0, 0, 5);
+        SpringUtilities.makeCompactGrid(strategyParamPanel, 1, 1, 0, 0, 12, 0);
 
         // optimization options panel and its components
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
@@ -286,7 +287,7 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{PF.getName(), PL.getName(), TrueKelly.getName(), PI.getName()};
+        String[] sortFactors = new String[]{PF.getName(), PL.getName(), Kelly.getName(), PI.getName()};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -304,19 +305,20 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
 
-        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 6, 0, 0, 5, 0);
+        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 6, 0, 0, 12, 0);
 
         northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
         northPanel.add(strategyPanel);
         northPanel.add(strategyParamPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization options")));
         northPanel.add(optimizationOptionsPanel);
-        SpringUtilities.makeCompactGrid(northPanel, 5, 1, 12, 5, 12, 5);
+        northPanel.add(new TitledSeparator(new JLabel("Optimization Results")));
+        SpringUtilities.makeCompactGrid(northPanel, 6, 1, 12, 12, 0, 8);
 
         JScrollPane resultsScrollPane = new JScrollPane();
-        centerPanel.add(new TitledSeparator(new JLabel("Optimization optimizationResults")));
+        //centerPanel.add(new TitledSeparator(new JLabel("Optimization Results")));
         centerPanel.add(resultsScrollPane);
-        SpringUtilities.makeCompactGrid(centerPanel, 2, 1, 12, 5, 12, 5);
+        SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 0, 12, 0);
 
         resultsTable = new JTable();
         resultsScrollPane.getViewport().add(resultsTable);
@@ -340,7 +342,8 @@ public class OptimizerDialog extends JDialog {
         closeButton = new JButton("Close");
         closeButton.setMnemonic('S');
 
-        JPanel buttonsPanel = new JPanel();
+        FlowLayout flowLayout = new FlowLayout(FlowLayout.CENTER, 5, 12);
+        JPanel buttonsPanel = new JPanel(flowLayout);
         buttonsPanel.add(optimizeButton);
         buttonsPanel.add(optimizationMapButton);
         buttonsPanel.add(cancelButton);
@@ -351,7 +354,7 @@ public class OptimizerDialog extends JDialog {
         progressPanel.add(new JLabel(" Estimated remaining time: "));
         progressPanel.add(progressLabel);
         progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 5, 12, 5);
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 8, 12, 8);
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);

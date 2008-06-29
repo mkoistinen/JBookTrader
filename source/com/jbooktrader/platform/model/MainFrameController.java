@@ -21,8 +21,8 @@ import java.awt.event.*;
  */
 public class MainFrameController {
     private final MainFrameDialog mainViewDialog;
-    private final JTable tradingTable;
-    private final TradingTableModel tradingTableModel;
+    private final JTable strategyTable;
+    private final StrategyTableModel strategyTableModel;
     private final PreferencesHolder prefs = PreferencesHolder.getInstance();
 
     public MainFrameController() throws JBookTraderException {
@@ -37,8 +37,8 @@ public class MainFrameController {
             mainViewDialog.setBounds(x, y, width, height);
         }
 
-        tradingTable = mainViewDialog.getTradingTable();
-        tradingTableModel = mainViewDialog.getTradingTableModel();
+        strategyTable = mainViewDialog.getStrategyTable();
+        strategyTableModel = mainViewDialog.getStrategyTableModel();
         assignListeners();
         new HeartBeatSender();
     }
@@ -56,19 +56,19 @@ public class MainFrameController {
     }
 
     private Strategy getSelectedRowStrategy() throws JBookTraderException {
-        int selectedRow = tradingTable.getSelectedRow();
+        int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
             throw new JBookTraderException("No strategy is selected.");
         }
-        return tradingTableModel.getStrategyForRow(selectedRow);
+        return strategyTableModel.getStrategyForRow(selectedRow);
     }
 
     private Strategy createSelectedRowStrategy() throws JBookTraderException {
-        int selectedRow = tradingTable.getSelectedRow();
+        int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
             throw new JBookTraderException("No strategy is selected.");
         }
-        return tradingTableModel.createStrategyForRow(selectedRow);
+        return strategyTableModel.createStrategyForRow(selectedRow);
     }
 
     private void openURL(String url) {
@@ -82,16 +82,16 @@ public class MainFrameController {
 
     private void assignListeners() {
 
-        tradingTable.addMouseListener(new MouseAdapter() {
+        strategyTable.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 int modifiers = e.getModifiers();
                 boolean actionRequested = (modifiers & InputEvent.BUTTON2_MASK) != 0;
                 actionRequested = actionRequested || (modifiers & InputEvent.BUTTON3_MASK) != 0;
                 if (actionRequested) {
-                    int selectedRow = tradingTable.rowAtPoint(e.getPoint());
-                    tradingTable.setRowSelectionInterval(selectedRow, selectedRow);
+                    int selectedRow = strategyTable.rowAtPoint(e.getPoint());
+                    strategyTable.setRowSelectionInterval(selectedRow, selectedRow);
                     mainViewDialog.showPopup(e);
-                    tradingTable.setRowSelectionInterval(selectedRow, selectedRow);
+                    strategyTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
             }
         });
@@ -200,8 +200,8 @@ public class MainFrameController {
                     Strategy strategy = getSelectedRowStrategy();
                     MarketBook book = strategy.getMarketBook();
                     if (book.size() != 0) {
-                        StrategyPerformanceChart spChart = new StrategyPerformanceChart(strategy);
-                        JFrame chartFrame = spChart.getChartFrame(mainViewDialog);
+                        PerformanceChart spChart = new PerformanceChart(mainViewDialog, strategy);
+                        JFrame chartFrame = spChart.getChart();
                         chartFrame.setVisible(true);
                     } else {
                         String msg = "There is no data to chart. Please run a strategy first.";

@@ -16,7 +16,7 @@ import java.io.*;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JDialog {
-    private static final Dimension MIN_SIZE = new Dimension(550, 120);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
     private final Strategy strategy;
     private final PreferencesHolder prefs;
     private JButton cancelButton, backTestButton, selectFileButton;
