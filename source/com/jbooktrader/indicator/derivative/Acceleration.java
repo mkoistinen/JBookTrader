@@ -3,7 +3,8 @@ package com.jbooktrader.indicator.derivative;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- *
+ * Acceleration of any indicator. Measures the rate of change in velocity
+ * of the underlying indicator.
  */
 public class Acceleration extends Indicator {
     private final double fastMultiplier, slowMultiplier, velocityMultiplier;

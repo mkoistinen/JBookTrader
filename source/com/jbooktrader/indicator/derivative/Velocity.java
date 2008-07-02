@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.derivative;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- *
+ * Velocity of any indicator
  */
 public class Velocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;

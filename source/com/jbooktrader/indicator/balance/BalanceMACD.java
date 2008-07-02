@@ -4,7 +4,7 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
 /**
- * Exponential moving average of market depth balance.
+ * MACD of market depth balance.
  */
 public class BalanceMACD extends Indicator {
     private final double fastMultiplier, slowMultiplier;

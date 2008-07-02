@@ -4,7 +4,7 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
 /**
- * Regressed depth balance
+ * Regressed market depth depth balance over a period of time
  */
 public class BalanceRegressed extends Indicator {
     private final int period;

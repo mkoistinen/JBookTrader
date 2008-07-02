@@ -5,8 +5,7 @@ import com.jbooktrader.platform.marketdepth.*;
 
 
 /**
- * Relative Strength Index. Implemented up to this specification:
- * http://en.wikipedia.org/wiki/Relative_strength
+ * Relative Strength Index of market depth balance
  */
 public class BalanceRSI extends Indicator {
     private final int periodLength;

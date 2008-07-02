@@ -4,7 +4,7 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 
 /**
- *
+ * Mid depth balance for the last 1-second bar
  */
 public class Balance extends Indicator {
 
