@@ -14,7 +14,7 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class VelocityRider extends Strategy {
+public class WildCat1 extends Strategy {
 
     // Technical indicators
     private final Indicator balanceMACDInd;
@@ -23,12 +23,13 @@ public class VelocityRider extends Strategy {
     private static final String PERIOD1 = "Period1";
     private static final String PERIOD2 = "Period2";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, exit;
 
 
-    public VelocityRider(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+    public WildCat1(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
         super(optimizationParams, marketBook);
 
         // Specify the contract to trade
@@ -42,6 +43,7 @@ public class VelocityRider extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
+        exit = getParam(EXIT);
         balanceMACDInd = new BalanceMACD(marketBook, getParam(PERIOD1), getParam(PERIOD2));
         addIndicator("balanceMACD", balanceMACDInd);
 
@@ -56,9 +58,12 @@ public class VelocityRider extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD1, 1, 60, 1, 142);
-        addParam(PERIOD2, 10, 100, 1, 524);
-        addParam(ENTRY, 5, 20, 1, 11);
+        // 145-525-14-8
+        // 156-741-16-8
+        addParam(PERIOD1, 130, 180, 1, 156);
+        addParam(PERIOD2, 670, 770, 1, 735);
+        addParam(ENTRY, 13, 19, 1, 16);
+        addParam(EXIT, 7, 14, 1, 8);
     }
 
     /**
@@ -72,6 +77,14 @@ public class VelocityRider extends Strategy {
             setPosition(1);
         } else if (balanceMACD <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && balanceMACD <= -exit) {
+                setPosition(0);
+            }
+            if (currentPosition < 0 && balanceMACD >= exit) {
+                setPosition(0);
+            }
         }
     }
 }

@@ -14,10 +14,10 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class WildCat extends Strategy {
+public class WildCat2 extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceMACDInd;
+    private final Indicator balanceMACDInd, balanceInd;
 
     // Strategy parameters names
     private static final String PERIOD1 = "Period1";
@@ -29,7 +29,7 @@ public class WildCat extends Strategy {
     private final int entry, exit;
 
 
-    public WildCat(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+    public WildCat2(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
         super(optimizationParams, marketBook);
 
         // Specify the contract to trade
@@ -44,7 +44,9 @@ public class WildCat extends Strategy {
 
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
+        balanceInd = new Balance(marketBook);
         balanceMACDInd = new BalanceMACD(marketBook, getParam(PERIOD1), getParam(PERIOD2));
+        addIndicator("balanceInd", balanceInd);
         addIndicator("balanceMACD", balanceMACDInd);
 
 
@@ -58,22 +60,10 @@ public class WildCat extends Strategy {
      */
     @Override
     public void setParams() {
-        /*
-        addParam(PERIOD1, 100, 200, 10, 145);
-        addParam(PERIOD2, 400, 600, 10, 525);
-        addParam(ENTRY, 5, 30, 1, 14);
-        addParam(EXIT, 1, 20, 1, 8);
-        */
-
-        // 145-525-14-8
-        // 156-741-16-8
-
-        addParam(PERIOD1, 100, 200, 5, 156);
-        addParam(PERIOD2, 400, 800, 5, 741);
-        addParam(ENTRY, 9, 18, 1, 16);
-        addParam(EXIT, 5, 10, 1, 8);
-
-
+        addParam(PERIOD1, 100, 200, 5, 146);
+        addParam(PERIOD2, 400, 800, 5, 646);
+        addParam(ENTRY, 5, 25, 1, 16);
+        addParam(EXIT, 25, 55, 1, 34);
     }
 
     /**
@@ -83,16 +73,17 @@ public class WildCat extends Strategy {
     @Override
     public void onBookChange() {
         double balanceMACD = balanceMACDInd.getValue();
+        double balance = balanceInd.getValue();
         if (balanceMACD >= entry) {
             setPosition(1);
         } else if (balanceMACD <= -entry) {
             setPosition(-1);
         } else {
             int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && balanceMACD <= -exit) {
+            if (currentPosition > 0 && balance <= -exit) {
                 setPosition(0);
             }
-            if (currentPosition < 0 && balanceMACD >= exit) {
+            if (currentPosition < 0 && balance >= exit) {
                 setPosition(0);
             }
         }

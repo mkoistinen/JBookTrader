@@ -3,8 +3,8 @@ package com.jbooktrader.platform.chart;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.*;
 
@@ -12,56 +12,12 @@ import java.util.*;
 
 
 /**
- * Multi-plot strategy performance chart which combines price,
- * indicators, executions, and P&L.
+ * Encapsulates performance chart data.
  */
-
-enum BarSize {
-    Second1("1 second", 1),
-    Second5("5 seconds", 5),
-    Second15("15 seconds", 15),
-    Second30("30 seconds", 30),
-    Minute1("1 minute", 60),
-    Minute5("5 minutes", 300),
-    Minute15("15 minutes", 900),
-    Minute30("30 minutes", 1800),
-    Hour1("1 hour", 3600);
-
-    private final String name;
-    private final int barSize;
-
-    BarSize(String name, int barSize) {
-        this.name = name;
-        this.barSize = barSize;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getSize() {
-        return barSize * 1000;
-    }
-
-
-    static public BarSize getBarSize(String name) {
-        for (BarSize barSize : values()) {
-            if (barSize.getName().equals(name)) {
-                return barSize;
-            }
-        }
-        return null;
-    }
-}
-
-
 public class PerformanceChartData {
     private final Strategy strategy;
-    private final PreferencesHolder prefs;
-
 
     public PerformanceChartData(Strategy strategy) {
-        prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
     }
 
@@ -70,15 +26,15 @@ public class PerformanceChartData {
     }
 
     public TimeSeries getProfitAndLossSeries() {
-        ProfitAndLossHistory plHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
+        NetProfitHistory netProfitHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
         TimeSeries ts = new TimeSeries("P&L", Second.class);
         ts.setRangeDescription("P&L");
 
         // make a defensive copy to prevent concurrent modification
-        List<ProfitAndLoss> profitAndLossHistory = new ArrayList<ProfitAndLoss>();
-        profitAndLossHistory.addAll(plHistory.getHistory());
+        List<TimedValue> profitAndLossHistory = new ArrayList<TimedValue>();
+        profitAndLossHistory.addAll(netProfitHistory.getHistory());
 
-        for (ProfitAndLoss profitAndLoss : profitAndLossHistory) {
+        for (TimedValue profitAndLoss : profitAndLossHistory) {
             ts.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
         }
 
@@ -137,11 +93,11 @@ public class PerformanceChartData {
 
     public OHLCDataset getIndicatorDataset(ChartableIndicator chartableIndicator, long frequency) {
 
-        List<IndicatorValue> indicatorValues = chartableIndicator.getIndicatorHistory();
+        List<TimedValue> indicatorValues = chartableIndicator.getIndicatorHistory();
         List<Bar> indicatorBars = new ArrayList<Bar>();
 
         Bar indicatorBar = null;
-        for (IndicatorValue indicatorValue : indicatorValues) {
+        for (TimedValue indicatorValue : indicatorValues) {
             long time = indicatorValue.getTime();
             double value = indicatorValue.getValue();
 

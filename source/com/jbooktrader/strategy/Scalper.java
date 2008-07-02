@@ -17,14 +17,14 @@ import com.jbooktrader.platform.util.*;
 public class Scalper extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceEMAInd;
+    private final Indicator balanceInd;
 
     // Strategy parameters names
-    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, exit;
 
 
     public Scalper(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
@@ -41,8 +41,9 @@ public class Scalper extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
-        balanceEMAInd = new BalanceEMA(marketBook, getParam(PERIOD));
-        addIndicator("balanceEMA", balanceEMAInd);
+        exit = getParam(EXIT);
+        balanceInd = new Balance(marketBook);
+        addIndicator("balance", balanceInd);
 
     }
 
@@ -54,8 +55,8 @@ public class Scalper extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 200, 300, 1, 209);
-        addParam(ENTRY, 9, 15, 1, 14);
+        addParam(ENTRY, 35, 60, 1, 50);
+        addParam(EXIT, 20, 60, 1, 45);
     }
 
     /**
@@ -64,11 +65,19 @@ public class Scalper extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double balanceEMA = balanceEMAInd.getValue();
-        if (balanceEMA >= entry) {
+        double balance = balanceInd.getValue();
+        if (balance >= entry) {
             setPosition(1);
-        } else if (balanceEMA <= -entry) {
+        } else if (balance <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && balance <= -exit) {
+                setPosition(0);
+            }
+            if (currentPosition < 0 && balance >= exit) {
+                setPosition(0);
+            }
         }
     }
 }

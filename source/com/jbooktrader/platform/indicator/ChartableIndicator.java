@@ -1,5 +1,7 @@
 package com.jbooktrader.platform.indicator;
 
+import com.jbooktrader.platform.util.*;
+
 import java.util.*;
 
 /**
@@ -8,12 +10,12 @@ import java.util.*;
 public class ChartableIndicator {
     private final Indicator indicator;
     private final String name;
-    private final List<IndicatorValue> indicatorValues;
+    private final List<TimedValue> indicatorValues;
 
     public ChartableIndicator(String name, Indicator indicator) {
         this.name = name;
         this.indicator = indicator;
-        indicatorValues = new ArrayList<IndicatorValue>();
+        indicatorValues = new ArrayList<TimedValue>();
     }
 
     public String getName() {
@@ -24,12 +26,12 @@ public class ChartableIndicator {
         return indicator;
     }
 
-    public List<IndicatorValue> getIndicatorHistory() {
+    public List<TimedValue> getIndicatorHistory() {
         return indicatorValues;
     }
 
     public void add(long time, double value) {
-        indicatorValues.add(new IndicatorValue(time, value));
+        indicatorValues.add(new TimedValue(time, value));
     }
 
 }
