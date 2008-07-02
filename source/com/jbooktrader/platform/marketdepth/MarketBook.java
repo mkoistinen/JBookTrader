@@ -63,12 +63,12 @@ public class MarketBook {
         return marketDepths.size() == 0;
     }
 
-    synchronized public void add(MarketDepth marketDepth) {
+    public void add(MarketDepth marketDepth) {
         //todo: reset book and indicators at the start of the day for backtesting and optimization purposes
         marketDepths.add(marketDepth);
     }
 
-    synchronized public MarketDepth getMarketDepth(int index) {
+    public MarketDepth getMarketDepth(int index) {
         return marketDepths.get(index);
     }
 

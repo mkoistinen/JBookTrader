@@ -11,10 +11,10 @@ import java.awt.event.*;
 
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
+    private final PreferencesHolder prefs;
     private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText;
     private JPasswordField emailPasswordField;
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
-    private final PreferencesHolder prefs;
 
     public PreferencesDialog(JFrame parent) {
         super(parent);

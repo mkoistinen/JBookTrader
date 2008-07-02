@@ -15,12 +15,11 @@ import java.util.*;
  * Scroll bar for a combined chart where the horizontal axis represents dates
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
-
     private static final int STEPS = 10000;
     private final DateAxis dateAxis;
     private final Range range;
-    private double rangeMin, dateRange, ratio;
     private final CombinedDomainXYPlot combinedDomainPlot;
+    private double rangeMin, dateRange, ratio;
 
     public DateScrollBar(CombinedDomainXYPlot combinedDomainPlot) {
         super(HORIZONTAL);

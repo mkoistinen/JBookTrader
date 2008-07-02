@@ -24,7 +24,7 @@ import java.util.List;
 
 
 /**
- * Contour plot of optimization optimizationResults
+ * Contour plot of optimization results
  */
 public class OptimizationMap {
     private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
@@ -164,7 +164,7 @@ public class OptimizationMap {
     private double getMetric(OptimizationResult optimizationResult) {
         double metric = 0;
         switch (sortPerformanceMetric) {
-            case PL:
+            case NetProfit:
                 metric = optimizationResult.getNetProfit();
                 break;
             case PF:

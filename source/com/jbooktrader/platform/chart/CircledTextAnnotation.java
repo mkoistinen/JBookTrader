@@ -10,17 +10,16 @@ import java.awt.*;
 import java.awt.geom.*;
 
 /**
- * Defines the shape of the markers which show order executions on the
- * strategy performance chart. In this implementation, the shape of a marker
- * is a solid circle with a letter "L", "S", or "F" inside the circle,
- * designating the "long", "short", and "flat" positions resulting from
- * order executions.
+ * Defines the shape of the markers which show strategy positions on the
+ * performance chart. In this implementation, the shape of a marker is a
+ * solid circle with a number inside, designating the strategy position
+ * at a point in time.
  */
 public class CircledTextAnnotation extends XYTextAnnotation {
     private final int radius;
-    private Color color;
     private final Stroke circleStroke = new BasicStroke(1);
     private final Paint circleColor = new Color(250, 240, 150);
+    private Color color;
 
     public CircledTextAnnotation(String text, double x, double y, int radius) {
         super(text, x, y);

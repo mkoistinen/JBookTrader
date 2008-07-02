@@ -11,14 +11,13 @@ import java.util.*;
 
 
 public final class Report {
+    private final static String FILE_SEP = System.getProperty("file.separator");
+    private final static String REPORT_DIR = JBookTrader.getAppPath() + FILE_SEP + "reports" + FILE_SEP;
     private final String fieldStart, fieldEnd, rowStart, rowEnd, fieldBreak;
     private final ReportRenderer renderer;
-
     private final SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
     private PrintWriter writer;
     private static boolean isDisabled;
-    private final static String FILE_SEP = System.getProperty("file.separator");
-    private final static String REPORT_DIR = JBookTrader.getAppPath() + FILE_SEP + "reports" + FILE_SEP;
 
     public Report(String fileName) throws IOException, JBookTraderException {
         String reportRendererClass = PreferencesHolder.getInstance().get(ReportRenderer);

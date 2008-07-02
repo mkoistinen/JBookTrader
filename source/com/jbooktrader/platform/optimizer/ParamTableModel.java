@@ -25,9 +25,9 @@ public class ParamTableModel extends TableDataModel {
     }
 
     @Override
-    public boolean isCellEditable(int row, int col) {
-        // param name column cannot be edited
-        return !(col == 0);
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        // param name column is fixed and cannot be edited
+        return (columnIndex != 0);
     }
 
     public void setParams(StrategyParams strategyParams) {

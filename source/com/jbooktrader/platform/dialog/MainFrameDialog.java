@@ -3,7 +3,7 @@ package com.jbooktrader.platform.dialog;
 
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
-import static com.jbooktrader.platform.model.StrategyTableModel.Column.*;
+import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -19,13 +19,12 @@ import java.net.*;
  * which acts as a simple "view" of the undelying model.
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
+    private final Toolkit toolkit;
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
     private StrategyTableModel strategyTableModel;
     private JTable strategyTable;
     private JPopupMenu popupMenu;
-    private final Toolkit toolkit;
-
 
     public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
@@ -244,9 +243,9 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
         // set custom column renderers
         TableColumnModel columnModel = strategyTable.getColumnModel();
-        NumberRenderer nr2 = new NumberRenderer(2);
-        columnModel.getColumn(PL.ordinal()).setCellRenderer(nr2);
-        columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr2);
+        NumberRenderer nr0 = new NumberRenderer(0);
+        columnModel.getColumn(NetProfit.ordinal()).setCellRenderer(nr0);
+        columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr0);
         NumberRenderer nr5 = new NumberRenderer(5);
         columnModel.getColumn(LowPrice.ordinal()).setCellRenderer(nr5);
         columnModel.getColumn(HighPrice.ordinal()).setCellRenderer(nr5);

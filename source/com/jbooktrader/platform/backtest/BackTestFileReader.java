@@ -15,12 +15,13 @@ import java.util.*;
 public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final static int COLUMNS = 8;
+    private final String fileName;
     private long previousTime;
     private SimpleDateFormat sdf;
     private BufferedReader reader;
     private int lineNumber, totalLines;
     private volatile boolean cancelled;
-    private final String fileName;
+
     private TimeZone tz;
 
     public int getTotalLineCount() {

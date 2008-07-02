@@ -31,11 +31,11 @@ import java.util.*;
 public class TradingSchedule {
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final int start, end;
-    private int exclusionStart, exclusionEnd;
     private final TimeZone tz;
-    private boolean hasExclusion;
     private final Calendar instant;
     private final String text;
+    private int exclusionStart, exclusionEnd;
+    private boolean hasExclusion;
 
     public TradingSchedule(String startTime, String endTime, String timeZone) throws JBookTraderException {
         tz = TimeZone.getTimeZone(timeZone);

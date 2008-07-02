@@ -15,12 +15,12 @@ import java.util.*;
  * backtesting and optimization of trading strategies.
  */
 public final class BackTestFileWriter {
-    private final static String FILE_SEP = System.getProperty("file.separator");
+    private static final String FILE_SEP = System.getProperty("file.separator");
     private static final String LINE_SEP = System.getProperty("line.separator");
     private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";
+    private final DecimalFormat decimalFormat;
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
-    private final DecimalFormat decimalFormat;
 
     public BackTestFileWriter(Strategy strategy) throws IOException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);

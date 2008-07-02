@@ -12,11 +12,10 @@ import java.util.*;
  * Sends SSL Mail
  */
 public class SecureMailSender {
-
-    private static SecureMailSender instance;
     private final Properties props;
     private final String user, password, subject, recipient;
     private final boolean isEnabled;
+    private static SecureMailSender instance;
 
     // inner class
     private class Mailer extends Thread {
