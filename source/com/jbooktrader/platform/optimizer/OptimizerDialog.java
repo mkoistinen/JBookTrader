@@ -287,7 +287,7 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{PF.getName(), PL.getName(), Kelly.getName(), PI.getName()};
+        String[] sortFactors = new String[]{PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName()};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -354,7 +354,7 @@ public class OptimizerDialog extends JDialog {
         progressPanel.add(new JLabel(" Estimated remaining time: "));
         progressPanel.add(progressLabel);
         progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 8, 12, 8);
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 12, 12, 0);
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);
@@ -371,20 +371,18 @@ public class OptimizerDialog extends JDialog {
 
     private void initParams() {
         try {
-            String className = "com.jbooktrader.strategy." + strategyName;
-            strategy = ClassFinder.getInstance(className);
+            strategy = ClassFinder.getInstance(strategyName);
             paramTableModel.setParams(strategy.getParams());
             setParamTableColumns();
             resultsTableModel = new ResultsTableModel(strategy);
             resultsTable.setModel(resultsTableModel);
 
             // set custom column renderers
-            NumberRenderer nr2 = new NumberRenderer(2);
             int params = strategy.getParams().size();
             TableColumnModel resultsColumnModel = resultsTable.getColumnModel();
             for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
                 int columnIndex = performanceMetric.ordinal() + params;
-                resultsColumnModel.getColumn(columnIndex).setCellRenderer(nr2);
+                resultsColumnModel.getColumn(columnIndex).setCellRenderer(new NumberRenderer(performanceMetric.getPrecision()));
             }
         } catch (Exception e) {
             Dispatcher.getReporter().report(e);

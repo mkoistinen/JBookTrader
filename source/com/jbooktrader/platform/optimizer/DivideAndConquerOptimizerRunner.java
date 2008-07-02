@@ -48,7 +48,6 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 tasks.addAll(getTasks(params));
             }
 
-
             strategies.clear();
             for (StrategyParams params : tasks) {
                 if (!uniqueParams.contains(params)) {
@@ -62,9 +61,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             }
 
             long totalSteps = completedSteps + (long) lineCount * iterationsRemaining * strategies.size();
-            setTotalSteps(totalSteps);
-
-            execute(strategies, 0);
+            execute(strategies, 0, totalSteps);
 
             iterationsRemaining--;
             completedSteps += (long) lineCount * strategies.size();
@@ -73,13 +70,11 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
             }
 
-
             topParams.clear();
             numberOfCandidates = (int) Math.min(Math.sqrt(TARGET_STRATEGIES_SIZE), optimizationResults.size());
             for (int index = 0; index < numberOfCandidates; index++) {
                 topParams.add(optimizationResults.get(index).getParams());
             }
-
 
             bestParamsList.clear();
             for (StrategyParams params : topParams) {

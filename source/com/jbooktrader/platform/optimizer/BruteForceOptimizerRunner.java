@@ -20,11 +20,10 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         LinkedList<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();
         long totalSteps = (long) lineCount * taskSize;
-        setTotalSteps(totalSteps);
 
         ArrayList<Strategy> strategies = new ArrayList<Strategy>();
 
-        while (!tasks.isEmpty()) {
+        while (!tasks.isEmpty() && !cancelled) {
             strategies.clear();
             while (!tasks.isEmpty() && strategies.size() != CHUNK_SIZE) {
                 StrategyParams params = tasks.removeFirst();
@@ -36,7 +35,8 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
                 }
 
             }
-            execute(strategies, taskSize);
+
+            execute(strategies, taskSize, totalSteps);
         }
     }
 }
