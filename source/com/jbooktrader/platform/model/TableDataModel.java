@@ -4,8 +4,8 @@ import javax.swing.table.*;
 import java.util.*;
 
 public class TableDataModel extends AbstractTableModel {
-    private String[] schema;
     private final List<Object> rows;
+    private String[] schema;
 
     public TableDataModel() {
         rows = new ArrayList<Object>();

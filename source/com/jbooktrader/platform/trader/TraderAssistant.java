@@ -10,6 +10,7 @@ import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.io.*;
@@ -53,6 +54,19 @@ public class TraderAssistant {
     public Strategy getStrategy(int strategyId) {
         return strategies.get(strategyId);
     }
+
+    public Strategy getStrategy(String name) {
+        Strategy strategy = null;
+        for (Map.Entry<Integer, Strategy> mapEntry : strategies.entrySet()) {
+            Strategy thisStrategy = mapEntry.getValue();
+            if (thisStrategy.getName().equals(name)) {
+                strategy = thisStrategy;
+                break;
+            }
+        }
+        return strategy;
+    }
+
 
     public void connect() throws JBookTraderException {
         if (socket == null || !socket.isConnected()) {
@@ -118,6 +132,7 @@ public class TraderAssistant {
         strategies.put(nextStrategyID, strategy);
         Dispatcher.Mode mode = Dispatcher.getMode();
         if (mode == ForwardTest || mode == Trade) {
+            HeartBeatSender.getInstance().addStrategy(strategy);
             Report strategyReport = new Report(strategy.getName());
             strategyReport.report(strategy.getStrategyReportHeaders());
             strategy.setReport(strategyReport);
@@ -129,6 +144,21 @@ public class TraderAssistant {
             Dispatcher.strategyStarted();
         }
     }
+
+    public synchronized void removeStrategy(String name) {
+        Strategy strategy = null;
+        for (Map.Entry<Integer, Strategy> mapEntry : strategies.entrySet()) {
+            Strategy thisStrategy = mapEntry.getValue();
+            if (thisStrategy.getName().equals(name)) {
+                strategy = thisStrategy;
+                break;
+            }
+        }
+        if (strategy != null) {
+            strategies.remove(strategy.getId());
+        }
+    }
+
 
     public void setAccountCode(String accountCode) {
         this.accountCode = accountCode;

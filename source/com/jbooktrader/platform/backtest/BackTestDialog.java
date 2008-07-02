@@ -17,7 +17,7 @@ import java.io.*;
  */
 public class BackTestDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
-    private final Strategy strategy;
+    private Strategy strategy;
     private final PreferencesHolder prefs;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
@@ -90,7 +90,7 @@ public class BackTestDialog extends JDialog {
                 if (btsr != null) {
                     btsr.cancel();
                 }
-                dispose();
+                signalCompleted();
             }
         });
 
@@ -100,7 +100,7 @@ public class BackTestDialog extends JDialog {
                 if (btsr != null) {
                     btsr.cancel();
                 }
-                dispose();
+                signalCompleted();
             }
         });
 
@@ -122,6 +122,11 @@ public class BackTestDialog extends JDialog {
         });
     }
 
+    public void dispose() {
+        btsr = null;
+        strategy = null;
+        super.dispose();
+    }
 
     private void init() {
 

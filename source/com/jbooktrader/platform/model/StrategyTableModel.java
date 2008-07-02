@@ -1,9 +1,11 @@
 package com.jbooktrader.platform.model;
 
 import com.jbooktrader.platform.marketdepth.*;
+import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
 import java.util.*;
@@ -11,37 +13,16 @@ import java.util.*;
 /**
  */
 public class StrategyTableModel extends TableDataModel {
-
-    // inner class to represent table schema
-    public enum Column {
-        Strategy("Strategy", String.class),
-        Symbol("Symbol", String.class),
-        Balance("Balance", Integer.class),
-        LowPrice("Low Price", Double.class),
-        HighPrice("High Price", Double.class),
-        Position("Position", Integer.class),
-        Trades("Trades", Integer.class),
-        MaxDD("Max DD", Double.class),
-        PL("P&L", Double.class);
-
-        private final String columnName;
-        private final Class<?> columnClass;
-
-        Column(String columnName, Class<?> columnClass) {
-            this.columnName = columnName;
-            this.columnClass = columnClass;
-        }
-    }
-
-    private final Map<Integer, Strategy> rows = new HashMap<Integer, Strategy>();
+    private final TraderAssistant traderAssistant;
 
     public StrategyTableModel() {
-        Column[] columns = Column.values();
+        StrategyTableColumn[] columns = StrategyTableColumn.values();
         ArrayList<String> allColumns = new ArrayList<String>();
-        for (Column column : columns) {
-            allColumns.add(column.columnName);
+        for (StrategyTableColumn column : columns) {
+            allColumns.add(column.getColumnName());
         }
         setSchema(allColumns.toArray(new String[columns.length]));
+        traderAssistant = Dispatcher.getTrader().getAssistant();
     }
 
     @Override
@@ -51,36 +32,42 @@ public class StrategyTableModel extends TableDataModel {
 
     @Override
     public Class<?> getColumnClass(int col) {
-        Column column = Column.values()[col];
-        return column.columnClass;
+        StrategyTableColumn column = StrategyTableColumn.values()[col];
+        return column.getColumnClass();
+    }
+
+    public String getStrategyNameForRow(int row) {
+        return (String) getRow(row)[Strategy.ordinal()];
     }
 
     public Strategy getStrategyForRow(int row) {
-        return rows.get(row);
+        String name = getStrategyNameForRow(row);
+        return traderAssistant.getStrategy(name);
     }
 
     public Strategy createStrategyForRow(int row) throws JBookTraderException {
         Strategy strategy = getStrategyForRow(row);
-        if (strategy.isActive()) {
+        if (strategy != null && strategy.isActive()) {
             throw new JBookTraderException("Strategy " + strategy + " is already running.");
         }
-        strategy = ClassFinder.getInstance(strategy.getClass().getName());
-        rows.put(row, strategy);
+        String strategyName = getStrategyNameForRow(row);
+        traderAssistant.removeStrategy(strategyName);
+        strategy = ClassFinder.getInstance(strategyName);
         update(strategy);
         fireTableRowsUpdated(row, row);
         return strategy;
     }
 
     private int getRow(Strategy strategy) {
-        int row = -1;
-        for (Map.Entry<Integer, Strategy> mapEntry : rows.entrySet()) {
-            Strategy thisStrategy = mapEntry.getValue();
-            if (thisStrategy == strategy) {
-                row = mapEntry.getKey();
-                break;
+        int selectedRow = -1;
+        int rowCount = getRowCount();
+        for (int row = 0; row < rowCount; row++) {
+            String name = getStrategyNameForRow(row);
+            if (name.equals(strategy.getName())) {
+                selectedRow = row;
             }
         }
-        return row;
+        return selectedRow;
     }
 
     public synchronized void update(Strategy strategy) {
@@ -88,24 +75,24 @@ public class StrategyTableModel extends TableDataModel {
         if (row >= 0) {
             MarketBook marketBook = strategy.getMarketBook();
             if (marketBook.size() > 0) {
-                setValueAt(marketBook.getLastMarketDepth().getMidBalance(), row, Column.Balance.ordinal());
-                setValueAt(marketBook.getLastMarketDepth().getLowPrice(), row, Column.LowPrice.ordinal());
-                setValueAt(marketBook.getLastMarketDepth().getHighPrice(), row, Column.HighPrice.ordinal());
+                MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
+                setValueAt(lastMarketDepth.getMidBalance(), row, Balance.ordinal());
+                setValueAt(lastMarketDepth.getLowPrice(), row, LowPrice.ordinal());
+                setValueAt(lastMarketDepth.getHighPrice(), row, HighPrice.ordinal());
             }
             PositionManager positionManager = strategy.getPositionManager();
             PerformanceManager performanceManager = strategy.getPerformanceManager();
-            setValueAt(positionManager.getPosition(), row, Column.Position.ordinal());
-            setValueAt(performanceManager.getTrades(), row, Column.Trades.ordinal());
-            setValueAt(performanceManager.getMaxDrawdown(), row, Column.MaxDD.ordinal());
-            setValueAt(performanceManager.getNetProfit(), row, Column.PL.ordinal());
+            setValueAt(positionManager.getPosition(), row, Position.ordinal());
+            setValueAt(performanceManager.getTrades(), row, Trades.ordinal());
+            setValueAt(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
+            setValueAt(performanceManager.getNetProfit(), row, NetProfit.ordinal());
         }
     }
 
     public void addStrategy(Strategy strategy) {
         Object[] row = new Object[getColumnCount()];
-        row[Column.Strategy.ordinal()] = strategy.getName();
-        row[Column.Symbol.ordinal()] = strategy.getContract().m_symbol;
+        row[Strategy.ordinal()] = strategy.getName();
+        row[Symbol.ordinal()] = strategy.getContract().m_symbol;
         addRow(row);
-        rows.put(getRowCount() - 1, strategy);
     }
 }

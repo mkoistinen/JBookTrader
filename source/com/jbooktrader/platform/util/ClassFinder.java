@@ -30,8 +30,8 @@ public class ClassFinder {
                 File packageDir = new File(file.getPath() + '/' + packageName);
                 if (packageDir.exists()) {
                     for (File f : packageDir.listFiles()) {
-                        String className = packageName + f.getName().substring(0, f.getName().lastIndexOf('.'));
-                        className = className.replace('/', '.');
+                        String className = f.getName();
+                        className = className.substring(0, className.lastIndexOf(".class"));
                         classNames.add(className);
                     }
                 }
@@ -44,7 +44,8 @@ public class ClassFinder {
 
     public static Strategy getInstance(String name) throws JBookTraderException {
         try {
-            Class<? extends Strategy> clazz = Class.forName(name).asSubclass(Strategy.class);
+            String className = "com.jbooktrader.strategy." + name;
+            Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
             Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
             Constructor<?> constructor = clazz.getConstructor(parameterTypes);
             return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());

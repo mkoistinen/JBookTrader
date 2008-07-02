@@ -24,12 +24,13 @@ public abstract class Strategy {
     private final List<String> strategyReportHeaders;
     private final StrategyParams params;
     private final MarketBook marketBook;
-    private final DecimalFormat nf2, nf5;
-    private final SimpleDateFormat df;
+    private final DecimalFormat df2, df5;
+    private final SimpleDateFormat sdf;
     private final Report eventReport;
     private final String name;
     private final List<Object> strategyReportColumns;
     private final List<ChartableIndicator> indicators;
+    private final boolean isOptimizationMode;
     private Report strategyReport;
     private Contract contract;
     private TradingSchedule tradingSchedule;
@@ -38,7 +39,6 @@ public abstract class Strategy {
     private boolean isActive, hasValidIndicators;
     private int position, id;
     private long time;
-    private final boolean isOptimizationMode;
 
 
     /**
@@ -74,9 +74,9 @@ public abstract class Strategy {
         name = getClass().getSimpleName();
         indicators = new ArrayList<ChartableIndicator>();
 
-        nf2 = NumberFormatterFactory.getNumberFormatter(2);
-        nf5 = NumberFormatterFactory.getNumberFormatter(5);
-        df = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
+        df2 = NumberFormatterFactory.getNumberFormatter(2);
+        df5 = NumberFormatterFactory.getNumberFormatter(5);
+        sdf = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
 
         eventReport = Dispatcher.getReporter();
         isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.Optimization);
@@ -133,27 +133,24 @@ public abstract class Strategy {
 
 
     public void report() {
-        boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
-        strategyReportColumns.clear();
         MarketDepth marketDepth = marketBook.getLastMarketDepth();
-        int trades = isCompletedTrade ? performanceManager.getTrades() : performanceManager.getTrades() + 1;
-        strategyReportColumns.add(trades);
-        strategyReportColumns.add(nf5.format(marketDepth.getLowPrice()));
-        strategyReportColumns.add(nf5.format(marketDepth.getHighPrice()));
+        boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
+
+        strategyReportColumns.clear();
+        strategyReportColumns.add(isCompletedTrade ? performanceManager.getTrades() : "--");
+        strategyReportColumns.add(df5.format(marketDepth.getLowPrice()));
+        strategyReportColumns.add(df5.format(marketDepth.getHighPrice()));
         strategyReportColumns.add(positionManager.getPosition());
-        strategyReportColumns.add(nf5.format(positionManager.getAvgFillPrice()));
-        strategyReportColumns.add(nf2.format(performanceManager.getTradeCommission()));
-        String tradeProfit = isCompletedTrade ? nf2.format(performanceManager.getTradeProfit()) : "N/A";
-        strategyReportColumns.add(tradeProfit);
-        strategyReportColumns.add(nf2.format(performanceManager.getNetProfit()));
+        strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
+        strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
+        strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");
+        strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
 
         for (ChartableIndicator chartableIndicator : indicators) {
-            synchronized (nf2) {
-                strategyReportColumns.add(nf2.format(chartableIndicator.getIndicator().getValue()));
-            }
+            strategyReportColumns.add(df2.format(chartableIndicator.getIndicator().getValue()));
         }
 
-        strategyReport.report(strategyReportColumns, df.format(getTime()));
+        strategyReport.report(strategyReportColumns, sdf.format(getTime()));
     }
 
 
@@ -203,7 +200,7 @@ public abstract class Strategy {
         this.contract = contract;
         contract.m_multiplier = String.valueOf(multiplier);
         this.tradingSchedule = tradingSchedule;
-        df.setTimeZone(tradingSchedule.getTimeZone());
+        sdf.setTimeZone(tradingSchedule.getTimeZone());
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
         marketBook.setName(name);
@@ -282,7 +279,7 @@ public abstract class Strategy {
         if (strategyReport != null) {
             strategyReportColumns.clear();
             strategyReportColumns.add(message);
-            strategyReport.report(strategyReportColumns, df.format(getTime()));
+            strategyReport.report(strategyReportColumns, sdf.format(getTime()));
         }
     }
 }

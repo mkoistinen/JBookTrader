@@ -40,7 +40,6 @@ public class MainFrameController {
         strategyTable = mainViewDialog.getStrategyTable();
         strategyTableModel = mainViewDialog.getStrategyTableModel();
         assignListeners();
-        new HeartBeatSender();
     }
 
     private void exit() {
@@ -55,12 +54,28 @@ public class MainFrameController {
         }
     }
 
+    private String getSelectedStrategyName() throws JBookTraderException {
+        int selectedRow = strategyTable.getSelectedRow();
+        if (selectedRow < 0) {
+            throw new JBookTraderException("No strategy is selected.");
+        }
+        return strategyTableModel.getStrategyNameForRow(selectedRow);
+    }
+
+
     private Strategy getSelectedRowStrategy() throws JBookTraderException {
         int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
             throw new JBookTraderException("No strategy is selected.");
         }
-        return strategyTableModel.getStrategyForRow(selectedRow);
+
+        Strategy strategy = strategyTableModel.getStrategyForRow(selectedRow);
+        if (strategy == null) {
+            String msg = "Please run this strategy first.";
+            throw new JBookTraderException(msg);
+        }
+
+        return strategy;
     }
 
     private Strategy createSelectedRowStrategy() throws JBookTraderException {
@@ -130,9 +145,9 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent ae) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    Strategy strategy = getSelectedRowStrategy();
+                    String name = getSelectedStrategyName();
                     Dispatcher.setMode(Optimization);
-                    new OptimizerDialog(mainViewDialog, strategy.getName());
+                    new OptimizerDialog(mainViewDialog, name);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());
                 } finally {
@@ -185,7 +200,7 @@ public class MainFrameController {
                         MessageDialog.showMessage(mainViewDialog, msg);
                     }
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.toString());
+                    MessageDialog.showError(mainViewDialog, t.getMessage());
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
