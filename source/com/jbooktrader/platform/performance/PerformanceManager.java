@@ -4,6 +4,7 @@ import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
 /**
  * Performance manager evaluates trading strategy performance based on statistics which include
@@ -13,21 +14,22 @@ public class PerformanceManager {
     private final int multiplier;
     private final Commission commission;
     private final Strategy strategy;
-    private final ProfitAndLossHistory profitAndLossHistory;
+    private final NetProfitHistory netProfitHistory;
 
     private int trades, profitableTrades, previousPosition;
+    private long exposureStart, totalExposure;
     private double tradeCommission, totalCommission;
     private double positionValue;
     private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
     private double peakNetProfit, maxDrawdown;
-    private double sumTradeProfit, sumTradeProfitSquared, riskAdjustedProfitPerTrade;
+    private double sumTradeProfit, sumTradeProfitSquared;
     private boolean isCompletedTrade;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
-        profitAndLossHistory = new ProfitAndLossHistory();
+        netProfitHistory = new NetProfitHistory();
     }
 
     public int getTrades() {
@@ -70,8 +72,8 @@ public class PerformanceManager {
         return totalSold - totalBought + positionValue - totalCommission;
     }
 
-    public ProfitAndLossHistory getProfitAndLossHistory() {
-        return profitAndLossHistory;
+    public NetProfitHistory getProfitAndLossHistory() {
+        return netProfitHistory;
     }
 
     public double getKellyCriterion() {
@@ -91,10 +93,18 @@ public class PerformanceManager {
 
     public double getPerformanceIndex() {
         double stdev = (trades - 1) * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit;
-        stdev = Math.sqrt(stdev) / (trades - 1);
-        return getAverageProfitPerTrade() / stdev;
+        if (stdev != 0) {
+            stdev = Math.sqrt(stdev) / (trades - 1);
+            return getAverageProfitPerTrade() / stdev;
+        } else {
+            return 0;
+        }
     }
 
+    public double getExposure() {
+        int size = strategy.getMarketBook().size();
+        return 100 * totalExposure / (double) size;
+    }
 
     public void update(double price, int position) {
         positionValue = position * price * multiplier;
@@ -118,18 +128,14 @@ public class PerformanceManager {
         update(avgFillPrice, position);
 
 
-        isCompletedTrade = false;
-        if (previousPosition != 0) {
-            isCompletedTrade = true;
+        isCompletedTrade = (previousPosition != 0);
+        if (isCompletedTrade) {
             trades++;
-            tradeProfit = netProfit - netProfitAsOfPreviousTrade;
 
+            tradeProfit = netProfit - netProfitAsOfPreviousTrade;
             sumTradeProfit += tradeProfit;
             sumTradeProfitSquared += (tradeProfit * tradeProfit);
-
-
             netProfitAsOfPreviousTrade = netProfit;
-
 
             if (tradeProfit >= 0) {
                 profitableTrades++;
@@ -141,7 +147,16 @@ public class PerformanceManager {
 
         if ((Dispatcher.getMode() != Optimization)) {
             long time = strategy.getTime();
-            profitAndLossHistory.add(new ProfitAndLoss(time, netProfit));
+            netProfitHistory.add(new TimedValue(time, netProfit));
+        }
+
+        int index = strategy.getMarketBook().size();
+        if (previousPosition == 0) {
+            exposureStart = index;
+        }
+
+        if (position == 0) {
+            totalExposure += (index - exposureStart);
         }
 
         previousPosition = position;

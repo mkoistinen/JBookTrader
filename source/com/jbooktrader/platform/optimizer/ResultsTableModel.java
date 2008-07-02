@@ -51,9 +51,10 @@ public class ResultsTableModel extends TableDataModel {
                 item[++index] = param.getValue();
             }
 
+            item[++index] = optimizationResult.getTrades();
+            item[++index] = optimizationResult.getExposure();
             item[++index] = optimizationResult.getNetProfit();
             item[++index] = optimizationResult.getMaxDrawdown();
-            item[++index] = optimizationResult.getTrades();
             item[++index] = optimizationResult.getProfitFactor();
             item[++index] = optimizationResult.getKellyCriterion();
             item[++index] = optimizationResult.getPerformanceIndex();

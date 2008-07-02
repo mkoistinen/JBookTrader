@@ -1,22 +1,30 @@
 package com.jbooktrader.platform.optimizer;
 
 public enum PerformanceMetric {
-    PL("P&L"),
-    MaxDD("Max DD"),
-    Trades("Trades"),
-    PF("Profit Factor"),
-    Kelly("Kelly Criterion"),
-    PI("Performance Index");
+    Trades("Trades", 0),
+    Exposure("Exposure", 0),
+    NetProfit("Net Profit", 0),
+    MaxDD("Max DD", 0),
+    PF("Profit Factor", 2),
+    Kelly("Kelly", 0),
+    PI("PI", 2);
 
     private final String name;
+    private final int precision;
 
-    PerformanceMetric(String name) {
+    PerformanceMetric(String name, int precision) {
         this.name = name;
+        this.precision = precision;
     }
 
     public String getName() {
         return name;
     }
+
+    public int getPrecision() {
+        return precision;
+    }
+
 
     static public PerformanceMetric getColumn(String name) {
         for (PerformanceMetric performanceMetric : values()) {
