@@ -11,7 +11,7 @@ import java.util.*;
 public class MarketBook {
     private final static int INSERT = 0, UPDATE = 1, DELETE = 2;
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final List<MarketDepth> marketDepths;
+    private final LinkedList<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
     private BackTestFileWriter backTestFileWriter;
     private String name;
@@ -20,7 +20,7 @@ public class MarketBook {
     private double highPrice, lowPrice;
 
     public MarketBook() {
-        marketDepths = new ArrayList<MarketDepth>();
+        marketDepths = new LinkedList<MarketDepth>();
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
     }
@@ -59,21 +59,13 @@ public class MarketBook {
         return marketDepths.size();
     }
 
-    public boolean isEmpty() {
-        return marketDepths.size() == 0;
-    }
-
     public void add(MarketDepth marketDepth) {
         //todo: reset book and indicators at the start of the day for backtesting and optimization purposes
         marketDepths.add(marketDepth);
     }
 
-    public MarketDepth getMarketDepth(int index) {
-        return marketDepths.get(index);
-    }
-
     public MarketDepth getLastMarketDepth() {
-        return marketDepths.get(marketDepths.size() - 1);
+        return marketDepths.getLast();
     }
 
     synchronized public void reset() {

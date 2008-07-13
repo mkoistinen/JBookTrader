@@ -72,7 +72,7 @@ public abstract class Strategy {
         strategyReportHeaders.add("Total P&L");
 
         name = getClass().getSimpleName();
-        indicators = new ArrayList<ChartableIndicator>();
+        indicators = new LinkedList<ChartableIndicator>();
 
         df2 = NumberFormatterFactory.getNumberFormatter(2);
         df5 = NumberFormatterFactory.getNumberFormatter(5);
@@ -233,11 +233,12 @@ public abstract class Strategy {
 
     public void updateIndicators() throws JBookTraderException {
         hasValidIndicators = true;
+        long time = marketBook.getLastMarketDepth().getTime();
         for (ChartableIndicator chartableIndicator : indicators) {
             Indicator indicator = chartableIndicator.getIndicator();
             try {
                 double value = indicator.calculate();
-                long time = marketBook.getLastMarketDepth().getTime();
+
                 if (!isOptimizationMode) {
                     chartableIndicator.add(time, value);
                 }

@@ -50,12 +50,13 @@ public final class StrategyInformationDialog extends JDialog {
         PerformanceManager pm = strategy.getPerformanceManager();
         add(performancePanel, "Position", strategy.getPositionManager().getPosition());
         add(performancePanel, "Trades", pm.getTrades());
+        add(performancePanel, "Exposure", nf2.format(pm.getExposure()));
         add(performancePanel, "% Profitable", nf2.format(pm.getPercentProfitableTrades()));
         add(performancePanel, "Average trade", nf2.format(pm.getAverageProfitPerTrade()));
         add(performancePanel, "Net Profit", nf2.format(pm.getNetProfit()));
         add(performancePanel, "Max Drawdown", nf2.format(pm.getMaxDrawdown()));
         add(performancePanel, "Profit Factor", nf2.format(pm.getProfitFactor()));
-        add(performancePanel, "Kelly Criterion", nf2.format(pm.getKellyCriterion()));
+        add(performancePanel, "Kelly", nf2.format(pm.getKellyCriterion()));
         add(performancePanel, "Perf. Index", nf2.format(pm.getPerformanceIndex()));
         SpringUtilities.makeCompactGrid(performancePanel, performancePanel.getComponentCount() / 2, 2, 12, 12, 5, 5);
 

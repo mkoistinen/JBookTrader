@@ -26,11 +26,6 @@ public class StrategyTableModel extends TableDataModel {
     }
 
     @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-
-    @Override
     public Class<?> getColumnClass(int col) {
         StrategyTableColumn column = StrategyTableColumn.values()[col];
         return column.getColumnClass();
@@ -58,7 +53,7 @@ public class StrategyTableModel extends TableDataModel {
         return strategy;
     }
 
-    private int getRow(Strategy strategy) {
+    private int getRowForStrategy(Strategy strategy) {
         int selectedRow = -1;
         int rowCount = getRowCount();
         for (int row = 0; row < rowCount; row++) {
@@ -71,22 +66,22 @@ public class StrategyTableModel extends TableDataModel {
     }
 
     public synchronized void update(Strategy strategy) {
-        int row = getRow(strategy);
-        if (row >= 0) {
-            MarketBook marketBook = strategy.getMarketBook();
-            if (marketBook.size() > 0) {
-                MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
-                setValueAt(lastMarketDepth.getMidBalance(), row, Balance.ordinal());
-                setValueAt(lastMarketDepth.getLowPrice(), row, LowPrice.ordinal());
-                setValueAt(lastMarketDepth.getHighPrice(), row, HighPrice.ordinal());
-            }
-            PositionManager positionManager = strategy.getPositionManager();
-            PerformanceManager performanceManager = strategy.getPerformanceManager();
-            setValueAt(positionManager.getPosition(), row, Position.ordinal());
-            setValueAt(performanceManager.getTrades(), row, Trades.ordinal());
-            setValueAt(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
-            setValueAt(performanceManager.getNetProfit(), row, NetProfit.ordinal());
+        int row = getRowForStrategy(strategy);
+
+        MarketBook marketBook = strategy.getMarketBook();
+        if (marketBook.size() > 0) {
+            MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
+            setValueAt(lastMarketDepth.getMidBalance(), row, Balance.ordinal());
+            setValueAt(lastMarketDepth.getLowPrice(), row, LowPrice.ordinal());
+            setValueAt(lastMarketDepth.getHighPrice(), row, HighPrice.ordinal());
         }
+        PositionManager positionManager = strategy.getPositionManager();
+        PerformanceManager performanceManager = strategy.getPerformanceManager();
+        setValueAt(positionManager.getPosition(), row, Position.ordinal());
+        setValueAt(performanceManager.getTrades(), row, Trades.ordinal());
+        setValueAt(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
+        setValueAt(performanceManager.getNetProfit(), row, NetProfit.ordinal());
+
     }
 
     public void addStrategy(Strategy strategy) {

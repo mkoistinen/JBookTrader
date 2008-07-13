@@ -2,7 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.indicator.price.*;
+import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -15,22 +15,21 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Balancer extends Strategy {
+public class Walker extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceEmaInd, rsiInd;
+    private final Indicator emaBalanceInd, emaBalanceDisplacementInd;
 
     // Strategy parameters names
     private static final String EMA_PERIOD = "EmaPeriod";
-    private static final String RSI_PERIOD = "RsiPeriod";
-    private static final String BALANCE_ENTRY = "BalanceEntry";
-    private static final String RSI_ENTRY = "RsiEntry";
+    private static final String DISPLACEMENT_PERIOD = "DisplacementPeriod";
+    private static final String ENTRY = "Entry";
 
     // Strategy parameters values
-    private final int balanceEntry, rsiEntry;
+    private final int entry;
 
 
-    public Balancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+    public Walker(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
         super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
@@ -40,14 +39,14 @@ public class Balancer extends Strategy {
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        balanceEntry = getParam(BALANCE_ENTRY);
-        rsiEntry = getParam(RSI_ENTRY);
+        entry = getParam(ENTRY);
 
         // Create technical indicators
-        rsiInd = new PriceRSI(marketBook, getParam(RSI_PERIOD));
-        balanceEmaInd = new BalanceEMA(marketBook, getParam(EMA_PERIOD));
-        addIndicator("PriceRSI", rsiInd);
-        addIndicator("BalanceEMA", balanceEmaInd);
+        emaBalanceInd = new BalanceEMA(marketBook, getParam(EMA_PERIOD));
+        emaBalanceDisplacementInd = new Displacement(emaBalanceInd, getParam(DISPLACEMENT_PERIOD));
+
+        addIndicator("emaBalance", emaBalanceInd);
+        addIndicator("displacement", emaBalanceDisplacementInd);
 
     }
 
@@ -59,10 +58,9 @@ public class Balancer extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 1, 15, 1, 3);
-        addParam(RSI_PERIOD, 50, 1000, 50, 60);
-        addParam(BALANCE_ENTRY, 20, 45, 5, 34);
-        addParam(RSI_ENTRY, 0, 30, 5, 15);
+        addParam(EMA_PERIOD, 1, 100, 5, 15);
+        addParam(DISPLACEMENT_PERIOD, 100, 600, 5, 675);
+        addParam(ENTRY, 5, 100, 5, 45);
     }
 
     /**
@@ -71,11 +69,10 @@ public class Balancer extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double rsi = rsiInd.getValue() - 50;
-        double balanceEma = balanceEmaInd.getValue();
-        if (balanceEma >= balanceEntry && rsi <= -rsiEntry) {
+        double displacement = emaBalanceDisplacementInd.getValue();
+        if (displacement >= entry) {
             setPosition(1);
-        } else if (balanceEma <= -balanceEntry && rsi >= rsiEntry) {
+        } else if (displacement <= -entry) {
             setPosition(-1);
         }
     }

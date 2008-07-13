@@ -3,9 +3,12 @@ package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
+
+import java.util.*;
 
 /**
  * This class is responsible for running the strategy against historical market data
@@ -24,15 +27,17 @@ public class BackTester {
     public void execute() throws JBookTraderException {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
+        PerformanceManager performanceManager = strategy.getPerformanceManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
-        long lineCount = 0;
-        long totalLines = backTestFileReader.getTotalLineCount();
-        backTestFileReader.reset();
-        MarketDepth marketDepth;
-        while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
-            lineCount++;
+        long marketDepthCounter = 0;
+        LinkedList<MarketDepth> marketDepths = backTestFileReader.getAll();
+        int size = marketDepths.size();
+
+        for (MarketDepth marketDepth : marketDepths) {
+            marketDepthCounter++;
             marketBook.add(marketDepth);
+            performanceManager.update(marketDepth.getMidPrice(), positionManager.getPosition());
             long instant = marketBook.getLastMarketDepth().getTime();
             strategy.setTime(instant);
             strategy.updateIndicators();
@@ -45,8 +50,8 @@ public class BackTester {
             }
 
             positionManager.trade();
-            if (lineCount % 1000 == 0) {
-                backTestDialog.setProgress(lineCount, totalLines, "Running back test");
+            if (marketDepthCounter % 1000 == 0) {
+                backTestDialog.setProgress(marketDepthCounter, size, "Running back test");
             }
         }
 

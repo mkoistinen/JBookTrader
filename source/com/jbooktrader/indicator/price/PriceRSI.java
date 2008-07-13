@@ -9,31 +9,31 @@ import com.jbooktrader.platform.marketdepth.*;
  * http://en.wikipedia.org/wiki/Relative_strength
  */
 public class PriceRSI extends Indicator {
-    private final int periodLength;
+    private final double multiplier;
+    private double emaUp, emaDown;
+    private double previousPrice;
 
     public PriceRSI(MarketBook marketBook, int periodLength) {
         super(marketBook);
-        this.periodLength = periodLength;
+        multiplier = 2. / (periodLength + 1.);
     }
 
     @Override
     public double calculate() {
-        //todo: cache it
-        int lastIndex = marketBook.size() - 1;
-        int firstIndex = lastIndex - periodLength + 1;
-
-        double gains = 0, losses = 0;
-
-        for (int index = firstIndex + 1; index <= lastIndex; index++) {
-            double change = marketBook.getMarketDepth(index).getMidPrice() - marketBook.getMarketDepth(index - 1).getMidPrice();
-            gains += Math.max(0, change);
-            losses += Math.max(0, -change);
+        double price = marketBook.getLastMarketDepth().getMidPrice();
+        if (previousPrice != 0) {
+            double change = price - previousPrice;
+            double up = (change > 0) ? change : 0;
+            double down = (change < 0) ? -change : 0;
+            emaUp += (up - emaUp) * multiplier;
+            emaDown += (down - emaDown) * multiplier;
+            double sum = emaUp + emaDown;
+            value = (sum == 0) ? 50 : (100 * emaUp / sum);
+        } else {
+            value = 50;
         }
+        previousPrice = price;
 
-        double change = gains + losses;
-
-        value = (change == 0) ? 50 : (100 * gains / change);
         return value;
-
     }
 }

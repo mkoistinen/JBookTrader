@@ -41,15 +41,15 @@ public class PerformanceManager {
     }
 
     public double getPercentProfitableTrades() {
-        return (100d * profitableTrades / trades);
+        return (trades == 0) ? 0 : (100d * profitableTrades / trades);
     }
 
     public double getAverageProfitPerTrade() {
-        return netProfit / trades;
+        return (trades == 0) ? 0 : netProfit / trades;
     }
 
     public double getProfitFactor() {
-        return grossProfit / grossLoss;
+        return (grossLoss == 0) ? 0 : grossProfit / grossLoss;
     }
 
     public double getMaxDrawdown() {
@@ -84,8 +84,8 @@ public class PerformanceManager {
             double aveLoss = grossLoss / unprofitableTrades;
             double winLossRatio = aveProfit / aveLoss;
             double probabilityOfWin = profitableTrades / (double) trades;
-            double probabilityOfLoss = 1 - probabilityOfWin;
-            kellyCriterion = 100 * (probabilityOfWin - (probabilityOfLoss / winLossRatio));
+            kellyCriterion = probabilityOfWin - (1 - probabilityOfWin) / winLossRatio;
+            kellyCriterion *= 100;
         }
 
         return kellyCriterion;
@@ -103,14 +103,20 @@ public class PerformanceManager {
 
     public double getExposure() {
         int size = strategy.getMarketBook().size();
-        return 100 * totalExposure / (double) size;
+        return (size == 0) ? 0 : 100 * totalExposure / (double) size;
     }
 
     public void update(double price, int position) {
         positionValue = position * price * multiplier;
         netProfit = totalSold - totalBought + positionValue - totalCommission;
-        peakNetProfit = Math.max(netProfit, peakNetProfit);
-        maxDrawdown = Math.max(maxDrawdown, peakNetProfit - netProfit);
+        if (netProfit > peakNetProfit) {
+            peakNetProfit = netProfit;
+        }
+
+        double drawdown = peakNetProfit - netProfit;
+        if (drawdown > maxDrawdown) {
+            maxDrawdown = drawdown;
+        }
     }
 
     public void update(int quantity, double avgFillPrice, int position) {

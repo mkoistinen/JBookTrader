@@ -2,6 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -17,11 +18,11 @@ import com.jbooktrader.platform.util.*;
 public class WildCat2 extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceMACDInd, balanceInd;
+    private final Indicator balanceInd, balanceVelocityInd;
 
     // Strategy parameters names
-    private static final String PERIOD1 = "Period1";
-    private static final String PERIOD2 = "Period2";
+    private static final String FAST_PERIOD = "FastPeriod";
+    private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
@@ -45,9 +46,9 @@ public class WildCat2 extends Strategy {
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
         balanceInd = new Balance(marketBook);
-        balanceMACDInd = new BalanceMACD(marketBook, getParam(PERIOD1), getParam(PERIOD2));
-        addIndicator("balanceInd", balanceInd);
-        addIndicator("balanceMACD", balanceMACDInd);
+        balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        addIndicator("balance", balanceInd);
+        addIndicator("balanceVelocity", balanceVelocityInd);
 
 
     }
@@ -60,8 +61,8 @@ public class WildCat2 extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD1, 100, 200, 5, 146);
-        addParam(PERIOD2, 400, 800, 5, 646);
+        addParam(FAST_PERIOD, 100, 200, 5, 146);
+        addParam(SLOW_PERIOD, 400, 800, 5, 646);
         addParam(ENTRY, 5, 25, 1, 16);
         addParam(EXIT, 25, 55, 1, 34);
     }
@@ -72,11 +73,11 @@ public class WildCat2 extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double balanceMACD = balanceMACDInd.getValue();
+        double balanceVelocity = balanceVelocityInd.getValue();
         double balance = balanceInd.getValue();
-        if (balanceMACD >= entry) {
+        if (balanceVelocity >= entry) {
             setPosition(1);
-        } else if (balanceMACD <= -entry) {
+        } else if (balanceVelocity <= -entry) {
             setPosition(-1);
         } else {
             int currentPosition = getPositionManager().getPosition();

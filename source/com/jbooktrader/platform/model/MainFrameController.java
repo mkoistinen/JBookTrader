@@ -115,7 +115,18 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent e) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    Strategy strategy = getSelectedRowStrategy();
+
+                    int selectedRow = strategyTable.getSelectedRow();
+                    if (selectedRow < 0) {
+                        throw new JBookTraderException("No strategy is selected.");
+                    }
+
+                    Strategy strategy = strategyTableModel.getStrategyForRow(selectedRow);
+                    if (strategy == null) {
+                        String name = strategyTableModel.getStrategyNameForRow(selectedRow);
+                        strategy = ClassFinder.getInstance(name);
+                    }
+
                     new StrategyInformationDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t.getMessage());

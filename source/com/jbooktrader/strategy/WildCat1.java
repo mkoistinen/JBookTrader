@@ -2,6 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -17,11 +18,11 @@ import com.jbooktrader.platform.util.*;
 public class WildCat1 extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceMACDInd;
+    private final Indicator balanceInd, balanceVelocityInd;
 
     // Strategy parameters names
-    private static final String PERIOD1 = "Period1";
-    private static final String PERIOD2 = "Period2";
+    private static final String FAST_PERIOD = "FastPeriod";
+    private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
@@ -44,8 +45,10 @@ public class WildCat1 extends Strategy {
 
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
-        balanceMACDInd = new BalanceMACD(marketBook, getParam(PERIOD1), getParam(PERIOD2));
-        addIndicator("balanceMACD", balanceMACDInd);
+        balanceInd = new Balance(marketBook);
+        balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        addIndicator("balance", balanceInd);
+        addIndicator("balanceVelocity", balanceVelocityInd);
 
 
     }
@@ -58,12 +61,10 @@ public class WildCat1 extends Strategy {
      */
     @Override
     public void setParams() {
-        // 145-525-14-8
-        // 156-741-16-8
-        addParam(PERIOD1, 130, 180, 1, 156);
-        addParam(PERIOD2, 670, 770, 1, 735);
-        addParam(ENTRY, 13, 19, 1, 16);
-        addParam(EXIT, 7, 14, 1, 8);
+        addParam(FAST_PERIOD, 130, 180, 1, 124);
+        addParam(SLOW_PERIOD, 500, 770, 1, 837);
+        addParam(ENTRY, 12, 19, 1, 19);
+        addParam(EXIT, 6, 14, 1, 11);
     }
 
     /**
@@ -72,17 +73,17 @@ public class WildCat1 extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double balanceMACD = balanceMACDInd.getValue();
-        if (balanceMACD >= entry) {
+        double balanceVelocity = balanceVelocityInd.getValue();
+        if (balanceVelocity >= entry) {
             setPosition(1);
-        } else if (balanceMACD <= -entry) {
+        } else if (balanceVelocity <= -entry) {
             setPosition(-1);
         } else {
             int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && balanceMACD <= -exit) {
+            if (currentPosition > 0 && balanceVelocity <= -exit) {
                 setPosition(0);
             }
-            if (currentPosition < 0 && balanceMACD >= exit) {
+            if (currentPosition < 0 && balanceVelocity >= exit) {
                 setPosition(0);
             }
         }

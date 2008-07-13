@@ -15,8 +15,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "4.02";
-    public static final String RELEASE_DATE = "July 02, 2008";
+    public static final String VERSION = "4.03";
+    public static final String RELEASE_DATE = "July 12, 2008";
     private static final String LOOK_AND_FEEL = "com.birosoft.liquid.LiquidLookAndFeel";
     private static String appPath;
 

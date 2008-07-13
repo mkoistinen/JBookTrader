@@ -4,6 +4,7 @@ import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
@@ -20,7 +21,7 @@ import java.util.*;
  */
 public abstract class OptimizerRunner implements Runnable {
     private static final int MAX_RESULTS = 10000; // max number of rows in the "optimization results" table
-    private static final long UPDATE_FREQUENCY = 2000000L; // lines
+    private static final long UPDATE_FREQUENCY = 4000000L; // lines
 
     private final NumberFormat nf2, nf0;
     private final String strategyName;
@@ -71,18 +72,19 @@ public abstract class OptimizerRunner implements Runnable {
             progressText += " " + count + " strategies";
         }
 
-        backTestFileReader.reset();
         marketBook.getAll().clear();
         setTotalSteps(totalSteps);
 
-        MarketDepth marketDepth;
-        while ((marketDepth = backTestFileReader.getNextMarketDepth()) != null) {
+        for (MarketDepth marketDepth : backTestFileReader.getAll()) {
             marketBook.add(marketDepth);
 
             long time = marketDepth.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
 
             for (Strategy strategy : strategies) {
+                PerformanceManager performanceManager = strategy.getPerformanceManager();
+                PositionManager positionManager = strategy.getPositionManager();
+                performanceManager.update(marketDepth.getMidPrice(), positionManager.getPosition());
                 strategy.setTime(time);
                 strategy.updateIndicators();
                 if (strategy.hasValidIndicators()) {
@@ -93,7 +95,7 @@ public abstract class OptimizerRunner implements Runnable {
                     strategy.closePosition();// force flat position
                 }
 
-                strategy.getPositionManager().trade();
+                positionManager.trade();
 
                 completedSteps++;
                 if (completedSteps % UPDATE_FREQUENCY == 0) {
@@ -229,7 +231,8 @@ public abstract class OptimizerRunner implements Runnable {
             optimizerDialog.enableProgress();
             optimizerDialog.showProgress("Scanning historical data file...");
             backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
-            lineCount = backTestFileReader.getTotalLineCount();
+            backTestFileReader.load();
+            lineCount = backTestFileReader.getAll().size();
 
             if (cancelled) {
                 return;

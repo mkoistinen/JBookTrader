@@ -16,21 +16,21 @@ public class HeartBeatSender {
     class Sender implements Runnable {
         public void run() {
             long instant = System.currentTimeMillis();
-            boolean isTradingPeriod = false;
+            boolean isInTradingPeriod = false;
             for (Strategy strategy : strategies) {
                 if (strategy.getTradingSchedule().contains(instant)) {
-                    isTradingPeriod = true;
+                    isInTradingPeriod = true;
                     break;
                 }
             }
 
-            if (isTradingPeriod) {
+            if (isInTradingPeriod) {
                 Dispatcher.Mode mode = Dispatcher.getMode();
                 if (mode == Trade || mode == ForwardTest) {
                     String message = "Heart beat message: ";
                     boolean isConnected = Dispatcher.getTrader().getAssistant().isConnected();
                     if (isConnected) {
-                        message += "JBT operating normally.";
+                        message += "JBT is operating normally.";
                     } else {
                         message += "TWS was disconnected from IB server.";
                     }
@@ -58,9 +58,17 @@ public class HeartBeatSender {
         strategies = new ArrayList<Strategy>();
         PreferencesHolder prefs = PreferencesHolder.getInstance();
         if (prefs.get(EmailMonitoring).equalsIgnoreCase("enabled")) {
-            int minutes = Integer.parseInt(prefs.get(HeartBeatInterval));
+            int frequencyMinutes = Integer.parseInt(prefs.get(HeartBeatInterval));
             ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleWithFixedDelay(new Sender(), 0, minutes * 60, TimeUnit.SECONDS);
+
+            long instant = System.currentTimeMillis();
+            long periodLengthInMillis = frequencyMinutes * 60 * 1000;
+            // Integer division gives us the number of whole periods
+            long completedPeriods = instant / periodLengthInMillis;
+            long firstNotificationTime = (completedPeriods + 1) * periodLengthInMillis;
+            long initialDelay = (firstNotificationTime - instant) / 1000;
+
+            scheduler.scheduleWithFixedDelay(new Sender(), initialDelay, frequencyMinutes * 60, TimeUnit.SECONDS);
         }
     }
 }

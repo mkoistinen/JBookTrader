@@ -59,7 +59,9 @@ public class ResultsTableModel extends TableDataModel {
             item[++index] = optimizationResult.getKellyCriterion();
             item[++index] = optimizationResult.getPerformanceIndex();
 
-            addRow(item);
+            addRowFast(item);
         }
+
+        fireTableDataChanged();
     }
 }

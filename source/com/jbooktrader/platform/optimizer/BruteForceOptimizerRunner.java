@@ -10,7 +10,7 @@ import java.util.*;
  * historical market depth.
  */
 public class BruteForceOptimizerRunner extends OptimizerRunner {
-    private static final int CHUNK_SIZE = 1000;
+    private static final int CHUNK_SIZE = 500;
 
     public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
         super(optimizerDialog, strategy, params);
@@ -21,7 +21,7 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         int taskSize = tasks.size();
         long totalSteps = (long) lineCount * taskSize;
 
-        ArrayList<Strategy> strategies = new ArrayList<Strategy>();
+        List<Strategy> strategies = new ArrayList<Strategy>();
 
         while (!tasks.isEmpty() && !cancelled) {
             strategies.clear();

@@ -11,6 +11,10 @@ public class TableDataModel extends AbstractTableModel {
         rows = new ArrayList<Object>();
     }
 
+    public void addRowFast(Object[] item) {
+        rows.add(item);
+    }
+
     public void addRow(Object[] item) {
         rows.add(item);
         fireTableDataChanged();
