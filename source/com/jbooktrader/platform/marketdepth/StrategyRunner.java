@@ -6,9 +6,9 @@ import com.jbooktrader.platform.strategy.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-public class MarketDepthTimer {
+public class StrategyRunner {
     private final List<Strategy> strategies;
-    private static MarketDepthTimer instance;
+    private static StrategyRunner instance;
 
     class MarketDepthHandler implements Runnable {
         public void run() {
@@ -16,7 +16,7 @@ public class MarketDepthTimer {
                 synchronized (strategies) {
                     for (Strategy strategy : strategies) {
                         MarketBook marketBook = strategy.getMarketBook();
-                        MarketDepth marketDepth = marketBook.getNewMarketDepth();
+                        MarketDepth marketDepth = marketBook.getNextMarketDepth();
                         if (marketDepth != null) {
                             marketBook.add(marketDepth);
                             strategy.process(marketDepth);
@@ -29,14 +29,14 @@ public class MarketDepthTimer {
         }
     }
 
-    synchronized public static MarketDepthTimer getInstance() {
+    synchronized public static StrategyRunner getInstance() {
         if (instance == null) {
-            instance = new MarketDepthTimer();
+            instance = new StrategyRunner();
         }
         return instance;
     }
 
-    private MarketDepthTimer() {
+    private StrategyRunner() {
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleWithFixedDelay(new MarketDepthHandler(), 0, 1, TimeUnit.SECONDS);

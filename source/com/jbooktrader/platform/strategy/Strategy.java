@@ -237,15 +237,14 @@ public abstract class Strategy {
         for (ChartableIndicator chartableIndicator : indicators) {
             Indicator indicator = chartableIndicator.getIndicator();
             try {
-                double value = indicator.calculate();
-
+                indicator.calculate();
                 if (!isOptimizationMode) {
-                    chartableIndicator.add(time, value);
+                    chartableIndicator.add(time, indicator.getValue());
                 }
-            } catch (IndexOutOfBoundsException aie) {
+            } catch (IndexOutOfBoundsException iob) {
                 hasValidIndicators = false;
                 // This exception will occur if book size is insufficient to calculate
-                // the indicator.
+                // the indicator. This is normal.
             } catch (Exception e) {
                 throw new JBookTraderException(e);
             }

@@ -120,7 +120,8 @@ public class CMEDataConverter {
                     instant.setTimeInMillis(time);
                     if ((time - previousTime) >= samplingFrequency) {
                         if (isRecordable(instant)) {
-                            MarketDepth marketDepth = new MarketDepth(time, openBalance, highBalance, lowBalance, closeBalance, highPrice, lowPrice);
+                            int balance = (highBalance + lowBalance) / 2;
+                            MarketDepth marketDepth = new MarketDepth(time, balance, highPrice, lowPrice);
                             backTestFileWriter.write(marketDepth, true);
                         }
 

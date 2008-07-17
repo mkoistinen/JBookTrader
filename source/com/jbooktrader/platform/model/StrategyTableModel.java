@@ -46,7 +46,6 @@ public class StrategyTableModel extends TableDataModel {
             throw new JBookTraderException("Strategy " + strategy + " is already running.");
         }
         String strategyName = getStrategyNameForRow(row);
-        traderAssistant.removeStrategy(strategyName);
         strategy = ClassFinder.getInstance(strategyName);
         update(strategy);
         fireTableRowsUpdated(row, row);
@@ -60,6 +59,7 @@ public class StrategyTableModel extends TableDataModel {
             String name = getStrategyNameForRow(row);
             if (name.equals(strategy.getName())) {
                 selectedRow = row;
+                break;
             }
         }
         return selectedRow;
@@ -71,7 +71,7 @@ public class StrategyTableModel extends TableDataModel {
         MarketBook marketBook = strategy.getMarketBook();
         if (marketBook.size() > 0) {
             MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
-            setValueAt(lastMarketDepth.getMidBalance(), row, Balance.ordinal());
+            setValueAt(lastMarketDepth.getBalance(), row, Balance.ordinal());
             setValueAt(lastMarketDepth.getLowPrice(), row, LowPrice.ordinal());
             setValueAt(lastMarketDepth.getHighPrice(), row, HighPrice.ordinal());
         }

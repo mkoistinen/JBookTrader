@@ -141,6 +141,7 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent e) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    Dispatcher.getTrader().getAssistant().removeAllStrategies();
                     Strategy strategy = createSelectedRowStrategy();
                     Dispatcher.setMode(BackTest);
                     new BackTestDialog(mainViewDialog, strategy);

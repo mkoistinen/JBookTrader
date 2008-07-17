@@ -21,7 +21,7 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         int taskSize = tasks.size();
         long totalSteps = (long) lineCount * taskSize;
 
-        List<Strategy> strategies = new ArrayList<Strategy>();
+        List<Strategy> strategies = new LinkedList<Strategy>();
 
         while (!tasks.isEmpty() && !cancelled) {
             strategies.clear();

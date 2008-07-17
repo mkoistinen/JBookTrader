@@ -139,26 +139,15 @@ public class TraderAssistant {
             String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
             eventReport.report(msg);
             requestMarketDepth(strategy, 5);
-            MarketDepthTimer.getInstance().addListener(strategy);
+            StrategyRunner.getInstance().addListener(strategy);
             strategy.setIsActive(true);
             Dispatcher.strategyStarted();
         }
     }
 
-    public synchronized void removeStrategy(String name) {
-        Strategy strategy = null;
-        for (Map.Entry<Integer, Strategy> mapEntry : strategies.entrySet()) {
-            Strategy thisStrategy = mapEntry.getValue();
-            if (thisStrategy.getName().equals(name)) {
-                strategy = thisStrategy;
-                break;
-            }
-        }
-        if (strategy != null) {
-            strategies.remove(strategy.getId());
-        }
+    public synchronized void removeAllStrategies() {
+        strategies.clear();
     }
-
 
     public void setAccountCode(String accountCode) {
         this.accountCode = accountCode;
@@ -206,7 +195,6 @@ public class TraderAssistant {
 
     public boolean isConnected() {
         Dispatcher.Mode mode = Dispatcher.getMode();
-
         if (mode == BackTest || mode == Optimization) {
             return true;
         } else {

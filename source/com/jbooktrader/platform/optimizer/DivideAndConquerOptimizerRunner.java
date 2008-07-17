@@ -32,7 +32,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         int iterationsRemaining = (int) (Math.log(maxRange) / Math.log(2.0));
         long completedSteps = 0;
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
-        List<Strategy> strategies = new ArrayList<Strategy>();
+        List<Strategy> strategies = new LinkedList<Strategy>();
         List<StrategyParams> topParams = new ArrayList<StrategyParams>();
         int numberOfCandidates = (int) Math.min(Math.sqrt(TARGET_STRATEGIES_SIZE), bestParamsList.size());
 

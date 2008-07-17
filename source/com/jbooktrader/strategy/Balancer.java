@@ -59,10 +59,11 @@ public class Balancer extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 1, 15, 1, 3);
-        addParam(RSI_PERIOD, 50, 1000, 50, 60);
-        addParam(BALANCE_ENTRY, 20, 45, 5, 34);
-        addParam(RSI_ENTRY, 0, 30, 5, 15);
+        // cme: 13-120-25-15
+        addParam(EMA_PERIOD, 2, 30, 1, 18);
+        addParam(RSI_PERIOD, 50, 300, 50, 128);
+        addParam(BALANCE_ENTRY, 15, 45, 5, 27);
+        addParam(RSI_ENTRY, 5, 30, 5, 15);
     }
 
     /**

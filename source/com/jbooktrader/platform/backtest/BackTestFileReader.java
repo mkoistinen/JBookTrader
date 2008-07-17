@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class BackTestFileReader {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final static int COLUMNS = 8;
+    private final static int COLUMNS = 5;
     private final LinkedList<MarketDepth> marketDepths;
     private long previousTime;
     private SimpleDateFormat sdf;
@@ -77,7 +77,7 @@ public class BackTestFileReader {
             }
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not read data file");
-        } catch (JBookTraderException e) {
+        } catch (Exception e) {
             String errorMsg = "";
             if (lineNumber > 0) {
                 errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
@@ -89,19 +89,25 @@ public class BackTestFileReader {
             }
             errorMsg += description;
             throw new JBookTraderException(errorMsg);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ioe) {
+                // ignore
+            }
         }
 
         report.report("Scanning historical market data file completed");
     }
 
 
-    private MarketDepth toMarketDepth(String line) throws JBookTraderException {
+    private MarketDepth toMarketDepth(String line) throws JBookTraderException, ParseException {
         if (sdf == null) {
             String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
             throw new JBookTraderException(msg);
         }
 
-        StringTokenizer st = new StringTokenizer(line, ",;");
+        StringTokenizer st = new StringTokenizer(line, ",");
 
         int tokenCount = st.countTokens();
         if (tokenCount != COLUMNS) {
@@ -111,12 +117,7 @@ public class BackTestFileReader {
 
         String dateToken = st.nextToken();
         String timeToken = st.nextToken();
-        long time;
-        try {
-            time = sdf.parse(dateToken + "," + timeToken).getTime();
-        } catch (ParseException pe) {
-            throw new JBookTraderException(pe);
-        }
+        long time = sdf.parse(dateToken + "," + timeToken).getTime();
 
         if (previousTime != 0) {
             if (time < previousTime) {
@@ -125,15 +126,10 @@ public class BackTestFileReader {
             }
         }
 
-        int open = Integer.parseInt(st.nextToken());
-        int high = Integer.parseInt(st.nextToken());
-        int low = Integer.parseInt(st.nextToken());
-        int close = Integer.parseInt(st.nextToken());
-
+        int balance = Integer.parseInt(st.nextToken());
         double lowPrice = Double.parseDouble(st.nextToken());
         double highPrice = Double.parseDouble(st.nextToken());
 
-        return new MarketDepth(time, open, high, low, close, highPrice, lowPrice);
+        return new MarketDepth(time, balance, highPrice, lowPrice);
     }
 }
-

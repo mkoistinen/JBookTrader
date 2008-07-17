@@ -61,10 +61,10 @@ public class WildCat1 extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 130, 180, 1, 124);
-        addParam(SLOW_PERIOD, 500, 770, 1, 837);
-        addParam(ENTRY, 12, 19, 1, 19);
-        addParam(EXIT, 6, 14, 1, 11);
+        addParam(FAST_PERIOD, 50, 300, 25, 178);
+        addParam(SLOW_PERIOD, 300, 900, 50, 660);
+        addParam(ENTRY, 10, 20, 1, 14);
+        addParam(EXIT, 5, 15, 1, 7);
     }
 
     /**

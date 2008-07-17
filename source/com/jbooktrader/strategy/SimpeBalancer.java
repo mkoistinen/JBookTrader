@@ -2,7 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.indicator.derivative.*;
+import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -15,41 +15,39 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Sweeper extends Strategy {
+public class SimpeBalancer extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceInd, balanceVelocityInd, balanceAccelerationInd;
+    private final Indicator balanceInd, rsiInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
-    private static final String ENTRY = "Entry";
+    private static final String RSI_PERIOD = "RsiPeriod";
+    private static final String BALANCE_ENTRY = "BalanceEntry";
+    private static final String RSI_ENTRY = "RsiEntry";
 
     // Strategy parameters values
-    private final int entry;
+    private final int balanceEntry, rsiEntry;
 
 
-    public Sweeper(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+    public SimpeBalancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
         super(optimizationParams, marketBook);
-
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
-        int multiplier = 50;// contract multiplier
-
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
-
+        int multiplier = 50;// contract multiplier
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        entry = getParam(ENTRY);
+        balanceEntry = getParam(BALANCE_ENTRY);
+        rsiEntry = getParam(RSI_ENTRY);
 
+        // Create technical indicators
+        rsiInd = new PriceRSI(marketBook, getParam(RSI_PERIOD));
         balanceInd = new Balance(marketBook);
-        balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        balanceAccelerationInd = new Acceleration(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator("balance", balanceInd);
-        addIndicator("velocity", balanceVelocityInd);
-        addIndicator("acceleration", balanceAccelerationInd);
+        addIndicator("Balance", balanceInd);
+        addIndicator("PriceRSI", rsiInd);
+
     }
 
     /**
@@ -60,9 +58,9 @@ public class Sweeper extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 25, 55, 1, 36);
-        addParam(SLOW_PERIOD, 500, 1500, 50, 1100);
-        addParam(ENTRY, 20, 50, 1, 39);
+        addParam(RSI_PERIOD, 50, 300, 50, 118);
+        addParam(BALANCE_ENTRY, 10, 45, 5, 31);
+        addParam(RSI_ENTRY, 0, 35, 5, 26);
     }
 
     /**
@@ -71,12 +69,11 @@ public class Sweeper extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        double balanceAcceleration = balanceAccelerationInd.getValue();
-        double strength = balanceVelocity + balanceAcceleration;
-        if (strength >= entry) {
+        double rsi = rsiInd.getValue() - 50;
+        double balance = balanceInd.getValue();
+        if (balance >= balanceEntry && rsi <= -rsiEntry) {
             setPosition(1);
-        } else if (strength <= -entry) {
+        } else if (balance <= -balanceEntry && rsi >= rsiEntry) {
             setPosition(-1);
         }
     }

@@ -17,8 +17,8 @@ import java.io.*;
  */
 public class BackTestDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
-    private Strategy strategy;
     private final PreferencesHolder prefs;
+    private Strategy strategy;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JProgressBar progressBar;
@@ -56,8 +56,14 @@ public class BackTestDialog extends JDialog {
         progressBar.setString(progressText);
     }
 
-    public void signalCompleted() {
-        dispose();
+    @Override
+    public void dispose() {
+        // References must be explicitely set to null, otherwise memory will leak. This is
+        // a little strange, but I could not find other ways to prevent the leak.
+        // todo: use profiler to see what's holding on to BackTestDialog after it's disposed
+        btsr = null;
+        strategy = null;
+        super.dispose();
     }
 
     private void setOptions() throws JBookTraderException {
@@ -90,7 +96,7 @@ public class BackTestDialog extends JDialog {
                 if (btsr != null) {
                     btsr.cancel();
                 }
-                signalCompleted();
+                dispose();
             }
         });
 
@@ -100,7 +106,6 @@ public class BackTestDialog extends JDialog {
                 if (btsr != null) {
                     btsr.cancel();
                 }
-                signalCompleted();
             }
         });
 
@@ -122,14 +127,7 @@ public class BackTestDialog extends JDialog {
         });
     }
 
-    public void dispose() {
-        btsr = null;
-        strategy = null;
-        super.dispose();
-    }
-
     private void init() {
-
         setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Back Test - " + strategy.getName());
