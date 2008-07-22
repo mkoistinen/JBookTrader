@@ -17,6 +17,16 @@ public enum JBTPreferences {
     EmailPassword("Password", ""),
     To("To", "@anyprovider.com"),
     EmailSubject("Email Subject", "[JBT Remote Notification]"),
+    //Columns
+    ColumnSymbol("Symbol","true"),
+    ColumnBalance("Balance","true"),
+    ColumnLowPrice("LowPrice","true"),
+    ColumnHighPrice("HighPrice","true"),
+    ColumnPosition("Position","true"),
+    ColumnTrades("Trades","true"),
+    ColumnMaxDD("MaxDD","true"),
+    ColumnNetProfit("NetProfit","true"),
+
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
     // Optimizer
@@ -40,6 +50,7 @@ public enum JBTPreferences {
     OptimizationMapHeight("optimization.map.height", "-1"),
     OptimizationMapX("optimization.map.x", "-1"),
     OptimizationMapY("optimization.map.y", "-1");
+
 
     private final String name, defaultValue;
 
