@@ -23,7 +23,7 @@ public class CMEDataConverter {
     private final String contract;
     private final Calendar instant;
     private long time, lineNumber;
-    private int openBalance, highBalance, lowBalance, closeBalance;
+    private int /*openBalance,*/ highBalance, lowBalance, closeBalance;
     private double highPrice, lowPrice;
 
 
@@ -125,7 +125,7 @@ public class CMEDataConverter {
                             backTestFileWriter.write(marketDepth, true);
                         }
 
-                        openBalance = highBalance = lowBalance = closeBalance;
+                        /*openBalance =*/ highBalance = lowBalance = closeBalance;
                         highPrice = asks.getFirst().getPrice();
                         lowPrice = bids.getFirst().getPrice();
                         previousTime = time;
