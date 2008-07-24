@@ -15,7 +15,7 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class SimpeBalancer extends Strategy {
+public class SimpleBalancer extends Strategy {
 
     // Technical indicators
     private final Indicator balanceInd, rsiInd;
@@ -29,7 +29,7 @@ public class SimpeBalancer extends Strategy {
     private final int balanceEntry, rsiEntry;
 
 
-    public SimpeBalancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
+    public SimpleBalancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
         super(optimizationParams, marketBook);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
