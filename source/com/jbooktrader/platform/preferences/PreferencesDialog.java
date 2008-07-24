@@ -15,8 +15,7 @@ public class PreferencesDialog extends JDialog {
     private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText;
     private JPasswordField emailPasswordField;
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
-    private JCheckBox columnSymbolCheck,columnBalanceCheck,columnLowPriceCheck,columnHighPriceCheck,columnPositionCheck
-            ,columnTradesCheck,columnMaxDDCheck,columnNetProfitCheck;
+    private JCheckBox columnSymbolCheck, columnBalanceCheck, columnLowPriceCheck, columnHighPriceCheck, columnPositionCheck, columnTradesCheck, columnMaxDDCheck, columnNetProfitCheck;
 
     public PreferencesDialog(JFrame parent) {
         super(parent);
@@ -117,7 +116,8 @@ public class PreferencesDialog extends JDialog {
         SpringUtilities.makeCompactGrid(remoteMonitoringTab, 6, 2, 12, 12, 8, 5);
 
         JPanel columnsTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Columns", columnsTab);
+        // The "columns" tab is still in development by Shane. Hide it for now.
+        //tabbedPane1.addTab("Columns", columnsTab);
         columnSymbolCheck = new JCheckBox();
         columnBalanceCheck = new JCheckBox();
         columnLowPriceCheck = new JCheckBox();
@@ -134,9 +134,7 @@ public class PreferencesDialog extends JDialog {
         add(columnsTab, ColumnTrades, columnTradesCheck);
         add(columnsTab, ColumnMaxDD, columnMaxDDCheck);
         add(columnsTab, ColumnNetProfit, columnNetProfitCheck);
-        //int rows, int cols, int initialX, int initialY, int xPad, int yPad
-        //Eugene look here:
-        SpringUtilities.makeCompactGrid(columnsTab, 6, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(columnsTab, 8, 2, 12, 12, 8, 5);
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -144,7 +142,8 @@ public class PreferencesDialog extends JDialog {
                     try {
                         int minutes = Integer.parseInt(heartBeatIntervalText.getText());
                         if (minutes < 1) {
-                            throw new JBookTraderException(HeartBeatInterval.getName() + " must be a positive number number.");
+                            throw new JBookTraderException(
+                                    HeartBeatInterval.getName() + " must be a positive number number.");
                         }
                     } catch (NumberFormatException nfe) {
                         throw new JBookTraderException(HeartBeatInterval.getName() + " must be a number.");
@@ -172,8 +171,9 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(ColumnTrades, Boolean.toString(columnTradesCheck.isSelected()));
                     prefs.set(ColumnMaxDD, Boolean.toString(columnMaxDDCheck.isSelected()));
                     prefs.set(ColumnNetProfit, Boolean.toString(columnNetProfitCheck.isSelected()));
-                    
-                    String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
+
+                    String msg
+                            = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
                     MessageDialog.showMessage(PreferencesDialog.this, msg);
                     dispose();
                 } catch (Exception ex) {
