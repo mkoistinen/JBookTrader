@@ -101,9 +101,9 @@ public final class BackTestFileWriter {
         header.append("# date, time, balance, lowPrice, highPrice").append(LINE_SEP);
         header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
         header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. balance is the period's book balance").append(LINE_SEP);
-        header.append("# 4. lowPrice is the period's lowest price").append(LINE_SEP);
-        header.append("# 5. highPrice is the period's highest price").append(LINE_SEP);
+        header.append("# 3. balance is the period's adjusted mean balance").append(LINE_SEP);
+        header.append("# 4. lowPrice is the period's lowest best bid").append(LINE_SEP);
+        header.append("# 5. highPrice is the period's highest best ask").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

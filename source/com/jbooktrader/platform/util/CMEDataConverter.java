@@ -7,13 +7,14 @@ import com.jbooktrader.platform.model.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.util.zip.*;
 
 /**
  * Converts historical market depth data from CME format to JBT format, and writes the data to a file.
  * The created data file can be used for backtesting and optimization of trading strategies.
  */
 public class CMEDataConverter {
-    private static final long RECORDING_START = 9 * 60 * 60 + 10 * 60; // 9:10:00 EDT
+    private static final long RECORDING_START = 9 * 60 * 60; // 9:00:00 EDT
     private static final long RECORDING_END = 16 * 60 * 60 + 15 * 60; // 16:15:00 EDT
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepthItem> bids, asks;
@@ -23,25 +24,23 @@ public class CMEDataConverter {
     private final String contract;
     private final Calendar instant;
     private long time, lineNumber;
-    private int /*openBalance,*/ highBalance, lowBalance, closeBalance;
     private double highPrice, lowPrice;
-
+    private double sumBalancesInSample;
+    private int numberOfBalancesInSample;
 
     public static void main(String[] args) throws JBookTraderException {
-
         if (args.length != 4) {
             throw new JBookTraderException("Usage: <cmeFileName> <jbtFileName> <contract> <samplingFrequency>");
         }
 
-        CMEDataConverter dataConverter = new CMEDataConverter(args[0], args[1], args[2]);
+        CMEDataConverter cmeDataConverter = new CMEDataConverter(args[0], args[1], args[2]);
         long samplingFrequency = Long.valueOf(args[3]);
 
-        dataConverter.convert(samplingFrequency);
+        cmeDataConverter.convert(samplingFrequency);
     }
 
 
     private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
-
         this.contract = contract;
 
         cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
@@ -58,10 +57,31 @@ public class CMEDataConverter {
             asks.add(null);
         }
 
+        String outFilename = "unzipped.cme";
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(cmeFileName)));
+            OutputStream unzippedStream;
+            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(cmeFileName));
+            zipInputStream.getNextEntry();
+            unzippedStream = new FileOutputStream(outFilename, false);
+
+            byte[] buffer = new byte[1024 * 1024];
+            int length;
+            System.out.println("Unzipping " + cmeFileName + " to " + outFilename);
+            while ((length = zipInputStream.read(buffer)) > 0) {
+                unzippedStream.write(buffer, 0, length);
+            }
+
+            unzippedStream.close();
+            zipInputStream.close();
+        } catch (IOException e) {
+            throw new JBookTraderException("Could unzip file " + cmeFileName);
+        }
+
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(outFilename)));
         } catch (FileNotFoundException fnfe) {
-            throw new JBookTraderException("Could not find file " + cmeFileName);
+            throw new JBookTraderException("Could not find file " + outFilename);
         }
 
         try {
@@ -70,15 +90,13 @@ public class CMEDataConverter {
             throw new JBookTraderException("Could not create file " + jbtFileName);
         }
 
-        System.out.println("Converting " + cmeFileName + " to " + jbtFileName);
+        System.out.println("Converting " + outFilename + " to " + jbtFileName);
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
         int cumulativeSize = 0;
         for (MarketDepthItem item : items) {
-            if (item != null) {
-                cumulativeSize += item.getSize();
-            }
+            cumulativeSize += item.getSize();
         }
         return cumulativeSize;
     }
@@ -86,10 +104,19 @@ public class CMEDataConverter {
     private void update() {
         int cumulativeBid = getCumulativeSize(bids);
         int cumulativeAsk = getCumulativeSize(asks);
+
+        int bestBid = bids.getFirst().getSize();
+        int bestAsk = asks.getFirst().getSize();
+        int lastBid = bids.getLast().getSize();
+        int lastAsk = asks.getLast().getSize();
+
+        int bestBidAskSum = bestBid + bestAsk;
+        cumulativeBid -= lastBid * bestBid / bestBidAskSum;
+        cumulativeAsk -= lastAsk * bestAsk / bestBidAskSum;
+
         double totalDepth = cumulativeBid + cumulativeAsk;
-        closeBalance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
-        highBalance = Math.max(closeBalance, highBalance);
-        lowBalance = Math.min(closeBalance, lowBalance);
+        sumBalancesInSample += (cumulativeBid - cumulativeAsk) / totalDepth;
+        numberOfBalancesInSample++;
         highPrice = Math.max(highPrice, asks.getFirst().getPrice());
         lowPrice = Math.min(lowPrice, bids.getFirst().getPrice());
     }
@@ -105,7 +132,6 @@ public class CMEDataConverter {
 
         try {
             long previousTime = 0;
-            backTestFileWriter.writeHeader();
 
             System.out.println("Conversion started...");
             while ((line = reader.readLine()) != null) {
@@ -116,19 +142,21 @@ public class CMEDataConverter {
 
                 try {
                     parse(line);
-                    update();
-                    instant.setTimeInMillis(time);
-                    if ((time - previousTime) >= samplingFrequency) {
-                        if (isRecordable(instant)) {
-                            int balance = (highBalance + lowBalance) / 2;
-                            MarketDepth marketDepth = new MarketDepth(time, balance, highPrice, lowPrice);
-                            backTestFileWriter.write(marketDepth, true);
-                        }
+                    if (lineNumber > 1000) { // don't update for the first 1000 lines
+                        update();
+                        instant.setTimeInMillis(time);
+                        if ((time - previousTime) >= samplingFrequency) {
+                            if (isRecordable(instant)) {
+                                int balance = (int) (100 * sumBalancesInSample / numberOfBalancesInSample);
+                                MarketDepth marketDepth = new MarketDepth(time, balance, highPrice, lowPrice);
+                                backTestFileWriter.write(marketDepth, true);
+                            }
 
-                        /*openBalance =*/ highBalance = lowBalance = closeBalance;
-                        highPrice = asks.getFirst().getPrice();
-                        lowPrice = bids.getFirst().getPrice();
-                        previousTime = time;
+                            sumBalancesInSample = numberOfBalancesInSample = 0;
+                            highPrice = asks.getFirst().getPrice();
+                            lowPrice = bids.getFirst().getPrice();
+                            previousTime = time;
+                        }
                     }
                 } catch (Exception e) {
                     String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
@@ -158,7 +186,6 @@ public class CMEDataConverter {
 
 
     private void parse(String line) throws ParseException {
-
         boolean isSpecifiedContract = (line.substring(49, 54).trim().equals(contract));
         boolean isLimitOrderMessage = line.substring(33, 35).equals("MA");
 
@@ -191,6 +218,5 @@ public class CMEDataConverter {
             }
         }
     }
-
 }
 

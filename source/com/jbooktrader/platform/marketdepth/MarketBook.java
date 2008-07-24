@@ -16,8 +16,9 @@ public class MarketBook {
     private BackTestFileWriter backTestFileWriter;
     private String name;
     private TimeZone timeZone;
-    private int highBalance, lowBalance, lastBalance;
     private double highPrice, lowPrice;
+    private double sumBalancesInSample;
+    private int numberOfBalancesInSample;
 
     public MarketBook() {
         marketDepths = new LinkedList<MarketDepth>();
@@ -71,7 +72,7 @@ public class MarketBook {
     synchronized public void reset() {
         bids.clear();
         asks.clear();
-        highPrice = lowPrice = highBalance = lowBalance = lastBalance = 0;
+        highPrice = lowPrice = sumBalancesInSample = numberOfBalancesInSample = 0;
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
@@ -85,10 +86,10 @@ public class MarketBook {
     synchronized public MarketDepth getNextMarketDepth() {
         MarketDepth marketDepth = null;
         if (lowPrice != 0 && highPrice != 0) {
-            int balance = (highBalance + lowBalance) / 2;
+            int balance = (int) (100 * sumBalancesInSample / numberOfBalancesInSample);
             marketDepth = new MarketDepth(balance, highPrice, lowPrice);
             // initialize next market depth values
-            highBalance = lowBalance = lastBalance;
+            sumBalancesInSample = numberOfBalancesInSample = 0;
             highPrice = asks.getFirst().getPrice();
             lowPrice = bids.getFirst().getPrice();
         }
@@ -115,17 +116,28 @@ public class MarketBook {
         }
 
         if (operation == UPDATE) {
+            // Calculate "adjusted mean balance"
+            // Reference: http://groups.google.com/group/jbooktrader/t/9df17cd7245b0225
             int cumulativeBid = getCumulativeSize(bids);
             int cumulativeAsk = getCumulativeSize(asks);
-            double totalDepth = cumulativeBid + cumulativeAsk;
-            lastBalance = (int) (100. * (cumulativeBid - cumulativeAsk) / totalDepth);
-            highBalance = Math.max(lastBalance, highBalance);
-            lowBalance = Math.min(lastBalance, lowBalance);
 
-            double bestBid = bids.getFirst().getPrice();
-            double bestAsk = asks.getFirst().getPrice();
-            highPrice = (highPrice == 0) ? bestAsk : Math.max(highPrice, bestAsk);
-            lowPrice = (lowPrice == 0) ? bestBid : Math.min(lowPrice, bestBid);
+            int bestBid = bids.getFirst().getSize();
+            int bestAsk = asks.getFirst().getSize();
+            int lastBid = bids.getLast().getSize();
+            int lastAsk = asks.getLast().getSize();
+
+            int bestBidAskSum = bestBid + bestAsk;
+            cumulativeBid -= lastBid * bestBid / bestBidAskSum;
+            cumulativeAsk -= lastAsk * bestAsk / bestBidAskSum;
+
+            double totalDepth = cumulativeBid + cumulativeAsk;
+            sumBalancesInSample += (cumulativeBid - cumulativeAsk) / totalDepth;
+            numberOfBalancesInSample++;
+
+            double bestAskPrice = asks.getFirst().getPrice();
+            double bestBidPrice = bids.getFirst().getPrice();
+            highPrice = (highPrice == 0) ? bestAskPrice : Math.max(highPrice, bestAskPrice);
+            lowPrice = (lowPrice == 0) ? bestBidPrice : Math.min(lowPrice, bestBidPrice);
         }
     }
 }
