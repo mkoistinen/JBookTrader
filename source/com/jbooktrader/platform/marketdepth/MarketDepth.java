@@ -6,13 +6,14 @@ package com.jbooktrader.platform.marketdepth;
 public class MarketDepth {
     private final long time;
     private final int balance;
-    private final double highPrice, lowPrice;
+    private final double highPrice, lowPrice, midPrice;
 
     public MarketDepth(long time, int balance, double highPrice, double lowPrice) {
         this.time = time;
         this.balance = balance;
         this.highPrice = highPrice;
         this.lowPrice = lowPrice;
+        midPrice = (highPrice + lowPrice) / 2;
     }
 
     public MarketDepth(int balance, double highPrice, double lowPrice) {
@@ -41,7 +42,7 @@ public class MarketDepth {
 
 
     public double getMidPrice() {
-        return (highPrice + lowPrice) / 2;
+        return midPrice;
     }
 
 

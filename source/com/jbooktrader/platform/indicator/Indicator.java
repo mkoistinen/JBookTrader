@@ -11,7 +11,6 @@ public abstract class Indicator {
     protected final Indicator parentIndicator;
     protected double value;
 
-
     public abstract double calculate();
 
     private Indicator(MarketBook marketBook, Indicator parentIndicator) {

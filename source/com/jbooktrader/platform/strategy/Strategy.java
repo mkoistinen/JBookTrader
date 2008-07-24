@@ -76,7 +76,7 @@ public abstract class Strategy {
 
         df2 = NumberFormatterFactory.getNumberFormatter(2);
         df5 = NumberFormatterFactory.getNumberFormatter(5);
-        sdf = new SimpleDateFormat("HH:mm:ss.SSS MM/dd/yy z");
+        sdf = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
 
         eventReport = Dispatcher.getReporter();
         isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.Optimization);

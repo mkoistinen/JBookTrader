@@ -7,8 +7,8 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 /**
- * Performance manager evaluates trading strategy performance based on statistics which include
- * various factors, such P&L, maximum drawdown, profit factor, etc.
+ * Performance manager evaluates trading strategy performance based on statistics
+ * which include various factors, such P&L, maximum drawdown, profit factor, etc.
  */
 public class PerformanceManager {
     private final int multiplier;
@@ -20,7 +20,8 @@ public class PerformanceManager {
     private long exposureStart, totalExposure;
     private double tradeCommission, totalCommission;
     private double positionValue;
-    private double totalBought, totalSold, tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
+    private double totalBought, totalSold;
+    private double tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
     private double peakNetProfit, maxDrawdown;
     private double sumTradeProfit, sumTradeProfitSquared;
     private boolean isCompletedTrade;
