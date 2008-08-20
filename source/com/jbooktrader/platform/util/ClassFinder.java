@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.strategy.*;
@@ -46,9 +45,9 @@ public class ClassFinder {
         try {
             String className = "com.jbooktrader.strategy." + name;
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
-            Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+            Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
             Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-            return (Strategy) constructor.newInstance(new StrategyParams(), new MarketBook());
+            return (Strategy) constructor.newInstance(new StrategyParams());
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
         } catch (Exception e) {

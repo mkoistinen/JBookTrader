@@ -64,6 +64,7 @@ public class CircledTextAnnotation extends XYTextAnnotation {
         if (quantity >= 25000) {
             quantity /= 25000;
         }
-        TextUtilities.drawRotatedString(String.valueOf(quantity), g2, anchorX, anchorY, getTextAnchor(), getRotationAngle(), getRotationAnchor());
+        TextUtilities.drawRotatedString(String.valueOf(quantity), g2, anchorX, anchorY, getTextAnchor(),
+                getRotationAngle(), getRotationAnchor());
     }
 }

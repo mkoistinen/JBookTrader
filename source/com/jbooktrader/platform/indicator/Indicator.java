@@ -7,23 +7,21 @@ import com.jbooktrader.platform.marketdepth.*;
  * Base class for all classes implementing technical indicators.
  */
 public abstract class Indicator {
-    protected final MarketBook marketBook;
-    protected final Indicator parentIndicator;
+    protected Indicator parentIndicator;
+    protected MarketBook marketBook;
     protected double value;
 
     public abstract double calculate();
 
-    private Indicator(MarketBook marketBook, Indicator parentIndicator) {
-        this.marketBook = marketBook;
-        this.parentIndicator = parentIndicator;
-    }
-
-    protected Indicator(MarketBook marketBook) {
-        this(marketBook, null);
+    protected Indicator() {
     }
 
     protected Indicator(Indicator parentIndicator) {
-        this(null, parentIndicator);
+        this.parentIndicator = parentIndicator;
+    }
+
+    public void setMarketBook(MarketBook marketBook) {
+        this.marketBook = marketBook;
     }
 
     @Override

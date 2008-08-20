@@ -2,10 +2,8 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.schedule.*;
@@ -15,38 +13,38 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class SimpleBalancer extends Strategy {
+public class Scalper1 extends Strategy {
 
     // Technical indicators
-    private final Indicator balanceInd, rsiInd;
+    private final Indicator balanceHighInd, balanceLowInd;
 
     // Strategy parameters names
-    private static final String RSI_PERIOD = "RsiPeriod";
-    private static final String BALANCE_ENTRY = "BalanceEntry";
-    private static final String RSI_ENTRY = "RsiEntry";
+    private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int balanceEntry, rsiEntry;
+    private final int entry, exit;
 
 
-    public SimpleBalancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public Scalper1(StrategyParams optimizationParams) throws JBookTraderException {
+        super(optimizationParams);
+
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
-        // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 50;// contract multiplier
+
+        // Define trading schedule
+        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
+
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
-        balanceEntry = getParam(BALANCE_ENTRY);
-        rsiEntry = getParam(RSI_ENTRY);
-
-        // Create technical indicators
-        rsiInd = new PriceRSI(marketBook, getParam(RSI_PERIOD));
-        balanceInd = new Balance(marketBook);
-        addIndicator("Balance", balanceInd);
-        addIndicator("PriceRSI", rsiInd);
+        entry = getParam(ENTRY);
+        exit = getParam(EXIT);
+        balanceHighInd = new BalanceHighEMA(1);
+        balanceLowInd = new BalanceLowEMA(1);
+        addIndicator(balanceLowInd);
+        addIndicator(balanceHighInd);
 
     }
 
@@ -58,9 +56,8 @@ public class SimpleBalancer extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(RSI_PERIOD, 50, 300, 50, 118);
-        addParam(BALANCE_ENTRY, 10, 45, 5, 31);
-        addParam(RSI_ENTRY, 0, 35, 5, 26);
+        addParam(ENTRY, 30, 80, 1, 58);
+        addParam(EXIT, 0, 50, 1, 30);
     }
 
     /**
@@ -69,12 +66,20 @@ public class SimpleBalancer extends Strategy {
      */
     @Override
     public void onBookChange() {
-        double rsi = rsiInd.getValue() - 50;
-        double balance = balanceInd.getValue();
-        if (balance >= balanceEntry && rsi <= -rsiEntry) {
+        double balanceHigh = balanceHighInd.getValue();
+        double balanceLow = balanceLowInd.getValue();
+        if (balanceHigh >= entry) {
             setPosition(1);
-        } else if (balance <= -balanceEntry && rsi >= rsiEntry) {
+        } else if (balanceLow <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && balanceHigh <= -exit) {
+                setPosition(0);
+            }
+            if (currentPosition < 0 && balanceLow >= exit) {
+                setPosition(0);
+            }
         }
     }
 }

@@ -53,7 +53,9 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 if (!uniqueParams.contains(params)) {
                     uniqueParams.add(params);
                     try {
-                        strategies.add((Strategy) strategyConstructor.newInstance(params, marketBook));
+                        Strategy strategy = (Strategy) strategyConstructor.newInstance(params);
+                        strategy.setMarketBook(marketBook);
+                        strategies.add(strategy);
                     } catch (Exception e) {
                         throw new JBookTraderException(e);
                     }

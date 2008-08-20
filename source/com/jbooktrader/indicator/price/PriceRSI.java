@@ -1,20 +1,18 @@
 package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
 
 
 /**
- * Relative Strength Index. Implemented up to this specification:
- * http://en.wikipedia.org/wiki/Relative_strength
+ * Relative Strength Index of price
+ * Specification: http://en.wikipedia.org/wiki/Relative_strength
  */
 public class PriceRSI extends Indicator {
     private final double multiplier;
     private double emaUp, emaDown;
     private double previousPrice;
 
-    public PriceRSI(MarketBook marketBook, int periodLength) {
-        super(marketBook);
+    public PriceRSI(int periodLength) {
         multiplier = 2. / (periodLength + 1.);
     }
 

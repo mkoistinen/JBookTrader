@@ -1,0 +1,32 @@
+package com.jbooktrader.platform.marketdepth;
+
+import java.util.*;
+
+public enum MarketBookOperation {
+
+    Insert(0),
+    Update(1),
+    Delete(2);
+
+    private final int value;
+    private static Map<Integer, MarketBookOperation> operations = new HashMap<Integer, MarketBookOperation>();
+
+
+    MarketBookOperation(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public static MarketBookOperation getOperation(int value) {
+        return operations.get(value);
+    }
+
+    static {
+        for (MarketBookOperation operation : values()) {
+            operations.put(operation.getValue(), operation);
+        }
+    }
+}

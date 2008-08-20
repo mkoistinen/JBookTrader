@@ -23,7 +23,7 @@ import java.util.*;
 public abstract class Strategy {
     private final List<String> strategyReportHeaders;
     private final StrategyParams params;
-    private final MarketBook marketBook;
+    private MarketBook marketBook;
     private final DecimalFormat df2, df5;
     private final SimpleDateFormat sdf;
     private final Report eventReport;
@@ -52,9 +52,8 @@ public abstract class Strategy {
     abstract protected void setParams();
 
 
-    protected Strategy(StrategyParams params, MarketBook marketBook) {
+    protected Strategy(StrategyParams params) {
         this.params = params;
-        this.marketBook = marketBook;
         if (params.size() == 0) {
             setParams();
         }
@@ -63,8 +62,8 @@ public abstract class Strategy {
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
         strategyReportHeaders.add("Trade #");
-        strategyReportHeaders.add("Low Price");
-        strategyReportHeaders.add("High Price");
+        strategyReportHeaders.add("Best Bid");
+        strategyReportHeaders.add("Best Ask");
         strategyReportHeaders.add("Position");
         strategyReportHeaders.add("Avg Fill Price");
         strategyReportHeaders.add("Commission");
@@ -80,6 +79,13 @@ public abstract class Strategy {
 
         eventReport = Dispatcher.getReporter();
         isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.Optimization);
+    }
+
+    public void setMarketBook(MarketBook marketBook) {
+        this.marketBook = marketBook;
+        for (ChartableIndicator chartableIndicator : indicators) {
+            chartableIndicator.getIndicator().setMarketBook(marketBook);
+        }
     }
 
     public void setReport(Report strategyReport) {
@@ -138,8 +144,8 @@ public abstract class Strategy {
 
         strategyReportColumns.clear();
         strategyReportColumns.add(isCompletedTrade ? performanceManager.getTrades() : "--");
-        strategyReportColumns.add(df5.format(marketDepth.getLowPrice()));
-        strategyReportColumns.add(df5.format(marketDepth.getHighPrice()));
+        strategyReportColumns.add(df5.format(marketDepth.getBestBid()));
+        strategyReportColumns.add(df5.format(marketDepth.getBestAsk()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
@@ -186,10 +192,12 @@ public abstract class Strategy {
         return time;
     }
 
-    protected void addIndicator(String name, Indicator indicator) {
+    protected void addIndicator(Indicator indicator) {
+        indicator.setMarketBook(marketBook);
+        String name = indicator.getClass().getSimpleName();
         ChartableIndicator chartableIndicator = new ChartableIndicator(name, indicator);
         indicators.add(chartableIndicator);
-        strategyReportHeaders.add(chartableIndicator.getName());
+        strategyReportHeaders.add(name);
     }
 
     public List<ChartableIndicator> getIndicators() {
@@ -203,7 +211,7 @@ public abstract class Strategy {
         sdf.setTimeZone(tradingSchedule.getTimeZone());
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
-        marketBook.setName(name);
+        marketBook = Dispatcher.getTrader().getAssistant().createMarketBook(this);
         marketBook.setTimeZone(tradingSchedule.getTimeZone());
     }
 
@@ -252,8 +260,9 @@ public abstract class Strategy {
     }
 
 
-    public void process(MarketDepth marketDepth) throws IOException, JBookTraderException {
-        if (isActive()) {
+    public void process() throws IOException, JBookTraderException {
+        if (isActive() && marketBook.size() > 0) {
+            MarketDepth marketDepth = marketBook.getLastMarketDepth();
             long instant = marketDepth.getTime();
             setTime(instant);
             updateIndicators();
@@ -262,15 +271,11 @@ public abstract class Strategy {
             }
 
             if (!tradingSchedule.contains(instant)) {
-                closePosition(); // force flat position
-            }
-
-            if (tradingSchedule.approximatelyContains(instant)) {
-                marketBook.save(marketDepth);
+                closePosition();// force flat position
             }
 
             positionManager.trade();
-            performanceManager.update(marketDepth.getMidPrice(), positionManager.getPosition());
+            performanceManager.updatePositionValue(marketDepth.getMidPrice(), positionManager.getPosition());
             Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
         }
     }

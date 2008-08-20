@@ -86,7 +86,6 @@ public class Trader extends EWrapperAdapter {
 
             if (errorCode == 1100) {// Connectivity between IB and TWS has been lost.
                 traderAssistant.setIsConnected(false);
-                SecureMailSender.getInstance().send("Event type: Connectivity between IB and TWS has been lost");
             }
 
             // handle errors 1101 and 1102
@@ -95,7 +94,6 @@ public class Trader extends EWrapperAdapter {
                 eventReport.report("Checking for executions while TWS was disconnected from the IB server.");
                 traderAssistant.requestExecutions();
                 traderAssistant.setIsConnected(true);
-                SecureMailSender.getInstance().send("Event type: Connectivity between IB and TWS has been restored");
             }
 
             if (errorCode == 317) {// Market depth data has been reset
@@ -110,6 +108,10 @@ public class Trader extends EWrapperAdapter {
                 Dispatcher.fireModelChanged(ModelListener.Event.Error, "IB reported: " + errorMsg);
             }
 
+            boolean requiresNotification = (errorCode != 2104 && errorCode != 2106 && errorCode != 2107 && errorCode != 317);
+            if (requiresNotification) {
+                SecureMailSender.getInstance().send(msg); 
+            }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
@@ -118,12 +120,25 @@ public class Trader extends EWrapperAdapter {
 
 
     @Override
-    public void updateMktDepth(int strategyId, int position, int operation, int side, double price, int size) {
+    public void updateMktDepth(int tickerId, int position, int operation, int side, double price, int size) {
         try {
-            MarketBook marketBook = traderAssistant.getStrategy(strategyId).getMarketBook();
-            marketBook.update(position, operation, side, price, size);
+            MarketBook marketBook = traderAssistant.getMarketBook(tickerId);
+            marketBook.update(position, MarketBookOperation.getOperation(operation), MarketBookSide.getSide(side), price, size);
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
+            eventReport.report(t);
+        }
+    }
+
+
+    @Override
+    public void tickSize(int tickerId, int tickType, int size) {
+        try {
+            if (tickType == TickType.VOLUME) {
+                MarketBook marketBook = traderAssistant.getMarketBook(tickerId);
+                marketBook.update(size);
+            }
+        } catch (Throwable t) {
             eventReport.report(t);
         }
     }

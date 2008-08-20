@@ -22,11 +22,14 @@ public class TraderAssistant {
     private final int port, clientID;
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
+    private final Map<String, Integer> tickers;
+    private final HashSet<Integer> subscribedTickers;
+    private final Map<Integer, MarketBook> marketBooks;
     private final Report eventReport;
     private final Trader trader;
 
     private EClientSocket socket;
-    private int nextStrategyID, orderID, serverVersion;
+    private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isConnected;
 
@@ -36,6 +39,9 @@ public class TraderAssistant {
         eventReport = Dispatcher.getReporter();
         strategies = new HashMap<Integer, Strategy>();
         openOrders = new HashMap<Integer, OpenOrder>();
+        tickers = new HashMap<String, Integer>();
+        marketBooks = new HashMap<Integer, MarketBook>();
+        subscribedTickers = new HashSet<Integer>();
 
         PreferencesHolder prefs = PreferencesHolder.getInstance();
 
@@ -54,6 +60,15 @@ public class TraderAssistant {
     public Strategy getStrategy(int strategyId) {
         return strategies.get(strategyId);
     }
+
+    public MarketBook getMarketBook(int tickerId) {
+        return marketBooks.get(tickerId);
+    }
+
+    public Map<Integer, MarketBook> getAllMarketBooks() {
+        return marketBooks;
+    }
+
 
     public Strategy getStrategy(String name) {
         Strategy strategy = null;
@@ -120,10 +135,38 @@ public class TraderAssistant {
     }
 
 
-    public void requestMarketDepth(Strategy strategy, int rows) {
-        socket.reqMktDepth(strategy.getId(), strategy.getContract(), rows);
-        String msg = strategy.getName() + ": " + "Requested market depth";
-        eventReport.report(msg);
+    public synchronized MarketBook createMarketBook(Strategy strategy) {
+        Contract contract = strategy.getContract();
+        String instrument = contract.m_symbol + "-" + contract.m_exchange + "-" + contract.m_secType + "-" + contract.m_expiry;
+        Integer ticker = tickers.get(instrument);
+        MarketBook marketBook;
+        if (ticker == null) {
+            marketBook = new MarketBook();
+            marketBook.setName(instrument);
+
+            tickerId++;
+            tickers.put(instrument, tickerId);
+            marketBooks.put(tickerId, marketBook);
+        } else {
+            marketBook = marketBooks.get(ticker);
+        }
+
+        return marketBook;
+    }
+
+
+    private synchronized void requestMarketData(Strategy strategy) {
+        Contract contract = strategy.getContract();
+        String instrument = contract.m_symbol + "-" + contract.m_exchange + "-" + contract.m_secType + "-" + contract.m_expiry;
+        Integer ticker = tickers.get(instrument);
+        if (!subscribedTickers.contains(ticker)) {
+            subscribedTickers.add(ticker);
+
+            socket.reqMktDepth(ticker, contract, 5);
+            socket.reqMktData(ticker, contract, "", false);
+            String msg = "Requested market depth and market data for instrument " + instrument;
+            eventReport.report(msg);
+        }
     }
 
     public synchronized void addStrategy(Strategy strategy) throws IOException, JBookTraderException {
@@ -138,7 +181,7 @@ public class TraderAssistant {
             strategy.setReport(strategyReport);
             String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
             eventReport.report(msg);
-            requestMarketDepth(strategy, 5);
+            requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);
             strategy.setIsActive(true);
             Dispatcher.strategyStarted();
@@ -147,6 +190,9 @@ public class TraderAssistant {
 
     public synchronized void removeAllStrategies() {
         strategies.clear();
+        tickers.clear();
+        subscribedTickers.clear();
+        marketBooks.clear();
     }
 
     public void setAccountCode(String accountCode) {
@@ -166,7 +212,7 @@ public class TraderAssistant {
                 MarketDepth md = strategy.getMarketBook().getLastMarketDepth();
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
-                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getHighPrice() : md.getLowPrice();
+                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getBestAsk() : md.getBestBid();
                 eventReport.report(msg);
                 trader.execDetails(orderID, contract, execution);
             }

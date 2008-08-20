@@ -18,7 +18,8 @@ public class BackTestStrategyRunner implements Runnable {
     private boolean cancelled;
     private BackTestFileReader backTestFileReader;
 
-    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) throws IOException, JBookTraderException {
+    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy)
+            throws IOException, JBookTraderException {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
 

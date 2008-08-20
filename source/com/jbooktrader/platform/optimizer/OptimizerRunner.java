@@ -4,7 +4,6 @@ import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
@@ -20,8 +19,8 @@ import java.util.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    private static final int MAX_RESULTS = 10000; // max number of rows in the "optimization results" table
-    private static final long UPDATE_FREQUENCY = 4000000L; // lines
+    private static final int MAX_RESULTS = 10000;// max number of rows in the "optimization results" table
+    private static final long UPDATE_FREQUENCY = 4000000L;// lines
 
     private final NumberFormat nf2, nf0;
     private final String strategyName;
@@ -40,7 +39,8 @@ public abstract class OptimizerRunner implements Runnable {
     protected int lineCount;
     protected MarketBook marketBook;
 
-    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
+    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params)
+            throws ClassNotFoundException, NoSuchMethodException {
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
@@ -49,7 +49,7 @@ public abstract class OptimizerRunner implements Runnable {
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
         Class<?> clazz = Class.forName(strategy.getClass().getName());
-        Class<?>[] parameterTypes = new Class[]{StrategyParams.class, MarketBook.class};
+        Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
         strategyConstructor = clazz.getConstructor(parameterTypes);
         resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
         marketBook = new MarketBook();
@@ -82,9 +82,6 @@ public abstract class OptimizerRunner implements Runnable {
             boolean inSchedule = tradingSchedule.contains(time);
 
             for (Strategy strategy : strategies) {
-                PerformanceManager performanceManager = strategy.getPerformanceManager();
-                PositionManager positionManager = strategy.getPositionManager();
-                performanceManager.update(marketDepth.getMidPrice(), positionManager.getPosition());
                 strategy.setTime(time);
                 strategy.updateIndicators();
                 if (strategy.hasValidIndicators()) {
@@ -95,7 +92,7 @@ public abstract class OptimizerRunner implements Runnable {
                     strategy.closePosition();// force flat position
                 }
 
-                positionManager.trade();
+                strategy.getPositionManager().trade();
 
                 completedSteps++;
                 if (completedSteps % UPDATE_FREQUENCY == 0) {
@@ -247,7 +244,8 @@ public abstract class OptimizerRunner implements Runnable {
                 saveToFile();
                 long totalTimeInSecs = (System.currentTimeMillis() - start) / 1000;
                 showFastProgress(100, 100, "Optimization");
-                MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
+                MessageDialog.showMessage(optimizerDialog,
+                        "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);

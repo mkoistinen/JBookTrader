@@ -51,8 +51,8 @@ public class PerformanceChartData {
             long time = marketDepth.getTime();
             double open, close;
             open = close = marketDepth.getMidPrice();
-            double high = marketDepth.getHighPrice();
-            double low = marketDepth.getLowPrice();
+            double low = marketDepth.getBestBid();
+            double high = marketDepth.getBestAsk();
 
             // Integer division gives us the number of whole periods
             long completedPeriods = time / frequency;

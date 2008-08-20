@@ -306,6 +306,7 @@ public class PerformanceChart {
         // indicator plots
         for (ChartableIndicator chartableIndicator : strategy.getIndicators()) {
             NumberAxis indicatorAxis = new NumberAxis(chartableIndicator.getName());
+            indicatorAxis.setLabelFont(new Font("Arial Narrow", Font.PLAIN, 11));
             OHLCDataset ds = performanceChartData.getIndicatorDataset(chartableIndicator, frequency);
             FastXYPlot indicatorPlot = new FastXYPlot(ds, dateAxis, indicatorAxis, null);
             indicatorPlot.setBackgroundPaint(BACKGROUND_COLOR);
@@ -348,6 +349,7 @@ public class PerformanceChart {
         pnlPlot = new FastXYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);
         pnlPlot.setBackgroundPaint(BACKGROUND_COLOR);
         combinedPlot.add(pnlPlot);
+
         combinedPlot.setDomainAxis(dateAxis);
         setRenderer();
 

@@ -27,6 +27,10 @@ public class TableDataModel extends AbstractTableModel {
         fireTableCellUpdated(row, col);
     }
 
+    public void setValueAtFast(Object value, int row, int col) {
+        Object[] changedItem = (Object[]) rows.get(row);
+        changedItem[col] = value;
+    }
 
     protected void removeAllData() {
         rows.clear();

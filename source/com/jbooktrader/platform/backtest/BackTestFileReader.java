@@ -13,8 +13,9 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
+    public final static int COLUMNS = 7;
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final static int COLUMNS = 5;
+
     private final LinkedList<MarketDepth> marketDepths;
     private long previousTime;
     private SimpleDateFormat sdf;
@@ -126,10 +127,15 @@ public class BackTestFileReader {
             }
         }
 
-        int balance = Integer.parseInt(st.nextToken());
-        double lowPrice = Double.parseDouble(st.nextToken());
-        double highPrice = Double.parseDouble(st.nextToken());
+        int lowBalance = Integer.parseInt(st.nextToken());
+        int highBalance = Integer.parseInt(st.nextToken());
 
-        return new MarketDepth(time, balance, highPrice, lowPrice);
+        double bestBid = Double.parseDouble(st.nextToken());
+        double bestAsk = Double.parseDouble(st.nextToken());
+
+        int volume = Integer.parseInt(st.nextToken());
+
+        return new MarketDepth(time, lowBalance, highBalance, bestBid, bestAsk, volume);
     }
 }
+

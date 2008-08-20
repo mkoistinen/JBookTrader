@@ -12,23 +12,28 @@ import java.util.zip.*;
 /**
  * Converts historical market depth data from CME format to JBT format, and writes the data to a file.
  * The created data file can be used for backtesting and optimization of trading strategies.
+ * <p/>
+ * Specifications:
+ * http://www.cme.com/files/SDKMDPCore.pdf
+ * http://www.cme.com/files/SDKRLCMessageSpecs.pdf
  */
 public class CMEDataConverter {
-    private static final long RECORDING_START = 9 * 60 * 60; // 9:00:00 EDT
-    private static final long RECORDING_END = 16 * 60 * 60 + 15 * 60; // 16:15:00 EDT
+    private static final long RECORDING_START = 9 * 60;// 9:00
+    private static final long RECORDING_END = 16 * 60 + 15;// 16:15
+    private static final long UPDATING_START = RECORDING_START - 60;
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final LinkedList<MarketDepthItem> bids, asks;
+    private final MarketBook marketBook;
+
     private final BackTestFileWriter backTestFileWriter;
     private final BufferedReader reader;
     private final SimpleDateFormat cmeDateFormat;
     private final String contract;
     private final Calendar instant;
+    private int minutesOfDay;
     private long time, lineNumber;
-    private double highPrice, lowPrice;
-    private double sumBalancesInSample;
-    private int numberOfBalancesInSample;
 
     public static void main(String[] args) throws JBookTraderException {
+
         if (args.length != 4) {
             throw new JBookTraderException("Usage: <cmeFileName> <jbtFileName> <contract> <samplingFrequency>");
         }
@@ -41,28 +46,27 @@ public class CMEDataConverter {
 
 
     private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
-        this.contract = contract;
 
-        cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        this.contract = contract;
+        marketBook = new MarketBook();
+
+        cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         cmeDateFormat.setLenient(false);
         cmeDateFormat.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
 
         instant = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
 
-        bids = new LinkedList<MarketDepthItem>();
-        asks = new LinkedList<MarketDepthItem>();
-
         for (int level = 0; level < 5; level++) {
-            bids.add(null);
-            asks.add(null);
+            marketBook.update(level, MarketBookOperation.Insert, MarketBookSide.Bid, 0, 0);
+            marketBook.update(level, MarketBookOperation.Insert, MarketBookSide.Ask, 0, 0);
         }
 
         String outFilename = "unzipped.cme";
         try {
             OutputStream unzippedStream;
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(cmeFileName));
+            ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(cmeFileName)));
             zipInputStream.getNextEntry();
-            unzippedStream = new FileOutputStream(outFilename, false);
+            unzippedStream = new BufferedOutputStream(new FileOutputStream(outFilename, false));
 
             byte[] buffer = new byte[1024 * 1024];
             int length;
@@ -76,7 +80,6 @@ public class CMEDataConverter {
         } catch (IOException e) {
             throw new JBookTraderException("Could unzip file " + cmeFileName);
         }
-
 
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(outFilename)));
@@ -93,70 +96,29 @@ public class CMEDataConverter {
         System.out.println("Converting " + outFilename + " to " + jbtFileName);
     }
 
-    private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
-        int cumulativeSize = 0;
-        for (MarketDepthItem item : items) {
-            cumulativeSize += item.getSize();
-        }
-        return cumulativeSize;
+    private boolean isRecordable() {
+        return minutesOfDay >= RECORDING_START && minutesOfDay < RECORDING_END;
     }
-
-    private void update() {
-        int cumulativeBid = getCumulativeSize(bids);
-        int cumulativeAsk = getCumulativeSize(asks);
-
-        int bestBid = bids.getFirst().getSize();
-        int bestAsk = asks.getFirst().getSize();
-        int lastBid = bids.getLast().getSize();
-        int lastAsk = asks.getLast().getSize();
-
-        int bestBidAskSum = bestBid + bestAsk;
-        cumulativeBid -= lastBid * bestBid / bestBidAskSum;
-        cumulativeAsk -= lastAsk * bestAsk / bestBidAskSum;
-
-        double totalDepth = cumulativeBid + cumulativeAsk;
-        sumBalancesInSample += (cumulativeBid - cumulativeAsk) / totalDepth;
-        numberOfBalancesInSample++;
-        highPrice = Math.max(highPrice, asks.getFirst().getPrice());
-        lowPrice = Math.min(lowPrice, bids.getFirst().getPrice());
-    }
-
-    private boolean isRecordable(Calendar instant) {
-        int secondsOfDay = instant.get(Calendar.HOUR_OF_DAY) * 60 * 60 + instant.get(Calendar.MINUTE) * 60 + instant.get(Calendar.SECOND);
-        return secondsOfDay >= RECORDING_START && secondsOfDay <= RECORDING_END;
-    }
-
 
     private void convert(long samplingFrequency) {
         String line = null;
+        int samples = 0;
+        long start = System.currentTimeMillis();
 
         try {
             long previousTime = 0;
-
-            System.out.println("Conversion started...");
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
-                if (lineNumber % 500000 == 0) {
-                    System.out.println(lineNumber + " lines converted");
-                }
 
                 try {
                     parse(line);
-                    if (lineNumber > 1000) { // don't update for the first 1000 lines
-                        update();
-                        instant.setTimeInMillis(time);
-                        if ((time - previousTime) >= samplingFrequency) {
-                            if (isRecordable(instant)) {
-                                int balance = (int) (100 * sumBalancesInSample / numberOfBalancesInSample);
-                                MarketDepth marketDepth = new MarketDepth(time, balance, highPrice, lowPrice);
-                                backTestFileWriter.write(marketDepth, true);
-                            }
-
-                            sumBalancesInSample = numberOfBalancesInSample = 0;
-                            highPrice = asks.getFirst().getPrice();
-                            lowPrice = bids.getFirst().getPrice();
-                            previousTime = time;
+                    if ((time - previousTime) >= samplingFrequency) {
+                        MarketDepth marketDepth = marketBook.getNextMarketDepth(time);
+                        if (isRecordable()) {
+                            backTestFileWriter.write(marketDepth, true);
+                            samples++;
                         }
+                        previousTime = time;
                     }
                 } catch (Exception e) {
                     String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
@@ -164,7 +126,9 @@ public class CMEDataConverter {
                     e.printStackTrace();
                 }
             }
-            System.out.println("Done: " + lineNumber + " lines converted successfully.");
+            System.out.println("Done: " + samples + " samples have been created.");
+            long end = System.currentTimeMillis();
+            System.out.println("converted in " + (end - start) / 1000 + " seconds.");
         } catch (Exception e) {
             String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
             errorMsg += line + LINE_SEP;
@@ -186,37 +150,47 @@ public class CMEDataConverter {
 
 
     private void parse(String line) throws ParseException {
-        boolean isSpecifiedContract = (line.substring(49, 54).trim().equals(contract));
-        boolean isLimitOrderMessage = line.substring(33, 35).equals("MA");
+        String dateTime = line.substring(17, 31);
+        time = cmeDateFormat.parse(dateTime).getTime();
+        instant.setTimeInMillis(time);
+        minutesOfDay = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
+        if (!(minutesOfDay >= UPDATING_START && minutesOfDay < RECORDING_END)) {
+            return;
+        }
 
-        if (isLimitOrderMessage && isSpecifiedContract) {
-            String centiseconds = line.substring(14, 16);
-            int millis = Integer.valueOf(centiseconds) * 10;
-            String date = line.substring(17, 29) + line.substring(12, 14) + millis;
-            time = cmeDateFormat.parse(date).getTime();
+        boolean isSpecifiedContract = (line.substring(49, 69).trim().equals(contract));
+        if (!isSpecifiedContract) {
+            return;
+        }
 
-            int position = 82;
+        String messageType = line.substring(33, 35);
+        boolean isLimitOrderMessage = messageType.equals("MA");
+        boolean isTradeMessage = messageType.equals("M6");
+        if (!(isLimitOrderMessage || isTradeMessage)) {
+            return;
+        }
+
+
+        if (isLimitOrderMessage) {
+            int groupStart = 0;
             for (int level = 0; level < 5; level++) {
                 if (line.charAt(76 + level) == '1') {
+                    int bidSize = Integer.parseInt(line.substring(groupStart + 82, groupStart + 94));
+                    double bidPrice = Integer.valueOf(line.substring(groupStart + 98, groupStart + 117)) / 100d;
+                    double askPrice = Integer.valueOf(line.substring(groupStart + 117, groupStart + 136)) / 100d;
+                    int askSize = Integer.parseInt(line.substring(groupStart + 140, groupStart + 152));
 
-                    int bidSize = Integer.parseInt(line.substring(position, position + 12));
+                    marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Bid, bidPrice, bidSize);
+                    marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Ask, askPrice, askSize);
 
-                    position += 16;
-                    double bidPrice = Integer.valueOf(line.substring(position + 1, position + 19)) / 100d;
-
-                    position += 19;
-                    double askPrice = Integer.valueOf(line.substring(position + 1, position + 19)) / 100d;
-
-                    position += 23;
-                    int askSize = Integer.parseInt(line.substring(position, position + 12));
-
-                    bids.set(level, new MarketDepthItem(bidSize, bidPrice));
-                    asks.set(level, new MarketDepthItem(askSize, askPrice));
-                    //System.out.println("Level: " + level + " Bid: " + bidPrice + " BidSize: " + bidSize + " Ask price:" + askPrice + " Ask Size:" + askSize);
-                    position += 14;
+                    groupStart += 72;
                 }
             }
         }
+
+        if (isTradeMessage) {
+            int quantity = Integer.parseInt(line.substring(116, 128));
+            marketBook.update(quantity);
+        }
     }
 }
-

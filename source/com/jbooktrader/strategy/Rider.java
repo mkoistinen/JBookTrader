@@ -2,6 +2,7 @@ package com.jbooktrader.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketdepth.*;
@@ -14,37 +15,42 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public class Classic extends Strategy {
+public class Rider extends Strategy {
 
     // Technical indicators
-    private final Indicator depthBalanceInd;
+    private final Indicator balanceVelocityInd;
 
     // Strategy parameters names
+    private static final String FAST_PERIOD = "FastPeriod";
+    private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-    private static final String STOP_LOSS = "Stop Loss";
-    private static final String PROFIT_TARGET = "Profit Target";
+    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final double entry, stopLoss, profitTarget;
+    private final int entry, exit;
 
 
-    public Classic(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public Rider(StrategyParams optimizationParams) throws JBookTraderException {
+        super(optimizationParams);
+
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
-        // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
         int multiplier = 50;// contract multiplier
+
+        // Define trading schedule
+        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
+
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
 
         entry = getParam(ENTRY);
-        stopLoss = getParam(STOP_LOSS);
-        profitTarget = getParam(PROFIT_TARGET);
+        exit = getParam(EXIT);
+        Indicator balanceInd = new Balance();
+        balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        addIndicator(balanceInd);
+        addIndicator(balanceVelocityInd);
 
-        // Create technical indicators
-        depthBalanceInd = new Balance(marketBook);
-        addIndicator("Depth Balance", depthBalanceInd);
+
     }
 
     /**
@@ -55,9 +61,10 @@ public class Classic extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(ENTRY, 35, 65, 1, 45);
-        addParam(STOP_LOSS, 1, 9, 1, 6);
-        addParam(PROFIT_TARGET, 5, 25, 1, 30);
+        addParam(FAST_PERIOD, 50, 300, 50, 93);
+        addParam(SLOW_PERIOD, 300, 700, 50, 488);
+        addParam(ENTRY, 5, 30, 5, 15);
+        addParam(EXIT, 5, 30, 5, 12);
     }
 
     /**
@@ -66,21 +73,17 @@ public class Classic extends Strategy {
      */
     @Override
     public void onBookChange() {
-        int currentPosition = getPositionManager().getPosition();
-        double depthBalance = depthBalanceInd.getValue();
-        if (depthBalance >= entry) {
+        double balanceVelocity = balanceVelocityInd.getValue();
+        if (balanceVelocity >= entry) {
             setPosition(1);
-        } else if (depthBalance <= -entry) {
+        } else if (balanceVelocity <= -entry) {
             setPosition(-1);
         } else {
-            double lastEntry = getPositionManager().getAvgFillPrice();
-            double currentPrice = getLastMarketDepth().getMidPrice();
-            double loss = 0;
-            if (currentPosition != 0) {
-                loss = (currentPosition > 0) ? (lastEntry - currentPrice) : (currentPrice - lastEntry);
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && balanceVelocity <= -exit) {
+                setPosition(0);
             }
-            double gain = -loss;
-            if (loss >= stopLoss || gain >= profitTarget) {
+            if (currentPosition < 0 && balanceVelocity >= exit) {
                 setPosition(0);
             }
         }

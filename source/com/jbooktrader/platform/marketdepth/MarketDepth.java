@@ -5,53 +5,60 @@ package com.jbooktrader.platform.marketdepth;
  */
 public class MarketDepth {
     private final long time;
-    private final int balance;
-    private final double highPrice, lowPrice, midPrice;
+    private final int lowBalance, highBalance;
+    private final double bestBid, bestAsk;
+    private final int volume;
 
-    public MarketDepth(long time, int balance, double highPrice, double lowPrice) {
+    public MarketDepth(long time, int lowBalance, int highBalance, double bestBid, double bestAsk, int volume) {
         this.time = time;
-        this.balance = balance;
-        this.highPrice = highPrice;
-        this.lowPrice = lowPrice;
-        midPrice = (highPrice + lowPrice) / 2;
+        this.lowBalance = lowBalance;
+        this.highBalance = highBalance;
+        this.bestBid = bestBid;
+        this.bestAsk = bestAsk;
+        this.volume = volume;
     }
 
-    public MarketDepth(int balance, double highPrice, double lowPrice) {
-        this(System.currentTimeMillis(), balance, highPrice, lowPrice);
+    public int getLowBalance() {
+        return lowBalance;
     }
 
-    public int getBalance() {
-        return balance;
+    public int getHighBalance() {
+        return highBalance;
     }
 
-    public boolean isValid() {
-        return highPrice != 0 && lowPrice != 0;
+    public int getMidBalance() {
+        return (highBalance + lowBalance) / 2;
     }
 
     public long getTime() {
         return time;
     }
 
-    public double getHighPrice() {
-        return highPrice;
+    public double getBestBid() {
+        return bestBid;
     }
 
-    public double getLowPrice() {
-        return lowPrice;
+    public double getBestAsk() {
+        return bestAsk;
     }
 
+    public int getVolume() {
+        return volume;
+    }
 
     public double getMidPrice() {
-        return midPrice;
+        return (bestBid + bestAsk) / 2;
     }
 
 
     public String toString() {
         StringBuilder marketDepth = new StringBuilder();
         marketDepth.append("time: ").append(getTime());
-        marketDepth.append(" balance: ").append(balance);
-        marketDepth.append(" high price: ").append(highPrice);
-        marketDepth.append(" low price: ").append(lowPrice);
+        marketDepth.append(" low balance: ").append(lowBalance);
+        marketDepth.append(" high balance: ").append(highBalance);
+        marketDepth.append(" best bid: ").append(bestBid);
+        marketDepth.append(" best ask: ").append(bestAsk);
+        marketDepth.append(" volume: ").append(volume);
 
         return marketDepth.toString();
     }

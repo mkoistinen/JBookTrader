@@ -23,6 +23,7 @@ public class PositionManager {
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
     private final PerformanceManager performanceManager;
+    private final SimpleDateFormat simpleDateFormat;
 
     private int position;
     private double avgFillPrice;
@@ -35,6 +36,8 @@ public class PositionManager {
         traderAssistant = Dispatcher.getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
+        simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+        simpleDateFormat.setTimeZone(strategy.getTradingSchedule().getTimeZone());
     }
 
     public LinkedList<Position> getPositionsHistory() {
@@ -73,7 +76,7 @@ public class PositionManager {
         avgFillPrice = openOrder.getAvgFillPrice();
 
 
-        performanceManager.update(quantity, avgFillPrice, position);
+        performanceManager.updateOnTrade(quantity, avgFillPrice, position);
 
         Dispatcher.Mode mode = Dispatcher.getMode();
         if ((mode != Optimization)) {
@@ -92,12 +95,14 @@ public class PositionManager {
         // remote email notification, if enabled
         if (mode == Trade || mode == ForwardTest) {
             String msg = "Event type: Trade" + LINE_SEP;
+            msg += "Time sent: " + simpleDateFormat.format(System.currentTimeMillis()) + LINE_SEP;
             msg += "Strategy: " + strategy.getName() + LINE_SEP;
             msg += "Position: " + position + LINE_SEP;
             msg += "Price: " + avgFillPrice + LINE_SEP;
             msg += "Trades: " + nf2.format(performanceManager.getTrades()) + LINE_SEP;
-            msg += "Trade P&L: " + nf2.format(performanceManager.getTradeProfit()) + LINE_SEP;
+            //msg += "Trade P&L: " + nf2.format(performanceManager.getTradeProfit()) + LINE_SEP;
             msg += "Total P&L: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
+
             SecureMailSender.getInstance().send(msg);
         }
     }

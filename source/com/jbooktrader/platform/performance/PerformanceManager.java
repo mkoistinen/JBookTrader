@@ -23,7 +23,6 @@ public class PerformanceManager {
     private double totalBought, totalSold;
     private double tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
     private double peakNetProfit, maxDrawdown;
-    private double sumTradeProfit, sumTradeProfitSquared;
     private boolean isCompletedTrade;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
@@ -93,13 +92,8 @@ public class PerformanceManager {
     }
 
     public double getPerformanceIndex() {
-        double stdev = (trades - 1) * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit;
-        if (stdev != 0) {
-            stdev = Math.sqrt(stdev) / (trades - 1);
-            return getAverageProfitPerTrade() / stdev;
-        } else {
-            return 0;
-        }
+        double pathTraversed = grossLoss + grossProfit;
+        return (pathTraversed == 0) ? 0 : (100 * netProfit / pathTraversed);
     }
 
     public double getExposure() {
@@ -107,20 +101,11 @@ public class PerformanceManager {
         return (size == 0) ? 0 : 100 * totalExposure / (double) size;
     }
 
-    public void update(double price, int position) {
+    public void updatePositionValue(double price, int position) {
         positionValue = position * price * multiplier;
-        netProfit = totalSold - totalBought + positionValue - totalCommission;
-        if (netProfit > peakNetProfit) {
-            peakNetProfit = netProfit;
-        }
-
-        double drawdown = peakNetProfit - netProfit;
-        if (drawdown > maxDrawdown) {
-            maxDrawdown = drawdown;
-        }
     }
 
-    public void update(int quantity, double avgFillPrice, int position) {
+    public void updateOnTrade(int quantity, double avgFillPrice, int position) {
 
         double tradeAmount = avgFillPrice * Math.abs(quantity) * multiplier;
         if (quantity > 0) {
@@ -132,16 +117,18 @@ public class PerformanceManager {
         tradeCommission = commission.getCommission(Math.abs(quantity), avgFillPrice);
         totalCommission += tradeCommission;
 
-        update(avgFillPrice, position);
+        updatePositionValue(avgFillPrice, position);
 
 
         isCompletedTrade = (previousPosition != 0);
         if (isCompletedTrade) {
             trades++;
 
+            netProfit = totalSold - totalBought + positionValue - totalCommission;
+            peakNetProfit = Math.max(netProfit, peakNetProfit);
+            maxDrawdown = Math.max(maxDrawdown, peakNetProfit - netProfit);
+
             tradeProfit = netProfit - netProfitAsOfPreviousTrade;
-            sumTradeProfit += tradeProfit;
-            sumTradeProfitSquared += (tradeProfit * tradeProfit);
             netProfitAsOfPreviousTrade = netProfit;
 
             if (tradeProfit >= 0) {

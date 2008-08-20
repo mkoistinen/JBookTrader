@@ -247,8 +247,8 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         columnModel.getColumn(NetProfit.ordinal()).setCellRenderer(nr0);
         columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr0);
         NumberRenderer nr5 = new NumberRenderer(5);
-        columnModel.getColumn(LowPrice.ordinal()).setCellRenderer(nr5);
-        columnModel.getColumn(HighPrice.ordinal()).setCellRenderer(nr5);
+        columnModel.getColumn(BestBid.ordinal()).setCellRenderer(nr5);
+        columnModel.getColumn(BestAsk.ordinal()).setCellRenderer(nr5);
 
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);

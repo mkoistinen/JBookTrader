@@ -8,6 +8,7 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
+import javax.swing.*;
 import java.util.*;
 
 /**
@@ -65,23 +66,27 @@ public class StrategyTableModel extends TableDataModel {
         return selectedRow;
     }
 
-    public synchronized void update(Strategy strategy) {
-        int row = getRowForStrategy(strategy);
+    public void update(Strategy strategy) {
+        final int row = getRowForStrategy(strategy);
 
         MarketBook marketBook = strategy.getMarketBook();
         if (marketBook.size() > 0) {
             MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
-            setValueAt(lastMarketDepth.getBalance(), row, Balance.ordinal());
-            setValueAt(lastMarketDepth.getLowPrice(), row, LowPrice.ordinal());
-            setValueAt(lastMarketDepth.getHighPrice(), row, HighPrice.ordinal());
+            setValueAtFast(lastMarketDepth.getBestBid(), row, BestBid.ordinal());
+            setValueAtFast(lastMarketDepth.getBestAsk(), row, BestAsk.ordinal());
+            setValueAtFast(marketBook.getCumulativeVolume(), row, Volume.ordinal());
         }
         PositionManager positionManager = strategy.getPositionManager();
         PerformanceManager performanceManager = strategy.getPerformanceManager();
-        setValueAt(positionManager.getPosition(), row, Position.ordinal());
-        setValueAt(performanceManager.getTrades(), row, Trades.ordinal());
-        setValueAt(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
-        setValueAt(performanceManager.getNetProfit(), row, NetProfit.ordinal());
-
+        setValueAtFast(positionManager.getPosition(), row, Position.ordinal());
+        setValueAtFast(performanceManager.getTrades(), row, Trades.ordinal());
+        setValueAtFast(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
+        setValueAtFast(performanceManager.getNetProfit(), row, NetProfit.ordinal());
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                fireTableRowsUpdated(row, row);
+            }
+        });
     }
 
     public void addStrategy(Strategy strategy) {

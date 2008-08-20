@@ -316,7 +316,6 @@ public class OptimizerDialog extends JDialog {
         SpringUtilities.makeCompactGrid(northPanel, 6, 1, 12, 12, 0, 8);
 
         JScrollPane resultsScrollPane = new JScrollPane();
-        //centerPanel.add(new TitledSeparator(new JLabel("Optimization Results")));
         centerPanel.add(resultsScrollPane);
         SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 0, 12, 0);
 
@@ -382,7 +381,8 @@ public class OptimizerDialog extends JDialog {
             TableColumnModel resultsColumnModel = resultsTable.getColumnModel();
             for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
                 int columnIndex = performanceMetric.ordinal() + params;
-                resultsColumnModel.getColumn(columnIndex).setCellRenderer(new NumberRenderer(performanceMetric.getPrecision()));
+                resultsColumnModel.getColumn(columnIndex).setCellRenderer(
+                        new NumberRenderer(performanceMetric.getPrecision()));
             }
         } catch (Exception e) {
             Dispatcher.getReporter().report(e);

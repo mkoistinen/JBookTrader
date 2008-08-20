@@ -56,9 +56,11 @@ public final class BackTestFileWriter {
     public void write(MarketDepth marketDepth, boolean flush) {
         StringBuilder sb = new StringBuilder();
         sb.append(dateFormat.format(new Date(marketDepth.getTime()))).append(",");
-        sb.append(marketDepth.getBalance()).append(",");
-        sb.append(decimalFormat.format(marketDepth.getLowPrice())).append(",");
-        sb.append(decimalFormat.format(marketDepth.getHighPrice()));
+        sb.append(marketDepth.getLowBalance()).append(",");
+        sb.append(marketDepth.getHighBalance()).append(",");
+        sb.append(decimalFormat.format(marketDepth.getBestBid())).append(",");
+        sb.append(decimalFormat.format(marketDepth.getBestAsk())).append(",");
+        sb.append(decimalFormat.format(marketDepth.getVolume()));
 
         writer.println(sb);
         if (flush) {
@@ -97,13 +99,14 @@ public final class BackTestFileWriter {
         StringBuilder header = new StringBuilder();
         String appInfo = JBookTrader.APP_NAME + ", version " + JBookTrader.VERSION;
         header.append("# This historical data file was created by ").append(appInfo).append(LINE_SEP);
-        header.append("# Each line represents the order book at a particular time and contains 5 columns:").append(LINE_SEP);
-        header.append("# date, time, balance, lowPrice, highPrice").append(LINE_SEP);
-        header.append("# 1. date is in the MMddyy format").append(LINE_SEP);
-        header.append("# 2. time is in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. balance is the period's adjusted mean balance").append(LINE_SEP);
-        header.append("# 4. lowPrice is the period's lowest best bid").append(LINE_SEP);
-        header.append("# 5. highPrice is the period's highest best ask").append(LINE_SEP);
+        header.append("# Each line represents a 1-second snapshot of the market and contains ").append(BackTestFileReader.COLUMNS).append(" columns:").append(LINE_SEP);
+        header.append("# 1. date in the MMddyy format").append(LINE_SEP);
+        header.append("# 2. time in the HHmmss format").append(LINE_SEP);
+        header.append("# 3. period's lowest book balance").append(LINE_SEP);
+        header.append("# 4. period's highest book balance").append(LINE_SEP);
+        header.append("# 5. highest bid price at the end of the period").append(LINE_SEP);
+        header.append("# 6. lowest ask price at the end of the period").append(LINE_SEP);
+        header.append("# 7. period's volume of traded contracts").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

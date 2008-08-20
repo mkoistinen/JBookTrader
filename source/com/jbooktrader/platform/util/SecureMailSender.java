@@ -34,9 +34,11 @@ public class SecureMailSender {
                 message.setSubject(subject);
                 message.setContent(content, "text/plain");
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+                //message.addFrom(new InternetAddress(user));
 
                 Transport transport = mailSession.getTransport();
                 transport.connect(user, password);
+
                 transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
                 transport.close();
 

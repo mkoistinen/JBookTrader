@@ -30,12 +30,12 @@ public class Balancer extends Strategy {
     private final int balanceEntry, rsiEntry;
 
 
-    public Balancer(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
+        super(optimizationParams);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
         int multiplier = 50;// contract multiplier
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
@@ -44,10 +44,10 @@ public class Balancer extends Strategy {
         rsiEntry = getParam(RSI_ENTRY);
 
         // Create technical indicators
-        rsiInd = new PriceRSI(marketBook, getParam(RSI_PERIOD));
-        balanceEmaInd = new BalanceEMA(marketBook, getParam(EMA_PERIOD));
-        addIndicator("PriceRSI", rsiInd);
-        addIndicator("BalanceEMA", balanceEmaInd);
+        rsiInd = new PriceRSI(getParam(RSI_PERIOD));
+        balanceEmaInd = new BalanceEMA(getParam(EMA_PERIOD));
+        addIndicator(rsiInd);
+        addIndicator(balanceEmaInd);
 
     }
 
@@ -59,10 +59,10 @@ public class Balancer extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 1, 25, 1, 8);
-        addParam(RSI_PERIOD, 150, 350, 25, 287);
-        addParam(BALANCE_ENTRY, 20, 40, 1, 27);
-        addParam(RSI_ENTRY, 0, 30, 1, 10);
+        addParam(EMA_PERIOD, 5, 50, 5, 6);
+        addParam(RSI_PERIOD, 25, 200, 25, 95);
+        addParam(BALANCE_ENTRY, 10, 45, 5, 30);
+        addParam(RSI_ENTRY, 10, 45, 5, 16);
     }
 
     /**

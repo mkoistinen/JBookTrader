@@ -18,7 +18,7 @@ import com.jbooktrader.platform.util.*;
 public class Walker extends Strategy {
 
     // Technical indicators
-    private final Indicator emaBalanceInd, emaBalanceDisplacementInd;
+    private final Indicator emaBalanceDisplacementInd;
 
     // Strategy parameters names
     private static final String EMA_PERIOD = "EmaPeriod";
@@ -29,12 +29,12 @@ public class Walker extends Strategy {
     private final int entry;
 
 
-    public Walker(StrategyParams optimizationParams, MarketBook marketBook) throws JBookTraderException {
-        super(optimizationParams, marketBook);
+    public Walker(StrategyParams optimizationParams) throws JBookTraderException {
+        super(optimizationParams);
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:20", "16:10", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
         int multiplier = 50;// contract multiplier
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission);
@@ -42,11 +42,11 @@ public class Walker extends Strategy {
         entry = getParam(ENTRY);
 
         // Create technical indicators
-        emaBalanceInd = new BalanceEMA(marketBook, getParam(EMA_PERIOD));
+        Indicator emaBalanceInd = new BalanceEMA(getParam(EMA_PERIOD));
         emaBalanceDisplacementInd = new Displacement(emaBalanceInd, getParam(DISPLACEMENT_PERIOD));
 
-        addIndicator("emaBalance", emaBalanceInd);
-        addIndicator("displacement", emaBalanceDisplacementInd);
+        addIndicator(emaBalanceInd);
+        addIndicator(emaBalanceDisplacementInd);
 
     }
 
@@ -58,9 +58,9 @@ public class Walker extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 5, 100, 5, 22);
-        addParam(DISPLACEMENT_PERIOD, 300, 900, 5, 627);
-        addParam(ENTRY, 5, 100, 5, 47);
+        addParam(EMA_PERIOD, 1, 100, 5, 15);
+        addParam(DISPLACEMENT_PERIOD, 100, 600, 5, 425);
+        addParam(ENTRY, 5, 100, 5, 42);
     }
 
     /**

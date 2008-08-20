@@ -12,7 +12,8 @@ import java.util.*;
 public class BruteForceOptimizerRunner extends OptimizerRunner {
     private static final int CHUNK_SIZE = 500;
 
-    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws ClassNotFoundException, NoSuchMethodException {
+    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params)
+            throws ClassNotFoundException, NoSuchMethodException {
         super(optimizerDialog, strategy, params);
     }
 
@@ -28,7 +29,8 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
             while (!tasks.isEmpty() && strategies.size() != CHUNK_SIZE) {
                 StrategyParams params = tasks.removeFirst();
                 try {
-                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params, marketBook);
+                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params);
+                    strategy.setMarketBook(marketBook);
                     strategies.add(strategy);
                 } catch (Exception e) {
                     throw new JBookTraderException(e);

@@ -9,16 +9,14 @@ import java.util.*;
  * Holds market depth history for a strategy.
  */
 public class MarketBook {
-    private final static int INSERT = 0, UPDATE = 1, DELETE = 2;
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketDepth> marketDepths;
     private final LinkedList<MarketDepthItem> bids, asks;
     private BackTestFileWriter backTestFileWriter;
     private String name;
     private TimeZone timeZone;
-    private double highPrice, lowPrice;
-    private double sumBalancesInSample;
-    private int numberOfBalancesInSample;
+    private double lowBalance, highBalance, lastBalance;
+    private int cumulativeVolume, previousCumulativeVolume;
 
     public MarketBook() {
         marketDepths = new LinkedList<MarketDepth>();
@@ -69,11 +67,24 @@ public class MarketBook {
         return marketDepths.getLast();
     }
 
-    synchronized public void reset() {
+    public MarketDepth getPreviousMarketDepth() {
+        return marketDepths.get(marketDepths.size() - 2);
+    }
+
+
+    public void reset() {
         bids.clear();
         asks.clear();
-        highPrice = lowPrice = sumBalancesInSample = numberOfBalancesInSample = 0;
     }
+
+    private boolean isValid() {
+        return (bids.size() == 5 && asks.size() == 5);
+    }
+
+    public int getCumulativeVolume() {
+        return cumulativeVolume;
+    }
+
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
         int cumulativeSize = 0;
@@ -83,61 +94,56 @@ public class MarketBook {
         return cumulativeSize;
     }
 
-    synchronized public MarketDepth getNextMarketDepth() {
+    public MarketDepth getNextMarketDepth(long time) {
         MarketDepth marketDepth = null;
-        if (lowPrice != 0 && highPrice != 0) {
-            int balance = (int) (100 * sumBalancesInSample / numberOfBalancesInSample);
-            marketDepth = new MarketDepth(balance, highPrice, lowPrice);
+        if (isValid()) {
+            int volume = cumulativeVolume - previousCumulativeVolume;
+            double bestBid = bids.getFirst().getPrice();
+            double bestAsk = asks.getFirst().getPrice();
+            marketDepth = new MarketDepth(time, (int) Math.round(lowBalance), (int) Math.round(highBalance), bestBid, bestAsk, volume);
+
             // initialize next market depth values
-            sumBalancesInSample = numberOfBalancesInSample = 0;
-            highPrice = asks.getFirst().getPrice();
-            lowPrice = bids.getFirst().getPrice();
+            previousCumulativeVolume = cumulativeVolume;
+            highBalance = lowBalance = lastBalance;
         }
 
         return marketDepth;
     }
 
-    synchronized public void update(int position, int operation, int side, double price, int size) {
-        List<MarketDepthItem> items = (side == 1) ? bids : asks;
+
+    public void update(int cumulativeVolume) {
+        if (previousCumulativeVolume == 0) {
+            previousCumulativeVolume = cumulativeVolume;
+        }
+        this.cumulativeVolume = cumulativeVolume;
+    }
+
+    public void update(int position, MarketBookOperation operation, MarketBookSide side, double price, int size) {
+        List<MarketDepthItem> items = (side == MarketBookSide.Bid) ? bids : asks;
         switch (operation) {
-            case INSERT:
+            case Insert:
                 items.add(position, new MarketDepthItem(size, price));
                 break;
-            case UPDATE:
+            case Update:
                 MarketDepthItem item = items.get(position);
                 item.setSize(size);
                 item.setPrice(price);
                 break;
-            case DELETE:
+            case Delete:
                 if (position < items.size()) {
                     items.remove(position);
                 }
                 break;
         }
 
-        if (operation == UPDATE) {
-            // Calculate "adjusted mean balance"
-            // Reference: http://groups.google.com/group/jbooktrader/t/9df17cd7245b0225
+        if (operation == MarketBookOperation.Update && isValid()) {
             int cumulativeBid = getCumulativeSize(bids);
             int cumulativeAsk = getCumulativeSize(asks);
-
-            int bestBid = bids.getFirst().getSize();
-            int bestAsk = asks.getFirst().getSize();
-            int lastBid = bids.getLast().getSize();
-            int lastAsk = asks.getLast().getSize();
-
-            int bestBidAskSum = bestBid + bestAsk;
-            cumulativeBid -= lastBid * bestBid / bestBidAskSum;
-            cumulativeAsk -= lastAsk * bestAsk / bestBidAskSum;
-
             double totalDepth = cumulativeBid + cumulativeAsk;
-            sumBalancesInSample += (cumulativeBid - cumulativeAsk) / totalDepth;
-            numberOfBalancesInSample++;
 
-            double bestAskPrice = asks.getFirst().getPrice();
-            double bestBidPrice = bids.getFirst().getPrice();
-            highPrice = (highPrice == 0) ? bestAskPrice : Math.max(highPrice, bestAskPrice);
-            lowPrice = (lowPrice == 0) ? bestBidPrice : Math.min(lowPrice, bestBidPrice);
+            lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
+            lowBalance = Math.min(lastBalance, lowBalance);
+            highBalance = Math.max(lastBalance, highBalance);
         }
     }
 }

@@ -25,15 +25,15 @@ public class Dispatcher {
         eventReport = new Report(eventReportFileName);
     }
 
-    synchronized public static void addListener(ModelListener listener) {
+    public static void addListener(ModelListener listener) {
         listeners.add(listener);
     }
 
-    synchronized public static void removeListener(ModelListener listener) {
+    public static void removeListener(ModelListener listener) {
         listeners.remove(listener);
     }
 
-    synchronized public static void fireModelChanged(ModelListener.Event event, Object value) {
+    public static void fireModelChanged(ModelListener.Event event, Object value) {
         if (mode != Mode.Optimization) {
             for (ModelListener listener : listeners) {
                 try {
