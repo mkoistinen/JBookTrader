@@ -104,8 +104,8 @@ public final class BackTestFileWriter {
         header.append("# 2. time in the HHmmss format").append(LINE_SEP);
         header.append("# 3. period's lowest book balance").append(LINE_SEP);
         header.append("# 4. period's highest book balance").append(LINE_SEP);
-        header.append("# 5. highest bid price at the end of the period").append(LINE_SEP);
-        header.append("# 6. lowest ask price at the end of the period").append(LINE_SEP);
+        header.append("# 5. best bid price at the period's end").append(LINE_SEP);
+        header.append("# 6. best ask price at the period's end").append(LINE_SEP);
         header.append("# 7. period's volume of traded contracts").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);

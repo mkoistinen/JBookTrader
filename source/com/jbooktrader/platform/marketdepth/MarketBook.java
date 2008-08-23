@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Holds market depth history for a strategy.
+ * Holds market depth history for a trading instrument.
  */
 public class MarketBook {
     private static final String LINE_SEP = System.getProperty("line.separator");

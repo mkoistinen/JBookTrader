@@ -61,10 +61,10 @@ public class Rider extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 50, 300, 50, 93);
-        addParam(SLOW_PERIOD, 300, 700, 50, 488);
-        addParam(ENTRY, 5, 30, 5, 15);
-        addParam(EXIT, 5, 30, 5, 12);
+        addParam(FAST_PERIOD, 80, 300, 50, 125);
+        addParam(SLOW_PERIOD, 300, 900, 50, 600);
+        addParam(ENTRY, 0, 30, 5, 16);
+        addParam(EXIT, 0, 30, 5, 10);
     }
 
     /**

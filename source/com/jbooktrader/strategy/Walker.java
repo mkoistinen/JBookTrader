@@ -58,9 +58,9 @@ public class Walker extends Strategy {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 1, 100, 5, 15);
-        addParam(DISPLACEMENT_PERIOD, 100, 600, 5, 425);
-        addParam(ENTRY, 5, 100, 5, 42);
+        addParam(EMA_PERIOD, 5, 100, 1, 12);
+        addParam(DISPLACEMENT_PERIOD, 200, 600, 1, 460);
+        addParam(ENTRY, 25, 80, 1, 50);
     }
 
     /**
