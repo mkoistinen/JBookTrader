@@ -1,20 +1,15 @@
 package com.jbooktrader.strategy;
 
-import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
 import com.jbooktrader.indicator.price.*;
-import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
-import com.jbooktrader.platform.schedule.*;
-import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
 
 /**
  *
  */
-public class Balancer extends Strategy {
+public class Balancer extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceEmaInd, rsiInd;
@@ -31,13 +26,6 @@ public class Balancer extends Strategy {
 
     public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
-        // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
-        // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
-        int multiplier = 50;// contract multiplier
-        Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
-        setStrategy(contract, tradingSchedule, multiplier, commission);
 
         balanceEntry = getParam(BALANCE_ENTRY);
         rsiEntry = getParam(RSI_ENTRY);
@@ -47,7 +35,6 @@ public class Balancer extends Strategy {
         balanceEmaInd = new BalanceEMA(getParam(EMA_PERIOD));
         addIndicator(rsiInd);
         addIndicator(balanceEmaInd);
-
     }
 
     /**

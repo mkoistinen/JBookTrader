@@ -1,7 +1,6 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.indicator.price.*;
+import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -9,10 +8,10 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Simple extends StrategyES {
+public class Dicey1 extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceEmaInd, rsiInd;
+    private final Indicator directionalVolumeInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
@@ -22,15 +21,12 @@ public class Simple extends StrategyES {
     private final int entry;
 
 
-    public Simple(StrategyParams optimizationParams) throws JBookTraderException {
+    public Dicey1(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        // Create technical indicators
-        rsiInd = new PriceRSI(getParam(PERIOD));
-        balanceEmaInd = new BalanceEMA(getParam(PERIOD));
-        addIndicator(rsiInd);
-        addIndicator(balanceEmaInd);
+        directionalVolumeInd = new DirectionalVolume(getParam(PERIOD));
+        addIndicator(directionalVolumeInd);
     }
 
     /**
@@ -41,8 +37,8 @@ public class Simple extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 5, 100, 5, 15);
-        addParam(ENTRY, 30, 90, 5, 72);
+        addParam(PERIOD, 60, 125, 1, 96);
+        addParam(ENTRY, 35, 50, 1, 41);
     }
 
     /**
@@ -51,11 +47,11 @@ public class Simple extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balance = balanceEmaInd.getValue() - (rsiInd.getValue() - 50);
-        if (balance >= entry) {
-            setPosition(1);
-        } else if (balance <= -entry) {
+        double directionalVolume = directionalVolumeInd.getValue();
+        if (directionalVolume >= entry) {
             setPosition(-1);
+        } else if (directionalVolume <= -entry) {
+            setPosition(1);
         }
     }
 }

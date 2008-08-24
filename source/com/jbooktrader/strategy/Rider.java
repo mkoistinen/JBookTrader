@@ -1,20 +1,15 @@
 package com.jbooktrader.strategy;
 
-import com.ib.client.*;
 import com.jbooktrader.indicator.balance.*;
 import com.jbooktrader.indicator.derivative.*;
-import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
-import com.jbooktrader.platform.schedule.*;
-import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
 
 /**
  *
  */
-public class Rider extends Strategy {
+public class Rider extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd;
@@ -32,24 +27,12 @@ public class Rider extends Strategy {
     public Rider(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
-        // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
-        int multiplier = 50;// contract multiplier
-
-        // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
-
-        Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
-        setStrategy(contract, tradingSchedule, multiplier, commission);
-
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
         Indicator balanceInd = new Balance();
         balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(balanceInd);
         addIndicator(balanceVelocityInd);
-
-
     }
 
     /**

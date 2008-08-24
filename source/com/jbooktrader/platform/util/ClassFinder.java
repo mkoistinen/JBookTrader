@@ -45,9 +45,13 @@ public class ClassFinder {
         try {
             String className = "com.jbooktrader.strategy." + name;
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
-            Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
-            Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-            return (Strategy) constructor.newInstance(new StrategyParams());
+            if (!Modifier.isAbstract(clazz.getModifiers())) {
+                Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
+                Constructor<?> constructor = clazz.getConstructor(parameterTypes);
+                return (Strategy) constructor.newInstance(new StrategyParams());
+            } else {
+                return null;
+            }
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
         } catch (Exception e) {
@@ -67,7 +71,9 @@ public class ClassFinder {
         for (String strategyName : strategyNames) {
             try {
                 Strategy strategy = getInstance(strategyName);
-                strategies.add(strategy);
+                if (strategy != null) {
+                    strategies.add(strategy);
+                }
             } catch (Exception e) {
                 String msg = "Could not create strategy " + strategyName + ": ";
                 msg += (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();

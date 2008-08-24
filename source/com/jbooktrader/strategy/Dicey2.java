@@ -1,7 +1,8 @@
 package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.balance.*;
-import com.jbooktrader.indicator.derivative.*;
+import com.jbooktrader.indicator.price.*;
+import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -9,30 +10,29 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Walker extends StrategyES {
+public class Dicey2 extends StrategyES {
 
     // Technical indicators
-    private final Indicator emaBalanceDisplacementInd;
+    private final Indicator directionalVolumeInd, rsiInd, balanceEmaInd;
 
     // Strategy parameters names
-    private static final String EMA_PERIOD = "EmaPeriod";
-    private static final String DISPLACEMENT_PERIOD = "DisplacementPeriod";
+    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
     private final int entry;
 
 
-    public Walker(StrategyParams optimizationParams) throws JBookTraderException {
+    public Dicey2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        // Create technical indicators
-        Indicator emaBalanceInd = new BalanceEMA(getParam(EMA_PERIOD));
-        emaBalanceDisplacementInd = new Displacement(emaBalanceInd, getParam(DISPLACEMENT_PERIOD));
-
-        addIndicator(emaBalanceInd);
-        addIndicator(emaBalanceDisplacementInd);
+        directionalVolumeInd = new DirectionalVolume(getParam(PERIOD));
+        rsiInd = new PriceRSI(getParam(PERIOD));
+        balanceEmaInd = new BalanceEMA(getParam(PERIOD));
+        addIndicator(directionalVolumeInd);
+        addIndicator(rsiInd);
+        addIndicator(balanceEmaInd);
     }
 
     /**
@@ -43,9 +43,8 @@ public class Walker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 5, 100, 1, 12);
-        addParam(DISPLACEMENT_PERIOD, 200, 600, 1, 460);
-        addParam(ENTRY, 25, 80, 1, 50);
+        addParam(PERIOD, 50, 300, 10, 171);
+        addParam(ENTRY, 35, 80, 1, 56);
     }
 
     /**
@@ -54,11 +53,13 @@ public class Walker extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double displacement = emaBalanceDisplacementInd.getValue();
-        if (displacement >= entry) {
-            setPosition(1);
-        } else if (displacement <= -entry) {
+        double directionalVolume = directionalVolumeInd.getValue();
+        double rsi = rsiInd.getValue() - 50;
+        double strength = directionalVolume + rsi - balanceEmaInd.getValue();
+        if (strength >= entry) {
             setPosition(-1);
+        } else if (strength <= -entry) {
+            setPosition(1);
         }
     }
 }
