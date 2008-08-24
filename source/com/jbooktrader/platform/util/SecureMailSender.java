@@ -12,8 +12,8 @@ import java.util.*;
  * Sends SSL Mail
  */
 public class SecureMailSender {
-    private final Properties props;
-    private final String user, password, subject, recipient;
+    private final Properties props = new Properties();
+    private String login, password, from, subject, recipient;
     private final boolean isEnabled;
     private static SecureMailSender instance;
 
@@ -27,27 +27,29 @@ public class SecureMailSender {
 
         public void run() {
             try {
-                Session mailSession = Session.getDefaultInstance(props);
-                //mailSession.setDebug(true); // sends debugging info to System.out
-
-                MimeMessage message = new MimeMessage(mailSession);
-                message.setSubject(subject);
-                message.setContent(content, "text/plain");
-                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-                //message.addFrom(new InternetAddress(user));
-
-                Transport transport = mailSession.getTransport();
-                transport.connect(user, password);
-
-                transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
-                transport.close();
-
+            	send();
                 Dispatcher.getReporter().report("Email notification sent");
             } catch (Throwable t) {
                 Dispatcher.getReporter().report("Email notification failed");
                 Dispatcher.getReporter().report(t);
             }
+        }
+        
+        public void send() throws MessagingException, SendFailedException {
+            Session mailSession = Session.getDefaultInstance(props);
+            //mailSession.setDebug(true); // sends debugging info to System.out
 
+            MimeMessage message = new MimeMessage(mailSession);
+            message.setFrom(new InternetAddress(from));
+            message.setSubject(subject);
+            message.setContent(content, "text/plain");
+            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+
+            Transport transport = mailSession.getTransport();
+            transport.connect(login, password);
+
+            transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
+            transport.close();
         }
     }
 
@@ -61,17 +63,31 @@ public class SecureMailSender {
     // private constructor for noninstantiability
     private SecureMailSender() {
         PreferencesHolder prefs = PreferencesHolder.getInstance();
-        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
-
-        props = new Properties();
+        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");        
+        _init(prefs.get(SMTPSHost), prefs.get(EmailLogin), prefs.get(EmailPassword), prefs.get(From), prefs.get(To), prefs.get(EmailSubject));
+    }
+    
+    // private constructor for noninstantiability
+    private SecureMailSender(String SMTPSHost, String login, String password, String from, String to, String subject) {
+    	isEnabled = false;
+    	_init(SMTPSHost, login, password, from, to , subject);
+    }
+    
+    private void _init(String SMTPSHost, String login, String password, String from, String to, String subject) {
         props.put("mail.transport.protocol", "smtps");
-        props.put("mail.smtps.host", "smtp.gmail.com");
+        props.put("mail.smtps.host", SMTPSHost);
         props.put("mail.smtps.auth", "true");
 
-        user = prefs.get(From);
-        recipient = prefs.get(To);
-        password = prefs.get(EmailPassword);
-        subject = prefs.get(EmailSubject);
+        this.from = from;
+        if(login.length()==0) {
+        	this.login = from;
+        }
+        else {
+            this.login = login;
+        }
+        this.recipient = to;
+        this.password = password;
+        this.subject = subject;    	
     }
 
     public void send(String content) {
@@ -80,4 +96,12 @@ public class SecureMailSender {
         }
     }
 
+    static public void sendTest(String SMTPSHost, String login, String password, String from, String to, String subject) throws MessagingException, SendFailedException {
+    	new SecureMailSender(SMTPSHost, login, password, from, to, subject)._sendTest();
+    	
+    }
+    
+    private void _sendTest() throws MessagingException, SendFailedException {
+    	new Mailer("JBT remote notification email test.").send();
+    }
 }

@@ -13,9 +13,11 @@ public enum JBTPreferences {
     // Remote monitoring
     EmailMonitoring("Monitoring", "disabled"),
     HeartBeatInterval("Heartbeat Interval", "30"),
-    From("From", "@gmail.com"),
+    SMTPSHost("SMTPS Host", "smtp.gmail.com"),
+    EmailLogin("Login", ""),
     EmailPassword("Password", ""),
-    To("To", "@anyprovider.com"),
+    From("From", "me@where.tld"),
+    To("To", "me@anyprovider.com"),
     EmailSubject("Email Subject", "[JBT Remote Notification]"),
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),

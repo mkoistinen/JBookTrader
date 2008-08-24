@@ -5,6 +5,7 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
+import javax.mail.AuthenticationFailedException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -12,7 +13,7 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText;
+    private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText, emailSMTPSHost, emailLogin;
     private JPasswordField emailPasswordField;
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
 
@@ -92,19 +93,39 @@ public class PreferencesDialog extends JDialog {
         JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
         emailMonitoringCombo = new JComboBox(new String[]{"disabled", "enabled"});
-        fromText = new JTextField();
+        emailSMTPSHost = new JTextField();
+        emailLogin = new JTextField();
         emailPasswordField = new JPasswordField();
+        fromText = new JTextField();
         toText = new JTextField();
         emailSubjectText = new JTextField();
         heartBeatIntervalText = new JTextField();
         add(remoteMonitoringTab, EmailMonitoring, emailMonitoringCombo);
-        add(remoteMonitoringTab, From, fromText);
+        add(remoteMonitoringTab, SMTPSHost, emailSMTPSHost);
+        add(remoteMonitoringTab, EmailLogin, emailLogin);
         add(remoteMonitoringTab, EmailPassword, emailPasswordField);
+        add(remoteMonitoringTab, From, fromText);
         add(remoteMonitoringTab, To, toText);
         add(remoteMonitoringTab, EmailSubject, emailSubjectText);
         add(remoteMonitoringTab, HeartBeatInterval, heartBeatIntervalText);
-        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 6, 2, 12, 12, 8, 5);
+        remoteMonitoringTab.add( new JLabel("Email test:"));
+        JButton emailTest = new JButton("Send a test email");
+        remoteMonitoringTab.add(emailTest);
+        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 9, 2, 12, 12, 8, 5);
 
+        emailTest.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {                
+                try {
+                    SecureMailSender.sendTest(emailSMTPSHost.getText(), emailLogin.getText(), new String(emailPasswordField.getPassword()), fromText.getText(), toText.getText(), emailSubjectText.getText());
+                    MessageDialog.showMessage(null, "Email notification sent");
+                } catch (AuthenticationFailedException err) {
+                    MessageDialog.showMessage(null, "Email notification failed:\nBad login or password"+"\n("+err.toString()+")");
+                } catch (Exception err) {
+                    MessageDialog.showMessage(null, "Email notification failed:\n"+err.getMessage()+"\n("+err.toString()+")");
+                }
+        	}
+        });
+        
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -125,8 +146,10 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(ReportRenderer, reportRendererText.getText());
                     prefs.set(ReportRecycling, (String) reportRecyclingCombo.getSelectedItem());
                     prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
-                    prefs.set(From, fromText.getText());
+                    prefs.set(SMTPSHost, emailSMTPSHost.getText());
+                    prefs.set(EmailLogin, emailLogin.getText());
                     prefs.set(EmailPassword, new String(emailPasswordField.getPassword()));
+                    prefs.set(From, fromText.getText());
                     prefs.set(To, toText.getText());
                     prefs.set(EmailSubject, emailSubjectText.getText());
                     prefs.set(HeartBeatInterval, heartBeatIntervalText.getText());
@@ -146,7 +169,7 @@ public class PreferencesDialog extends JDialog {
         });
 
 
-        setPreferredSize(new Dimension(500, 280));
+        setPreferredSize(new Dimension(500, 340));
 
     }
 }
