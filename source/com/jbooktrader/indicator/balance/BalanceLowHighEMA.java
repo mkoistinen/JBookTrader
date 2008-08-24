@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator.price;
+package com.jbooktrader.indicator.balance;
 
 import com.jbooktrader.platform.indicator.*;
 

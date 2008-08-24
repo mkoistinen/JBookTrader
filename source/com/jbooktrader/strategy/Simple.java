@@ -5,7 +5,6 @@ import com.jbooktrader.indicator.balance.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.schedule.*;
