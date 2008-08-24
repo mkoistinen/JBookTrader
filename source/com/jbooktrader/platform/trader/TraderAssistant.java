@@ -94,7 +94,7 @@ public class TraderAssistant {
             }
 
             // IB Log levels: 1=SYSTEM 2=ERROR 3=WARNING 4=INFORMATION 5=DETAIL
-            socket.setServerLogLevel(2);
+            socket.setServerLogLevel(3);
             socket.reqNewsBulletins(true);
             serverVersion = socket.serverVersion();
             isConnected = true;

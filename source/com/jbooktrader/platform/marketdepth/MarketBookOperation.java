@@ -4,9 +4,7 @@ import java.util.*;
 
 public enum MarketBookOperation {
 
-    Insert(0),
-    Update(1),
-    Delete(2);
+    Insert(0), Update(1), Delete(2);
 
     private final int value;
     private static final Map<Integer, MarketBookOperation> operations = new HashMap<Integer, MarketBookOperation>();
@@ -16,17 +14,13 @@ public enum MarketBookOperation {
         this.value = value;
     }
 
-    private int getValue() {
-        return value;
-    }
-
     public static MarketBookOperation getOperation(int value) {
         return operations.get(value);
     }
 
     static {
         for (MarketBookOperation operation : values()) {
-            operations.put(operation.getValue(), operation);
+            operations.put(operation.value, operation);
         }
     }
 }
