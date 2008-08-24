@@ -13,9 +13,10 @@ import java.util.*;
  */
 public class SecureMailSender {
     private final Properties props = new Properties();
-    private String login, password, from, subject, recipient;
+    private String login, password, subject, recipient;
     private final boolean isEnabled;
     private static SecureMailSender instance;
+    private static PreferencesHolder prefs = PreferencesHolder.getInstance();
 
     // inner class
     private class Mailer extends Thread {
@@ -27,23 +28,23 @@ public class SecureMailSender {
 
         public void run() {
             try {
-            	send();
-                Dispatcher.getReporter().report("Email notification sent");
+                send();
+                Dispatcher.getReporter().report("Email notification sent.");
             } catch (Throwable t) {
-                Dispatcher.getReporter().report("Email notification failed");
+                Dispatcher.getReporter().report("Email notification failed.");
                 Dispatcher.getReporter().report(t);
             }
         }
-        
+
         public void send() throws MessagingException, SendFailedException {
             Session mailSession = Session.getDefaultInstance(props);
             //mailSession.setDebug(true); // sends debugging info to System.out
 
             MimeMessage message = new MimeMessage(mailSession);
-            message.setFrom(new InternetAddress(from));
             message.setSubject(subject);
             message.setContent(content, "text/plain");
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            message.setFrom(new InternetAddress(login));
 
             Transport transport = mailSession.getTransport();
             transport.connect(login, password);
@@ -61,34 +62,23 @@ public class SecureMailSender {
     }
 
     // private constructor for noninstantiability
-    private SecureMailSender() {
-        PreferencesHolder prefs = PreferencesHolder.getInstance();
-        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");        
-        _init(prefs.get(SMTPSHost), prefs.get(EmailLogin), prefs.get(EmailPassword), prefs.get(From), prefs.get(To), prefs.get(EmailSubject));
-    }
-    
-    // private constructor for noninstantiability
-    private SecureMailSender(String SMTPSHost, String login, String password, String from, String to, String subject) {
-    	isEnabled = false;
-    	_init(SMTPSHost, login, password, from, to , subject);
-    }
-    
-    private void _init(String SMTPSHost, String login, String password, String from, String to, String subject) {
+    private SecureMailSender(String smtpsHost, String login, String password, String to, String subject) {
+        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
         props.put("mail.transport.protocol", "smtps");
-        props.put("mail.smtps.host", SMTPSHost);
+        props.put("mail.smtps.host", smtpsHost);
         props.put("mail.smtps.auth", "true");
 
-        this.from = from;
-        if(login.length()==0) {
-        	this.login = from;
-        }
-        else {
-            this.login = login;
-        }
+        this.login = login;
         this.recipient = to;
         this.password = password;
-        this.subject = subject;    	
+        this.subject = subject;
     }
+
+    // private constructor for noninstantiability
+    private SecureMailSender() {
+        this(prefs.get(SMTPSHost), prefs.get(EmailLogin), prefs.get(EmailPassword), prefs.get(To), prefs.get(EmailSubject));
+    }
+
 
     public void send(String content) {
         if (isEnabled) {
@@ -96,12 +86,8 @@ public class SecureMailSender {
         }
     }
 
-    static public void sendTest(String SMTPSHost, String login, String password, String from, String to, String subject) throws MessagingException, SendFailedException {
-    	new SecureMailSender(SMTPSHost, login, password, from, to, subject)._sendTest();
-    	
+    static public void test(String SMTPSHost, String login, String password, String to, String subject) throws MessagingException {
+        new SecureMailSender(SMTPSHost, login, password, to, subject).new Mailer("JBT remote notification email test.").send();
     }
-    
-    private void _sendTest() throws MessagingException, SendFailedException {
-    	new Mailer("JBT remote notification email test.").send();
-    }
+
 }
