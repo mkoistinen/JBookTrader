@@ -11,7 +11,7 @@ public class TableDataModel extends AbstractTableModel {
         rows = new ArrayList<Object>();
     }
 
-    public void addRowFast(Object[] item) {
+    protected void addRowFast(Object[] item) {
         rows.add(item);
     }
 
@@ -27,7 +27,7 @@ public class TableDataModel extends AbstractTableModel {
         fireTableCellUpdated(row, col);
     }
 
-    public void setValueAtFast(Object value, int row, int col) {
+    protected void setValueAtFast(Object value, int row, int col) {
         Object[] changedItem = (Object[]) rows.get(row);
         changedItem[col] = value;
     }

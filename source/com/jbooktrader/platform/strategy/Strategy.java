@@ -12,7 +12,6 @@ import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.util.*;
 
-import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -67,8 +66,8 @@ public abstract class Strategy {
         strategyReportHeaders.add("Position");
         strategyReportHeaders.add("Avg Fill Price");
         strategyReportHeaders.add("Commission");
-        strategyReportHeaders.add("Trade P&L");
-        strategyReportHeaders.add("Total P&L");
+        strategyReportHeaders.add("Trade Net Profit");
+        strategyReportHeaders.add("Total Net Profit");
 
         name = getClass().getSimpleName();
         indicators = new LinkedList<ChartableIndicator>();
@@ -260,7 +259,7 @@ public abstract class Strategy {
     }
 
 
-    public void process() throws IOException, JBookTraderException {
+    public void process() throws JBookTraderException {
         if (isActive() && marketBook.size() > 0) {
             MarketDepth marketDepth = marketBook.getLastMarketDepth();
             long instant = marketDepth.getTime();

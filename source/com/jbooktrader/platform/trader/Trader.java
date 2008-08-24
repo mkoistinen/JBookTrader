@@ -110,7 +110,7 @@ public class Trader extends EWrapperAdapter {
 
             boolean requiresNotification = (errorCode != 2104 && errorCode != 2106 && errorCode != 2107 && errorCode != 317);
             if (requiresNotification) {
-                SecureMailSender.getInstance().send(msg); 
+                SecureMailSender.getInstance().send(msg);
             }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects

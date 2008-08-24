@@ -94,14 +94,16 @@ public class PositionManager {
 
         // remote email notification, if enabled
         if (mode == Trade || mode == ForwardTest) {
+            boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
             String msg = "Event type: Trade" + LINE_SEP;
             msg += "Time sent: " + simpleDateFormat.format(System.currentTimeMillis()) + LINE_SEP;
             msg += "Strategy: " + strategy.getName() + LINE_SEP;
             msg += "Position: " + position + LINE_SEP;
             msg += "Price: " + avgFillPrice + LINE_SEP;
             msg += "Trades: " + nf2.format(performanceManager.getTrades()) + LINE_SEP;
-            //msg += "Trade P&L: " + nf2.format(performanceManager.getTradeProfit()) + LINE_SEP;
-            msg += "Total P&L: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
+            String tradeNetProfit = isCompletedTrade ? nf2.format(performanceManager.getTradeProfit()) : "--";
+            msg += "Trade net profit: " + tradeNetProfit + LINE_SEP;
+            msg += "Total net profit: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
 
             SecureMailSender.getInstance().send(msg);
         }

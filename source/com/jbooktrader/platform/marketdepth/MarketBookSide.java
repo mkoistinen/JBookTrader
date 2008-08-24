@@ -8,14 +8,14 @@ public enum MarketBookSide {
     Bid(1);
 
     private final int value;
-    private static Map<Integer, MarketBookSide> sides = new HashMap<Integer, MarketBookSide>();
+    private static final Map<Integer, MarketBookSide> sides = new HashMap<Integer, MarketBookSide>();
 
 
     MarketBookSide(int value) {
         this.value = value;
     }
 
-    public int getValue() {
+    private int getValue() {
         return value;
     }
 

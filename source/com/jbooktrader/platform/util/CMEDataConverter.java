@@ -21,6 +21,7 @@ public class CMEDataConverter {
     private static final long RECORDING_START = 9 * 60;// 9:00
     private static final long RECORDING_END = 16 * 60 + 15;// 16:15
     private static final long UPDATING_START = RECORDING_START - 60;
+    private static final String INVALID_PRICE = "999999999999999999";
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final MarketBook marketBook;
 
@@ -103,13 +104,10 @@ public class CMEDataConverter {
     private void convert(long samplingFrequency) {
         String line = null;
         int samples = 0;
-        long start = System.currentTimeMillis();
-
         try {
             long previousTime = 0;
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
-
                 try {
                     parse(line);
                     if ((time - previousTime) >= samplingFrequency) {
@@ -126,9 +124,7 @@ public class CMEDataConverter {
                     e.printStackTrace();
                 }
             }
-            System.out.println("Done: " + samples + " samples have been created.");
-            long end = System.currentTimeMillis();
-            System.out.println("converted in " + (end - start) / 1000 + " seconds.");
+            System.out.println("Done: " + samples + " samples have been converted.");
         } catch (Exception e) {
             String errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
             errorMsg += line + LINE_SEP;
@@ -175,22 +171,25 @@ public class CMEDataConverter {
             int groupStart = 0;
             for (int level = 0; level < 5; level++) {
                 if (line.charAt(76 + level) == '1') {
-                    int bidSize = Integer.parseInt(line.substring(groupStart + 82, groupStart + 94));
-                    double bidPrice = Integer.valueOf(line.substring(groupStart + 98, groupStart + 117)) / 100d;
-                    double askPrice = Integer.valueOf(line.substring(groupStart + 117, groupStart + 136)) / 100d;
-                    int askSize = Integer.parseInt(line.substring(groupStart + 140, groupStart + 152));
-
-                    marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Bid, bidPrice, bidSize);
-                    marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Ask, askPrice, askSize);
-
+                    String bidPriceS = line.substring(groupStart + 99, groupStart + 117);
+                    String askPriceS = line.substring(groupStart + 118, groupStart + 136);
+                    boolean isValid = !(bidPriceS.equals(INVALID_PRICE)) && !(askPriceS.equals(INVALID_PRICE));
+                    if (isValid) {
+                        double bidPrice = Integer.valueOf(bidPriceS) / 100d;
+                        double askPrice = Integer.valueOf(askPriceS) / 100d;
+                        int bidSize = Integer.parseInt(line.substring(groupStart + 82, groupStart + 94));
+                        int askSize = Integer.parseInt(line.substring(groupStart + 140, groupStart + 152));
+                        marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Bid, bidPrice, bidSize);
+                        marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Ask, askPrice, askSize);
+                    }
                     groupStart += 72;
                 }
             }
         }
 
         if (isTradeMessage) {
-            int quantity = Integer.parseInt(line.substring(116, 128));
-            marketBook.update(quantity);
+            int cumulativeVolume = Integer.parseInt(line.substring(116, 128));
+            marketBook.update(cumulativeVolume);
         }
     }
 }

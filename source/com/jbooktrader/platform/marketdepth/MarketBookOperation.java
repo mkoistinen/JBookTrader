@@ -9,14 +9,14 @@ public enum MarketBookOperation {
     Delete(2);
 
     private final int value;
-    private static Map<Integer, MarketBookOperation> operations = new HashMap<Integer, MarketBookOperation>();
+    private static final Map<Integer, MarketBookOperation> operations = new HashMap<Integer, MarketBookOperation>();
 
 
     MarketBookOperation(int value) {
         this.value = value;
     }
 
-    public int getValue() {
+    private int getValue() {
         return value;
     }
 

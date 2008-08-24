@@ -72,7 +72,7 @@ public final class BackTestFileWriter {
         writer.close();
     }
 
-    public void writeHeader() {
+    private void writeHeader() {
         StringBuilder header = getHeader();
         writer.println(header);
     }
