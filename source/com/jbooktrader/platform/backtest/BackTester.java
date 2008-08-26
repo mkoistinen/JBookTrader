@@ -58,5 +58,4 @@ public class BackTester {
         strategy.setIsActive(false);
         Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, strategy);
     }
-
 }

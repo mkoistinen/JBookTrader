@@ -76,6 +76,7 @@ public class StrategyTableModel extends TableDataModel {
             setValueAtFast(lastMarketDepth.getBestAsk(), row, BestAsk.ordinal());
             setValueAtFast(marketBook.getCumulativeVolume(), row, Volume.ordinal());
         }
+
         PositionManager positionManager = strategy.getPositionManager();
         PerformanceManager performanceManager = strategy.getPerformanceManager();
         setValueAtFast(positionManager.getPosition(), row, Position.ordinal());

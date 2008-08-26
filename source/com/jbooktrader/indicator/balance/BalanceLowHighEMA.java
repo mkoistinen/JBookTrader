@@ -4,7 +4,7 @@ import com.jbooktrader.platform.indicator.*;
 
 
 /**
- * Relative Strength Index of price
+ * Relative Strength Index of market depth
  * Specification: http://en.wikipedia.org/wiki/Relative_strength
  */
 public class BalanceLowHighEMA extends Indicator {

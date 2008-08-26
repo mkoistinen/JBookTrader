@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.volume;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Mid depth balance for the last 1-second bar
+ * Volume for the last period
  */
 public class Volume extends Indicator {
 

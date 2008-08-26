@@ -99,6 +99,4 @@ public class Dispatcher {
             fireModelChanged(ModelListener.Event.StrategiesEnd, null);
         }
     }
-
-
 }

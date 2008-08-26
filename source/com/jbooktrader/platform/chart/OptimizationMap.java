@@ -248,8 +248,8 @@ public class OptimizationMap {
         public Paint getPaint(double z) {
             double normalizedZ = z - min;
             double clrs = 255.0 / (max - min);
-            int clr = (int) (255 - normalizedZ * clrs);
-            return new Color(clr, clr, clr, 255);
+            int color = (int) (255 - normalizedZ * clrs);
+            return new Color(color, color, color, 255);
         }
 
         public double getUpperBound() {

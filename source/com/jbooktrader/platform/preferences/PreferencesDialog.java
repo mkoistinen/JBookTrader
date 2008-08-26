@@ -130,11 +130,21 @@ public class PreferencesDialog extends JDialog {
                     try {
                         int minutes = Integer.parseInt(heartBeatIntervalText.getText());
                         if (minutes < 1) {
-                            throw new JBookTraderException(HeartBeatInterval.getName() + " must be a positive number number.");
+                            throw new JBookTraderException(HeartBeatInterval.getName() + " must be a positive number.");
                         }
                     } catch (NumberFormatException nfe) {
                         throw new JBookTraderException(HeartBeatInterval.getName() + " must be a number.");
                     }
+
+                    try {
+                        int clientId = Integer.parseInt(clientIDText.getText());
+                        if (clientId < 0) {
+                            throw new JBookTraderException(ClientID.getName() + " must be a number greater or equal to 0.");
+                        }
+                    } catch (NumberFormatException nfe) {
+                        throw new JBookTraderException(ClientID.getName() + " must be an integer.");
+                    }
+
 
                     prefs.set(Host, hostText.getText());
                     prefs.set(Port, portText.getText());

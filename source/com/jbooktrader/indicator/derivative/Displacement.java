@@ -5,7 +5,7 @@ import com.jbooktrader.platform.indicator.*;
 import java.util.*;
 
 /**
- * Change of BalanceEMA Indicator
+ * Displacement of any indicator
  */
 public class Displacement extends Indicator {
     private final int period;

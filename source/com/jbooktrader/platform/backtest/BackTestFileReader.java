@@ -94,7 +94,7 @@ public class BackTestFileReader {
             try {
                 reader.close();
             } catch (IOException ioe) {
-                throw new JBookTraderException("Could not close data file");
+                report.report(ioe);
             }
         }
 
