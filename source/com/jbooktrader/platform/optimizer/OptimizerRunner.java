@@ -84,11 +84,12 @@ public abstract class OptimizerRunner implements Runnable {
             for (Strategy strategy : strategies) {
                 strategy.setTime(time);
                 strategy.updateIndicators();
-                if (strategy.hasValidIndicators()) {
-                    strategy.onBookChange();
+                if(inSchedule) {
+	                if (strategy.hasValidIndicators()) {
+	                    strategy.onBookChange();
+	                }
                 }
-
-                if (!inSchedule) {
+	            else {
                     strategy.closePosition();// force flat position
                 }
 
