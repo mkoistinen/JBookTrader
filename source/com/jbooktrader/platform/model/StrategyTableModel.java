@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.model;
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
@@ -71,9 +71,9 @@ public class StrategyTableModel extends TableDataModel {
 
         MarketBook marketBook = strategy.getMarketBook();
         if (marketBook.size() > 0) {
-            MarketDepth lastMarketDepth = marketBook.getLastMarketDepth();
-            setValueAtFast(lastMarketDepth.getBestBid(), row, BestBid.ordinal());
-            setValueAtFast(lastMarketDepth.getBestAsk(), row, BestAsk.ordinal());
+            MarketSnapshot lastMarketSnapshot = marketBook.getLastMarketSnapshot();
+            setValueAtFast(lastMarketSnapshot.getBestBid(), row, BestBid.ordinal());
+            setValueAtFast(lastMarketSnapshot.getBestAsk(), row, BestAsk.ordinal());
             setValueAtFast(marketBook.getCumulativeVolume(), row, Volume.ordinal());
         }
 

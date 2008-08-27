@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.trader.*;
 
@@ -20,10 +20,10 @@ public class StrategyRunner {
                 if (marketBooks != null) {
                     for (MarketBook marketBook : marketBooks) {
                         long time = System.currentTimeMillis();
-                        MarketDepth marketDepth = marketBook.getNextMarketDepth(time);
-                        if (marketDepth != null) {
-                            marketBook.add(marketDepth);
-                            marketBook.save(marketDepth);
+                        MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(time);
+                        if (marketSnapshot != null) {
+                            marketBook.add(marketSnapshot);
+                            marketBook.save(marketSnapshot);
                         }
                     }
 

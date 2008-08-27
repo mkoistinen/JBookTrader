@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.depth.*;
-import com.jbooktrader.indicator.price.*;
+import com.jbooktrader.indicator.index.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -9,28 +9,33 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Simple extends StrategyES {
+public class Vixer extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceEmaInd, rsiInd;
+    private final Indicator balanceEmaInd, vixIndexEmaInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
-    private static final String ENTRY = "Entry";
+    private static final String BALANCE_ENTRY = "DepthBalance Entry";
+    private static final String VIX_ENTRY = "Vix Entry";
+
 
     // Strategy parameters values
-    private final int entry;
+    private final int balanceEntry, vixEntry;
 
 
-    public Simple(StrategyParams optimizationParams) throws JBookTraderException {
+    public Vixer(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
-        entry = getParam(ENTRY);
+        balanceEntry = getParam(BALANCE_ENTRY);
+        vixEntry = getParam(VIX_ENTRY);
+
         // Create technical indicators
-        rsiInd = new PriceRSI(getParam(PERIOD));
         balanceEmaInd = new DepthBalanceEMA(getParam(PERIOD));
-        addIndicator(rsiInd);
+        vixIndexEmaInd = new VixIndexEMA(getParam(PERIOD));
+
         addIndicator(balanceEmaInd);
+        addIndicator(vixIndexEmaInd);
     }
 
     /**
@@ -41,8 +46,9 @@ public class Simple extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 5, 100, 5, 15);
-        addParam(ENTRY, 30, 90, 5, 72);
+        addParam(PERIOD, 1, 50, 1, 1);
+        addParam(BALANCE_ENTRY, 0, 50, 1, 25);
+        addParam(VIX_ENTRY, 1, 50, 1, 10);
     }
 
     /**
@@ -51,10 +57,11 @@ public class Simple extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balance = balanceEmaInd.getValue() - (rsiInd.getValue() - 50);
-        if (balance >= entry) {
+        double balanceEma = balanceEmaInd.getValue();
+        double vixIndex = vixIndexEmaInd.getValue();
+        if (balanceEma >= balanceEntry && vixIndex >= vixEntry) {
             setPosition(1);
-        } else if (balance <= -entry) {
+        } else if (balanceEma <= -balanceEntry && vixIndex >= vixEntry) {
             setPosition(-1);
         }
     }

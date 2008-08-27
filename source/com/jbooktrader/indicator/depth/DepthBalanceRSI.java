@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator.balance;
+package com.jbooktrader.indicator.depth;
 
 import com.jbooktrader.platform.indicator.*;
 
@@ -7,18 +7,18 @@ import com.jbooktrader.platform.indicator.*;
  * Relative Strength Index of market depth
  * Specification: http://en.wikipedia.org/wiki/Relative_strength
  */
-public class BalanceLowHighEMA extends Indicator {
+public class DepthBalanceRSI extends Indicator {
     private final double multiplier;
     private double emaUp, emaDown;
     private double previousBalance;
 
-    public BalanceLowHighEMA(int periodLength) {
+    public DepthBalanceRSI(int periodLength) {
         multiplier = 2. / (periodLength + 1.);
     }
 
     @Override
     public double calculate() {
-        double balance = marketBook.getLastMarketDepth().getMidBalance();
+        double balance = marketBook.getLastMarketSnapshot().getMidBalance();
         if (previousBalance != 0) {
             double change = balance - previousBalance;
             double up = (change > 0) ? change : 0;

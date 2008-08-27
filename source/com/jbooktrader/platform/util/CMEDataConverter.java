@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.util;
 
 import com.jbooktrader.platform.backtest.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 
@@ -58,8 +59,8 @@ public class CMEDataConverter {
         instant = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
 
         for (int level = 0; level < 5; level++) {
-            marketBook.update(level, MarketBookOperation.Insert, MarketBookSide.Bid, 0, 0);
-            marketBook.update(level, MarketBookOperation.Insert, MarketBookSide.Ask, 0, 0);
+            marketBook.updateDepth(level, MarketDepthOperation.Insert, MarketDepthSide.Bid, 0, 0);
+            marketBook.updateDepth(level, MarketDepthOperation.Insert, MarketDepthSide.Ask, 0, 0);
         }
 
         String outFilename = "unzipped.cme";
@@ -111,9 +112,9 @@ public class CMEDataConverter {
                 try {
                     parse(line);
                     if ((time - previousTime) >= samplingFrequency) {
-                        MarketDepth marketDepth = marketBook.getNextMarketDepth(time);
+                        MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(time);
                         if (isRecordable()) {
-                            backTestFileWriter.write(marketDepth, true);
+                            backTestFileWriter.write(marketSnapshot, true);
                             samples++;
                         }
                         previousTime = time;
@@ -179,8 +180,8 @@ public class CMEDataConverter {
                         double askPrice = Integer.valueOf(askPriceS) / 100d;
                         int bidSize = Integer.parseInt(line.substring(groupStart + 82, groupStart + 94));
                         int askSize = Integer.parseInt(line.substring(groupStart + 140, groupStart + 152));
-                        marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Bid, bidPrice, bidSize);
-                        marketBook.update(level, MarketBookOperation.Update, MarketBookSide.Ask, askPrice, askSize);
+                        marketBook.updateDepth(level, MarketDepthOperation.Update, MarketDepthSide.Bid, bidPrice, bidSize);
+                        marketBook.updateDepth(level, MarketDepthOperation.Update, MarketDepthSide.Ask, askPrice, askSize);
                     }
                     groupStart += 72;
                 }
@@ -189,7 +190,7 @@ public class CMEDataConverter {
 
         if (isTradeMessage) {
             int cumulativeVolume = Integer.parseInt(line.substring(116, 128));
-            marketBook.update(cumulativeVolume);
+            marketBook.updateVolume(cumulativeVolume);
         }
     }
 }

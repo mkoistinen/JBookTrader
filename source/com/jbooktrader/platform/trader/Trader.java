@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
@@ -123,7 +124,7 @@ public class Trader extends EWrapperAdapter {
     public void updateMktDepth(int tickerId, int position, int operation, int side, double price, int size) {
         try {
             MarketBook marketBook = traderAssistant.getMarketBook(tickerId);
-            marketBook.update(position, MarketBookOperation.getOperation(operation), MarketBookSide.getSide(side), price, size);
+            marketBook.updateDepth(position, MarketDepthOperation.getOperation(operation), MarketDepthSide.getSide(side), price, size);
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
@@ -134,14 +135,25 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void tickSize(int tickerId, int tickType, int size) {
         try {
-            if (tickType == TickType.VOLUME) {
+            if (tickType == TickType.VOLUME && size != 0) {
                 MarketBook marketBook = traderAssistant.getMarketBook(tickerId);
-                marketBook.update(size);
+                marketBook.updateVolume(size);
             }
         } catch (Throwable t) {
             eventReport.report(t);
         }
     }
+
+    public void tickPrice(int tickerId, int field, double price, int canAutoExecute) {
+        try {
+            if (field == TickType.LAST) {
+                traderAssistant.updateIndexes(tickerId, price);
+            }
+        } catch (Throwable t) {
+            eventReport.report(t);
+        }
+    }
+
 
     @Override
     public void nextValidId(int orderId) {

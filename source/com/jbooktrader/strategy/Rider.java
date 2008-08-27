@@ -1,6 +1,6 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
@@ -29,7 +29,7 @@ public class Rider extends StrategyES {
 
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
-        Indicator balanceInd = new Balance();
+        Indicator balanceInd = new DepthBalance();
         balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(balanceInd);
         addIndicator(balanceVelocityInd);

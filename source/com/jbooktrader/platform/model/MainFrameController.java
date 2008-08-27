@@ -3,7 +3,7 @@ package com.jbooktrader.platform.model;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;

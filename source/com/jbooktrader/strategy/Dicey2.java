@@ -1,6 +1,6 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
@@ -29,7 +29,7 @@ public class Dicey2 extends StrategyES {
         entry = getParam(ENTRY);
         directionalVolumeInd = new DirectionalVolume(getParam(PERIOD));
         rsiInd = new PriceRSI(getParam(PERIOD));
-        balanceEmaInd = new BalanceEMA(getParam(PERIOD));
+        balanceEmaInd = new DepthBalanceEMA(getParam(PERIOD));
         addIndicator(directionalVolumeInd);
         addIndicator(rsiInd);
         addIndicator(balanceEmaInd);

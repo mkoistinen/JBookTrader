@@ -1,7 +1,7 @@
 package com.jbooktrader.indicator.volume;
 
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 
 
 /**
@@ -16,11 +16,11 @@ public class DirectionalVolume extends Indicator {
 
     @Override
     public double calculate() {
-        MarketDepth marketDepth = marketBook.getLastMarketDepth();
-        double priceNow = marketBook.getLastMarketDepth().getMidPrice();
-        double priceThen = marketBook.getPreviousMarketDepth().getMidPrice();
+        MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
+        double priceNow = marketBook.getLastMarketSnapshot().getMidPrice();
+        double priceThen = marketBook.getPreviousMarketSnapshot().getMidPrice();
         double priceChange = priceNow - priceThen;
-        int volume = marketDepth.getVolume();
+        int volume = marketSnapshot.getVolume();
 
         int upVolume = (priceChange > 0) ? volume : 0;
         int downVolume = (priceChange < 0) ? volume : 0;

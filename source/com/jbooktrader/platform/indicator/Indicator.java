@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.indicator;
 
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 
 /**
  * Base class for all classes implementing technical indicators.

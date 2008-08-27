@@ -1,21 +1,25 @@
-package com.jbooktrader.platform.marketdepth;
+package com.jbooktrader.platform.marketbook;
 
 
 /**
  */
-public class MarketDepth {
+public class MarketSnapshot {
     private final long time;
     private final int lowBalance, highBalance;
     private final double bestBid, bestAsk;
     private final int volume;
+    private final double tick, trin, vix;
 
-    public MarketDepth(long time, int lowBalance, int highBalance, double bestBid, double bestAsk, int volume) {
+    public MarketSnapshot(long time, int lowBalance, int highBalance, double bestBid, double bestAsk, int volume, double tick, double trin, double vix) {
         this.time = time;
         this.lowBalance = lowBalance;
         this.highBalance = highBalance;
         this.bestBid = bestBid;
         this.bestAsk = bestAsk;
         this.volume = volume;
+        this.tick = tick;
+        this.trin = trin;
+        this.vix = vix;
     }
 
     public int getLowBalance() {
@@ -46,6 +50,18 @@ public class MarketDepth {
         return volume;
     }
 
+    public double getTick() {
+        return tick;
+    }
+
+    public double getTrin() {
+        return trin;
+    }
+
+    public double getVix() {
+        return vix;
+    }
+
     public double getMidPrice() {
         return (bestBid + bestAsk) / 2;
     }
@@ -59,6 +75,9 @@ public class MarketDepth {
         marketDepth.append(" best bid: ").append(bestBid);
         marketDepth.append(" best ask: ").append(bestAsk);
         marketDepth.append(" volume: ").append(volume);
+        marketDepth.append(" tick: ").append(tick);
+        marketDepth.append(" trin: ").append(trin);
+        marketDepth.append(" vix: ").append(vix);
 
         return marketDepth.toString();
     }

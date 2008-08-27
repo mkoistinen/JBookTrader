@@ -18,7 +18,7 @@ public class PriceRSI extends Indicator {
 
     @Override
     public double calculate() {
-        double price = marketBook.getLastMarketDepth().getMidPrice();
+        double price = marketBook.getLastMarketSnapshot().getMidPrice();
         if (previousPrice != 0) {
             double change = price - previousPrice;
             double up = (change > 0) ? change : 0;

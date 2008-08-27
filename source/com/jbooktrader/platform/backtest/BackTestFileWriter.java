@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -53,14 +53,17 @@ public final class BackTestFileWriter {
     }
 
 
-    public void write(MarketDepth marketDepth, boolean flush) {
+    public void write(MarketSnapshot marketSnapshot, boolean flush) {
         StringBuilder sb = new StringBuilder();
-        sb.append(dateFormat.format(new Date(marketDepth.getTime()))).append(",");
-        sb.append(marketDepth.getLowBalance()).append(",");
-        sb.append(marketDepth.getHighBalance()).append(",");
-        sb.append(decimalFormat.format(marketDepth.getBestBid())).append(",");
-        sb.append(decimalFormat.format(marketDepth.getBestAsk())).append(",");
-        sb.append(decimalFormat.format(marketDepth.getVolume()));
+        sb.append(dateFormat.format(new Date(marketSnapshot.getTime()))).append(",");
+        sb.append(marketSnapshot.getLowBalance()).append(",");
+        sb.append(marketSnapshot.getHighBalance()).append(",");
+        sb.append(decimalFormat.format(marketSnapshot.getBestBid())).append(",");
+        sb.append(decimalFormat.format(marketSnapshot.getBestAsk())).append(",");
+        sb.append(decimalFormat.format(marketSnapshot.getVolume())).append(",");
+        sb.append(decimalFormat.format(marketSnapshot.getTick())).append(",");
+        sb.append(decimalFormat.format(marketSnapshot.getTrin())).append(",");
+        sb.append(decimalFormat.format(marketSnapshot.getVix()));
 
         writer.println(sb);
         if (flush) {
@@ -83,11 +86,11 @@ public final class BackTestFileWriter {
             writeHeader();
 
             // make a defensive copy to prevent concurrent modification
-            List<MarketDepth> marketDepths = new ArrayList<MarketDepth>();
-            marketDepths.addAll(marketBook.getAll());
+            List<MarketSnapshot> marketSnapshots = new ArrayList<MarketSnapshot>();
+            marketSnapshots.addAll(marketBook.getAll());
 
-            for (MarketDepth marketDepth : marketDepths) {
-                write(marketDepth, false);
+            for (MarketSnapshot marketSnapshot : marketSnapshots) {
+                write(marketSnapshot, false);
             }
             writer.flush();
             close();
@@ -107,6 +110,9 @@ public final class BackTestFileWriter {
         header.append("# 5. best bid price at the period's end").append(LINE_SEP);
         header.append("# 6. best ask price at the period's end").append(LINE_SEP);
         header.append("# 7. period's volume of traded contracts").append(LINE_SEP);
+        header.append("# 8. NYSE TICK at the period's end").append(LINE_SEP);
+        header.append("# 9. NYSE TRIN at the period's end").append(LINE_SEP);
+        header.append("# 10. CBOE VIX at the period's end").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

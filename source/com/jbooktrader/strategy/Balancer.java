@@ -1,6 +1,6 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
@@ -32,7 +32,7 @@ public class Balancer extends StrategyES {
 
         // Create technical indicators
         rsiInd = new PriceRSI(getParam(RSI_PERIOD));
-        balanceEmaInd = new BalanceEMA(getParam(EMA_PERIOD));
+        balanceEmaInd = new DepthBalanceEMA(getParam(EMA_PERIOD));
         addIndicator(rsiInd);
         addIndicator(balanceEmaInd);
     }

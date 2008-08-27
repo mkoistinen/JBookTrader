@@ -3,7 +3,7 @@ package com.jbooktrader.platform.strategy;
 import com.ib.client.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
@@ -138,13 +138,13 @@ public abstract class Strategy {
 
 
     public void report() {
-        MarketDepth marketDepth = marketBook.getLastMarketDepth();
+        MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
         boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
 
         strategyReportColumns.clear();
         strategyReportColumns.add(isCompletedTrade ? performanceManager.getTrades() : "--");
-        strategyReportColumns.add(df5.format(marketDepth.getBestBid()));
-        strategyReportColumns.add(df5.format(marketDepth.getBestAsk()));
+        strategyReportColumns.add(df5.format(marketSnapshot.getBestBid()));
+        strategyReportColumns.add(df5.format(marketSnapshot.getBestAsk()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
@@ -214,8 +214,8 @@ public abstract class Strategy {
         marketBook.setTimeZone(tradingSchedule.getTimeZone());
     }
 
-    protected MarketDepth getLastMarketDepth() {
-        return marketBook.getLastMarketDepth();
+    protected MarketSnapshot getLastMarketDepth() {
+        return marketBook.getLastMarketSnapshot();
     }
 
     public MarketBook getMarketBook() {
@@ -240,7 +240,7 @@ public abstract class Strategy {
 
     public void updateIndicators() throws JBookTraderException {
         hasValidIndicators = true;
-        long time = marketBook.getLastMarketDepth().getTime();
+        long time = marketBook.getLastMarketSnapshot().getTime();
         for (ChartableIndicator chartableIndicator : indicators) {
             Indicator indicator = chartableIndicator.getIndicator();
             try {
@@ -261,8 +261,8 @@ public abstract class Strategy {
 
     public void process() throws JBookTraderException {
         if (isActive() && marketBook.size() > 0) {
-            MarketDepth marketDepth = marketBook.getLastMarketDepth();
-            long instant = marketDepth.getTime();
+            MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
+            long instant = marketSnapshot.getTime();
             setTime(instant);
             updateIndicators();
             if (hasValidIndicators()) {
@@ -274,7 +274,7 @@ public abstract class Strategy {
             }
 
             positionManager.trade();
-            performanceManager.updatePositionValue(marketDepth.getMidPrice(), positionManager.getPosition());
+            performanceManager.updatePositionValue(marketSnapshot.getMidPrice(), positionManager.getPosition());
             Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
         }
     }

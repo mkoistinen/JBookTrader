@@ -42,4 +42,9 @@ public class ContractFactory {
     public static Contract makeCashContract(String symbol, String currency) {
         return makeContract(symbol, "CASH", "IDEALPRO", null, currency);
     }
+
+    public static Contract makeIndexContract(String symbol, String exchange) {
+        return makeContract(symbol, "IND", exchange, null, null);
+    }
+
 }

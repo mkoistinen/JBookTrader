@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.report.*;
@@ -75,10 +75,10 @@ public abstract class OptimizerRunner implements Runnable {
         marketBook.getAll().clear();
         setTotalSteps(totalSteps);
 
-        for (MarketDepth marketDepth : backTestFileReader.getAll()) {
-            marketBook.add(marketDepth);
+        for (MarketSnapshot marketSnapshot : backTestFileReader.getAll()) {
+            marketBook.add(marketSnapshot);
 
-            long time = marketDepth.getTime();
+            long time = marketSnapshot.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
 
             for (Strategy strategy : strategies) {

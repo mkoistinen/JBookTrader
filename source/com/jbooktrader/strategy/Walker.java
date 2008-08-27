@@ -1,6 +1,6 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
@@ -28,7 +28,7 @@ public class Walker extends StrategyES {
 
         entry = getParam(ENTRY);
         // Create technical indicators
-        Indicator emaBalanceInd = new BalanceEMA(getParam(EMA_PERIOD));
+        Indicator emaBalanceInd = new DepthBalanceEMA(getParam(EMA_PERIOD));
         emaBalanceDisplacementInd = new Displacement(emaBalanceInd, getParam(DISPLACEMENT_PERIOD));
 
         addIndicator(emaBalanceInd);

@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.report.*;
 
@@ -13,17 +13,17 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
-    public final static int COLUMNS = 7;
+    public final static int COLUMNS = 10;
     private static final String LINE_SEP = System.getProperty("line.separator");
 
-    private final LinkedList<MarketDepth> marketDepths;
+    private final LinkedList<MarketSnapshot> marketSnapshots;
     private long previousTime;
     private SimpleDateFormat sdf;
     private volatile boolean cancelled;
     private BufferedReader reader;
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
-        marketDepths = new LinkedList<MarketDepth>();
+        marketSnapshots = new LinkedList<MarketSnapshot>();
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
         } catch (FileNotFoundException fnfe) {
@@ -35,8 +35,8 @@ public class BackTestFileReader {
         cancelled = true;
     }
 
-    public LinkedList<MarketDepth> getAll() {
-        return marketDepths;
+    public LinkedList<MarketSnapshot> getAll() {
+        return marketSnapshots;
     }
 
     private void getTimeZone(String line) throws JBookTraderException {
@@ -67,9 +67,9 @@ public class BackTestFileReader {
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                    MarketDepth marketDepth = toMarketDepth(line);
-                    previousTime = marketDepth.getTime();
-                    marketDepths.add(marketDepth);
+                    MarketSnapshot marketSnapshot = toMarketDepth(line);
+                    previousTime = marketSnapshot.getTime();
+                    marketSnapshots.add(marketSnapshot);
                 }
 
                 if (isProperty && line.startsWith("timeZone")) {
@@ -102,7 +102,7 @@ public class BackTestFileReader {
     }
 
 
-    private MarketDepth toMarketDepth(String line) throws JBookTraderException, ParseException {
+    private MarketSnapshot toMarketDepth(String line) throws JBookTraderException, ParseException {
         if (sdf == null) {
             String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
             throw new JBookTraderException(msg);
@@ -129,13 +129,15 @@ public class BackTestFileReader {
 
         int lowBalance = Integer.parseInt(st.nextToken());
         int highBalance = Integer.parseInt(st.nextToken());
-
         double bestBid = Double.parseDouble(st.nextToken());
         double bestAsk = Double.parseDouble(st.nextToken());
-
         int volume = Integer.parseInt(st.nextToken());
+        double tick = Double.parseDouble(st.nextToken());
+        double trin = Double.parseDouble(st.nextToken());
+        double vix = Double.parseDouble(st.nextToken());
 
-        return new MarketDepth(time, lowBalance, highBalance, bestBid, bestAsk, volume);
+
+        return new MarketSnapshot(time, lowBalance, highBalance, bestBid, bestAsk, volume, tick, trin, vix);
     }
 }
 

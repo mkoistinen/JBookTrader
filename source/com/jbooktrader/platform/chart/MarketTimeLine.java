@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.chart;
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import org.jfree.chart.axis.*;
 
 
@@ -21,8 +21,8 @@ public class MarketTimeLine {
         SegmentedTimeline timeline = new SegmentedTimeline(SEGMENT_SIZE, 1, 0);
         long previousTime = marketBook.getAll().get(0).getTime();
 
-        for (MarketDepth marketDepth : marketBook.getAll()) {
-            long marketDepthTime = marketDepth.getTime();
+        for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
+            long marketDepthTime = marketSnapshot.getTime();
             long difference = marketDepthTime - previousTime;
             if (difference > MAX_GAP) {
                 timeline.addException(previousTime + GAP_BUFFER, marketDepthTime - GAP_BUFFER);

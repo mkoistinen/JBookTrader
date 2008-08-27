@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -47,12 +47,12 @@ public class PerformanceChartData {
         List<Bar> priceBars = new ArrayList<Bar>();
 
         Bar bar = null;
-        for (MarketDepth marketDepth : marketBook.getAll()) {
-            long time = marketDepth.getTime();
+        for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
+            long time = marketSnapshot.getTime();
             double open, close;
-            open = close = marketDepth.getMidPrice();
-            double low = marketDepth.getBestBid();
-            double high = marketDepth.getBestAsk();
+            open = close = marketSnapshot.getMidPrice();
+            double low = marketSnapshot.getBestBid();
+            double high = marketSnapshot.getBestAsk();
 
             // Integer division gives us the number of whole periods
             long completedPeriods = time / frequency;

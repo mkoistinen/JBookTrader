@@ -1,7 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.depth.*;
-import com.jbooktrader.indicator.price.*;
+import com.jbooktrader.indicator.index.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -9,28 +9,33 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Simple extends StrategyES {
+public class Ticker extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceEmaInd, rsiInd;
+    private final Indicator balanceEmaInd, tickIndexEmaInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
-    private static final String ENTRY = "Entry";
+    private static final String BALANCE_ENTRY = "DepthBalance Entry";
+    private static final String TICK_ENTRY = "Tick Entry";
+
 
     // Strategy parameters values
-    private final int entry;
+    private final int balanceEntry, tickEntry;
 
 
-    public Simple(StrategyParams optimizationParams) throws JBookTraderException {
+    public Ticker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
-        entry = getParam(ENTRY);
+        balanceEntry = getParam(BALANCE_ENTRY);
+        tickEntry = getParam(TICK_ENTRY);
+
         // Create technical indicators
-        rsiInd = new PriceRSI(getParam(PERIOD));
         balanceEmaInd = new DepthBalanceEMA(getParam(PERIOD));
-        addIndicator(rsiInd);
+        tickIndexEmaInd = new TickIndexEMA(getParam(PERIOD));
+
         addIndicator(balanceEmaInd);
+        addIndicator(tickIndexEmaInd);
     }
 
     /**
@@ -41,8 +46,9 @@ public class Simple extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 5, 100, 5, 15);
-        addParam(ENTRY, 30, 90, 5, 72);
+        addParam(PERIOD, 1, 50, 1, 1);
+        addParam(BALANCE_ENTRY, 0, 50, 1, 25);
+        addParam(TICK_ENTRY, 50, 800, 50, 80);
     }
 
     /**
@@ -51,10 +57,11 @@ public class Simple extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balance = balanceEmaInd.getValue() - (rsiInd.getValue() - 50);
-        if (balance >= entry) {
+        double balanceEma = balanceEmaInd.getValue();
+        double tickIndex = tickIndexEmaInd.getValue();
+        if (balanceEma >= balanceEntry && tickIndex >= tickEntry) {
             setPosition(1);
-        } else if (balance <= -entry) {
+        } else if (balanceEma <= -balanceEntry && tickIndex <= -tickEntry) {
             setPosition(-1);
         }
     }

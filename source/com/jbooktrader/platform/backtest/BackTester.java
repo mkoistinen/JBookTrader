@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
 
-import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.schedule.*;
@@ -29,13 +29,13 @@ public class BackTester {
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         long marketDepthCounter = 0;
-        LinkedList<MarketDepth> marketDepths = backTestFileReader.getAll();
-        int size = marketDepths.size();
+        LinkedList<MarketSnapshot> marketSnapshots = backTestFileReader.getAll();
+        int size = marketSnapshots.size();
 
-        for (MarketDepth marketDepth : marketDepths) {
+        for (MarketSnapshot marketSnapshot : marketSnapshots) {
             marketDepthCounter++;
-            marketBook.add(marketDepth);
-            long instant = marketBook.getLastMarketDepth().getTime();
+            marketBook.add(marketSnapshot);
+            long instant = marketBook.getLastMarketSnapshot().getTime();
             strategy.setTime(instant);
             strategy.updateIndicators();
             if (strategy.hasValidIndicators()) {

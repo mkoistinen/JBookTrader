@@ -12,7 +12,7 @@ public class Volume extends Indicator {
 
     @Override
     public double calculate() {
-        value = marketBook.getLastMarketDepth().getVolume();
+        value = marketBook.getLastMarketSnapshot().getVolume();
         return value;
     }
 }
