@@ -12,8 +12,8 @@ import java.util.*;
  * Sends SSL Mail
  */
 public class SecureMailSender {
-    private final Properties props = new Properties();
-    private String login, password, subject, recipient;
+    private static final Properties props = new Properties();
+    private final String host, login, password, subject, sender, recipient;
     private final boolean isEnabled;
     private static SecureMailSender instance;
     private static PreferencesHolder prefs = PreferencesHolder.getInstance();
@@ -44,10 +44,10 @@ public class SecureMailSender {
             message.setSubject(subject);
             message.setContent(content, "text/plain");
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-            message.setFrom(new InternetAddress(login));
+            message.setFrom(new InternetAddress(sender));
 
             Transport transport = mailSession.getTransport();
-            transport.connect(login, password);
+            transport.connect(host, login, password);
 
             transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
             transport.close();
@@ -62,13 +62,14 @@ public class SecureMailSender {
     }
 
     // private constructor for noninstantiability
-    private SecureMailSender(String smtpsHost, String login, String password, String to, String subject) {
+    private SecureMailSender(String smtpsHost, String login, String password, String from, String to, String subject) {
         isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
-        props.put("mail.transport.protocol", "smtps");
-        props.put("mail.smtps.host", smtpsHost);
-        props.put("mail.smtps.auth", "true");
+        props.setProperty("mail.transport.protocol", "smtps");
+        props.setProperty("mail.smtps.auth", "true");
 
+        this.host = smtpsHost;
         this.login = login;
+        this.sender = from.isEmpty() ? login : from;
         this.recipient = to;
         this.password = password;
         this.subject = subject;
@@ -76,7 +77,7 @@ public class SecureMailSender {
 
     // private constructor for noninstantiability
     private SecureMailSender() {
-        this(prefs.get(SMTPSHost), prefs.get(EmailLogin), prefs.get(EmailPassword), prefs.get(To), prefs.get(EmailSubject));
+        this(prefs.get(SMTPSHost), prefs.get(EmailLogin), prefs.get(EmailPassword), prefs.get(From), prefs.get(To), prefs.get(EmailSubject));
     }
 
 
@@ -86,8 +87,8 @@ public class SecureMailSender {
         }
     }
 
-    static public void test(String SMTPSHost, String login, String password, String to, String subject) throws MessagingException {
-        new SecureMailSender(SMTPSHost, login, password, to, subject).new Mailer("JBT remote notification email test.").send();
+    static public void test(String SMTPSHost, String login, String password, String from, String to, String subject) throws MessagingException {
+        new SecureMailSender(SMTPSHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send();
     }
 
 }

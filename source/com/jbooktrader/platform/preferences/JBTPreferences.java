@@ -18,6 +18,7 @@ public enum JBTPreferences {
     SMTPSHost("SMTPS Host", "smtp.gmail.com"),
     EmailLogin("Email Login", "me@gmail.com"),
     EmailPassword("Email Password", ""),
+    From("From", "me@gmail.com"),
     To("To", "me@anyprovider.com"),
     EmailSubject("Email Subject", "[JBT Remote Notification]"),
 
