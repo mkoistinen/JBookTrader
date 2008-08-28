@@ -28,7 +28,7 @@ public class SecureMailSender {
 
         public void run() {
             try {
-                send();
+                send(false);
                 Dispatcher.getReporter().report("Email notification sent.");
             } catch (Throwable t) {
                 Dispatcher.getReporter().report("Email notification failed.");
@@ -36,9 +36,9 @@ public class SecureMailSender {
             }
         }
 
-        public void send() throws MessagingException, SendFailedException {
+        public void send(boolean debug) throws MessagingException {
             Session mailSession = Session.getDefaultInstance(props);
-            //mailSession.setDebug(true); // sends debugging info to System.out
+            mailSession.setDebug(debug);
 
             MimeMessage message = new MimeMessage(mailSession);
             message.setSubject(subject);
@@ -87,8 +87,9 @@ public class SecureMailSender {
         }
     }
 
-    static public void test(String SMTPSHost, String login, String password, String from, String to, String subject) throws MessagingException {
-        new SecureMailSender(SMTPSHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send();
+    static public void test(String SMTPSHost, String login, String password, String from, String to, String subject)
+            throws MessagingException {
+        new SecureMailSender(SMTPSHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send(true);
     }
 
 }

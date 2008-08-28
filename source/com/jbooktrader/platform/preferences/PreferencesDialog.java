@@ -97,7 +97,6 @@ public class PreferencesDialog extends JDialog {
         emailLogin = new JTextField();
         emailPasswordField = new JPasswordField();
         fromText = new JTextField();
-        fromText.setToolTipText("Leave empty if same as login");
         toText = new JTextField();
         emailSubjectText = new JTextField();
         heartBeatIntervalText = new JTextField();
@@ -117,12 +116,16 @@ public class PreferencesDialog extends JDialog {
         emailTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    SecureMailSender.test(emailSMTPSHost.getText(), emailLogin.getText(), new String(emailPasswordField.getPassword()), fromText.getText(), toText.getText(), emailSubjectText.getText());
+                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    SecureMailSender.test(emailSMTPSHost.getText(), emailLogin.getText(), new String(emailPasswordField.getPassword()),
+                            fromText.getText(), toText.getText(), emailSubjectText.getText());
                     MessageDialog.showMessage(null, "Email notification sent.");
                 } catch (AuthenticationFailedException afe) {
                     MessageDialog.showMessage(null, "Email notification failed, invalid login or password: " + afe);
                 } catch (Exception ex) {
                     MessageDialog.showMessage(null, "Email notification failed: " + ex);
+                } finally {
+                    setCursor(Cursor.getDefaultCursor());
                 }
             }
         });
