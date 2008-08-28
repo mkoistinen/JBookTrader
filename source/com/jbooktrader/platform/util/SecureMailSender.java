@@ -15,8 +15,8 @@ public class SecureMailSender {
     private static final Properties props = new Properties();
     private final String host, login, password, subject, sender, recipient;
     private final boolean isEnabled;
+    private static final PreferencesHolder prefs = PreferencesHolder.getInstance();
     private static SecureMailSender instance;
-    private static PreferencesHolder prefs = PreferencesHolder.getInstance();
 
     // inner class
     private class Mailer extends Thread {
@@ -69,7 +69,7 @@ public class SecureMailSender {
 
         this.host = smtpsHost;
         this.login = login;
-        this.sender = from.isEmpty() ? login : from;
+        this.sender = from;
         this.recipient = to;
         this.password = password;
         this.subject = subject;
@@ -87,9 +87,9 @@ public class SecureMailSender {
         }
     }
 
-    static public void test(String SMTPSHost, String login, String password, String from, String to, String subject)
+    static public void test(String smtpsHost, String login, String password, String from, String to, String subject)
             throws MessagingException {
-        new SecureMailSender(SMTPSHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send(true);
+        new SecureMailSender(smtpsHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send(true);
     }
 
 }
