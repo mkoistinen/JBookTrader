@@ -9,7 +9,7 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Ticker extends StrategyES {
+public class Ticker2 extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceEmaInd, tickIndexEmaInd;
@@ -24,7 +24,7 @@ public class Ticker extends StrategyES {
     private final int balanceEntry, tickEntry;
 
 
-    public Ticker(StrategyParams optimizationParams) throws JBookTraderException {
+    public Ticker2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         balanceEntry = getParam(BALANCE_ENTRY);
@@ -48,7 +48,7 @@ public class Ticker extends StrategyES {
     public void setParams() {
         addParam(PERIOD, 1, 100, 1, 44);
         addParam(BALANCE_ENTRY, 0, 50, 1, 24);
-        addParam(TICK_ENTRY, 50, 800, 50, 200);
+        addParam(TICK_ENTRY, 0, 500, 50, 25);
     }
 
     /**
@@ -59,9 +59,9 @@ public class Ticker extends StrategyES {
     public void onBookChange() {
         double balanceEma = balanceEmaInd.getValue();
         double tickIndex = tickIndexEmaInd.getValue();
-        if (balanceEma >= balanceEntry && tickIndex >= tickEntry) {
+        if (balanceEma >= balanceEntry && tickIndex <= -tickEntry) {
             setPosition(1);
-        } else if (balanceEma <= -balanceEntry && tickIndex <= -tickEntry) {
+        } else if (balanceEma <= -balanceEntry && tickIndex >= tickEntry) {
             setPosition(-1);
         }
     }
