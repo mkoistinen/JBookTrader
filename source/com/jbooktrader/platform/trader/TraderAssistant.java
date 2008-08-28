@@ -272,11 +272,7 @@ public class TraderAssistant {
 
     public boolean isConnected() {
         Dispatcher.Mode mode = Dispatcher.getMode();
-        if (mode == BackTest || mode == Optimization) {
-            return true;
-        } else {
-            return isConnected;
-        }
+        return mode == BackTest || mode == Optimization || isConnected;
     }
 
     public void setIsConnected(boolean isConnected) {

@@ -38,12 +38,12 @@ public class BackTester {
             long instant = marketBook.getLastMarketSnapshot().getTime();
             strategy.setTime(instant);
             strategy.updateIndicators();
-            if(tradingSchedule.contains(instant)) {
-	            if (strategy.hasValidIndicators()) {
-	                strategy.onBookChange();
-	            }
-            }
-	        else {
+
+            if (tradingSchedule.contains(instant)) {
+                if (strategy.hasValidIndicators()) {
+                    strategy.onBookChange();
+                }
+            } else {
                 strategy.closePosition();// force flat position
             }
 

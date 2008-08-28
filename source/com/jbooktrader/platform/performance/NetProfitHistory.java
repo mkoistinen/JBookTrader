@@ -5,7 +5,7 @@ import com.jbooktrader.platform.util.*;
 import java.util.*;
 
 /**
- * Holds P&L history.
+ * Holds net profit history for a strategy.
  */
 public class NetProfitHistory {
     private final List<TimedValue> history;

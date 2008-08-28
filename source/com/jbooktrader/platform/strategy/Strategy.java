@@ -265,12 +265,12 @@ public abstract class Strategy {
             long instant = marketSnapshot.getTime();
             setTime(instant);
             updateIndicators();
-            if(tradingSchedule.contains(instant)) {
-	            if (hasValidIndicators()) {
-	                onBookChange();
-	            }
-            }
-            else {
+
+            if (tradingSchedule.contains(instant)) {
+                if (hasValidIndicators()) {
+                    onBookChange();
+                }
+            } else {
                 closePosition();// force flat position
             }
 

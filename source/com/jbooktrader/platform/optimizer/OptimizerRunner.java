@@ -84,12 +84,12 @@ public abstract class OptimizerRunner implements Runnable {
             for (Strategy strategy : strategies) {
                 strategy.setTime(time);
                 strategy.updateIndicators();
-                if(inSchedule) {
-	                if (strategy.hasValidIndicators()) {
-	                    strategy.onBookChange();
-	                }
-                }
-	            else {
+
+                if (inSchedule) {
+                    if (strategy.hasValidIndicators()) {
+                        strategy.onBookChange();
+                    }
+                } else {
                     strategy.closePosition();// force flat position
                 }
 
@@ -245,8 +245,7 @@ public abstract class OptimizerRunner implements Runnable {
                 saveToFile();
                 long totalTimeInSecs = (System.currentTimeMillis() - start) / 1000;
                 showFastProgress(100, 100, "Optimization");
-                MessageDialog.showMessage(optimizerDialog,
-                        "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
+                MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
