@@ -46,9 +46,9 @@ public class Ticker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 1, 50, 1, 1);
-        addParam(BALANCE_ENTRY, 0, 50, 1, 25);
-        addParam(TICK_ENTRY, 50, 800, 50, 80);
+        addParam(PERIOD, 1, 100, 1, 44);
+        addParam(BALANCE_ENTRY, 0, 50, 1, 24);
+        addParam(TICK_ENTRY, 50, 800, 50, 200);
     }
 
     /**
