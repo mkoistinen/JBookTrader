@@ -15,9 +15,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "5.04";
+    public static final String VERSION = "5.05";
     public static final String RELEASE_DATE = "August 26, 2008";
-    private static final String LOOK_AND_FEEL = "com.birosoft.liquid.LiquidLookAndFeel";
     private static String appPath;
 
     /**
@@ -27,7 +26,7 @@ public class JBookTrader {
     private JBookTrader() throws JBookTraderException, IOException {
         try {
             LiquidLookAndFeel.setLiquidDecorations(true, "mac");
-            UIManager.setLookAndFeel(LOOK_AND_FEEL);
+            UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");
         } catch (Throwable t) {
             String msg = t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.";
             MessageDialog.showMessage(null, msg);
