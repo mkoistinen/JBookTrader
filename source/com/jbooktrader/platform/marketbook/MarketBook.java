@@ -88,7 +88,6 @@ public class MarketBook {
         return cumulativeVolume;
     }
 
-
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
         int cumulativeSize = 0;
         for (MarketDepthItem item : items) {
@@ -127,7 +126,6 @@ public class MarketBook {
                 break;
         }
     }
-
 
     public void updateVolume(int cumulativeVolume) {
         if (previousCumulativeVolume == 0) {

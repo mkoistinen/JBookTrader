@@ -106,7 +106,6 @@ public class PerformanceManager {
     }
 
     public void updateOnTrade(int quantity, double avgFillPrice, int position) {
-
         double tradeAmount = avgFillPrice * Math.abs(quantity) * multiplier;
         if (quantity > 0) {
             totalBought += tradeAmount;
@@ -118,7 +117,6 @@ public class PerformanceManager {
         totalCommission += tradeCommission;
 
         updatePositionValue(avgFillPrice, position);
-
 
         isCompletedTrade = (previousPosition != 0);
         if (isCompletedTrade) {

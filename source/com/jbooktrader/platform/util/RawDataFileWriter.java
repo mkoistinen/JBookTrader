@@ -12,10 +12,10 @@ public final class RawDataFileWriter {
     private static final String FILE_SEP = System.getProperty("file.separator");
     private static final String LINE_SEP = System.getProperty("line.separator");
     private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";
-    private SimpleDateFormat dateFormat;
-    private PrintWriter writer;
     private final TimeZone timeZone;
     private static long counter;
+    private SimpleDateFormat dateFormat;
+    private PrintWriter writer;
 
     public RawDataFileWriter(String fileName, TimeZone timeZone) throws IOException {
         this.timeZone = timeZone;

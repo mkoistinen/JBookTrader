@@ -16,7 +16,6 @@ public class NumberFormatterFactory {
         return decimalFormat;
     }
 
-
     public static DecimalFormat getNumberFormatter(int maxFractionDigits) {
         return getNumberFormatter(0, maxFractionDigits);
     }
