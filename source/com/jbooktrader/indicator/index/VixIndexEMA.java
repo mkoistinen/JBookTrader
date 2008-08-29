@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.index;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Vix Index
+ * EMA of VIX Index
  */
 public class VixIndexEMA extends Indicator {
     private final double multiplier;

@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.index;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Tick Index
+ * EMA of NYSE TICK Index
  */
 public class TickIndexEMA extends Indicator {
     private final double multiplier;

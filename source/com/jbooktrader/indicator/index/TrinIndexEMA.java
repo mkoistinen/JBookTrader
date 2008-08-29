@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.index;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Trin Index
+ * EMA of NYSE TRIN Index
  */
 public class TrinIndexEMA extends Indicator {
     private final double multiplier;
