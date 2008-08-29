@@ -2,7 +2,6 @@ package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
-import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -26,9 +25,6 @@ public class BackTestStrategyRunner implements Runnable {
         if (!isOptimizationMode) {
             Dispatcher.getTrader().getAssistant().addStrategy(strategy);
             Dispatcher.getReporter().report(strategy.getName() + ": strategy started");
-            Report strategyReport = new Report(strategy.getName());
-            strategyReport.report(strategy.getStrategyReportHeaders());
-            strategy.setReport(strategyReport);
         }
     }
 
