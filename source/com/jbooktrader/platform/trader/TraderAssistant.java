@@ -202,14 +202,10 @@ public class TraderAssistant {
 
     public synchronized void addStrategy(Strategy strategy) throws IOException, JBookTraderException {
         nextStrategyID++;
-        strategy.setId(nextStrategyID);
         strategies.put(nextStrategyID, strategy);
         Dispatcher.Mode mode = Dispatcher.getMode();
         if (mode == ForwardTest || mode == Trade) {
             HeartBeatSender.getInstance().addStrategy(strategy);
-            Report strategyReport = new Report(strategy.getName());
-            strategyReport.report(strategy.getStrategyReportHeaders());
-            strategy.setReport(strategyReport);
             String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
             eventReport.report(msg);
             requestMarketData(strategy);
@@ -233,19 +229,22 @@ public class TraderAssistant {
     private synchronized void placeOrder(Contract contract, Order order, Strategy strategy) {
         try {
             orderID++;
-            String msg = strategy.getName() + ": Placed order " + orderID;
             openOrders.put(orderID, new OpenOrder(orderID, order, strategy));
+            Dispatcher.Mode mode = Dispatcher.getMode();
 
-            if (Dispatcher.getMode() == Trade) {
+            if (mode == Trade) {
                 socket.placeOrder(orderID, contract, order);
-                eventReport.report(msg);
             } else {
                 MarketSnapshot md = strategy.getMarketBook().getLastMarketSnapshot();
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
                 execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getBestAsk() : md.getBestBid();
-                eventReport.report(msg);
                 trader.execDetails(orderID, contract, execution);
+            }
+
+            if (mode == Trade || mode == ForwardTest) {
+                String msg = strategy.getName() + ": Placed order " + orderID;
+                eventReport.report(msg);
             }
 
         } catch (Throwable t) {

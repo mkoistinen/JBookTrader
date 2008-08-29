@@ -77,35 +77,35 @@ public class PositionManager {
 
 
         performanceManager.updateOnTrade(quantity, avgFillPrice, position);
+        orderExecutionPending = false;
 
         Dispatcher.Mode mode = Dispatcher.getMode();
-        if ((mode != Optimization)) {
+        if (mode != Optimization) {
             positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
+            strategy.getStrategyReportManager().report();
+        }
+
+        if (mode == ForwardTest || mode == Trade) {
             StringBuilder msg = new StringBuilder();
             msg.append(strategy.getName()).append(": ");
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");
             msg.append("Avg Fill Price: ").append(avgFillPrice).append(". ");
             msg.append("Position: ").append(getPosition());
             eventReport.report(msg.toString());
-            strategy.report();
-        }
 
-        orderExecutionPending = false;
-
-        // remote email notification, if enabled
-        if (mode == Trade || mode == ForwardTest) {
+            // remote email notification, if enabled
             boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
-            String msg = "Event type: Trade" + LINE_SEP;
-            msg += "Time sent: " + simpleDateFormat.format(System.currentTimeMillis()) + LINE_SEP;
-            msg += "Strategy: " + strategy.getName() + LINE_SEP;
-            msg += "Position: " + position + LINE_SEP;
-            msg += "Price: " + avgFillPrice + LINE_SEP;
-            msg += "Trades: " + nf2.format(performanceManager.getTrades()) + LINE_SEP;
+            String notification = "Event type: Trade" + LINE_SEP;
+            notification += "Time sent: " + simpleDateFormat.format(System.currentTimeMillis()) + LINE_SEP;
+            notification += "Strategy: " + strategy.getName() + LINE_SEP;
+            notification += "Position: " + position + LINE_SEP;
+            notification += "Price: " + avgFillPrice + LINE_SEP;
+            notification += "Trades: " + nf2.format(performanceManager.getTrades()) + LINE_SEP;
             String tradeNetProfit = isCompletedTrade ? nf2.format(performanceManager.getTradeProfit()) : "--";
-            msg += "Trade net profit: " + tradeNetProfit + LINE_SEP;
-            msg += "Total net profit: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
+            notification += "Trade net profit: " + tradeNetProfit + LINE_SEP;
+            notification += "Total net profit: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
 
-            SecureMailSender.getInstance().send(msg);
+            SecureMailSender.getInstance().send(notification);
         }
     }
 

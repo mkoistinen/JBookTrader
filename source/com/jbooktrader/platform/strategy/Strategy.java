@@ -5,14 +5,13 @@ import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
-import com.jbooktrader.platform.util.*;
 
-import java.text.*;
 import java.util.*;
 
 /**
@@ -20,25 +19,20 @@ import java.util.*;
  */
 
 public abstract class Strategy {
-    private final List<String> strategyReportHeaders;
     private final StrategyParams params;
     private MarketBook marketBook;
-    private final DecimalFormat df2, df5;
-    private final SimpleDateFormat sdf;
     private final Report eventReport;
     private final String name;
-    private final List<Object> strategyReportColumns;
     private final List<ChartableIndicator> indicators;
     private final boolean isOptimizationMode;
-    private Report strategyReport;
     private Contract contract;
     private TradingSchedule tradingSchedule;
     private PositionManager positionManager;
     private PerformanceManager performanceManager;
+    private StrategyReportManager strategyReportManager;
     private boolean isActive, hasValidIndicators;
-    private int position, id;
+    private int position;
     private long time;
-
 
     /**
      * Framework calls this method when order book changes.
@@ -57,27 +51,10 @@ public abstract class Strategy {
             setParams();
         }
 
-        strategyReportColumns = new ArrayList<Object>();
-        strategyReportHeaders = new ArrayList<String>();
-        strategyReportHeaders.add("Time & Date");
-        strategyReportHeaders.add("Trade #");
-        strategyReportHeaders.add("Best Bid");
-        strategyReportHeaders.add("Best Ask");
-        strategyReportHeaders.add("Position");
-        strategyReportHeaders.add("Avg Fill Price");
-        strategyReportHeaders.add("Commission");
-        strategyReportHeaders.add("Trade Net Profit");
-        strategyReportHeaders.add("Total Net Profit");
-
         name = getClass().getSimpleName();
         indicators = new LinkedList<ChartableIndicator>();
-
-        df2 = NumberFormatterFactory.getNumberFormatter(2);
-        df5 = NumberFormatterFactory.getNumberFormatter(5);
-        sdf = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
-
         eventReport = Dispatcher.getReporter();
-        isOptimizationMode = (Dispatcher.getMode() == Dispatcher.Mode.Optimization);
+        isOptimizationMode = (Dispatcher.getMode() == Optimization);
     }
 
     public void setMarketBook(MarketBook marketBook) {
@@ -85,14 +62,6 @@ public abstract class Strategy {
         for (ChartableIndicator chartableIndicator : indicators) {
             chartableIndicator.getIndicator().setMarketBook(marketBook);
         }
-    }
-
-    public void setReport(Report strategyReport) {
-        this.strategyReport = strategyReport;
-    }
-
-    public List<String> getStrategyReportHeaders() {
-        return strategyReportHeaders;
     }
 
     public boolean isActive() {
@@ -119,43 +88,12 @@ public abstract class Strategy {
     public void closePosition() {
         position = 0;
         if (positionManager.getPosition() != 0) {
-            String msg = "End of trading interval. Closing current position.";
-            eventReport.report(getName() + ": " + msg);
+            Dispatcher.Mode mode = Dispatcher.getMode();
+            if (mode == ForwardTest || mode == Trade) {
+                String msg = "End of trading interval. Closing current position.";
+                eventReport.report(getName() + ": " + msg);
+            }
         }
-    }
-
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(" ").append(name).append(" [");
-        sb.append(contract.m_symbol).append("-");
-        sb.append(contract.m_secType).append("-");
-        sb.append(contract.m_exchange).append("]");
-
-        return sb.toString();
-    }
-
-
-    public void report() {
-        MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
-        boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
-
-        strategyReportColumns.clear();
-        strategyReportColumns.add(isCompletedTrade ? performanceManager.getTrades() : "--");
-        strategyReportColumns.add(df5.format(marketSnapshot.getBestBid()));
-        strategyReportColumns.add(df5.format(marketSnapshot.getBestAsk()));
-        strategyReportColumns.add(positionManager.getPosition());
-        strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
-        strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
-        strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");
-        strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
-
-        for (ChartableIndicator chartableIndicator : indicators) {
-            strategyReportColumns.add(df2.format(chartableIndicator.getIndicator().getValue()));
-        }
-
-        strategyReport.report(strategyReportColumns, sdf.format(getTime()));
     }
 
 
@@ -179,6 +117,10 @@ public abstract class Strategy {
         return performanceManager;
     }
 
+    public StrategyReportManager getStrategyReportManager() {
+        return strategyReportManager;
+    }
+
     public TradingSchedule getTradingSchedule() {
         return tradingSchedule;
     }
@@ -196,7 +138,7 @@ public abstract class Strategy {
         String name = indicator.getClass().getSimpleName();
         ChartableIndicator chartableIndicator = new ChartableIndicator(name, indicator);
         indicators.add(chartableIndicator);
-        strategyReportHeaders.add(name);
+        strategyReportManager.addHeader(indicator);
     }
 
     public List<ChartableIndicator> getIndicators() {
@@ -207,9 +149,9 @@ public abstract class Strategy {
         this.contract = contract;
         contract.m_multiplier = String.valueOf(multiplier);
         this.tradingSchedule = tradingSchedule;
-        sdf.setTimeZone(tradingSchedule.getTimeZone());
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
+        strategyReportManager = new StrategyReportManager(this);
         marketBook = Dispatcher.getTrader().getAssistant().createMarketBook(this);
         marketBook.setTimeZone(tradingSchedule.getTimeZone());
     }
@@ -220,14 +162,6 @@ public abstract class Strategy {
 
     public MarketBook getMarketBook() {
         return marketBook;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public Contract getContract() {
@@ -280,11 +214,14 @@ public abstract class Strategy {
         }
     }
 
-    public void report(String message) {
-        if (strategyReport != null) {
-            strategyReportColumns.clear();
-            strategyReportColumns.add(message);
-            strategyReport.report(strategyReportColumns, sdf.format(getTime()));
-        }
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ").append(name).append(" [");
+        sb.append(contract.m_symbol).append("-");
+        sb.append(contract.m_secType).append("-");
+        sb.append(contract.m_exchange).append("]");
+
+        return sb.toString();
     }
 }
