@@ -12,10 +12,10 @@ import java.util.*;
  * Sends SSL Mail
  */
 public class SecureMailSender {
-    private static final Properties props = new Properties();
+    private final static Properties props = new Properties();
     private final String host, login, password, subject, sender, recipient;
     private final boolean isEnabled;
-    private static final PreferencesHolder prefs = PreferencesHolder.getInstance();
+    private final static PreferencesHolder prefs = PreferencesHolder.getInstance();
     private static SecureMailSender instance;
 
     // inner class
@@ -29,7 +29,6 @@ public class SecureMailSender {
         public void run() {
             try {
                 send(false);
-                Dispatcher.getReporter().report("Email notification sent.");
             } catch (Throwable t) {
                 Dispatcher.getReporter().report("Email notification failed.");
                 Dispatcher.getReporter().report(t);
