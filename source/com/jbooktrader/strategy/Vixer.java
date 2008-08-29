@@ -16,7 +16,7 @@ public class Vixer extends StrategyES {
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
-    private static final String BALANCE_ENTRY = "DepthBalance Entry";
+    private static final String BALANCE_ENTRY = "Depth Balance Entry";
     private static final String VIX_ENTRY = "Vix Entry";
 
 

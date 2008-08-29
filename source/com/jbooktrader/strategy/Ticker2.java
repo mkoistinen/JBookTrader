@@ -16,7 +16,7 @@ public class Ticker2 extends StrategyES {
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
-    private static final String BALANCE_ENTRY = "DepthBalance Entry";
+    private static final String BALANCE_ENTRY = "Depth Balance Entry";
     private static final String TICK_ENTRY = "Tick Entry";
 
 
@@ -46,9 +46,9 @@ public class Ticker2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 1, 100, 1, 44);
-        addParam(BALANCE_ENTRY, 0, 50, 1, 24);
-        addParam(TICK_ENTRY, 0, 500, 50, 25);
+        addParam(PERIOD, 1, 100, 1, 66);
+        addParam(BALANCE_ENTRY, 0, 50, 1, 23);
+        addParam(TICK_ENTRY, 0, 500, 25, 75);
     }
 
     /**

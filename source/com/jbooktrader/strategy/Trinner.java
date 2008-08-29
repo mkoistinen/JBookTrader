@@ -47,8 +47,8 @@ public class Trinner extends StrategyES {
     @Override
     public void setParams() {
         addParam(PERIOD, 1, 100, 1, 13);
-        addParam(BALANCE_ENTRY, 0, 50, 1, 10);
-        addParam(TRIN_ENTRY, 0, 10, 1, 0);
+        addParam(BALANCE_ENTRY, 20, 50, 1, 10);
+        addParam(TRIN_ENTRY, 0, 200, 1, 0);
     }
 
     /**
@@ -59,10 +59,10 @@ public class Trinner extends StrategyES {
     public void onBookChange() {
         double balanceEma = balanceEmaInd.getValue();
         if (trinIndexEmaInd.getValue() != 0) {
-            double trinIndex = (trinIndexEmaInd.getValue() - 1) * 10;
-            if (balanceEma >= balanceEntry && trinIndex >= trinEntry) {
+            double trinIndex = (trinIndexEmaInd.getValue() - 1) * 100;
+            if (balanceEma >= balanceEntry && trinIndex <= -trinEntry) {
                 setPosition(1);
-            } else if (balanceEma <= -balanceEntry && trinIndex <= -trinEntry) {
+            } else if (balanceEma <= -balanceEntry && trinIndex >= trinEntry) {
                 setPosition(-1);
             }
         }
