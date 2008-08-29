@@ -229,8 +229,13 @@ public class TraderAssistant {
     private synchronized void placeOrder(Contract contract, Order order, Strategy strategy) {
         try {
             orderID++;
-            openOrders.put(orderID, new OpenOrder(orderID, order, strategy));
             Dispatcher.Mode mode = Dispatcher.getMode();
+            if (mode == Trade || mode == ForwardTest) {
+                String msg = strategy.getName() + ": Placing order " + orderID;
+                eventReport.report(msg);
+            }
+
+            openOrders.put(orderID, new OpenOrder(orderID, order, strategy));
 
             if (mode == Trade) {
                 socket.placeOrder(orderID, contract, order);
@@ -241,12 +246,6 @@ public class TraderAssistant {
                 execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getBestAsk() : md.getBestBid();
                 trader.execDetails(orderID, contract, execution);
             }
-
-            if (mode == Trade || mode == ForwardTest) {
-                String msg = strategy.getName() + ": Placed order " + orderID;
-                eventReport.report(msg);
-            }
-
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
