@@ -29,12 +29,12 @@ public class Commission {
 
     public double getCommission(int contracts, double price) {
         double commission = rate * contracts;
-        commission = Math.max(commission, minimum);
         if (maximumPercent > 0) {
             double maximumCommission = contracts * price * maximumPercent;
             commission = Math.min(commission, maximumCommission);
         }
 
+        commission = Math.max(commission, minimum);
         return commission;
     }
 }
