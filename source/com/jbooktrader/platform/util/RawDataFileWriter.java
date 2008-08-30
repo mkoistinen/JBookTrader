@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.util;
 
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
@@ -17,7 +18,7 @@ public final class RawDataFileWriter {
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
-    public RawDataFileWriter(String fileName, TimeZone timeZone) throws IOException {
+    public RawDataFileWriter(String fileName, TimeZone timeZone) {
         this.timeZone = timeZone;
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {
@@ -26,7 +27,11 @@ public final class RawDataFileWriter {
 
         String fullFileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
 
-        writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
+        try {
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
+        } catch (IOException ioe) {
+            throw new JBookTraderException("Could not write to file " + fullFileName);
+        }
         dateFormat = new SimpleDateFormat("HH:mm:ss.SSS");
         dateFormat.setTimeZone(timeZone);
         writeHeader();
@@ -34,8 +39,8 @@ public final class RawDataFileWriter {
 
 
     public void write(String s) {
-        s = dateFormat.format(System.currentTimeMillis()) + "," + s;
-        writer.println(s);
+        String msg = dateFormat.format(System.currentTimeMillis()) + "," + s;
+        writer.println(msg);
         counter++;
         if (counter % 1000 == 0) {
             writer.flush();

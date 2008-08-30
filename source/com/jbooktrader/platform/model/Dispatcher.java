@@ -4,7 +4,6 @@ package com.jbooktrader.platform.model;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.trader.*;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -21,7 +20,7 @@ public class Dispatcher {
     private static Mode mode;
     private static int activeStrategies;
 
-    public static void setReporter(String eventReportFileName) throws IOException, JBookTraderException {
+    public static void setReporter(String eventReportFileName) {
         eventReport = new Report(eventReportFileName);
     }
 
@@ -67,7 +66,7 @@ public class Dispatcher {
         System.exit(0);
     }
 
-    public static void setMode(Mode mode) throws JBookTraderException {
+    public static void setMode(Mode mode) {
         Dispatcher.mode = mode;
         eventReport.report("Mode set to: " + mode);
 

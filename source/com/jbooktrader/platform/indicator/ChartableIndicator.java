@@ -12,9 +12,9 @@ public class ChartableIndicator {
     private final String name;
     private final List<TimedValue> indicatorValues;
 
-    public ChartableIndicator(String name, Indicator indicator) {
-        this.name = name;
+    public ChartableIndicator(Indicator indicator) {
         this.indicator = indicator;
+        name = indicator.getClass().getSimpleName();
         indicatorValues = new ArrayList<TimedValue>();
     }
 

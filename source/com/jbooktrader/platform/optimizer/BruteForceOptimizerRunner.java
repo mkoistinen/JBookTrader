@@ -12,12 +12,11 @@ import java.util.*;
 public class BruteForceOptimizerRunner extends OptimizerRunner {
     private static final int CHUNK_SIZE = 500;
 
-    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params)
-            throws ClassNotFoundException, NoSuchMethodException {
+    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) {
         super(optimizerDialog, strategy, params);
     }
 
-    public void optimize() throws JBookTraderException {
+    public void optimize() {
         LinkedList<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();
         long totalSteps = (long) lineCount * taskSize;

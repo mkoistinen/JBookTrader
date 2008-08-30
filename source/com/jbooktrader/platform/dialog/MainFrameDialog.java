@@ -26,7 +26,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private JTable strategyTable;
     private JPopupMenu popupMenu;
 
-    public MainFrameDialog() throws JBookTraderException {
+    public MainFrameDialog() {
         toolkit = Toolkit.getDefaultToolkit();
         init();
         populateStrategies();
@@ -141,7 +141,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         aboutMenuItem.addActionListener(action);
     }
 
-    private URL getImageURL(String imageFileName) throws JBookTraderException {
+    private URL getImageURL(String imageFileName) {
         URL imgURL = ClassLoader.getSystemResource(imageFileName);
         if (imgURL == null) {
             String msg = "Could not locate " + imageFileName + ". Make sure the /resources directory is in the classpath.";
@@ -150,12 +150,12 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         return imgURL;
     }
 
-    private ImageIcon getImageIcon(String imageFileName) throws JBookTraderException {
+    private ImageIcon getImageIcon(String imageFileName) {
         return new ImageIcon(toolkit.getImage(getImageURL(imageFileName)));
     }
 
 
-    private void populateStrategies() throws JBookTraderException {
+    private void populateStrategies() {
         ClassFinder classFinder = new ClassFinder();
         for (Strategy strategy : classFinder.getStrategies()) {
             strategyTableModel.addStrategy(strategy);
@@ -174,7 +174,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         popupMenu.show(strategyTable, mouseEvent.getX(), mouseEvent.getY());
     }
 
-    private void init() throws JBookTraderException {
+    private void init() {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
 

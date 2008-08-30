@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -22,7 +23,7 @@ public final class BackTestFileWriter {
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
-    public BackTestFileWriter(Strategy strategy) throws IOException {
+    public BackTestFileWriter(Strategy strategy) {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         JFileChooser fileChooser = new JFileChooser(MARKET_DATA_DIR);
         fileChooser.setDialogTitle("Save historical market depth " + strategy.getName());
@@ -32,11 +33,15 @@ public final class BackTestFileWriter {
             dateFormat.setTimeZone(strategy.getTradingSchedule().getTimeZone());
             File file = fileChooser.getSelectedFile();
             String fileName = file.getAbsolutePath();
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, false)));
+            try {
+                writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, false)));
+            } catch (IOException ioe) {
+                throw new JBookTraderException("Could not write to file " + fileName);
+            }
         }
     }
 
-    public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws IOException {
+    public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {
@@ -47,7 +52,12 @@ public final class BackTestFileWriter {
         if (isAutoSave) {
             fullFileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
         }
-        writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
+
+        try {
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
+        } catch (IOException ioe) {
+            throw new JBookTraderException("Could not write to file " + fileName);
+        }
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
     }

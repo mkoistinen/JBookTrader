@@ -40,7 +40,7 @@ public class HeartBeatSender {
         }
     }
 
-    public static HeartBeatSender getInstance() {
+    public synchronized static HeartBeatSender getInstance() {
         if (instance == null) {
             instance = new HeartBeatSender();
         }

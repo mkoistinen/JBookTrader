@@ -23,7 +23,7 @@ public class BackTester {
         this.backTestDialog = backTestDialog;
     }
 
-    public void execute() throws JBookTraderException {
+    public void execute() {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();

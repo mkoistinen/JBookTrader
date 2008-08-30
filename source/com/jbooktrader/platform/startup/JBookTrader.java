@@ -15,7 +15,7 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "5.05";
+    public static final String VERSION = "5.06";
     public static final String RELEASE_DATE = "August 29, 2008";
     private static String appPath;
 
@@ -23,7 +23,7 @@ public class JBookTrader {
      * Instantiates the necessary parts of the application: the application model,
      * views, and controller.
      */
-    private JBookTrader() throws JBookTraderException, IOException {
+    private JBookTrader() {
         try {
             LiquidLookAndFeel.setLiquidDecorations(true, "mac");
             UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");

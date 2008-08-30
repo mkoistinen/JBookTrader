@@ -4,7 +4,6 @@ import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.marketindex.*;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -35,7 +34,7 @@ public class MarketBook {
         this.timeZone = timeZone;
     }
 
-    public void save(MarketSnapshot marketSnapshot) throws IOException {
+    public void save(MarketSnapshot marketSnapshot) {
         if (backTestFileWriter == null) {
             backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
         }

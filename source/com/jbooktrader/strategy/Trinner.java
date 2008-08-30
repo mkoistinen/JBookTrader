@@ -3,7 +3,6 @@ package com.jbooktrader.strategy;
 import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.index.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -24,7 +23,7 @@ public class Trinner extends StrategyES {
     private final int balanceEntry, trinEntry;
 
 
-    public Trinner(StrategyParams optimizationParams) throws JBookTraderException {
+    public Trinner(StrategyParams optimizationParams) {
         super(optimizationParams);
 
         balanceEntry = getParam(BALANCE_ENTRY);

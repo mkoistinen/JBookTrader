@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.report;
 
+import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
@@ -25,7 +26,7 @@ public final class Report {
             Class<? extends ReportRenderer> clazz = Class.forName(reportRendererClass).asSubclass(ReportRenderer.class);
             renderer = clazz.newInstance();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new JBookTraderException(e);
         }
 
         fieldStart = renderer.getFieldStart();
@@ -52,7 +53,7 @@ public final class Report {
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
+            throw new JBookTraderException(ioe);
         }
         StringBuilder s = new StringBuilder();
         s.append(emphasisStart).append("New Report Started: ").append(df.format(getDate())).append(emphasisEnd);

@@ -9,7 +9,6 @@ import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
-import java.io.*;
 import java.lang.reflect.*;
 import java.text.*;
 import java.util.*;
@@ -39,8 +38,7 @@ public abstract class OptimizerRunner implements Runnable {
     protected int lineCount;
     protected MarketBook marketBook;
 
-    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params)
-            throws ClassNotFoundException, NoSuchMethodException {
+    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) {
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
@@ -48,17 +46,29 @@ public abstract class OptimizerRunner implements Runnable {
         optimizationResults = new ArrayList<OptimizationResult>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
-        Class<?> clazz = Class.forName(strategy.getClass().getName());
+
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(strategy.getClass().getName());
+        } catch (ClassNotFoundException cnfe) {
+            throw new JBookTraderException("Could not find class " + strategy.getClass().getName());
+        }
         Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
-        strategyConstructor = clazz.getConstructor(parameterTypes);
+
+        try {
+            strategyConstructor = clazz.getConstructor(parameterTypes);
+        } catch (NoSuchMethodException nsme) {
+            throw new JBookTraderException("Could not find strategy constructor for " + strategy.getClass().getName());
+        }
+
         resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
         marketBook = new MarketBook();
         minTrades = optimizerDialog.getMinTrades();
     }
 
-    protected abstract void optimize() throws JBookTraderException;
+    protected abstract void optimize();
 
-    void setTotalSteps(long totalSteps) {
+    private void setTotalSteps(long totalSteps) {
         if (timeEstimator == null) {
             timeEstimator = new ComputationalTimeEstimator(System.currentTimeMillis(), totalSteps);
         }
@@ -66,7 +76,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
 
-    void execute(List<Strategy> strategies, int count, long totalSteps) throws JBookTraderException {
+    void execute(List<Strategy> strategies, int count, long totalSteps) {
         String progressText = "Optimizing";
         if (count > 0) {
             progressText += " " + count + " strategies";
@@ -126,7 +136,7 @@ public abstract class OptimizerRunner implements Runnable {
         cancelled = true;
     }
 
-    private void saveToFile() throws IOException, JBookTraderException {
+    private void saveToFile() {
         if (optimizationResults.size() == 0) {
             return;
         }

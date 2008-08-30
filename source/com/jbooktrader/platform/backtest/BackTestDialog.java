@@ -66,7 +66,7 @@ public class BackTestDialog extends JDialog {
         super.dispose();
     }
 
-    private void setOptions() throws JBookTraderException {
+    private void setOptions() {
         String historicalFileName = fileNameText.getText();
         File file = new File(historicalFileName);
         if (!file.exists()) {

@@ -35,21 +35,25 @@ public class SecureMailSender {
             }
         }
 
-        public void send(boolean debug) throws MessagingException {
+        public void send(boolean debug) {
             Session mailSession = Session.getDefaultInstance(props);
             mailSession.setDebug(debug);
 
             MimeMessage message = new MimeMessage(mailSession);
-            message.setSubject(subject);
-            message.setContent(content, "text/plain");
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-            message.setFrom(new InternetAddress(sender));
+            try {
+                message.setSubject(subject);
+                message.setContent(content, "text/plain");
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+                message.setFrom(new InternetAddress(sender));
 
-            Transport transport = mailSession.getTransport();
-            transport.connect(host, login, password);
+                Transport transport = mailSession.getTransport();
+                transport.connect(host, login, password);
 
-            transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
-            transport.close();
+                transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
+                transport.close();
+            } catch (MessagingException me) {
+                throw new JBookTraderException(me);
+            }
         }
     }
 
@@ -86,8 +90,7 @@ public class SecureMailSender {
         }
     }
 
-    static public void test(String smtpsHost, String login, String password, String from, String to, String subject)
-            throws MessagingException {
+    static public void test(String smtpsHost, String login, String password, String from, String to, String subject) {
         new SecureMailSender(smtpsHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send(true);
     }
 

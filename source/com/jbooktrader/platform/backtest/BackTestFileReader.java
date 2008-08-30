@@ -22,7 +22,7 @@ public class BackTestFileReader {
     private volatile boolean cancelled;
     private BufferedReader reader;
 
-    public BackTestFileReader(String fileName) throws JBookTraderException {
+    public BackTestFileReader(String fileName) {
         marketSnapshots = new LinkedList<MarketSnapshot>();
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
@@ -39,7 +39,7 @@ public class BackTestFileReader {
         return marketSnapshots;
     }
 
-    private void getTimeZone(String line) throws JBookTraderException {
+    private void getTimeZone(String line) {
         String timeZone = line.substring(line.indexOf('=') + 1);
         TimeZone tz = TimeZone.getTimeZone(timeZone);
         if (!tz.getID().equals(timeZone)) {
@@ -53,7 +53,7 @@ public class BackTestFileReader {
         sdf.setTimeZone(tz);
     }
 
-    public void load() throws JBookTraderException {
+    public void load() {
         Report report = Dispatcher.getReporter();
         report.report("Scanning historical market data file");
         String line = "";
@@ -102,7 +102,7 @@ public class BackTestFileReader {
     }
 
 
-    private MarketSnapshot toMarketDepth(String line) throws JBookTraderException, ParseException {
+    private MarketSnapshot toMarketDepth(String line) {
         if (sdf == null) {
             String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
             throw new JBookTraderException(msg);
@@ -118,7 +118,12 @@ public class BackTestFileReader {
 
         String dateToken = st.nextToken();
         String timeToken = st.nextToken();
-        long time = sdf.parse(dateToken + "," + timeToken).getTime();
+        long time;
+        try {
+            time = sdf.parse(dateToken + "," + timeToken).getTime();
+        } catch (ParseException pe) {
+            throw new JBookTraderException("Could not parse date/time in " + dateToken + "," + timeToken);
+        }
 
         if (previousTime != 0) {
             if (time < previousTime) {

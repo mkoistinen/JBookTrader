@@ -291,7 +291,7 @@ public class OptimizationMap {
 
 
         XYPlot plot = new XYPlot(dataset, xAxis, yAxis, renderer);
-        JFreeChart chart = new JFreeChart(plot);
+        chart = new JFreeChart(plot);
 
         chart.removeLegend();
         chart.getPlot().setOutlineStroke(new BasicStroke(1.0f));

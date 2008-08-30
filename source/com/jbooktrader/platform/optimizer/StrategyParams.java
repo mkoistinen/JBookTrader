@@ -1,5 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.model.*;
+
 import java.util.*;
 
 /**
@@ -73,6 +75,6 @@ public class StrategyParams {
                 return param;
             }
         }
-        throw new RuntimeException("Parameter " + name + " is not defined.");
+        throw new JBookTraderException("Parameter " + name + " is not defined.");
     }
 }

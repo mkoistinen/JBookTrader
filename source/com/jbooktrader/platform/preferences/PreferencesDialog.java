@@ -5,7 +5,6 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
-import javax.mail.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -120,8 +119,6 @@ public class PreferencesDialog extends JDialog {
                     SecureMailSender.test(emailSMTPSHost.getText(), emailLogin.getText(), new String(emailPasswordField.getPassword()),
                             fromText.getText(), toText.getText(), emailSubjectText.getText());
                     MessageDialog.showMessage(null, "Email notification sent.");
-                } catch (AuthenticationFailedException afe) {
-                    MessageDialog.showMessage(null, "Email notification failed, invalid login or password: " + afe);
                 } catch (Exception ex) {
                     MessageDialog.showMessage(null, "Email notification failed: " + ex);
                 } finally {

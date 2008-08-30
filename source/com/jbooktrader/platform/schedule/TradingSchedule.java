@@ -37,7 +37,7 @@ public class TradingSchedule {
     private int exclusionStart, exclusionEnd;
     private boolean hasExclusion;
 
-    public TradingSchedule(String startTime, String endTime, String timeZone) throws JBookTraderException {
+    public TradingSchedule(String startTime, String endTime, String timeZone) {
         tz = TimeZone.getTimeZone(timeZone);
         if (!tz.getID().equals(timeZone)) {
             String msg = "The specified time zone " + "\"" + timeZone + "\"" + " is invalid." + LINE_SEP;
@@ -56,7 +56,7 @@ public class TradingSchedule {
         text = startTime + " to " + endTime + " (" + timeZone + ")";
     }
 
-    public void setExclusion(String startExclusionTime, String endExclusionTime) throws JBookTraderException {
+    public void setExclusion(String startExclusionTime, String endExclusionTime) {
         exclusionStart = getMinutes(startExclusionTime);
         exclusionEnd = getMinutes(endExclusionTime);
         if (exclusionStart >= exclusionEnd) {
@@ -99,7 +99,7 @@ public class TradingSchedule {
     }
 
 
-    private int getMinutes(String time) throws JBookTraderException {
+    private int getMinutes(String time) {
         StringTokenizer st = new StringTokenizer(time, ":");
         int tokens = st.countTokens();
         if (tokens != 2) {

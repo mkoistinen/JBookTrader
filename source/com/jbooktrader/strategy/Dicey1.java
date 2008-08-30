@@ -2,7 +2,6 @@ package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -21,7 +20,7 @@ public class Dicey1 extends StrategyES {
     private final int entry;
 
 
-    public Dicey1(StrategyParams optimizationParams) throws JBookTraderException {
+    public Dicey1(StrategyParams optimizationParams) {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -49,9 +48,9 @@ public class Dicey1 extends StrategyES {
     public void onBookChange() {
         double directionalVolume = directionalVolumeInd.getValue();
         if (directionalVolume >= entry) {
-            setPosition(-1);
-        } else if (directionalVolume <= -entry) {
             setPosition(1);
+        } else if (directionalVolume <= -entry) {
+            setPosition(-1);
         }
     }
 }

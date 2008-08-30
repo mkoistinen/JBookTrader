@@ -34,7 +34,7 @@ public class CMEDataConverter {
     private int minutesOfDay;
     private long time, lineNumber;
 
-    public static void main(String[] args) throws JBookTraderException {
+    public static void main(String[] args) {
 
         if (args.length != 4) {
             throw new JBookTraderException("Usage: <cmeFileName> <jbtFileName> <contract> <samplingFrequency>");
@@ -47,7 +47,7 @@ public class CMEDataConverter {
     }
 
 
-    private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
+    private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) {
 
         this.contract = contract;
         marketBook = new MarketBook();
@@ -89,11 +89,9 @@ public class CMEDataConverter {
             throw new JBookTraderException("Could not find file " + outFilename);
         }
 
-        try {
-            backTestFileWriter = new BackTestFileWriter(jbtFileName, TimeZone.getTimeZone("America/New_York"), false);
-        } catch (IOException ioe) {
-            throw new JBookTraderException("Could not create file " + jbtFileName);
-        }
+
+        backTestFileWriter = new BackTestFileWriter(jbtFileName, TimeZone.getTimeZone("America/New_York"), false);
+
 
         System.out.println("Converting " + outFilename + " to " + jbtFileName);
     }
@@ -146,9 +144,14 @@ public class CMEDataConverter {
     }
 
 
-    private void parse(String line) throws ParseException {
+    private void parse(String line) {
         String dateTime = line.substring(17, 31);
-        time = cmeDateFormat.parse(dateTime).getTime();
+
+        try {
+            time = cmeDateFormat.parse(dateTime).getTime();
+        } catch (ParseException pe) {
+            throw new JBookTraderException(" Could not parse " + dateTime);
+        }
         instant.setTimeInMillis(time);
         minutesOfDay = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
         if (!(minutesOfDay >= UPDATING_START && minutesOfDay < RECORDING_END)) {

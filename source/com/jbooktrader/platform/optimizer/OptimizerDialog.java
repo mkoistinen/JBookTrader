@@ -88,7 +88,7 @@ public class OptimizerDialog extends JDialog {
         getRootPane().setDefaultButton(optimizationMapButton);
     }
 
-    private void setOptions() throws JBookTraderException {
+    private void setOptions() {
         String historicalFileName = fileNameText.getText();
 
         File file = new File(historicalFileName);

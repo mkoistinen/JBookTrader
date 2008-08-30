@@ -5,8 +5,6 @@ import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
-import java.io.*;
-
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
  * historical market depth.
@@ -17,7 +15,7 @@ public class BackTestStrategyRunner implements Runnable {
     private boolean cancelled;
     private BackTestFileReader backTestFileReader;
 
-    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) throws IOException, JBookTraderException {
+    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
 

@@ -14,7 +14,6 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
-import java.io.*;
 import java.util.*;
 
 
@@ -86,7 +85,7 @@ public class TraderAssistant {
     }
 
 
-    public void connect() throws JBookTraderException {
+    public void connect() {
         if (socket == null || !socket.isConnected()) {
             eventReport.report("Connecting to TWS");
 
@@ -200,7 +199,7 @@ public class TraderAssistant {
         }
     }
 
-    public synchronized void addStrategy(Strategy strategy) throws IOException, JBookTraderException {
+    public synchronized void addStrategy(Strategy strategy) {
         nextStrategyID++;
         strategies.put(nextStrategyID, strategy);
         Dispatcher.Mode mode = Dispatcher.getMode();
@@ -277,7 +276,7 @@ public class TraderAssistant {
         this.isConnected = isConnected;
     }
 
-    private void checkAccountType() throws JBookTraderException {
+    private void checkAccountType() {
         socket.reqAccountUpdates(true, advisorAccountID);
 
         try {

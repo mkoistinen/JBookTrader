@@ -135,8 +135,7 @@ public abstract class Strategy {
 
     protected void addIndicator(Indicator indicator) {
         indicator.setMarketBook(marketBook);
-        String name = indicator.getClass().getSimpleName();
-        ChartableIndicator chartableIndicator = new ChartableIndicator(name, indicator);
+        ChartableIndicator chartableIndicator = new ChartableIndicator(indicator);
         indicators.add(chartableIndicator);
         strategyReportManager.addHeader(indicator);
     }
@@ -172,7 +171,7 @@ public abstract class Strategy {
         return name;
     }
 
-    public void updateIndicators() throws JBookTraderException {
+    public void updateIndicators() {
         hasValidIndicators = true;
         long time = marketBook.getLastMarketSnapshot().getTime();
         for (ChartableIndicator chartableIndicator : indicators) {
@@ -193,7 +192,7 @@ public abstract class Strategy {
     }
 
 
-    public void process() throws JBookTraderException {
+    public void process() {
         if (isActive() && marketBook.size() > 0) {
             MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
             long instant = marketSnapshot.getTime();
