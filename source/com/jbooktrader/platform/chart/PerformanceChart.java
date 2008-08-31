@@ -95,7 +95,7 @@ public class PerformanceChart {
                 BarSize barSize = BarSize.getBarSize(item);
 
                 if (barSize == BarSize.Second1) {
-                    int bookSize = performanceChartData.getMarketBookSize();
+                    int bookSize = strategy.getMarketBook().size();
                     if (bookSize > 1000000) {// about 2 months of 1-second data
                         String msg = "Bar size is too small for this historical data set.";
                         MessageDialog.showError(chartFrame, msg);

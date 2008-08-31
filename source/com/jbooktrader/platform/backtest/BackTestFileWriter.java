@@ -95,11 +95,7 @@ public final class BackTestFileWriter {
 
             writeHeader();
 
-            // make a defensive copy to prevent concurrent modification
-            List<MarketSnapshot> marketSnapshots = new ArrayList<MarketSnapshot>();
-            marketSnapshots.addAll(marketBook.getAll());
-
-            for (MarketSnapshot marketSnapshot : marketSnapshots) {
+            for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
                 write(marketSnapshot, false);
             }
             writer.flush();

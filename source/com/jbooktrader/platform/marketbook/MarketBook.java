@@ -7,31 +7,29 @@ import com.jbooktrader.platform.marketindex.*;
 import java.util.*;
 
 /**
- * Holds market depth history for a trading instrument.
+ * Holds history of market snapshots for a trading instrument.
  */
 public class MarketBook {
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final LinkedList<MarketSnapshot> marketSnapshots;
     private final LinkedList<MarketDepthItem> bids, asks;
+    private final String name;
+    private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
-    private String name;
-    private TimeZone timeZone;
     private double lowBalance, highBalance, lastBalance;
     private int cumulativeVolume, previousCumulativeVolume;
     private double tick, trin, vix;
 
-    public MarketBook() {
+    public MarketBook(String name, TimeZone timeZone) {
+        this.name = name;
+        this.timeZone = timeZone;
         marketSnapshots = new LinkedList<MarketSnapshot>();
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
-        this.timeZone = timeZone;
+    public MarketBook() {
+        this(null, null);
     }
 
     public void save(MarketSnapshot marketSnapshot) {

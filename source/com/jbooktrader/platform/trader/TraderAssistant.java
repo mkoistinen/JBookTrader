@@ -143,9 +143,7 @@ public class TraderAssistant {
         Integer ticker = tickers.get(instrument);
         MarketBook marketBook;
         if (ticker == null) {
-            marketBook = new MarketBook();
-            marketBook.setName(instrument);
-
+            marketBook = new MarketBook(instrument, strategy.getTradingSchedule().getTimeZone());
             tickerId++;
             tickers.put(instrument, tickerId);
             marketBooks.put(tickerId, marketBook);
@@ -216,7 +214,9 @@ public class TraderAssistant {
 
     public synchronized void removeAllStrategies() {
         strategies.clear();
+        openOrders.clear();
         tickers.clear();
+        indexes.clear();
         subscribedTickers.clear();
         marketBooks.clear();
     }

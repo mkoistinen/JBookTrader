@@ -28,6 +28,8 @@ public class BackTester {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
+        indicatorManager.setMarketBook(marketBook);
+
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         long marketDepthCounter = 0;

@@ -138,8 +138,8 @@ public abstract class Strategy {
         positionManager = new PositionManager(this);
         strategyReportManager = new StrategyReportManager(this);
         marketBook = Dispatcher.getTrader().getAssistant().createMarketBook(this);
-        marketBook.setTimeZone(tradingSchedule.getTimeZone());
-        indicatorManager = new IndicatorManager(marketBook);
+        indicatorManager = new IndicatorManager();
+        indicatorManager.setMarketBook(marketBook);
     }
 
     public MarketBook getMarketBook() {

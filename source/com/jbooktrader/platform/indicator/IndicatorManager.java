@@ -10,19 +10,18 @@ import java.util.*;
  *
  */
 public class IndicatorManager {
-
-    private MarketBook marketBook;
     private final List<ChartableIndicator> indicators;
     private final boolean isOptimizationMode;
+    private MarketBook marketBook;    
     private boolean hasValidIndicators;
 
-    public IndicatorManager(MarketBook marketBook) {
-        this.marketBook = marketBook;
+    public IndicatorManager() {
         indicators = new LinkedList<ChartableIndicator>();
         isOptimizationMode = (Dispatcher.getMode() == Optimization);
     }
 
     public void setMarketBook(MarketBook marketBook) {
+        this.marketBook = marketBook;
         for (ChartableIndicator chartableIndicator : indicators) {
             chartableIndicator.getIndicator().setMarketBook(marketBook);
         }
@@ -33,7 +32,6 @@ public class IndicatorManager {
     }
 
     public void addIndicator(Indicator indicator) {
-        indicator.setMarketBook(marketBook);
         ChartableIndicator chartableIndicator = new ChartableIndicator(indicator);
         indicators.add(chartableIndicator);
     }

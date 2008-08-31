@@ -21,20 +21,12 @@ public class PerformanceChartData {
         this.strategy = strategy;
     }
 
-    public int getMarketBookSize() {
-        return strategy.getMarketBook().size();
-    }
-
     public TimeSeries getProfitAndLossSeries() {
         NetProfitHistory netProfitHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
         TimeSeries ts = new TimeSeries("P&L", Second.class);
         ts.setRangeDescription("P&L");
 
-        // make a defensive copy to prevent concurrent modification
-        List<TimedValue> profitAndLossHistory = new ArrayList<TimedValue>();
-        profitAndLossHistory.addAll(netProfitHistory.getHistory());
-
-        for (TimedValue profitAndLoss : profitAndLossHistory) {
+        for (TimedValue profitAndLoss : netProfitHistory.getHistory()) {
             ts.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
         }
 
