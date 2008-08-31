@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
 
+import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
@@ -26,6 +27,7 @@ public class BackTester {
     public void execute() {
         MarketBook marketBook = strategy.getMarketBook();
         PositionManager positionManager = strategy.getPositionManager();
+        IndicatorManager indicatorManager = strategy.getIndicatorManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
 
         long marketDepthCounter = 0;
@@ -37,10 +39,10 @@ public class BackTester {
             marketBook.add(marketSnapshot);
             long instant = marketBook.getLastMarketSnapshot().getTime();
             strategy.setTime(instant);
-            strategy.updateIndicators();
+            indicatorManager.updateIndicators();
 
             if (tradingSchedule.contains(instant)) {
-                if (strategy.hasValidIndicators()) {
+                if (strategy.getIndicatorManager().hasValidIndicators()) {
                     strategy.onBookChange();
                 }
             } else {

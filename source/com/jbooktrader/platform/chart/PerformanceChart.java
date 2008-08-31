@@ -108,7 +108,7 @@ public class PerformanceChart {
                 pricePlot.setDataset(priceDataset);
 
                 int index = -1;
-                for (ChartableIndicator chartableIndicator : strategy.getIndicators()) {
+                for (ChartableIndicator chartableIndicator : strategy.getIndicatorManager().getIndicators()) {
                     OHLCDataset ds = performanceChartData.getIndicatorDataset(chartableIndicator, frequency);
                     indicatorPlots.get(++index).setDataset(ds);
                 }
@@ -304,7 +304,7 @@ public class PerformanceChart {
         combinedPlot.add(pricePlot, PRICE_PLOT_WEIGHT);
 
         // indicator plots
-        for (ChartableIndicator chartableIndicator : strategy.getIndicators()) {
+        for (ChartableIndicator chartableIndicator : strategy.getIndicatorManager().getIndicators()) {
             NumberAxis indicatorAxis = new NumberAxis(chartableIndicator.getName());
             indicatorAxis.setLabelFont(new Font("Arial Narrow", Font.PLAIN, 11));
             OHLCDataset ds = performanceChartData.getIndicatorDataset(chartableIndicator, frequency);

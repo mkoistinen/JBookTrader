@@ -68,7 +68,7 @@ public class StrategyReportManager {
         strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
 
 
-        for (ChartableIndicator chartableIndicator : strategy.getIndicators()) {
+        for (ChartableIndicator chartableIndicator : strategy.getIndicatorManager().getIndicators()) {
             strategyReportColumns.add(df2.format(chartableIndicator.getIndicator().getValue()));
         }
 

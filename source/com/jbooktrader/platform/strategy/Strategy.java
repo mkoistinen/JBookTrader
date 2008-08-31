@@ -12,8 +12,6 @@ import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
 
-import java.util.*;
-
 /**
  * Base class for all classes that implement trading strategies.
  */
@@ -23,14 +21,13 @@ public abstract class Strategy {
     private MarketBook marketBook;
     private final Report eventReport;
     private final String name;
-    private final List<ChartableIndicator> indicators;
-    private final boolean isOptimizationMode;
     private Contract contract;
     private TradingSchedule tradingSchedule;
     private PositionManager positionManager;
     private PerformanceManager performanceManager;
     private StrategyReportManager strategyReportManager;
-    private boolean isActive, hasValidIndicators;
+    private IndicatorManager indicatorManager;
+    private boolean isActive;
     private int position;
     private long time;
 
@@ -52,16 +49,12 @@ public abstract class Strategy {
         }
 
         name = getClass().getSimpleName();
-        indicators = new LinkedList<ChartableIndicator>();
         eventReport = Dispatcher.getReporter();
-        isOptimizationMode = (Dispatcher.getMode() == Optimization);
     }
 
     public void setMarketBook(MarketBook marketBook) {
         this.marketBook = marketBook;
-        for (ChartableIndicator chartableIndicator : indicators) {
-            chartableIndicator.getIndicator().setMarketBook(marketBook);
-        }
+        indicatorManager.setMarketBook(marketBook);
     }
 
     public boolean isActive() {
@@ -70,11 +63,6 @@ public abstract class Strategy {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
-    }
-
-
-    public boolean hasValidIndicators() {
-        return hasValidIndicators;
     }
 
     public int getPosition() {
@@ -121,6 +109,10 @@ public abstract class Strategy {
         return strategyReportManager;
     }
 
+    public IndicatorManager getIndicatorManager() {
+        return indicatorManager;
+    }
+
     public TradingSchedule getTradingSchedule() {
         return tradingSchedule;
     }
@@ -134,14 +126,8 @@ public abstract class Strategy {
     }
 
     protected void addIndicator(Indicator indicator) {
-        indicator.setMarketBook(marketBook);
-        ChartableIndicator chartableIndicator = new ChartableIndicator(indicator);
-        indicators.add(chartableIndicator);
+        indicatorManager.addIndicator(indicator);
         strategyReportManager.addHeader(indicator);
-    }
-
-    public List<ChartableIndicator> getIndicators() {
-        return indicators;
     }
 
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) {
@@ -153,10 +139,7 @@ public abstract class Strategy {
         strategyReportManager = new StrategyReportManager(this);
         marketBook = Dispatcher.getTrader().getAssistant().createMarketBook(this);
         marketBook.setTimeZone(tradingSchedule.getTimeZone());
-    }
-
-    protected MarketSnapshot getLastMarketDepth() {
-        return marketBook.getLastMarketSnapshot();
+        indicatorManager = new IndicatorManager(marketBook);
     }
 
     public MarketBook getMarketBook() {
@@ -171,36 +154,15 @@ public abstract class Strategy {
         return name;
     }
 
-    public void updateIndicators() {
-        hasValidIndicators = true;
-        long time = marketBook.getLastMarketSnapshot().getTime();
-        for (ChartableIndicator chartableIndicator : indicators) {
-            Indicator indicator = chartableIndicator.getIndicator();
-            try {
-                indicator.calculate();
-                if (!isOptimizationMode) {
-                    chartableIndicator.add(time, indicator.getValue());
-                }
-            } catch (IndexOutOfBoundsException iob) {
-                hasValidIndicators = false;
-                // This exception will occur if book size is insufficient to calculate
-                // the indicator. This is normal.
-            } catch (Exception e) {
-                throw new JBookTraderException(e);
-            }
-        }
-    }
-
-
     public void process() {
         if (isActive() && marketBook.size() > 0) {
             MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
             long instant = marketSnapshot.getTime();
             setTime(instant);
-            updateIndicators();
+            indicatorManager.updateIndicators();
 
             if (tradingSchedule.contains(instant)) {
-                if (hasValidIndicators()) {
+                if (indicatorManager.hasValidIndicators()) {
                     onBookChange();
                 }
             } else {
