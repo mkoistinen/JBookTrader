@@ -15,7 +15,7 @@ import java.util.*;
  * Scroll bar for a combined chart where the horizontal axis represents dates
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
-    private static final int STEPS = 10000;
+    private static final int STEPS = 100000;
     private final DateAxis dateAxis;
     private final Range range;
     private final CombinedDomainXYPlot combinedDomainPlot;
@@ -78,6 +78,7 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
 
 
     public void axisChanged(AxisChangeEvent event) {
+        rangeUpdate();
         Timeline timeLine = dateAxis.getTimeline();
         rangeMin = timeLine.toTimelineValue((long) range.getLowerBound());
         double rangeMax = timeLine.toTimelineValue((long) range.getUpperBound());
@@ -106,6 +107,5 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
         }
 
         dateAxis.setRange(start, end);
-        rangeUpdate();
     }
 }
