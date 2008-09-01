@@ -17,17 +17,15 @@ public class Rider extends StrategyES {
     private static final String FAST_PERIOD = "FastPeriod";
     private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int entry, exit;
+    private final int entry;
 
 
     public Rider(StrategyParams optimizationParams) {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        exit = getParam(EXIT);
         Indicator balanceInd = new DepthBalance();
         balanceVelocityInd = new Velocity(balanceInd, getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(balanceInd);
@@ -42,10 +40,9 @@ public class Rider extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 80, 300, 50, 125);
-        addParam(SLOW_PERIOD, 300, 900, 50, 600);
-        addParam(ENTRY, 0, 30, 5, 16);
-        addParam(EXIT, 0, 30, 5, 10);
+        addParam(FAST_PERIOD, 1, 100, 50, 30);
+        addParam(SLOW_PERIOD, 200, 900, 100, 405);
+        addParam(ENTRY, 15, 45, 1, 25);
     }
 
     /**
@@ -59,14 +56,6 @@ public class Rider extends StrategyES {
             setPosition(1);
         } else if (balanceVelocity <= -entry) {
             setPosition(-1);
-        } else {
-            int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && balanceVelocity <= -exit) {
-                setPosition(0);
-            }
-            if (currentPosition < 0 && balanceVelocity >= exit) {
-                setPosition(0);
-            }
         }
     }
 }
