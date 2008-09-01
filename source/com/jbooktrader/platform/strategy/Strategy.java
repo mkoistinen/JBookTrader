@@ -139,7 +139,6 @@ public abstract class Strategy {
         strategyReportManager = new StrategyReportManager(this);
         marketBook = Dispatcher.getTrader().getAssistant().createMarketBook(this);
         indicatorManager = new IndicatorManager();
-        indicatorManager.setMarketBook(marketBook);
     }
 
     public MarketBook getMarketBook() {

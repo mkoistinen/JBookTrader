@@ -198,6 +198,7 @@ public class TraderAssistant {
     }
 
     public synchronized void addStrategy(Strategy strategy) {
+        strategy.getIndicatorManager().setMarketBook(strategy.getMarketBook());
         nextStrategyID++;
         strategies.put(nextStrategyID, strategy);
         Dispatcher.Mode mode = Dispatcher.getMode();
