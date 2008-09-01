@@ -67,17 +67,7 @@ public class StrategyReportManager {
         strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");
         strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
 
-
-        for (ChartableIndicator chartableIndicator : strategy.getIndicatorManager().getIndicators()) {
-            strategyReportColumns.add(df2.format(chartableIndicator.getIndicator().getValue()));
-        }
-
         strategyReport.report(strategyReportColumns, sdf.format(strategy.getTime()));
-    }
-
-
-    public void addHeader(Indicator indicator) {
-        strategyReportHeaders.add(indicator.getClass().getSimpleName());
     }
 
 }

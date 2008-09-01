@@ -127,7 +127,6 @@ public abstract class Strategy {
 
     protected void addIndicator(Indicator indicator) {
         indicatorManager.addIndicator(indicator);
-        strategyReportManager.addHeader(indicator);
     }
 
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) {
