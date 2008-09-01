@@ -22,7 +22,6 @@ public class BackTestStrategyRunner implements Runnable {
         boolean isOptimizationMode = (Dispatcher.getMode() == Optimization);
         if (!isOptimizationMode) {
             Dispatcher.getTrader().getAssistant().addStrategy(strategy);
-            Dispatcher.getReporter().report(strategy.getName() + ": strategy started");
         }
     }
 

@@ -18,7 +18,7 @@ public class MarketBook {
     private BackTestFileWriter backTestFileWriter;
     private double lowBalance, highBalance, lastBalance;
     private int cumulativeVolume, previousCumulativeVolume;
-    private double tick, trin, vix;
+    private double tick;
 
     public MarketBook(String name, TimeZone timeZone) {
         this.name = name;
@@ -100,7 +100,7 @@ public class MarketBook {
             double bestBid = bids.getFirst().getPrice();
             double bestAsk = asks.getFirst().getPrice();
             marketSnapshot = new MarketSnapshot(time, (int) Math.round(lowBalance), (int) Math.round(highBalance), bestBid, bestAsk, volume,
-                    tick, trin, vix);
+                    tick);
 
             // initialize next market depth values
             previousCumulativeVolume = cumulativeVolume;
@@ -114,12 +114,6 @@ public class MarketBook {
         switch (marketIndex) {
             case Tick:
                 tick = value;
-                break;
-            case Trin:
-                trin = value;
-                break;
-            case Vix:
-                vix = value;
                 break;
         }
     }

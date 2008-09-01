@@ -71,9 +71,7 @@ public final class BackTestFileWriter {
         sb.append(decimalFormat.format(marketSnapshot.getBestBid())).append(",");
         sb.append(decimalFormat.format(marketSnapshot.getBestAsk())).append(",");
         sb.append(decimalFormat.format(marketSnapshot.getVolume())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getTick())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getTrin())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getVix()));
+        sb.append(decimalFormat.format(marketSnapshot.getTick()));
 
         writer.println(sb);
         if (flush) {
@@ -117,8 +115,6 @@ public final class BackTestFileWriter {
         header.append("# 6. best ask price at the period's end").append(LINE_SEP);
         header.append("# 7. period's volume of traded contracts").append(LINE_SEP);
         header.append("# 8. NYSE TICK at the period's end").append(LINE_SEP);
-        header.append("# 9. NYSE TRIN at the period's end").append(LINE_SEP);
-        header.append("# 10. CBOE VIX at the period's end").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

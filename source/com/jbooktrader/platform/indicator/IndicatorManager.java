@@ -12,7 +12,7 @@ import java.util.*;
 public class IndicatorManager {
     private final List<ChartableIndicator> indicators;
     private final boolean isOptimizationMode;
-    private MarketBook marketBook;    
+    private MarketBook marketBook;
     private boolean hasValidIndicators;
 
     public IndicatorManager() {

@@ -13,7 +13,7 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
-    public final static int COLUMNS = 10;
+    public final static int COLUMNS = 8;
     private static final String LINE_SEP = System.getProperty("line.separator");
 
     private final LinkedList<MarketSnapshot> marketSnapshots;
@@ -55,7 +55,6 @@ public class BackTestFileReader {
 
     public void load() {
         Report report = Dispatcher.getReporter();
-        report.report("Scanning historical market data file");
         String line = "";
         int lineNumber = 0;
 
@@ -97,8 +96,6 @@ public class BackTestFileReader {
                 report.report(ioe);
             }
         }
-
-        report.report("Scanning historical market data file completed");
     }
 
 
@@ -138,11 +135,8 @@ public class BackTestFileReader {
         double bestAsk = Double.parseDouble(st.nextToken());
         int volume = Integer.parseInt(st.nextToken());
         double tick = Double.parseDouble(st.nextToken());
-        double trin = Double.parseDouble(st.nextToken());
-        double vix = Double.parseDouble(st.nextToken());
 
-
-        return new MarketSnapshot(time, lowBalance, highBalance, bestBid, bestAsk, volume, tick, trin, vix);
+        return new MarketSnapshot(time, lowBalance, highBalance, bestBid, bestAsk, volume, tick);
     }
 }
 

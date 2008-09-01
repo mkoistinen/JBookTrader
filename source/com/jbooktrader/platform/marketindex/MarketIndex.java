@@ -7,7 +7,7 @@ import java.util.*;
 
 public enum MarketIndex {
 
-    Tick("TICK-NYSE", "NYSE"), Trin("TRIN-NYSE", "NYSE"), Vix("VIX", "CBOE");
+    Tick("TICK-NYSE", "NYSE");
 
     private final String ticker;
     private final Contract contract;

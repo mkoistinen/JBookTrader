@@ -1,5 +1,7 @@
 package com.jbooktrader.strategy;
 
+import com.jbooktrader.indicator.depth.*;
+import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -7,10 +9,11 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Dicey1 extends StrategyES {
+public class Dicey extends StrategyES {
 
     // Technical indicators
     private final Indicator directionalVolumeInd;
+    private final Indicator rsiInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
@@ -20,12 +23,16 @@ public class Dicey1 extends StrategyES {
     private final int entry;
 
 
-    public Dicey1(StrategyParams optimizationParams) {
+    public Dicey(StrategyParams optimizationParams) {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
         directionalVolumeInd = new DirectionalVolume(getParam(PERIOD));
+        rsiInd = new PriceRSI(getParam(PERIOD));
+        Indicator balanceEmaInd = new DepthBalanceEMA(getParam(PERIOD));
         addIndicator(directionalVolumeInd);
+        addIndicator(rsiInd);
+        addIndicator(balanceEmaInd);
     }
 
     /**
@@ -36,8 +43,8 @@ public class Dicey1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 60, 125, 1, 96);
-        addParam(ENTRY, 35, 50, 1, 41);
+        addParam(PERIOD, 50, 300, 10, 195);
+        addParam(ENTRY, 35, 80, 1, 74);
     }
 
     /**
@@ -47,10 +54,12 @@ public class Dicey1 extends StrategyES {
     @Override
     public void onBookChange() {
         double directionalVolume = directionalVolumeInd.getValue();
-        if (directionalVolume >= entry) {
-            setPosition(1);
-        } else if (directionalVolume <= -entry) {
+        double rsi = rsiInd.getValue() - 50;
+        double strength = directionalVolume + rsi;
+        if (strength >= entry) {
             setPosition(-1);
+        } else if (strength <= -entry) {
+            setPosition(1);
         }
     }
 }

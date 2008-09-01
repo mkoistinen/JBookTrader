@@ -8,9 +8,9 @@ public class MarketSnapshot {
     private final int lowBalance, highBalance;
     private final double bestBid, bestAsk;
     private final int volume;
-    private final double tick, trin, vix;
+    private final double tick;
 
-    public MarketSnapshot(long time, int lowBalance, int highBalance, double bestBid, double bestAsk, int volume, double tick, double trin, double vix) {
+    public MarketSnapshot(long time, int lowBalance, int highBalance, double bestBid, double bestAsk, int volume, double tick) {
         this.time = time;
         this.lowBalance = lowBalance;
         this.highBalance = highBalance;
@@ -18,8 +18,6 @@ public class MarketSnapshot {
         this.bestAsk = bestAsk;
         this.volume = volume;
         this.tick = tick;
-        this.trin = trin;
-        this.vix = vix;
     }
 
     public int getLowBalance() {
@@ -54,14 +52,6 @@ public class MarketSnapshot {
         return tick;
     }
 
-    public double getTrin() {
-        return trin;
-    }
-
-    public double getVix() {
-        return vix;
-    }
-
     public double getMidPrice() {
         return (bestBid + bestAsk) / 2;
     }
@@ -76,8 +66,6 @@ public class MarketSnapshot {
         marketDepth.append(" best ask: ").append(bestAsk);
         marketDepth.append(" volume: ").append(volume);
         marketDepth.append(" tick: ").append(tick);
-        marketDepth.append(" trin: ").append(trin);
-        marketDepth.append(" vix: ").append(vix);
 
         return marketDepth.toString();
     }
