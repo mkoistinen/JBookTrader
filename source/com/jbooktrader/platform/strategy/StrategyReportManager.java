@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.strategy;
 
-import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
