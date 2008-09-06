@@ -129,12 +129,16 @@ public class MarketBook {
         List<MarketDepthItem> items = (side == MarketDepthSide.Bid) ? bids : asks;
         switch (operation) {
             case Insert:
-                items.add(position, new MarketDepthItem(size, price));
+                if (position <= items.size()) {
+                    items.add(position, new MarketDepthItem(size, price));
+                }
                 break;
             case Update:
-                MarketDepthItem item = items.get(position);
-                item.setSize(size);
-                item.setPrice(price);
+                if (position < items.size()) {
+                    MarketDepthItem item = items.get(position);
+                    item.setSize(size);
+                    item.setPrice(price);
+                }
                 break;
             case Delete:
                 if (position < items.size()) {
