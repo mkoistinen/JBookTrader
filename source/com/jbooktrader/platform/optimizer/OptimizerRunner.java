@@ -1,51 +1,57 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.*;
-import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.report.*;
-import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import java.lang.reflect.*;
 import java.text.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    private static final int MAX_RESULTS = 10000;// max number of rows in the "optimization results" table
-    private static final long UPDATE_FREQUENCY = 4000000L;// lines
+    protected final OptimizerDialog optimizerDialog;
+    protected final LinkedList<OptimizationResult> optimizationResults;
+    protected final StrategyParams strategyParams;
+    protected final Constructor<?> strategyConstructor;
+    protected int lineCount;
+    protected boolean cancelled;
+    protected final int availableProcessors;
 
+    private static final int MAX_RESULTS = 10000;// max number of rows in the "optimization results" table
+    private final ScheduledExecutorService progressExecutor;
     private final NumberFormat nf2, nf0;
     private final String strategyName;
-    private final TradingSchedule tradingSchedule;
     private final int minTrades;
-    private final OptimizerDialog optimizerDialog;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private BackTestFileReader backTestFileReader;
     private long completedSteps;
+    private long totalSteps, totalStrategies;
+    private ExecutorService executor;
 
-    protected final List<OptimizationResult> optimizationResults;
-    protected final StrategyParams strategyParams;
-    protected final Constructor<?> strategyConstructor;
-    protected boolean cancelled;
-    protected int lineCount;
-    protected MarketBook marketBook;
+    class ProgressRunner implements Runnable {
+        public void run() {
+            if (completedSteps > 0) {
+                showFastProgress(completedSteps, "Optimizing " + totalStrategies + " strategies");
+            }
+        }
+    }
 
     OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) {
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
-        tradingSchedule = strategy.getTradingSchedule();
-        optimizationResults = new ArrayList<OptimizationResult>();
+        optimizationResults = new LinkedList<OptimizationResult>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
+        availableProcessors = Runtime.getRuntime().availableProcessors();
 
         Class<?> clazz;
         try {
@@ -62,77 +68,81 @@ public abstract class OptimizerRunner implements Runnable {
         }
 
         resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
-        marketBook = new MarketBook();
         minTrades = optimizerDialog.getMinTrades();
+        progressExecutor = Executors.newSingleThreadScheduledExecutor();
+        executor = Executors.newFixedThreadPool(availableProcessors);
     }
 
     protected abstract void optimize();
 
-    private void setTotalSteps(long totalSteps) {
+    public void setTotalSteps(long totalSteps) {
+        this.totalSteps = totalSteps;
         if (timeEstimator == null) {
             timeEstimator = new ComputationalTimeEstimator(System.currentTimeMillis(), totalSteps);
         }
         timeEstimator.setTotalIterations(totalSteps);
     }
 
+    public void setTotalStrategies(long totalStrategies) {
+        this.totalStrategies = totalStrategies;
+    }
 
-    void execute(List<Strategy> strategies, int count, long totalSteps) {
-        String progressText = "Optimizing";
-        if (count > 0) {
-            progressText += " " + count + " strategies";
+    public int getMinTrades() {
+        return minTrades;
+    }
+
+    public BackTestFileReader getBackTestFileReader() {
+        return backTestFileReader;
+    }
+
+    void execute(List<Strategy> strategies) {
+
+        int size = strategies.size();
+        if (size == 0) {
+            return;
         }
 
-        marketBook.getAll().clear();
-        setTotalSteps(totalSteps);
+        int workers = availableProcessors;
+        int strategiesPerWorker = size / workers;
+        if (size < workers) {
+            workers = 1;
+            strategiesPerWorker = size;
+        }
 
-        for (MarketSnapshot marketSnapshot : backTestFileReader.getAll()) {
-            marketBook.add(marketSnapshot);
+        int fromIndex = 0;
+        Set<Future<List<OptimizationResult>>> set = new HashSet<Future<List<OptimizationResult>>>();
 
-            long time = marketSnapshot.getTime();
-            boolean inSchedule = tradingSchedule.contains(time);
+        for (int worker = 0; worker < workers; worker++) {
+            int toIndex = fromIndex + strategiesPerWorker;
+            if (worker == workers - 1) {
+                toIndex = size;
+            }
 
-            for (Strategy strategy : strategies) {
-                strategy.setTime(time);
-                strategy.getIndicatorManager().updateIndicators();
-                if (inSchedule) {
-                    if (strategy.getIndicatorManager().hasValidIndicators()) {
-                        strategy.onBookChange();
-                    }
-                } else {
-                    strategy.closePosition();// force flat position
-                }
+            List<Strategy> workerStrategies = strategies.subList(fromIndex, toIndex);
+            Callable<List<OptimizationResult>> callable = new OptimizerWorker(this, workerStrategies);
+            Future<List<OptimizationResult>> future = executor.submit(callable);
+            set.add(future);
+            fromIndex = toIndex;
+        }
 
-                strategy.getPositionManager().trade();
-
-                completedSteps++;
-                if (completedSteps % UPDATE_FREQUENCY == 0) {
-                    showFastProgress(completedSteps, totalSteps, progressText);
-                }
-                if (cancelled) {
-                    return;
-                }
+        for (Future<List<OptimizationResult>> future : set) {
+            try {
+                List<OptimizationResult> results = future.get();
+                optimizationResults.addAll(results);
+            } catch (Exception e) {
+                throw new JBookTraderException(e);
             }
         }
-
-        for (Strategy strategy : strategies) {
-            strategy.closePosition();
-            strategy.getPositionManager().trade();
-
-            PerformanceManager performanceManager = strategy.getPerformanceManager();
-            int trades = performanceManager.getTrades();
-
-            if (trades >= minTrades) {
-                OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
-                optimizationResults.add(optimizationResult);
-            }
-        }
-
         showResults();
     }
 
-
     public void cancel() {
+        optimizerDialog.showProgress("Stopping optimization...");
         cancelled = true;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     private void saveToFile() {
@@ -183,19 +193,22 @@ public abstract class OptimizerRunner implements Runnable {
         Report.disable();
     }
 
-    private void showResults() {
+    public void showResults() {
         Collections.sort(optimizationResults, resultComparator);
         while (optimizationResults.size() > MAX_RESULTS) {
-            optimizationResults.remove(optimizationResults.size() - 1);
+            optimizationResults.removeLast();
         }
         optimizerDialog.setResults(optimizationResults);
     }
 
-    private void showFastProgress(long counter, long numberOfTasks, String text) {
-        String remainingTime = (counter == numberOfTasks) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
-        optimizerDialog.setProgress(counter, numberOfTasks, text, remainingTime);
+    public void showFastProgress(long counter, String text) {
+        String remainingTime = (counter == totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
+        optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
     }
 
+    public synchronized void iterationsCompleted(long iterationsCompleted) {
+        completedSteps += iterationsCompleted;
+    }
 
     protected LinkedList<StrategyParams> getTasks(StrategyParams params) {
         for (StrategyParam param : params.getAll()) {
@@ -245,21 +258,25 @@ public abstract class OptimizerRunner implements Runnable {
                 return;
             }
 
-            long start = System.currentTimeMillis();
             optimizerDialog.showProgress("Starting optimization ...");
+            progressExecutor.scheduleWithFixedDelay(new ProgressRunner(), 0, 1, TimeUnit.SECONDS);
+            long start = System.currentTimeMillis();
             optimize();
+            long end = System.currentTimeMillis();
+            progressExecutor.shutdownNow();
 
             if (!cancelled) {
                 optimizerDialog.showProgress("Saving optimization results ...");
                 saveToFile();
-                long totalTimeInSecs = (System.currentTimeMillis() - start) / 1000;
-                showFastProgress(100, 100, "Optimization");
+                long totalTimeInSecs = (end - start) / 1000;
+                showFastProgress(totalSteps, "Optimization");
                 MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
             MessageDialog.showError(optimizerDialog, t.toString());
         } finally {
+            progressExecutor.shutdownNow();
             optimizerDialog.signalCompleted();
         }
     }
