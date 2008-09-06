@@ -45,9 +45,9 @@ public class TickFader extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 1, 100, 1, 60);
-        addParam(BALANCE_ENTRY, 0, 50, 1, 23);
-        addParam(TICK_ENTRY, 0, 500, 25, 157);
+        addParam(PERIOD, 5, 500, 5, 227);
+        addParam(BALANCE_ENTRY, 10, 50, 1, 16);
+        addParam(TICK_ENTRY, 0, 500, 25, 135);
     }
 
     /**
