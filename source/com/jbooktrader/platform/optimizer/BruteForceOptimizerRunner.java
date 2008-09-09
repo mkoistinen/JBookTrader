@@ -3,6 +3,7 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -32,6 +33,8 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
                 try {
                     Strategy strategy = (Strategy) strategyConstructor.newInstance(params);
                     strategies.add(strategy);
+                } catch (InvocationTargetException ite) {
+                	throw new JBookTraderException(new Exception(ite.getCause()));
                 } catch (Exception e) {
                     throw new JBookTraderException(e);
                 }
