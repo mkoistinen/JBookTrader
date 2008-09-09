@@ -18,7 +18,7 @@ public final class RawDataFileWriter {
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
-    public RawDataFileWriter(String fileName, TimeZone timeZone) {
+    public RawDataFileWriter(String fileName, TimeZone timeZone) throws JBookTraderException {
         this.timeZone = timeZone;
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {

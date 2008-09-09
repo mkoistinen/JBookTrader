@@ -20,7 +20,7 @@ public class Dispatcher {
     private static Mode mode;
     private static int activeStrategies;
 
-    public static void setReporter(String eventReportFileName) {
+    public static void setReporter(String eventReportFileName) throws JBookTraderException {
         eventReport = new Report(eventReportFileName);
     }
 
@@ -66,7 +66,7 @@ public class Dispatcher {
         System.exit(0);
     }
 
-    public static void setMode(Mode mode) {
+    public static void setMode(Mode mode) throws JBookTraderException {
         Dispatcher.mode = mode;
         eventReport.report("Mode set to: " + mode);
 

@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.util;
 
 import com.jbooktrader.platform.model.*;
+
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 
@@ -35,7 +36,7 @@ public class SecureMailSender {
             }
         }
 
-        public void send(boolean debug) {
+        public void send(boolean debug) throws JBookTraderException {
             Session mailSession = Session.getDefaultInstance(props);
             mailSession.setDebug(debug);
 
@@ -90,7 +91,7 @@ public class SecureMailSender {
         }
     }
 
-    static public void test(String smtpsHost, String login, String password, String from, String to, String subject) {
+    static public void test(String smtpsHost, String login, String password, String from, String to, String subject) throws JBookTraderException {
         new SecureMailSender(smtpsHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send(true);
     }
 

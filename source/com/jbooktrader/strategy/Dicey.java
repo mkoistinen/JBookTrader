@@ -4,6 +4,7 @@ import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -23,7 +24,7 @@ public class Dicey extends StrategyES {
     private final int entry;
 
 
-    public Dicey(StrategyParams optimizationParams) {
+    public Dicey(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);

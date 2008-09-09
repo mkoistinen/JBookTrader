@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.*;
+
 import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
@@ -19,7 +20,7 @@ public final class Report {
     private PrintWriter writer;
     private static boolean isDisabled;
 
-    public Report(String fileName) {
+    public Report(String fileName) throws JBookTraderException {
         String reportRendererClass = PreferencesHolder.getInstance().get(ReportRenderer);
 
         try {

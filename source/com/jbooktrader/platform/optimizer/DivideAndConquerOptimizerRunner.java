@@ -13,11 +13,11 @@ import java.util.*;
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
     private final static int TARGET_STRATEGIES_SIZE = 100;
 
-    public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) {
+    public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         super(optimizerDialog, strategy, params);
     }
 
-    public void optimize() {
+    public void optimize() throws JBookTraderException {
         List<StrategyParams> bestParamsList = new ArrayList<StrategyParams>();
         StrategyParams startingParams = new StrategyParams(strategyParams);
         bestParamsList.add(startingParams);

@@ -41,7 +41,7 @@ public class StrategyTableModel extends TableDataModel {
         return traderAssistant.getStrategy(name);
     }
 
-    public Strategy createStrategyForRow(int row) {
+    public Strategy createStrategyForRow(int row) throws JBookTraderException {
         Strategy strategy = getStrategyForRow(row);
         if (strategy != null && strategy.isActive()) {
             throw new JBookTraderException("Strategy " + strategy + " is already running.");

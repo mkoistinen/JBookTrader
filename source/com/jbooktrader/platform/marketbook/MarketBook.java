@@ -3,6 +3,7 @@ package com.jbooktrader.platform.marketbook;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.marketindex.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 
 import java.util.*;
 
@@ -16,6 +17,7 @@ public class MarketBook {
     private final String name;
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
+    private boolean backTestFileWriterDisabled = false;
     private double lowBalance, highBalance, lastBalance;
     private int cumulativeVolume, previousCumulativeVolume;
     private double tick;
@@ -33,8 +35,15 @@ public class MarketBook {
     }
 
     public void save(MarketSnapshot marketSnapshot) {
+        if (backTestFileWriterDisabled) return;
         if (backTestFileWriter == null) {
-            backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
+            try {
+                backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
+            } catch (JBookTraderException e) {
+                backTestFileWriterDisabled = true;
+                // in order to make sure this is logged in EventReport
+                throw new RuntimeException(e);
+            }
         }
         backTestFileWriter.write(marketSnapshot, true);
     }

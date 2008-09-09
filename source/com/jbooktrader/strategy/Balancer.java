@@ -3,6 +3,7 @@ package com.jbooktrader.strategy;
 import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -23,7 +24,7 @@ public class Balancer extends StrategyES {
     private final int balanceEntry, rsiEntry;
 
 
-    public Balancer(StrategyParams optimizationParams) {
+    public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         balanceEntry = getParam(BALANCE_ENTRY);

@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.strategy;
 
 import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
@@ -21,6 +22,7 @@ public class StrategyReportManager {
     private final PositionManager positionManager;
     private final PerformanceManager performanceManager;
     private Report strategyReport;
+    private boolean strategyReportDisabled = false;
 
     public StrategyReportManager(Strategy strategy) {
         this.strategy = strategy;
@@ -48,8 +50,15 @@ public class StrategyReportManager {
     }
 
     public void report() {
+        if (strategyReportDisabled) return;
         if (strategyReport == null) {
-            strategyReport = new Report(strategy.getName());
+            try {
+                strategyReport = new Report(strategy.getName());
+            } catch (JBookTraderException e) {
+                strategyReportDisabled = true;
+                // in order to make sure this is logged in EventReport
+                throw new RuntimeException(e);
+            }
             strategyReport.report(strategyReportHeaders);
         }
 

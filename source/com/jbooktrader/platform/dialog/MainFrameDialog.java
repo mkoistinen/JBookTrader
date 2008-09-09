@@ -2,6 +2,7 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
+
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.startup.*;
@@ -26,7 +27,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private JTable strategyTable;
     private JPopupMenu popupMenu;
 
-    public MainFrameDialog() {
+    public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
         init();
         populateStrategies();
@@ -141,7 +142,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         aboutMenuItem.addActionListener(action);
     }
 
-    private URL getImageURL(String imageFileName) {
+    private URL getImageURL(String imageFileName) throws JBookTraderException {
         URL imgURL = ClassLoader.getSystemResource(imageFileName);
         if (imgURL == null) {
             String msg = "Could not locate " + imageFileName + ". Make sure the /resources directory is in the classpath.";
@@ -150,12 +151,12 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         return imgURL;
     }
 
-    private ImageIcon getImageIcon(String imageFileName) {
+    private ImageIcon getImageIcon(String imageFileName) throws JBookTraderException {
         return new ImageIcon(toolkit.getImage(getImageURL(imageFileName)));
     }
 
 
-    private void populateStrategies() {
+    private void populateStrategies() throws JBookTraderException {
         ClassFinder classFinder = new ClassFinder();
         for (Strategy strategy : classFinder.getStrategies()) {
             strategyTableModel.addStrategy(strategy);
@@ -174,7 +175,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         popupMenu.show(strategyTable, mouseEvent.getX(), mouseEvent.getY());
     }
 
-    private void init() {
+    private void init() throws JBookTraderException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
 

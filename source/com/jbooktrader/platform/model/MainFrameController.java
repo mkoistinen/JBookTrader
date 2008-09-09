@@ -25,7 +25,7 @@ public class MainFrameController {
     private final StrategyTableModel strategyTableModel;
     private final PreferencesHolder prefs = PreferencesHolder.getInstance();
 
-    public MainFrameController() {
+    public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
         Dispatcher.addListener(mainViewDialog);
         int width = prefs.getInt(MainWindowWidth);
@@ -54,7 +54,7 @@ public class MainFrameController {
         }
     }
 
-    private String getSelectedStrategyName() {
+    private String getSelectedStrategyName() throws JBookTraderException {
         int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
             throw new JBookTraderException("No strategy is selected.");
@@ -63,7 +63,7 @@ public class MainFrameController {
     }
 
 
-    private Strategy getSelectedRowStrategy() {
+    private Strategy getSelectedRowStrategy() throws JBookTraderException {
         int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
             throw new JBookTraderException("No strategy is selected.");
@@ -78,7 +78,7 @@ public class MainFrameController {
         return strategy;
     }
 
-    private Strategy createSelectedRowStrategy() {
+    private Strategy createSelectedRowStrategy() throws JBookTraderException {
         int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
             throw new JBookTraderException("No strategy is selected.");

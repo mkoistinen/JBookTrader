@@ -4,6 +4,7 @@ import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.marketindex.*;
 import com.jbooktrader.platform.model.*;
+
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.position.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -85,7 +86,7 @@ public class TraderAssistant {
     }
 
 
-    public void connect() {
+    public void connect() throws JBookTraderException {
         if (socket == null || !socket.isConnected()) {
             eventReport.report("Connecting to TWS");
 
@@ -277,7 +278,7 @@ public class TraderAssistant {
         this.isConnected = isConnected;
     }
 
-    private void checkAccountType() {
+    private void checkAccountType() throws JBookTraderException {
         socket.reqAccountUpdates(true, advisorAccountID);
 
         try {

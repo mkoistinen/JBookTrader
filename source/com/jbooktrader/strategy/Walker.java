@@ -3,6 +3,7 @@ package com.jbooktrader.strategy;
 import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.derivative.*;
 import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -22,7 +23,7 @@ public class Walker extends StrategyES {
     private final int entry;
 
 
-    public Walker(StrategyParams optimizationParams) {
+    public Walker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);

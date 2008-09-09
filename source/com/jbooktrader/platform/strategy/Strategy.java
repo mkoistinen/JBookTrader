@@ -5,6 +5,7 @@ import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
+
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
@@ -89,7 +90,7 @@ public abstract class Strategy {
         return params;
     }
 
-    protected int getParam(String name) {
+    protected int getParam(String name) throws JBookTraderException {
         return params.get(name).getValue();
     }
 

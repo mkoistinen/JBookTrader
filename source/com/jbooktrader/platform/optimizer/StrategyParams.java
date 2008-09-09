@@ -22,8 +22,14 @@ public class StrategyParams {
         boolean allSame = true;
         for (StrategyParam param : params) {
             int value = param.getValue();
-            int thatValue = that.get(param.getName()).getValue();
-            if (value != thatValue) {
+            int thatValue;
+            try {
+                thatValue = that.get(param.getName()).getValue();
+                if (value != thatValue) {
+                    allSame = false;
+                    break;
+                }
+            } catch (JBookTraderException e) {
                 allSame = false;
                 break;
             }
@@ -69,7 +75,7 @@ public class StrategyParams {
     }
 
 
-    public StrategyParam get(String name) {
+    public StrategyParam get(String name) throws JBookTraderException {
         for (StrategyParam param : params) {
             if (param.getName().equals(name)) {
                 return param;

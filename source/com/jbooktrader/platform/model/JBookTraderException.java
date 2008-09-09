@@ -1,11 +1,11 @@
 package com.jbooktrader.platform.model;
 
-public class JBookTraderException extends RuntimeException {
+public class JBookTraderException extends Exception {
     public JBookTraderException(String message) {
         super(message);
     }
 
-    public JBookTraderException(Exception e) {
+    public JBookTraderException(Throwable e) {
         super(e);
     }
 

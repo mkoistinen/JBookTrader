@@ -44,7 +44,7 @@ public abstract class OptimizerRunner implements Runnable {
         }
     }
 
-    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) {
+    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
@@ -73,7 +73,7 @@ public abstract class OptimizerRunner implements Runnable {
         executor = Executors.newFixedThreadPool(availableProcessors);
     }
 
-    protected abstract void optimize();
+    protected abstract void optimize() throws JBookTraderException;
 
     public void setTotalSteps(long totalSteps) {
         this.totalSteps = totalSteps;
@@ -95,7 +95,7 @@ public abstract class OptimizerRunner implements Runnable {
         return backTestFileReader;
     }
 
-    void execute(List<Strategy> strategies) {
+    void execute(List<Strategy> strategies) throws JBookTraderException {
 
         int size = strategies.size();
         if (size == 0) {
@@ -145,7 +145,7 @@ public abstract class OptimizerRunner implements Runnable {
         return cancelled;
     }
 
-    private void saveToFile() {
+    private void saveToFile() throws JBookTraderException {
         if (optimizationResults.size() == 0) {
             return;
         }

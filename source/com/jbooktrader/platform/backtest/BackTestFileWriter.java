@@ -23,7 +23,7 @@ public final class BackTestFileWriter {
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
-    public BackTestFileWriter(Strategy strategy) {
+    public BackTestFileWriter(Strategy strategy) throws JBookTraderException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         JFileChooser fileChooser = new JFileChooser(MARKET_DATA_DIR);
         fileChooser.setDialogTitle("Save historical market depth " + strategy.getName());
@@ -41,7 +41,7 @@ public final class BackTestFileWriter {
         }
     }
 
-    public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) {
+    public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws JBookTraderException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {

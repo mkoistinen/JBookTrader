@@ -11,11 +11,11 @@ import java.util.*;
 public class BruteForceOptimizerRunner extends OptimizerRunner {
     private static final int STRATEGIES_PER_PROCESSOR = 250;
 
-    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) {
+    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         super(optimizerDialog, strategy, params);
     }
 
-    public void optimize() {
+    public void optimize() throws JBookTraderException {
         LinkedList<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();
         long totalSteps = (long) lineCount * taskSize;

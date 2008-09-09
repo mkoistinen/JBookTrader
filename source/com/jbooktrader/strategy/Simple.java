@@ -3,6 +3,7 @@ package com.jbooktrader.strategy;
 import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.model.JBookTraderException;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -21,7 +22,7 @@ public class Simple extends StrategyES {
     private final int entry;
 
 
-    public Simple(StrategyParams optimizationParams) {
+    public Simple(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);

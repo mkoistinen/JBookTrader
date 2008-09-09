@@ -22,7 +22,7 @@ public class BackTestFileReader {
     private volatile boolean cancelled;
     private BufferedReader reader;
 
-    public BackTestFileReader(String fileName) {
+    public BackTestFileReader(String fileName) throws JBookTraderException {
         marketSnapshots = new LinkedList<MarketSnapshot>();
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
@@ -39,7 +39,7 @@ public class BackTestFileReader {
         return marketSnapshots;
     }
 
-    private void getTimeZone(String line) {
+    private void getTimeZone(String line) throws JBookTraderException {
         String timeZone = line.substring(line.indexOf('=') + 1);
         TimeZone tz = TimeZone.getTimeZone(timeZone);
         if (!tz.getID().equals(timeZone)) {
@@ -53,7 +53,7 @@ public class BackTestFileReader {
         sdf.setTimeZone(tz);
     }
 
-    public void load() {
+    public void load() throws JBookTraderException {
         Report report = Dispatcher.getReporter();
         String line = "";
         int lineNumber = 0;
@@ -99,7 +99,7 @@ public class BackTestFileReader {
     }
 
 
-    private MarketSnapshot toMarketDepth(String line) {
+    private MarketSnapshot toMarketDepth(String line) throws JBookTraderException {
         if (sdf == null) {
             String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
             throw new JBookTraderException(msg);

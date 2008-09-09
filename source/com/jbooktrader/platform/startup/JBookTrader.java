@@ -23,7 +23,7 @@ public class JBookTrader {
      * Instantiates the necessary parts of the application: the application model,
      * views, and controller.
      */
-    private JBookTrader() {
+    private JBookTrader() throws JBookTraderException {
         try {
             LiquidLookAndFeel.setLiquidDecorations(true, "mac");
             UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");

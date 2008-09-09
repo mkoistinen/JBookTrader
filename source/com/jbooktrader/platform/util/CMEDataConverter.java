@@ -34,7 +34,7 @@ public class CMEDataConverter {
     private int minutesOfDay;
     private long time, lineNumber;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JBookTraderException {
 
         if (args.length != 4) {
             throw new JBookTraderException("Usage: <cmeFileName> <jbtFileName> <contract> <samplingFrequency>");
@@ -47,7 +47,7 @@ public class CMEDataConverter {
     }
 
 
-    private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) {
+    private CMEDataConverter(String cmeFileName, String jbtFileName, String contract) throws JBookTraderException {
 
         this.contract = contract;
         marketBook = new MarketBook();
@@ -144,7 +144,7 @@ public class CMEDataConverter {
     }
 
 
-    private void parse(String line) {
+    private void parse(String line) throws JBookTraderException {
         String dateTime = line.substring(17, 31);
 
         try {
