@@ -65,6 +65,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
             long totalSteps = completedSteps + (long) lineCount * iterationsRemaining * strategies.size();
             setTotalSteps(totalSteps);
+            setTotalStrategies(strategies.size());
             execute(strategies);
 
             iterationsRemaining--;
