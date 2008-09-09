@@ -52,7 +52,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                         break;
 
                 }
-                setTitle(JBookTrader.APP_NAME + " - [" + subTitle + "]");
+                setTitle(JBookTrader.APP_NAME + " " + JBookTrader.VERSION + " - [" + subTitle + "]");
                 break;
             case Error:
                 String msg = (String) value;
@@ -263,7 +263,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         status.setForeground(Color.GRAY);
         add(status, BorderLayout.SOUTH);
         setPreferredSize(new Dimension(500, 309));
-        setTitle(JBookTrader.APP_NAME);
+        setTitle(JBookTrader.APP_NAME + " " + JBookTrader.VERSION);
         pack();
         setLocationRelativeTo(null);
     }
