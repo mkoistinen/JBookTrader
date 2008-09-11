@@ -3,7 +3,7 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -11,7 +11,6 @@ import java.util.*;
  * historical market depth.
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
-    private final static int TARGET_STRATEGIES_SIZE = 100;
 
     public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         super(optimizerDialog, strategy, params);
@@ -34,12 +33,13 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
         List<Strategy> strategies = new LinkedList<Strategy>();
         List<StrategyParams> topParams = new ArrayList<StrategyParams>();
-        int numberOfCandidates = (int) Math.min(Math.sqrt(TARGET_STRATEGIES_SIZE), bestParamsList.size());
+        int chunkSize = STRATEGIES_PER_PROCESSOR * availableProcessors;
+        int numberOfCandidates = (int) Math.min(Math.sqrt(chunkSize), bestParamsList.size());
 
         do {
 
             tasks.clear();
-            int partsPerDimension = (int) Math.max(3, Math.pow(TARGET_STRATEGIES_SIZE / numberOfCandidates, 1. / dimensions));
+            int partsPerDimension = (int) Math.max(2, Math.pow((double) chunkSize / numberOfCandidates, 1. / dimensions));
             for (StrategyParams params : bestParamsList) {
                 for (StrategyParam param : params.getAll()) {
                     int step = Math.max(1, (param.getMax() - param.getMin()) / (partsPerDimension - 1));
@@ -56,7 +56,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                         Strategy strategy = (Strategy) strategyConstructor.newInstance(params);
                         strategies.add(strategy);
                     } catch (InvocationTargetException ite) {
-                    	throw new JBookTraderException(new Exception(ite.getCause()));
+                        throw new JBookTraderException(new Exception(ite.getCause()));
                     } catch (Exception e) {
                         throw new JBookTraderException(e);
                     }
@@ -76,7 +76,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             }
 
             topParams.clear();
-            numberOfCandidates = (int) Math.min(Math.sqrt(TARGET_STRATEGIES_SIZE), optimizationResults.size());
+            numberOfCandidates = (int) Math.min(Math.sqrt(chunkSize), optimizationResults.size());
             for (int index = 0; index < numberOfCandidates; index++) {
                 topParams.add(optimizationResults.get(index).getParams());
             }

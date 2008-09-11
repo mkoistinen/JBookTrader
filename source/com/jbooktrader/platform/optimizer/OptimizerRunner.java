@@ -16,7 +16,8 @@ import java.util.concurrent.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    protected final OptimizerDialog optimizerDialog;
+    protected final int STRATEGIES_PER_PROCESSOR = 250;
+    private final OptimizerDialog optimizerDialog;
     protected final LinkedList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected final Constructor<?> strategyConstructor;
@@ -75,7 +76,7 @@ public abstract class OptimizerRunner implements Runnable {
 
     protected abstract void optimize() throws JBookTraderException;
 
-    public void setTotalSteps(long totalSteps) {
+    protected void setTotalSteps(long totalSteps) {
         this.totalSteps = totalSteps;
         if (timeEstimator == null) {
             timeEstimator = new ComputationalTimeEstimator(System.currentTimeMillis(), totalSteps);
@@ -83,7 +84,7 @@ public abstract class OptimizerRunner implements Runnable {
         timeEstimator.setTotalIterations(totalSteps);
     }
 
-    public void setTotalStrategies(long totalStrategies) {
+    protected void setTotalStrategies(long totalStrategies) {
         this.totalStrategies = totalStrategies;
     }
 
@@ -193,7 +194,7 @@ public abstract class OptimizerRunner implements Runnable {
         Report.disable();
     }
 
-    public void showResults() {
+    private void showResults() {
         Collections.sort(optimizationResults, resultComparator);
         while (optimizationResults.size() > MAX_RESULTS) {
             optimizationResults.removeLast();
@@ -201,7 +202,7 @@ public abstract class OptimizerRunner implements Runnable {
         optimizerDialog.setResults(optimizationResults);
     }
 
-    public void showFastProgress(long counter, String text) {
+    private void showFastProgress(long counter, String text) {
         String remainingTime = (counter == totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
         optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
     }
