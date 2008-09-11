@@ -3,7 +3,7 @@ package com.jbooktrader.strategy;
 import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -45,10 +45,10 @@ public class Balancer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 10, 25, 5, 15);
-        addParam(RSI_PERIOD, 125, 145, 25, 134);
-        addParam(BALANCE_ENTRY, 22, 30, 5, 27);
-        addParam(RSI_ENTRY, 13, 28, 5, 15);
+        addParam(EMA_PERIOD, 10, 40, 5, 30);
+        addParam(RSI_PERIOD, 50, 150, 25, 82);
+        addParam(BALANCE_ENTRY, 15, 30, 1, 20);
+        addParam(RSI_ENTRY, 10, 30, 1, 25);
     }
 
     /**

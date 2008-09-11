@@ -1,10 +1,9 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.price.*;
 import com.jbooktrader.indicator.volume.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 
 /**
@@ -30,10 +29,8 @@ public class Dicey extends StrategyES {
         entry = getParam(ENTRY);
         directionalVolumeInd = new DirectionalVolume(getParam(PERIOD));
         rsiInd = new PriceRSI(getParam(PERIOD));
-        Indicator balanceEmaInd = new DepthBalanceEMA(getParam(PERIOD));
         addIndicator(directionalVolumeInd);
         addIndicator(rsiInd);
-        addIndicator(balanceEmaInd);
     }
 
     /**
@@ -44,8 +41,8 @@ public class Dicey extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 50, 300, 10, 195);
-        addParam(ENTRY, 35, 80, 1, 74);
+        addParam(PERIOD, 50, 500, 1, 154);
+        addParam(ENTRY, 20, 50, 1, 40);
     }
 
     /**
@@ -56,11 +53,11 @@ public class Dicey extends StrategyES {
     public void onBookChange() {
         double directionalVolume = directionalVolumeInd.getValue();
         double rsi = rsiInd.getValue() - 50;
-        double strength = directionalVolume + rsi;
+        double strength = directionalVolume - rsi;
         if (strength >= entry) {
-            setPosition(-1);
-        } else if (strength <= -entry) {
             setPosition(1);
+        } else if (strength <= -entry) {
+            setPosition(-1);
         }
     }
 }
