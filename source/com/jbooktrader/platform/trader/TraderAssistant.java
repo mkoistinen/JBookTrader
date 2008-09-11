@@ -4,7 +4,6 @@ import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.marketindex.*;
 import com.jbooktrader.platform.model.*;
-
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.position.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;

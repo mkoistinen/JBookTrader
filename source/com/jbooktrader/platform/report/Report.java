@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.*;
-
 import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;

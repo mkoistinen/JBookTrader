@@ -3,7 +3,7 @@ package com.jbooktrader.platform.marketbook;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.marketindex.*;
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 
 import java.util.*;
 
@@ -38,7 +38,6 @@ public class MarketBook {
             try {
                 backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
             } catch (JBookTraderException e) {
-                // in order to make sure this is logged in EventReport
                 throw new RuntimeException(e);
             }
         }

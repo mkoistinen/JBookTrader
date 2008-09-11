@@ -2,7 +2,6 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.model.*;
-
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;

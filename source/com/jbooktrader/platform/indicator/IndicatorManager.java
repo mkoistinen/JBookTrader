@@ -2,7 +2,6 @@ package com.jbooktrader.platform.indicator;
 
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 
 import java.util.*;

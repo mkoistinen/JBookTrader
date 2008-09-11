@@ -2,7 +2,6 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
-
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.startup.*;

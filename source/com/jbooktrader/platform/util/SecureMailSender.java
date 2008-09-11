@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.util;
 
 import com.jbooktrader.platform.model.*;
-
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 

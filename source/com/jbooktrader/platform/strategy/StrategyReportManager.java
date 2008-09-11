@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.strategy;
 
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
@@ -53,7 +53,6 @@ public class StrategyReportManager {
             try {
                 strategyReport = new Report(strategy.getName());
             } catch (JBookTraderException e) {
-                // in order to make sure this is logged in EventReport
                 throw new RuntimeException(e);
             }
             strategyReport.report(strategyReportHeaders);
