@@ -1,7 +1,8 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
+
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -10,14 +11,16 @@ import com.jbooktrader.platform.util.*;
  * historical market depth.
  */
 public class BackTestStrategyRunner implements Runnable {
-    private final BackTestDialog backTestDialog;
+    private final BackTestProgressIndicator backTestProgressIndicator;
     private final Strategy strategy;
+    private final String dataFileName;
     private boolean cancelled;
     private BackTestFileReader backTestFileReader;
 
-    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
-        this.backTestDialog = backTestDialog;
+    public BackTestStrategyRunner(BackTestProgressIndicator backTestProgressIndicator, Strategy strategy, String dataFileName) {
+        this.backTestProgressIndicator = backTestProgressIndicator;
         this.strategy = strategy;
+        this.dataFileName = dataFileName;
 
         boolean isOptimizationMode = (Dispatcher.getMode() == Optimization);
         if (!isOptimizationMode) {
@@ -27,26 +30,26 @@ public class BackTestStrategyRunner implements Runnable {
 
     public void cancel() {
         backTestFileReader.cancel();
-        backTestDialog.showProgress("Stopping back test...");
+        backTestProgressIndicator.showProgress("Stopping back test...");
         cancelled = true;
     }
 
     public void run() {
         try {
-            backTestDialog.enableProgress();
-            backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
-            backTestDialog.showProgress("Reading historical data file...");
+            backTestProgressIndicator.enableProgress();
+            backTestFileReader = new BackTestFileReader(dataFileName);
+            backTestProgressIndicator.showProgress("Reading historical data file...");
             backTestFileReader.load();
             if (!cancelled) {
-                backTestDialog.showProgress("Running back test...");
-                BackTester backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
+                backTestProgressIndicator.showProgress("Running back test...");
+                BackTester backTester = new BackTester(strategy, backTestFileReader, backTestProgressIndicator);
                 backTester.execute();
             }
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
-            MessageDialog.showError(backTestDialog, t.toString());
+            MessageDialog.showError(null, t.toString());
         } finally {
-            backTestDialog.dispose();
+            backTestProgressIndicator.dispose();
         }
     }
 }

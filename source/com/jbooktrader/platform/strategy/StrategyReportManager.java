@@ -51,7 +51,7 @@ public class StrategyReportManager {
     public void report() {
         if (strategyReport == null) {
             try {
-                strategyReport = new Report(strategy.getName());
+                strategyReport = Dispatcher.createReport(strategy.getName());
             } catch (JBookTraderException e) {
                 throw new RuntimeException(e);
             }

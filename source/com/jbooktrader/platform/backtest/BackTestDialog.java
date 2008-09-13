@@ -1,7 +1,8 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -15,7 +16,7 @@ import java.io.*;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class BackTestDialog extends JDialog {
+public class BackTestDialog extends JDialog implements BackTestProgressIndicator {
     private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
     private final PreferencesHolder prefs;
     private Strategy strategy;
@@ -71,8 +72,7 @@ public class BackTestDialog extends JDialog {
         File file = new File(historicalFileName);
         if (!file.exists()) {
             fileNameText.requestFocus();
-            String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
-            throw new JBookTraderException(msg);
+            throw new JBookTraderException("Historical file " + "\"" + historicalFileName + "\"" + " does not exist.");
         }
     }
 
@@ -83,7 +83,7 @@ public class BackTestDialog extends JDialog {
                 try {
                     prefs.set(BackTesterFileName, fileNameText.getText());
                     setOptions();
-                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy);
+                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy, getFileName());
                     new Thread(btsr).start();
                 } catch (Exception ex) {
                     MessageDialog.showError(BackTestDialog.this, ex.getMessage());

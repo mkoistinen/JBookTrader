@@ -153,7 +153,7 @@ public abstract class OptimizerRunner implements Runnable {
 
         Report.enable();
         String fileName = strategyName + "Optimizer";
-        Report optimizerReport = new Report(fileName);
+        Report optimizerReport = Dispatcher.createReport(fileName);
 
         optimizerReport.reportDescription("Strategy parameters:");
         for (StrategyParam param : strategyParams.getAll()) {

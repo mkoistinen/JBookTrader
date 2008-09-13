@@ -1,7 +1,10 @@
 package com.jbooktrader.platform.startup;
 
 import com.birosoft.liquid.*;
+import com.jbooktrader.platform.backtest.CommandLineBackTester;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.report.ReportFactoryConsole;
+import com.jbooktrader.platform.report.ReportFactoryFile;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
@@ -37,15 +40,15 @@ public class JBookTrader {
         UIManager.put("Label.foreground", color);
         UIManager.put("TitledBorder.titleColor", color);
 
-        Dispatcher.setReporter("EventReport");
-
         new MainFrameController();
     }
 
     /**
      * Starts JBookTrader application.
      *
-     * @param args
+     * @param args The first parameter is the JBT installation directory. You can optionnally pass 3 additionnals parameters.
+     *             "--backtest StrategyName DataFileName" to run a backtest from the command line
+     *             "--optimize StrategyName DataFileName" to run the optimizer from the command line
      */
     public static void main(String[] args) {
         try {
@@ -57,12 +60,29 @@ public class JBookTrader {
                 return;
             }
 
-            if (args.length != 1) {
-                String msg = "Exactly one argument must be passed. Usage: JBookTrader <JBookTraderDirectory>";
-                throw new JBookTraderException(msg);
+            if(args.length >=1 ) {
+                JBookTrader.appPath = args[0];
             }
-            JBookTrader.appPath = args[0];
-            new JBookTrader();
+            
+            if(args.length == 1) {
+                Dispatcher.setReportFactory(new ReportFactoryFile());
+                Dispatcher.setReporter("EventReport");
+            	new JBookTrader();	
+            }
+            else if(args.length == 4 && ( args[1].equals("--backtest") || args.equals("--optimize") ) ){
+            	if(args[1].equals("--backtest")) {
+                    Dispatcher.setReportFactory(new ReportFactoryConsole());
+                    Dispatcher.setReporter("EventReport");
+            		new CommandLineBackTester(args[2], args[3]);            		
+            	}
+            	else { // optimize
+            		
+            	}
+            }
+            else if (args.length != 1) {
+                throw new JBookTraderException("Usage: JBookTrader <JBookTraderDirectory> [--backtest|--optimize StrategyName DataFileName]");
+            }
+
         } catch (Throwable t) {
             MessageDialog.showError(null, t.getMessage());
             Dispatcher.getReporter().report(t);

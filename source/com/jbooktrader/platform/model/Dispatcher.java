@@ -19,10 +19,11 @@ public class Dispatcher {
     private static Trader trader;
     private static Mode mode;
     private static int activeStrategies;
+    private static ReportFactory reportFactory;
 
     public static void setReporter(String eventReportFileName) throws JBookTraderException {
-        eventReport = new Report(eventReportFileName);
-    }
+        eventReport = reportFactory.newReport(eventReportFileName);
+    }   
 
     public static void addListener(ModelListener listener) {
         listeners.add(listener);
@@ -79,9 +80,9 @@ public class Dispatcher {
         }
 
         if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-            trader.getAssistant().connect();
+            getTrader().getAssistant().connect();
         } else {
-            trader.getAssistant().disconnect();
+            getTrader().getAssistant().disconnect();
         }
         fireModelChanged(ModelListener.Event.ModeChanged, null);
 
@@ -97,5 +98,13 @@ public class Dispatcher {
         if (activeStrategies == 0) {
             fireModelChanged(ModelListener.Event.StrategiesEnd, null);
         }
+    }
+
+    public static void setReportFactory(ReportFactory reportFactory) {
+        Dispatcher.reportFactory = reportFactory;
+    }
+    
+    public static Report createReport(String fileName) throws JBookTraderException {
+        return reportFactory.newReport(fileName);
     }
 }

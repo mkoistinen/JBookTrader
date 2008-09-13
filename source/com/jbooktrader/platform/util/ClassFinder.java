@@ -59,6 +59,8 @@ public class ClassFinder {
             }
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
+        } catch (ClassNotFoundException cnte) {
+        	throw new JBookTraderException("Class " + name + "not found");
         } catch (Exception e) {
             throw new JBookTraderException(e.getCause().getMessage());
         }

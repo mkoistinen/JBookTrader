@@ -1,8 +1,6 @@
 package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
-import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
@@ -11,24 +9,14 @@ import java.util.*;
 
 
 public final class Report {
-    private final static String FILE_SEP = System.getProperty("file.separator");
-    private final static String REPORT_DIR = JBookTrader.getAppPath() + FILE_SEP + "reports" + FILE_SEP;
     private final String fieldStart, fieldEnd, rowStart, rowEnd, fieldBreak;
     private final ReportRenderer renderer;
     private final SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
     private PrintWriter writer;
     private static boolean isDisabled;
 
-    public Report(String fileName) throws JBookTraderException {
-        String reportRendererClass = PreferencesHolder.getInstance().get(ReportRenderer);
-
-        try {
-            Class<? extends ReportRenderer> clazz = Class.forName(reportRendererClass).asSubclass(ReportRenderer.class);
-            renderer = clazz.newInstance();
-        } catch (Exception e) {
-            throw new JBookTraderException(e);
-        }
-
+    public Report(ReportRenderer renderer, PrintWriter writer) throws JBookTraderException {
+        this.renderer = renderer;
         fieldStart = renderer.getFieldStart();
         fieldEnd = renderer.getFieldEnd();
         rowStart = renderer.getRowStart();
@@ -37,24 +25,13 @@ public final class Report {
         String emphasisStart = renderer.getEmphasisStart();
         String emphasisEnd = renderer.getEmphasisEnd();
         String rootStart = renderer.getRootStart();
-        String fileExtension = renderer.getFileExtension();
-
 
         if (isDisabled) {
             return;
         }
+        
+        this.writer = writer;
 
-        File reportDir = new File(REPORT_DIR);
-        if (!reportDir.exists()) {
-            reportDir.mkdir();
-        }
-
-        String fullFileName = REPORT_DIR + fileName + "." + fileExtension;
-        try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
-        } catch (IOException ioe) {
-            throw new JBookTraderException(ioe);
-        }
         StringBuilder s = new StringBuilder();
         s.append(emphasisStart).append("New Report Started: ").append(df.format(getDate())).append(emphasisEnd);
         reportDescription(s.toString());
@@ -74,6 +51,10 @@ public final class Report {
 
     public static void enable() {
         isDisabled = false;
+    }
+    
+    public static boolean isDisabled() {
+        return isDisabled;
     }
 
     private void report(StringBuilder message) {
@@ -145,6 +126,5 @@ public final class Report {
             writer.flush();
         }
     }
-
 
 }
