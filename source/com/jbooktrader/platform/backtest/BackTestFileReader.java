@@ -13,6 +13,7 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
+    private final static long GAP = 8 * 60 * 60 * 1000;
     public final static int COLUMNS = 8;
     private static final String LINE_SEP = System.getProperty("line.separator");
 
@@ -21,6 +22,8 @@ public class BackTestFileReader {
     private SimpleDateFormat sdf;
     private volatile boolean cancelled;
     private BufferedReader reader;
+    private int tradingDays;
+
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
         marketSnapshots = new LinkedList<MarketSnapshot>();
@@ -37,6 +40,10 @@ public class BackTestFileReader {
 
     public LinkedList<MarketSnapshot> getAll() {
         return marketSnapshots;
+    }
+
+    public int getTradingDays() {
+        return tradingDays;
     }
 
     private void getTimeZone(String line) throws JBookTraderException {
@@ -127,6 +134,11 @@ public class BackTestFileReader {
                 String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
                 throw new JBookTraderException(msg);
             }
+        }
+
+        long difference = time - previousTime;
+        if (difference > GAP) {
+            tradingDays++;
         }
 
         int lowBalance = Integer.parseInt(st.nextToken());

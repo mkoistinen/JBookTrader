@@ -24,16 +24,24 @@ public class PerformanceManager {
     private double tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
     private double peakNetProfit, maxDrawdown;
     private boolean isCompletedTrade;
+    private int tradingDays;
+    private double sumTradeProfit, sumTradeProfitSquared;
+
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
         netProfitHistory = new NetProfitHistory();
+        tradingDays = 1;
     }
 
     public int getTrades() {
         return trades;
+    }
+
+    public void setTradingDays(int tradingDays) {
+        this.tradingDays = tradingDays;
     }
 
     public boolean getIsCompletedTrade() {
@@ -92,8 +100,16 @@ public class PerformanceManager {
     }
 
     public double getPerformanceIndex() {
-        double pathTraversed = grossLoss + grossProfit;
-        return (pathTraversed == 0) ? 0 : (100 * netProfit / pathTraversed);
+        double pi = 0;
+        if (trades > 0) {
+            double stdev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
+            if (stdev != 0) {
+                double tradesPerDay = trades / (double) tradingDays;
+                pi = 100 * Math.sqrt(tradesPerDay) * getAverageProfitPerTrade() / stdev;
+            }
+        }
+
+        return pi;
     }
 
     public double getExposure() {
@@ -128,6 +144,10 @@ public class PerformanceManager {
 
             tradeProfit = netProfit - netProfitAsOfPreviousTrade;
             netProfitAsOfPreviousTrade = netProfit;
+
+            sumTradeProfit += tradeProfit;
+            sumTradeProfitSquared += (tradeProfit * tradeProfit);
+
 
             if (tradeProfit >= 0) {
                 profitableTrades++;
