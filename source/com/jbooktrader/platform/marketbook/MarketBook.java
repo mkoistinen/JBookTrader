@@ -17,6 +17,7 @@ public class MarketBook {
     private final String name;
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
+    private boolean backTestFileWriterDisabled = false;
     private double lowBalance, highBalance, lastBalance;
     private int cumulativeVolume, previousCumulativeVolume;
     private double tick;
@@ -34,10 +35,13 @@ public class MarketBook {
     }
 
     public void save(MarketSnapshot marketSnapshot) {
+        if (backTestFileWriterDisabled) return;
         if (backTestFileWriter == null) {
             try {
                 backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
             } catch (JBookTraderException e) {
+                backTestFileWriterDisabled = true;
+                // in order to make sure this is logged in EventReport
                 throw new RuntimeException(e);
             }
         }
