@@ -1,7 +1,8 @@
 package com.jbooktrader.platform.preferences;
 
-import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
@@ -12,7 +13,8 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, clientIDText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText, emailSMTPSHost, emailLogin;
+    private JTextField hostText, portText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText, emailSMTPSHost, emailLogin;
+    private JSpinner clientIDSpin;
     private JPasswordField emailPasswordField;
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
 
@@ -27,23 +29,27 @@ public class PreferencesDialog extends JDialog {
     }
 
     private void add(JPanel panel, JBTPreferences pref, JTextField textField) {
-        JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
-        fieldNameLabel.setLabelFor(textField);
-        textField.setPreferredSize(FIELD_DIMENSION);
-        textField.setMaximumSize(FIELD_DIMENSION);
         textField.setText(prefs.get(pref));
-        panel.add(fieldNameLabel);
-        panel.add(textField);
+        genericAdd(panel, pref, textField);
+    }
+    
+    private void add(JPanel panel, JBTPreferences pref, JSpinner spinner) {
+        spinner.setValue(prefs.getInt(pref));
+        genericAdd(panel, pref, spinner);
     }
 
     private void add(JPanel panel, JBTPreferences pref, JComboBox comboBox) {
-        JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
-        fieldNameLabel.setLabelFor(comboBox);
-        comboBox.setPreferredSize(FIELD_DIMENSION);
-        comboBox.setMaximumSize(FIELD_DIMENSION);
         comboBox.setSelectedItem(prefs.get(pref));
+        genericAdd(panel, pref, comboBox);
+    }
+    
+    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
+        JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
+        fieldNameLabel.setLabelFor(comp);
+        comp.setPreferredSize(FIELD_DIMENSION);
+        comp.setMaximumSize(FIELD_DIMENSION);
         panel.add(fieldNameLabel);
-        panel.add(comboBox);
+        panel.add(comp);        
     }
 
 
@@ -71,12 +77,12 @@ public class PreferencesDialog extends JDialog {
         tabbedPane1.addTab("TWS Connection", connectionTab);
         hostText = new JTextField();
         portText = new JTextField();
-        clientIDText = new JTextField();
+        clientIDSpin = new JSpinner(new SpinnerNumberModel(0,0,1000,1));
         accountTypeCombo = new JComboBox(new String[]{"Universal", "Advisor"});
         advisorAccountText = new JTextField();
         add(connectionTab, Host, hostText);
         add(connectionTab, Port, portText);
-        add(connectionTab, ClientID, clientIDText);
+        add(connectionTab, ClientID, clientIDSpin);
         add(connectionTab, AccountType, accountTypeCombo);
         add(connectionTab, AdvisorAccount, advisorAccountText);
         SpringUtilities.makeCompactGrid(connectionTab, 5, 2, 12, 12, 8, 5);
@@ -139,19 +145,9 @@ public class PreferencesDialog extends JDialog {
                         throw new JBookTraderException(HeartBeatInterval.getName() + " must be a number.");
                     }
 
-                    try {
-                        int clientId = Integer.parseInt(clientIDText.getText());
-                        if (clientId < 0) {
-                            throw new JBookTraderException(ClientID.getName() + " must be a number greater or equal to 0.");
-                        }
-                    } catch (NumberFormatException nfe) {
-                        throw new JBookTraderException(ClientID.getName() + " must be an integer.");
-                    }
-
-
                     prefs.set(Host, hostText.getText());
                     prefs.set(Port, portText.getText());
-                    prefs.set(ClientID, clientIDText.getText());
+                    prefs.set(ClientID, clientIDSpin.getValue().toString());
                     prefs.set(AccountType, (String) accountTypeCombo.getSelectedItem());
                     prefs.set(AdvisorAccount, advisorAccountText.getText());
                     prefs.set(ReportRenderer, reportRendererText.getText());
