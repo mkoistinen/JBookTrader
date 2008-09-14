@@ -120,3 +120,5 @@ public final class BackTestFileWriter {
         return header;
     }
 }
+
+/* $Id$ */

@@ -79,3 +79,5 @@ public class StrategyReportManager {
     }
 
 }
+
+/* $Id$ */

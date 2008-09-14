@@ -161,3 +161,5 @@ public class Trader extends EWrapperAdapter {
     }
 
 }
+
+/* $Id$ */

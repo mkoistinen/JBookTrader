@@ -25,3 +25,5 @@ public class Velocity extends Indicator {
         return value;
     }
 }
+
+/* $Id$ */

@@ -16,3 +16,5 @@ public class ChartMonitor extends ChartPanel {
         setCursor(Cursor.getDefaultCursor());
     }
 }
+
+/* $Id$ */

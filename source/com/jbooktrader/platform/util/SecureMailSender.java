@@ -95,3 +95,5 @@ public class SecureMailSender {
     }
 
 }
+
+/* $Id$ */

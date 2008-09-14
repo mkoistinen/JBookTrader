@@ -33,3 +33,5 @@ public class NumberRenderer extends DefaultTableCellRenderer {
         setText(text);
     }
 }
+
+/* $Id$ */

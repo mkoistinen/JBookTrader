@@ -138,3 +138,5 @@ public class AboutDialog extends JDialog {
         }
     }
 }
+
+/* $Id$ */

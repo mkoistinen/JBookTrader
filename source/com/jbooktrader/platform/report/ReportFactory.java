@@ -6,3 +6,5 @@ public interface ReportFactory {
 
     Report newReport(String fileName) throws JBookTraderException;
 }
+
+/* $Id$ */

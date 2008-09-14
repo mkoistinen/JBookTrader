@@ -64,3 +64,5 @@ public class Bar {
     }
 
 }
+
+/* $Id$ */

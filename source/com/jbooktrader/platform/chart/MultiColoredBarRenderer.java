@@ -35,3 +35,5 @@ public class MultiColoredBarRenderer extends HighLowRenderer {
         return super.initialise(g2, dataArea, plot, dataset, info);
     }
 }
+
+/* $Id$ */

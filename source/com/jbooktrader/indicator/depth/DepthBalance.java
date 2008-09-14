@@ -16,3 +16,5 @@ public class DepthBalance extends Indicator {
         return value;
     }
 }
+
+/* $Id$ */

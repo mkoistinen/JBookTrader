@@ -25,3 +25,5 @@ public abstract class StrategyES extends Strategy {
     }
 
 }
+
+/* $Id$ */

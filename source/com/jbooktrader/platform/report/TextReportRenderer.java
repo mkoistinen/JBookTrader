@@ -39,3 +39,5 @@ public class TextReportRenderer implements ReportRenderer {
         return "txt";
     }
 }
+
+/* $Id$ */

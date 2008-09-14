@@ -33,3 +33,4 @@ public enum MarketIndex {
         }
     }
 }
+/* $Id$ */

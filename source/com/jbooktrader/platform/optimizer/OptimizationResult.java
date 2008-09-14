@@ -53,3 +53,5 @@ public class OptimizationResult {
         return exposure;
     }
 }
+
+/* $Id$ */

@@ -180,3 +180,5 @@ public class PreferencesDialog extends JDialog {
 
     }
 }
+
+/* $Id$ */

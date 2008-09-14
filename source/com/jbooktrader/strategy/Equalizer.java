@@ -60,3 +60,5 @@ public class Equalizer extends StrategyES {
         }
     }
 }
+
+/* $Id$ */

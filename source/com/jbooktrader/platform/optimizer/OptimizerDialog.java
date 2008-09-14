@@ -410,3 +410,5 @@ public class OptimizerDialog extends JDialog {
         return PerformanceMetric.getColumn(selectedItem);
     }
 }
+
+/* $Id$ */

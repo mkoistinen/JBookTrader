@@ -173,3 +173,5 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
     }
 
 }
+
+/* $Id$ */

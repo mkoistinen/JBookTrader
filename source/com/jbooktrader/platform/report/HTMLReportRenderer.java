@@ -39,3 +39,5 @@ public class HTMLReportRenderer implements ReportRenderer {
     }
 
 }
+
+/* $Id$ */

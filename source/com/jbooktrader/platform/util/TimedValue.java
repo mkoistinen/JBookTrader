@@ -20,3 +20,5 @@ public class TimedValue {
         return value;
     }
 }
+
+/* $Id$ */

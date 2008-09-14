@@ -6,3 +6,5 @@ public interface BackTestProgressIndicator {
 	public void showProgress(String progressText);
 	public void dispose();
 }
+
+/* $Id$ */

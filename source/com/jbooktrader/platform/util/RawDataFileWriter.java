@@ -65,3 +65,5 @@ public final class RawDataFileWriter {
         return header;
     }
 }
+
+/* $Id$ */

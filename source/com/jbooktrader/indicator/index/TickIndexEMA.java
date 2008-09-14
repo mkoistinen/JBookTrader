@@ -19,3 +19,4 @@ public class TickIndexEMA extends Indicator {
         return value;
     }
 }
+/* $Id$ */

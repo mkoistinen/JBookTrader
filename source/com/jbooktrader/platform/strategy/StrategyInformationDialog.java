@@ -84,3 +84,5 @@ public final class StrategyInformationDialog extends JDialog {
         getContentPane().setPreferredSize(new Dimension(450, 400));
     }
 }
+
+/* $Id$ */

@@ -11,3 +11,5 @@ public class ReportFactoryConsole implements ReportFactory {
     }
 
 }
+
+/* $Id$ */

@@ -268,3 +268,5 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         setLocationRelativeTo(null);
     }
 }
+
+/* $Id$ */

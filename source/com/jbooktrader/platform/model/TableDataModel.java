@@ -69,3 +69,5 @@ public class TableDataModel extends AbstractTableModel {
         return (schema == null) ? 0 : schema.length;
     }
 }
+
+/* $Id$ */

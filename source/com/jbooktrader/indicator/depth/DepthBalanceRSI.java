@@ -36,3 +36,5 @@ public class DepthBalanceRSI extends Indicator {
         return value;
     }
 }
+
+/* $Id$ */

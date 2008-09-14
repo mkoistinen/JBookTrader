@@ -66,3 +66,5 @@ public class TickFollower extends StrategyES {
         }
     }
 }
+
+/* $Id$ */

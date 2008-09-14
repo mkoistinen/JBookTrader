@@ -122,3 +122,5 @@ public class PositionManager {
         }
     }
 }
+
+/* $Id$ */

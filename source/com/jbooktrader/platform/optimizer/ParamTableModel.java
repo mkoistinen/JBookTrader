@@ -60,3 +60,5 @@ public class ParamTableModel extends TableDataModel {
         return strategyParams;
     }
 }
+
+/* $Id$ */

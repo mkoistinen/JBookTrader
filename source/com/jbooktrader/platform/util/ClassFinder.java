@@ -90,3 +90,5 @@ public class ClassFinder {
         return strategies;
     }
 }
+
+/* $Id$ */

@@ -24,3 +24,4 @@ public enum MarketDepthOperation {
         }
     }
 }
+/* $Id$ */

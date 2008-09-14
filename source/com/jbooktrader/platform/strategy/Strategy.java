@@ -184,3 +184,5 @@ public abstract class Strategy {
         return sb.toString();
     }
 }
+
+/* $Id$ */

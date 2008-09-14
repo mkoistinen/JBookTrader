@@ -36,3 +36,5 @@ public abstract class Indicator {
     }
 
 }
+
+/* $Id$ */

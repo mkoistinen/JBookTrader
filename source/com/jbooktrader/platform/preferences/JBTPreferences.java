@@ -65,3 +65,5 @@ public enum JBTPreferences {
         return name;
     }
 }
+
+/* $Id$ */

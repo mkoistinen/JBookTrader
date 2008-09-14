@@ -109,3 +109,5 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
         dateAxis.setRange(start, end);
     }
 }
+
+/* $Id$ */

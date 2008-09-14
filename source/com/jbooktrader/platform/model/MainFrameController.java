@@ -292,3 +292,5 @@ public class MainFrameController {
         });
     }
 }
+
+/* $Id$ */
