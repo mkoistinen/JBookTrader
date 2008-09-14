@@ -19,7 +19,7 @@ public class Dispatcher {
     private static Trader trader;
     private static Mode mode;
     private static int activeStrategies;
-    private static ReportFactory reportFactory;
+    private static ReportFactory reportFactory = new ReportFactoryConsole();
 
     public static void setReporter(String eventReportFileName) throws JBookTraderException {
         eventReport = reportFactory.newReport(eventReportFileName);
@@ -102,6 +102,10 @@ public class Dispatcher {
 
     public static void setReportFactory(ReportFactory reportFactory) {
         Dispatcher.reportFactory = reportFactory;
+    }
+    
+    public static ReportFactory getReportFactory() {
+        return reportFactory;
     }
     
     public static Report createReport(String fileName) throws JBookTraderException {

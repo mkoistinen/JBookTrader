@@ -3,6 +3,8 @@ package com.jbooktrader.platform.startup;
 import com.birosoft.liquid.*;
 import com.jbooktrader.platform.backtest.CommandLineBackTester;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.CommandLineOptimizer;
+import com.jbooktrader.platform.optimizer.PerformanceMetric;
 import com.jbooktrader.platform.report.ReportFactoryConsole;
 import com.jbooktrader.platform.report.ReportFactoryFile;
 import com.jbooktrader.platform.util.*;
@@ -43,12 +45,36 @@ public class JBookTrader {
         new MainFrameController();
     }
 
+    
+    public static void showUsage() throws JBookTraderException {
+        
+        StringBuilder pmList = new StringBuilder();
+        for(PerformanceMetric pm : PerformanceMetric.values()) {
+            pmList.append("  '"+pm.getName()+"'\n");
+        }
+        
+        throw new JBookTraderException("Usage: JBookTrader <JBookTraderDirectory>\n" +
+                "  * Add the following options to run a backtest from the command line :\n" +
+                "    --backtest StrategyName DataFileName\n" +
+                "  * Add the followind options to run the optimizer from the command line:\n" +
+                "    --optimize StrategyName DataFileName SortCriteria MinTrades OptimizerMethod\n" +
+                "\n" +
+                "Examples:\n" +
+                "$> JBookTrader /work/jbt\n" +
+                "$> JBookTrader /work/jbt --backtest MyStrategy /marketdata/ES.txt\n" +
+                "$> JBookTrader /work/jbt --optimize MyStrategy /marketdata/ES.txt 'Profit Factor' 100 bf\n" +
+                "\n" +
+                "Available SortCriteria are:\n" + pmList.toString() +
+                "\n" +
+                "Available OptimizerMethod are:\n" +
+                "  'bf' : for brute force omptimizer method\n" +
+                "  'dnc' : for divide and conquer optimizer method\n" );
+    }
+    
     /**
      * Starts JBookTrader application.
      *
-     * @param args The first parameter is the JBT installation directory. You can optionnally pass 3 additionnals parameters.
-     *             "--backtest StrategyName DataFileName" to run a backtest from the command line
-     *             "--optimize StrategyName DataFileName" to run the optimizer from the command line
+     * @param args
      */
     public static void main(String[] args) {
         try {
@@ -63,29 +89,35 @@ public class JBookTrader {
             if(args.length >=1 ) {
                 JBookTrader.appPath = args[0];
             }
-            
+
+            // Launch JBT GUI
             if(args.length == 1) {
                 Dispatcher.setReportFactory(new ReportFactoryFile());
                 Dispatcher.setReporter("EventReport");
             	new JBookTrader();	
             }
-            else if(args.length == 4 && ( args[1].equals("--backtest") || args.equals("--optimize") ) ){
-            	if(args[1].equals("--backtest")) {
-                    Dispatcher.setReportFactory(new ReportFactoryConsole());
-                    Dispatcher.setReporter("EventReport");
-            		new CommandLineBackTester(args[2], args[3]);            		
-            	}
-            	else { // optimize
-            		
-            	}
+            // Launch command line backtester
+            else if(args.length == 4 && args[1].equals("--backtest")){
+                Dispatcher.setReportFactory(new ReportFactoryConsole());
+                Dispatcher.setReporter("EventReport");
+        		new CommandLineBackTester(args[2], args[3]);            		
             }
+            // Launch command line optimizer
+            else if(args.length == 7 && args[1].equals("--optimize") ){
+                Dispatcher.setReportFactory(new ReportFactoryConsole());
+                Dispatcher.setReporter("EventReport");
+                new CommandLineOptimizer(args[2],args[3],args[4],args[5],args[6]);                
+            }
+            // Show Usage help
             else if (args.length != 1) {
-                throw new JBookTraderException("Usage: JBookTrader <JBookTraderDirectory> [--backtest|--optimize StrategyName DataFileName]");
+                showUsage();
             }
 
         } catch (Throwable t) {
             MessageDialog.showError(null, t.getMessage());
-            Dispatcher.getReporter().report(t);
+            if(Dispatcher.getReporter()!=null) {
+                Dispatcher.getReporter().report(t);
+            }
         }
     }
 

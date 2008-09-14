@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class OptimizerDialog extends JDialog {
+public class OptimizerDialog extends JDialog implements OptimizerProgressIndicator {
     private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
@@ -138,9 +138,9 @@ public class OptimizerDialog extends JDialog {
 
                     int optimizationMethod = optimizationMethodCombo.getSelectedIndex();
                     if (optimizationMethod == 0) {
-                        optimizerRunner = new BruteForceOptimizerRunner(OptimizerDialog.this, strategy, params);
+                        optimizerRunner = new BruteForceOptimizerRunner(OptimizerDialog.this, strategy, params, getFileName(), getSortCriteria(), getMinTrades());
                     } else if (optimizationMethod == 1) {
-                        optimizerRunner = new DivideAndConquerOptimizerRunner(OptimizerDialog.this, strategy, params);
+                        optimizerRunner = new DivideAndConquerOptimizerRunner(OptimizerDialog.this, strategy, params, getFileName(), getSortCriteria(), getMinTrades());
                     }
 
                     new Thread(optimizerRunner).start();
@@ -408,6 +408,14 @@ public class OptimizerDialog extends JDialog {
     public PerformanceMetric getSortCriteria() {
         String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
         return PerformanceMetric.getColumn(selectedItem);
+    }
+
+    public void showError(String msg) {
+        MessageDialog.showError(this, msg);
+    }
+
+    public void showMessage(String msg) {
+        MessageDialog.showMessage(this, msg);
     }
 }
 

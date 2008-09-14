@@ -12,8 +12,8 @@ import java.util.*;
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
-    public DivideAndConquerOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
-        super(optimizerDialog, strategy, params);
+    public DivideAndConquerOptimizerRunner(OptimizerProgressIndicator optimizerProgressIndicator, Strategy strategy, StrategyParams params, String dataFileName, PerformanceMetric sortCriteria, int minTrades) throws JBookTraderException {
+        super(optimizerProgressIndicator, strategy, params, dataFileName, sortCriteria, minTrades);
     }
 
     public void optimize() throws JBookTraderException {
