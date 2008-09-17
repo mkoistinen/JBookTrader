@@ -4,10 +4,10 @@ import java.io.File;
 
 import com.jbooktrader.platform.model.Dispatcher;
 import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.Dispatcher.Mode;
 import com.jbooktrader.platform.preferences.PreferencesHolder;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ClassFinder;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 public class CommandLineBackTester {
@@ -41,12 +41,11 @@ public class CommandLineBackTester {
         }
 
         prefs.set(BackTesterFileName, dataFileName);
-        Dispatcher.setMode(BackTest);
+        Dispatcher.setMode(Mode.BackTest);
 
         Strategy strategy = ClassFinder.getInstance(strategyName);
-        Thread bts = new Thread(new BackTestStrategyRunner(new CommandLineBackTesterProgressIndicator(), strategy, dataFileName));
-        bts.start();
-        bts.join();
+        BackTestStrategyRunner bts = new BackTestStrategyRunner(new CommandLineBackTesterProgressIndicator(), strategy, dataFileName);
+        bts.run();
     }
 }
 

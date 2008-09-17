@@ -3,7 +3,9 @@ package com.jbooktrader.platform.optimizer;
 import java.io.File;
 import java.util.List;
 
+import com.jbooktrader.platform.model.Dispatcher;
 import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.Dispatcher.Mode;
 import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.Strategy;
 import com.jbooktrader.platform.util.ClassFinder;
@@ -12,13 +14,19 @@ public class CommandLineOptimizer {
     
     private class CommandLineOptimizerProgessIndicator implements OptimizerProgressIndicator {
 
+    	private int oldpercent = -1;
+    	
         public void enableProgress() {
             System.err.println("Starting to optimize...");
         }
 
         public void setProgress(long counter, long totalSteps, String text, String remainingTime) {
             int percent = (int) (100 * (counter / (double) totalSteps));
-            System.err.println(text + ": " + percent + "% completed (ETA "+remainingTime+")");   
+            
+            if(percent!=oldpercent) {
+                System.err.println(text + ": " + percent + "% completed (ETA "+remainingTime+")");
+            }
+            oldpercent=percent;
         }
 
         public void setResults(List<OptimizationResult> optimizationResults) {
@@ -43,6 +51,8 @@ public class CommandLineOptimizer {
     }
     
     public CommandLineOptimizer(String strategyName, String dataFileName, String sortCriteria, String pMinTrades, String optimizerMethodName) throws JBookTraderException, InterruptedException {
+    	
+        Dispatcher.setMode(Mode.Optimization);
 
         Strategy strategy = ClassFinder.getInstance(strategyName);
 
@@ -73,8 +83,6 @@ public class CommandLineOptimizer {
             return;
         }
 
-        Thread optimizerThread = new Thread(optimizerRunner);
-        optimizerThread.start();
-        optimizerThread.join();
+        optimizerRunner.run();
     }
 }

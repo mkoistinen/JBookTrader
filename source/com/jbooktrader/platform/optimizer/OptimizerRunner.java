@@ -267,6 +267,7 @@ public abstract class OptimizerRunner implements Runnable {
             optimize();
             long end = System.currentTimeMillis();
             progressExecutor.shutdownNow();
+            executor.shutdownNow();
 
             if (!cancelled) {
                 optimizerProgressIndicator.showProgress("Saving optimization results ...");
