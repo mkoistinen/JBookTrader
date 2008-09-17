@@ -3,10 +3,12 @@ package com.jbooktrader.platform.startup;
 import com.birosoft.liquid.*;
 import com.jbooktrader.platform.backtest.CommandLineBackTester;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.Dispatcher.Mode;
 import com.jbooktrader.platform.optimizer.CommandLineOptimizer;
 import com.jbooktrader.platform.optimizer.PerformanceMetric;
 import com.jbooktrader.platform.report.ReportFactoryConsole;
 import com.jbooktrader.platform.report.ReportFactoryFile;
+import com.jbooktrader.platform.strategy.CommandLineStrategyRunner;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
@@ -45,15 +47,19 @@ public class JBookTrader {
         new MainFrameController();
     }
 
-    
+
     public static void showUsage() throws JBookTraderException {
-        
+
         StringBuilder pmList = new StringBuilder();
         for(PerformanceMetric pm : PerformanceMetric.values()) {
             pmList.append("  '"+pm.getName()+"'\n");
         }
-        
+
         throw new JBookTraderException("Usage: JBookTrader <JBookTraderDirectory>\n" +
+                "  * Add the following options to run one or more strategy in forward test mode:\n" +
+                "    --forwardtest OneStrategy [AnotherStrategy ...]\n" +
+                "  * Add the following options to live trade one or more strategy:\n" +
+                "    --trade OneStrategy [AnotherStrategy ...]\n" +
                 "  * Add the following options to run a backtest from the command line :\n" +
                 "    --backtest StrategyName DataFileName\n" +
                 "  * Add the followind options to run the optimizer from the command line:\n" +
@@ -61,6 +67,8 @@ public class JBookTrader {
                 "\n" +
                 "Examples:\n" +
                 "$> JBookTrader /work/jbt\n" +
+                "$> JBookTrader /work/jbt --forwardtest Strategy1 Strategy2\n" +
+                "$> JBookTrader /work/jbt --trade Strategy1 Strategy2\n" +
                 "$> JBookTrader /work/jbt --backtest MyStrategy /marketdata/ES.txt\n" +
                 "$> JBookTrader /work/jbt --optimize MyStrategy /marketdata/ES.txt 'Profit Factor' 100 bf\n" +
                 "\n" +
@@ -70,7 +78,17 @@ public class JBookTrader {
                 "  'bf' : for brute force omptimizer method\n" +
                 "  'dnc' : for divide and conquer optimizer method\n" );
     }
-    
+
+
+    private static void runCommandLineTrade(Mode mode, String[] args) throws JBookTraderException {
+        Dispatcher.setReportFactory(new ReportFactoryConsole());
+        Dispatcher.setReporter("EventReport");
+        String[] strategyNames = new String[args.length-2];
+        System.arraycopy(args, 2, strategyNames, 0, args.length-2);
+        new CommandLineStrategyRunner(mode, strategyNames);		
+    }
+
+
     /**
      * Starts JBookTrader application.
      *
@@ -94,19 +112,27 @@ public class JBookTrader {
             if(args.length == 1) {
                 Dispatcher.setReportFactory(new ReportFactoryFile());
                 Dispatcher.setReporter("EventReport");
-            	new JBookTrader();	
+                new JBookTrader();	
             }
             // Launch command line backtester
             else if(args.length == 4 && args[1].equals("--backtest")){
                 Dispatcher.setReportFactory(new ReportFactoryConsole());
                 Dispatcher.setReporter("EventReport");
-        		new CommandLineBackTester(args[2], args[3]);            		
+                new CommandLineBackTester(args[2], args[3]);            		
             }
             // Launch command line optimizer
             else if(args.length == 7 && args[1].equals("--optimize") ){
                 Dispatcher.setReportFactory(new ReportFactoryConsole());
                 Dispatcher.setReporter("EventReport");
                 new CommandLineOptimizer(args[2],args[3],args[4],args[5],args[6]);                
+            }
+            // Launch command line forward test
+            else if(args.length>2 && args[1].equals("--forwardtest") ) {
+                runCommandLineTrade(Mode.ForwardTest, args);
+            }
+            // Launch command line live trading
+            else if(args.length>2 && args[1].equals("--trade") ) {
+                runCommandLineTrade(Mode.Trade, args);
             }
             // Show Usage help
             else if (args.length != 1) {
