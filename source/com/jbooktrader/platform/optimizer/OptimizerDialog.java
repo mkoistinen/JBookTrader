@@ -25,7 +25,8 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
     private final String strategyName;
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
-    private JTextField fileNameText, minTradesText;
+    private JTextField fileNameText;
+    private JSpinner minTradesText;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
     private JProgressBar progressBar;
@@ -97,17 +98,6 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
             String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
             throw new JBookTraderException(msg);
         }
-
-        try {
-            int minTrades = Integer.parseInt(minTradesText.getText());
-            if (minTrades < 2) {
-                minTradesText.requestFocus();
-                throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be greater or equal to 2.");
-            }
-        } catch (NumberFormatException nfe) {
-            minTradesText.requestFocus();
-            throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be an integer.");
-        }
     }
 
     private void setParamTableColumns() {
@@ -130,7 +120,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
             public void actionPerformed(ActionEvent e) {
                 try {
                     prefs.set(OptimizerFileName, fileNameText.getText());
-                    prefs.set(OptimizerMinTrades, minTradesText.getText());
+                    prefs.set(OptimizerMinTrades, minTradesText.getValue().toString());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
                     setOptions();
@@ -299,8 +289,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
         }
 
         JLabel minTradesLabel = new JLabel("Minimum trades: ");
-        minTradesText = new JTextField("50");
-        minTradesText.setText(prefs.get(OptimizerMinTrades));
+        minTradesText = new JSpinner(new SpinnerNumberModel(prefs.getInt(OptimizerMinTrades),2,1000000,1));
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
@@ -401,7 +390,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
     }
 
     public int getMinTrades() {
-        return Integer.parseInt(minTradesText.getText());
+        return ((SpinnerNumberModel)minTradesText.getModel()).getNumber().intValue();
     }
 
 
