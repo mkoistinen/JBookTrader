@@ -13,12 +13,12 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, advisorAccountText, reportRendererText, fromText, toText, emailSubjectText, heartBeatIntervalText, emailSMTPSHost, emailLogin;
+    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, heartBeatIntervalText, emailSMTPSHost, emailLogin;
     private JSpinner clientIDSpin;
     private JPasswordField emailPasswordField;
-    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo;
+    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo;
 
-    public PreferencesDialog(JFrame parent) {
+    public PreferencesDialog(JFrame parent) throws JBookTraderException {
         super(parent);
         prefs = PreferencesHolder.getInstance();
         init();
@@ -53,7 +53,7 @@ public class PreferencesDialog extends JDialog {
     }
 
 
-    private void init() {
+    private void init() throws JBookTraderException {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Preferences");
 
@@ -89,9 +89,9 @@ public class PreferencesDialog extends JDialog {
 
         JPanel reportingTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Reporting", reportingTab);
-        reportRendererText = new JTextField();
+        reportRendererCombo = new JComboBox(ClassFinder.getReportRenderers());
         reportRecyclingCombo = new JComboBox(new String[]{"Append", "New"});
-        add(reportingTab, ReportRenderer, reportRendererText);
+        add(reportingTab, ReportRenderer, reportRendererCombo);
         add(reportingTab, ReportRecycling, reportRecyclingCombo);
         SpringUtilities.makeCompactGrid(reportingTab, 2, 2, 12, 12, 8, 5);
 
@@ -150,7 +150,7 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(ClientID, clientIDSpin.getValue().toString());
                     prefs.set(AccountType, (String) accountTypeCombo.getSelectedItem());
                     prefs.set(AdvisorAccount, advisorAccountText.getText());
-                    prefs.set(ReportRenderer, reportRendererText.getText());
+                    prefs.set(ReportRenderer, (String) reportRendererCombo.getSelectedItem());
                     prefs.set(ReportRecycling, (String) reportRecyclingCombo.getSelectedItem());
                     prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
                     prefs.set(SMTPSHost, emailSMTPSHost.getText());

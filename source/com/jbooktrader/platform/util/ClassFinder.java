@@ -9,7 +9,6 @@ import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
-
 public class ClassFinder {
 
     /**
@@ -19,7 +18,7 @@ public class ClassFinder {
      * JBookTrader will know how to run a trading strategy as long as that
      * strategy is implemented in a class that extends the base Strategy class.
      */
-    private List<String> getClasses(String packageName) throws JBookTraderException {
+    private static List<String> getClasses(String packageName) throws JBookTraderException {
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
         List<String> classNames = new ArrayList<String>();
 
@@ -66,7 +65,7 @@ public class ClassFinder {
         }
     }
 
-    public List<Strategy> getStrategies() throws JBookTraderException {
+    public static List<Strategy> getStrategies() throws JBookTraderException {
         List<Strategy> strategies = new ArrayList<Strategy>();
         List<String> strategyNames;
         try {
@@ -88,6 +87,30 @@ public class ClassFinder {
             }
         }
         return strategies;
+    }
+
+    public static Vector<String> getReportRenderers() throws JBookTraderException {
+        Vector<String> reportNames = new Vector<String>();
+        
+        for(String className: getClasses("com/jbooktrader/platform/report") ){
+            try {
+                String fullClassName = "com.jbooktrader.platform.report." + className;
+                Class<?> clazz = Class.forName(fullClassName);
+                boolean interfaceFound = false;
+                for(Class<?> implementedInterface: clazz.getInterfaces()) {
+                    if(implementedInterface.getName().equals("com.jbooktrader.platform.report.ReportRenderer")) {
+                        interfaceFound = true;
+                        break;
+                    }
+                }
+                if(interfaceFound) {
+                    reportNames.add(fullClassName);
+                }
+            } catch (Exception e) {
+            }
+        }
+
+        return reportNames;
     }
 }
 
