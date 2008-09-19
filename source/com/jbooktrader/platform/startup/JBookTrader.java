@@ -10,7 +10,7 @@ import com.jbooktrader.platform.report.ReportFactoryConsole;
 import com.jbooktrader.platform.report.ReportFactoryFile;
 import com.jbooktrader.platform.strategy.CommandLineStrategyRunner;
 import com.jbooktrader.platform.util.*;
-import com.jbooktrader.platform.web.WebServer;
+//import com.jbooktrader.platform.web.WebServer;
 
 import javax.swing.*;
 import javax.swing.plaf.*;
