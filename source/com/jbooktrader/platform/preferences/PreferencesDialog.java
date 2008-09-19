@@ -65,10 +65,14 @@ public class PreferencesDialog extends JDialog {
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
 
+        JPanel  noticePanel = new JPanel();        
+        JLabel  noticeLabel = new JLabel("Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.");
+        noticeLabel.setForeground(Color.red);
+        noticePanel.add(noticeLabel);       
 
+        getContentPane().add(noticePanel , BorderLayout.NORTH);
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
-
 
         JTabbedPane tabbedPane1 = new JTabbedPane();
         contentPanel.add(tabbedPane1, BorderLayout.CENTER);
@@ -160,8 +164,8 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(To, toText.getText());
                     prefs.set(EmailSubject, emailSubjectText.getText());
                     prefs.set(HeartBeatInterval, heartBeatIntervalText.getText());
-                    String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
-                    MessageDialog.showMessage(PreferencesDialog.this, msg);
+                    //String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
+                    //MessageDialog.showMessage(PreferencesDialog.this, msg);
                     dispose();
                 } catch (Exception ex) {
                     MessageDialog.showError(PreferencesDialog.this, ex.getMessage());
@@ -176,7 +180,7 @@ public class PreferencesDialog extends JDialog {
         });
 
 
-        setPreferredSize(new Dimension(500, 360));
+        setPreferredSize(new Dimension(500, 380));
 
     }
 }
