@@ -10,6 +10,7 @@ import com.jbooktrader.platform.report.ReportFactoryConsole;
 import com.jbooktrader.platform.report.ReportFactoryFile;
 import com.jbooktrader.platform.strategy.CommandLineStrategyRunner;
 import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.web.WebServer;
 
 import javax.swing.*;
 import javax.swing.plaf.*;
@@ -45,6 +46,7 @@ public class JBookTrader {
         UIManager.put("TitledBorder.titleColor", color);
 
         new MainFrameController();
+        //WebServer.start();
     }
 
 
