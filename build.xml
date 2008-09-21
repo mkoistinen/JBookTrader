@@ -1,4 +1,4 @@
-<project name="JBookTrader" default="compile" basedir=".">
+<project name="JBookTrader" default="run" basedir=".">
 
   <property name="build.dir" value="${basedir}/bin" />
   <property name="jar.dir" value="${basedir}/lib" />
