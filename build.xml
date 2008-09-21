@@ -1,0 +1,76 @@
+<project name="JBookTrader" default="compile" basedir=".">
+
+  <property name="build.dir" value="${basedir}/bin" />
+  <property name="jar.dir" value="${basedir}/lib" />
+  <property name="source.dir" value="${basedir}/source" />
+
+  <property name="jcommon.jar" value="${jar.dir}/jcommon-1.0.13.jar" />
+  <property name="jfreechart.jar" value="${jar.dir}/jfreechart-1.0.10.jar" />
+
+  <property name="jetty.jar" value="${jar.dir}/jetty-6.1.11.jar" />
+  <property name="jetty-util.jar" value="${jar.dir}/jetty-util-6.1.11.jar" />
+  <property name="servlet-api.jar" value="${jar.dir}/servlet-api-2.5-6.1.11.jar" />
+
+  <property name="liquidlnf.jar" value="${jar.dir}/liquidlnf.jar" />
+
+  <property name="mail.jar" value="${jar.dir}/mail.jar" />
+
+  <property name="twsapi.jar" value="${jar.dir}/API-9.4.jar" />
+
+  <path id="compile.classpath">
+    <pathelement location="${jcommon.jar}" />
+    <pathelement location="${jfreechart.jar}" />
+    <pathelement location="${liquidlnf.jar}" />
+    <pathelement location="${mail.jar}" />
+    <pathelement location="${twsapi.jar}" />
+    <pathelement location="${jetty.jar}" />
+    <pathelement location="${jetty-util.jar}" />
+    <pathelement location="${servlet-api.jar}" />
+  </path>
+
+  <path id="run.classpath">
+    <pathelement location="${jcommon.jar}" />
+    <pathelement location="${jfreechart.jar}" />
+    <pathelement location="${liquidlnf.jar}" />
+    <pathelement location="${mail.jar}" />
+    <pathelement location="${twsapi.jar}" />
+    <pathelement location="${jetty.jar}" />
+    <pathelement location="${jetty-util.jar}" />
+    <pathelement location="${servlet-api.jar}" />
+    <pathelement location="${build.dir}" />
+    <pathelement location="${basedir}/resources" />
+  </path>
+
+  <target name="compile" depends="prepare" description="Compile Java sources">
+    <!-- Compile Java classes as necessary -->
+    <javac srcdir="${source.dir}" destdir="${build.dir}" debug="true" optimize="true">
+        <compilerarg value="-Xlint" compiler="javac1.5" />
+        <compilerarg value="-Xlint:-fallthrough" compiler="javac1.5" />
+        <compilerarg value="-Xlint:-serial" compiler="javac1.5" />
+        <compilerarg value="-Xlint:-unchecked" compiler="javac1.5" />
+        <classpath refid="compile.classpath"/>
+    </javac>
+  </target>
+
+  <target name="prepare">
+    <!-- Create build directories as needed -->
+    <mkdir dir="${build.dir}" />
+  </target>
+
+  <target name="run" depends="compile">
+    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+      <arg path="${basedir}"/>
+    </java>
+  </target>
+
+  <target name="javadoc" depends="compile" description="Create Javadoc API documentation">
+    <mkdir dir="${basedir}/docs/api"/>
+    <javadoc sourcepath="${source.dir}" destdir="docs/api" packagenames="*" windowtitle="JBookTrader API">
+      <classpath refid="compile.classpath"/>
+      <doctitle><![CDATA[<h2>JBookTrader</h2>]]></doctitle>
+      <link href="http://java.sun.com/javase/6/docs/api/" />
+      <link href="http://java.sun.com/products/javamail/javadocs/" />
+    </javadoc>
+  </target>
+
+</project>
