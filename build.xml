@@ -1,48 +1,45 @@
 <project name="JBookTrader" default="run" basedir=".">
 
+
+  <!-- properties to be overrided with ant -Dname=value when using
+       targets backtest, optimize, forwardtest and trade -->
+
+  <!-- list of strategies to use in forward test and live trading mode -->
+  <property name="strategies" value="Strastegy1 Stragtegy2"/>
+
+  <!-- strategy to backtest or optimize -->
+  <property name="strategy" value="StrastegyName"/>
+
+  <!-- data file name to use for backtest or optimize -->
+  <property name="datafile" value="/work/data/ES.txt"/>
+
+  <!-- sort criteria to sort the optimizer's results -->
+  <property name="sortcriteria" value="Profit Factor"/>
+
+  <!-- minimum number of trades to include the result in the optimizer's results -->
+  <property name="mintrades" value="100"/>
+
+  <!-- optimizer method used: bf for "Brute Force" and dnc for "Divide and Conquer" -->
+  <property name="optzmethod" value="bf"/>
+
+
   <property name="build.dir" value="${basedir}/bin" />
   <property name="jar.dir" value="${basedir}/lib" />
   <property name="source.dir" value="${basedir}/source" />
 
-  <property name="jcommon.jar" value="${jar.dir}/jcommon-1.0.13.jar" />
-  <property name="jfreechart.jar" value="${jar.dir}/jfreechart-1.0.10.jar" />
-
-  <property name="jetty.jar" value="${jar.dir}/jetty-6.1.11.jar" />
-  <property name="jetty-util.jar" value="${jar.dir}/jetty-util-6.1.11.jar" />
-  <property name="servlet-api.jar" value="${jar.dir}/servlet-api-2.5-6.1.11.jar" />
-
-  <property name="liquidlnf.jar" value="${jar.dir}/liquidlnf.jar" />
-
-  <property name="mail.jar" value="${jar.dir}/mail.jar" />
-
-  <property name="twsapi.jar" value="${jar.dir}/API-9.4.jar" />
-
   <path id="compile.classpath">
-    <pathelement location="${jcommon.jar}" />
-    <pathelement location="${jfreechart.jar}" />
-    <pathelement location="${liquidlnf.jar}" />
-    <pathelement location="${mail.jar}" />
-    <pathelement location="${twsapi.jar}" />
-    <pathelement location="${jetty.jar}" />
-    <pathelement location="${jetty-util.jar}" />
-    <pathelement location="${servlet-api.jar}" />
+    <fileset dir="${jar.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
   </path>
 
   <path id="run.classpath">
-    <pathelement location="${jcommon.jar}" />
-    <pathelement location="${jfreechart.jar}" />
-    <pathelement location="${liquidlnf.jar}" />
-    <pathelement location="${mail.jar}" />
-    <pathelement location="${twsapi.jar}" />
-    <pathelement location="${jetty.jar}" />
-    <pathelement location="${jetty-util.jar}" />
-    <pathelement location="${servlet-api.jar}" />
+    <path refid="compile.classpath"/>
     <pathelement location="${build.dir}" />
     <pathelement location="${basedir}/resources" />
   </path>
 
-  <target name="compile" depends="prepare" description="Compile Java sources">
-    <!-- Compile Java classes as necessary -->
+  <target name="compile" depends="prepare" description="Compile Java classes as necessary">
     <javac srcdir="${source.dir}" destdir="${build.dir}" debug="true" optimize="true">
         <compilerarg value="-Xlint" compiler="javac1.5" />
         <compilerarg value="-Xlint:-fallthrough" compiler="javac1.5" />
@@ -52,18 +49,59 @@
     </javac>
   </target>
 
-  <target name="prepare">
-    <!-- Create build directories as needed -->
+  <target name="clean" description="Delete generated files">
+    <delete dir="${build.dir}" />
+    <delete dir="${basedir}/docs/api" />
+  </target>
+
+  <target name="prepare" description="Create build directories as needed">
     <mkdir dir="${build.dir}" />
   </target>
 
-  <target name="run" depends="compile">
+  <target name="run" depends="compile" description="Run JBT in GUI mode">
     <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
       <arg path="${basedir}"/>
     </java>
   </target>
 
-  <target name="javadoc" depends="compile" description="Create Javadoc API documentation">
+  <target name="forwardtest" depends="compile" description="Run JBT in command line forwardtest mode">
+    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+      <arg path="${basedir}"/>
+      <arg value="--forwardtest"/>
+      <arg line="${strategies}"/>
+    </java>
+  </target>
+
+  <target name="trade" depends="compile" description="Run JBT in command line live trade mode">
+    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+      <arg path="${basedir}"/>
+      <arg value="--trade"/>
+      <arg line="${strategies}"/>
+    </java>
+  </target>
+
+  <target name="backtest" depends="compile" description="Run a backtest in command line mode">
+    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+      <arg path="${basedir}"/>
+      <arg value="--backtest"/>
+      <arg value="${strategy}"/>
+      <arg value="${datafile}"/>
+    </java>
+  </target>
+
+  <target name="optimize" depends="compile" description="Run the optimizer in command line mode">
+    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+      <arg path="${basedir}"/>
+      <arg value="--optimize"/>
+      <arg value="${strategy}"/>
+      <arg value="${datafile}"/>
+      <arg value="${sortcriteria}"/>
+      <arg value="${mintrades}"/>
+      <arg value="${optzmethod}"/>
+    </java>
+  </target>
+
+  <target name="javadoc" depends="compile" description="Create Javadoc API documentation in ${basedir}/docs/api">
     <mkdir dir="${basedir}/docs/api"/>
     <javadoc sourcepath="${source.dir}" destdir="docs/api" packagenames="*" windowtitle="JBookTrader API">
       <classpath refid="compile.classpath"/>
