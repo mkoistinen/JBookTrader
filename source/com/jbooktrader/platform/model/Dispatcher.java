@@ -3,6 +3,7 @@ package com.jbooktrader.platform.model;
 
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.trader.*;
+import com.jbooktrader.platform.web.*;
 
 import java.util.*;
 
@@ -81,6 +82,7 @@ public class Dispatcher {
 
         if (mode == Mode.Trade || mode == Mode.ForwardTest) {
             getTrader().getAssistant().connect();
+            MonitoringServer.start();
         } else {
             getTrader().getAssistant().disconnect();
         }

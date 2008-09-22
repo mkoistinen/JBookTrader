@@ -63,6 +63,11 @@ public class TraderAssistant {
         return strategies.get(strategyId);
     }
 
+    public Collection<Strategy> getAllStrategies() {
+        return strategies.values();
+    }
+
+
     public MarketBook getMarketBook(int tickerId) {
         return marketBooks.get(tickerId);
     }
