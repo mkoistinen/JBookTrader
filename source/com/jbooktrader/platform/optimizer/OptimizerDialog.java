@@ -289,7 +289,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
         }
 
         JLabel minTradesLabel = new JLabel("Minimum trades: ");
-        minTradesText = new JSpinner(new SpinnerNumberModel(prefs.getInt(OptimizerMinTrades),2,1000000,1));
+        minTradesText = new JSpinner(new SpinnerNumberModel(prefs.getInt(OptimizerMinTrades), 2, 1000000, 1));
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
@@ -390,7 +390,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
     }
 
     public int getMinTrades() {
-        return ((SpinnerNumberModel)minTradesText.getModel()).getNumber().intValue();
+        return ((SpinnerNumberModel) minTradesText.getModel()).getNumber().intValue();
     }
 
 

@@ -1,8 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;

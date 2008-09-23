@@ -1,8 +1,7 @@
 package com.jbooktrader.platform.preferences;
 
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
-
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
@@ -32,7 +31,7 @@ public class PreferencesDialog extends JDialog {
         textField.setText(prefs.get(pref));
         genericAdd(panel, pref, textField);
     }
-    
+
     private void add(JPanel panel, JBTPreferences pref, JSpinner spinner) {
         spinner.setValue(prefs.getInt(pref));
         genericAdd(panel, pref, spinner);
@@ -42,14 +41,14 @@ public class PreferencesDialog extends JDialog {
         comboBox.setSelectedItem(prefs.get(pref));
         genericAdd(panel, pref, comboBox);
     }
-    
+
     private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
         JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
         fieldNameLabel.setLabelFor(comp);
         comp.setPreferredSize(FIELD_DIMENSION);
         comp.setMaximumSize(FIELD_DIMENSION);
         panel.add(fieldNameLabel);
-        panel.add(comp);        
+        panel.add(comp);
     }
 
 
@@ -65,12 +64,12 @@ public class PreferencesDialog extends JDialog {
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
 
-        JPanel  noticePanel = new JPanel();        
-        JLabel  noticeLabel = new JLabel("Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.");
+        JPanel noticePanel = new JPanel();
+        JLabel noticeLabel = new JLabel("Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.");
         noticeLabel.setForeground(Color.red);
-        noticePanel.add(noticeLabel);       
+        noticePanel.add(noticeLabel);
 
-        getContentPane().add(noticePanel , BorderLayout.NORTH);
+        getContentPane().add(noticePanel, BorderLayout.NORTH);
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 
@@ -81,7 +80,7 @@ public class PreferencesDialog extends JDialog {
         tabbedPane1.addTab("TWS Connection", connectionTab);
         hostText = new JTextField();
         portText = new JTextField();
-        clientIDSpin = new JSpinner(new SpinnerNumberModel(0,0,1000,1));
+        clientIDSpin = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
         accountTypeCombo = new JComboBox(new String[]{"Universal", "Advisor"});
         advisorAccountText = new JTextField();
         add(connectionTab, Host, hostText);
@@ -90,7 +89,7 @@ public class PreferencesDialog extends JDialog {
         add(connectionTab, AccountType, accountTypeCombo);
         add(connectionTab, AdvisorAccount, advisorAccountText);
         SpringUtilities.makeCompactGrid(connectionTab, 5, 2, 12, 12, 8, 5);
-        setWidth(connectionTab,clientIDSpin,45);
+        setWidth(connectionTab, clientIDSpin, 45);
 
         JPanel reportingTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Reporting", reportingTab);
@@ -109,7 +108,7 @@ public class PreferencesDialog extends JDialog {
         fromText = new JTextField();
         toText = new JTextField();
         emailSubjectText = new JTextField();
-        heartBeatIntervalSpin = new JSpinner(new SpinnerNumberModel(1,1,99999,1));
+        heartBeatIntervalSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         add(remoteMonitoringTab, EmailMonitoring, emailMonitoringCombo);
         add(remoteMonitoringTab, SMTPSHost, emailSMTPSHost);
         add(remoteMonitoringTab, EmailLogin, emailLogin);
@@ -122,7 +121,7 @@ public class PreferencesDialog extends JDialog {
         JButton emailTestButton = new JButton("Send a test email");
         remoteMonitoringTab.add(emailTestButton);
         SpringUtilities.makeCompactGrid(remoteMonitoringTab, 9, 2, 12, 12, 8, 5);
-        setWidth(remoteMonitoringTab,heartBeatIntervalSpin,65);
+        setWidth(remoteMonitoringTab, heartBeatIntervalSpin, 65);
 
         emailTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -174,18 +173,17 @@ public class PreferencesDialog extends JDialog {
         setPreferredSize(new Dimension(500, 380));
 
     }
-    
-    private void setWidth(JPanel p, Component c, int width) throws JBookTraderException
-    {
+
+    private void setWidth(JPanel p, Component c, int width) throws JBookTraderException {
         SpringLayout layout;
         try {
-            layout = (SpringLayout)p.getLayout();
+            layout = (SpringLayout) p.getLayout();
             SpringLayout.Constraints spinLayoutConstraint = layout.getConstraints(c);
             spinLayoutConstraint.setWidth(Spring.constant(width));
         } catch (ClassCastException exc) {
             throw new JBookTraderException("The first argument to makeGrid must use SpringLayout.");
-        }           
-    }    
+        }
+    }
 }
 
 /* $Id$ */

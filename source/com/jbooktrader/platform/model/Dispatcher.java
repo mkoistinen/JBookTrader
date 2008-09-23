@@ -24,7 +24,7 @@ public class Dispatcher {
 
     public static void setReporter(String eventReportFileName) throws JBookTraderException {
         eventReport = reportFactory.newReport(eventReportFileName);
-    }   
+    }
 
     public static void addListener(ModelListener listener) {
         listeners.add(listener);
@@ -105,11 +105,11 @@ public class Dispatcher {
     public static void setReportFactory(ReportFactory reportFactory) {
         Dispatcher.reportFactory = reportFactory;
     }
-    
+
     public static ReportFactory getReportFactory() {
         return reportFactory;
     }
-    
+
     public static Report createReport(String fileName) throws JBookTraderException {
         return reportFactory.newReport(fileName);
     }

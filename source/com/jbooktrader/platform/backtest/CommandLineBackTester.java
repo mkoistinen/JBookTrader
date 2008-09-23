@@ -1,39 +1,38 @@
 package com.jbooktrader.platform.backtest;
 
-import java.io.File;
-
-import com.jbooktrader.platform.model.Dispatcher;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.model.Dispatcher.Mode;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ClassFinder;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.Dispatcher.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
+
+import java.io.*;
 
 public class CommandLineBackTester {
     private final PreferencesHolder prefs = PreferencesHolder.getInstance();
-    
+
     private class CommandLineBackTesterProgressIndicator implements BackTestProgressIndicator {
 
-		public void dispose() {
-			System.err.println("Finished.");	
-		}
+        public void dispose() {
+            System.err.println("Finished.");
+        }
 
-		public void enableProgress() {
-			System.err.println("Starting to backtest...");
-		}
+        public void enableProgress() {
+            System.err.println("Starting to backtest...");
+        }
 
-		public void setProgress(long count, long iterations, String text) {
-			System.err.println(count + " out of "+iterations+" made. "+text);
-		}
+        public void setProgress(long count, long iterations, String text) {
+            System.err.println(count + " out of " + iterations + " made. " + text);
+        }
 
-		public void showProgress(String progressText) {
-			System.err.println(progressText);	
-		}
-    	
+        public void showProgress(String progressText) {
+            System.err.println(progressText);
+        }
+
     }
-    
-	public CommandLineBackTester(String strategyName, String dataFileName) throws JBookTraderException, InterruptedException {
+
+    public CommandLineBackTester(String strategyName, String dataFileName) throws JBookTraderException, InterruptedException {
 
         File file = new File(dataFileName);
         if (!file.exists()) {

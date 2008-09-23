@@ -59,7 +59,7 @@ public class ClassFinder {
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
         } catch (ClassNotFoundException cnte) {
-        	throw new JBookTraderException("Class " + name + "not found");
+            throw new JBookTraderException("Class " + name + "not found");
         } catch (Exception e) {
             throw new JBookTraderException(e.getCause().getMessage());
         }
@@ -91,19 +91,19 @@ public class ClassFinder {
 
     public static Vector<String> getReportRenderers() throws JBookTraderException {
         Vector<String> reportNames = new Vector<String>();
-        
-        for(String className: getClasses("com/jbooktrader/platform/report") ){
+
+        for (String className : getClasses("com/jbooktrader/platform/report")) {
             try {
                 String fullClassName = "com.jbooktrader.platform.report." + className;
                 Class<?> clazz = Class.forName(fullClassName);
                 boolean interfaceFound = false;
-                for(Class<?> implementedInterface: clazz.getInterfaces()) {
-                    if(implementedInterface.getName().equals("com.jbooktrader.platform.report.ReportRenderer")) {
+                for (Class<?> implementedInterface : clazz.getInterfaces()) {
+                    if (implementedInterface.getName().equals("com.jbooktrader.platform.report.ReportRenderer")) {
                         interfaceFound = true;
                         break;
                     }
                 }
-                if(interfaceFound) {
+                if (interfaceFound) {
                     reportNames.add(fullClassName);
                 }
             } catch (Exception e) {

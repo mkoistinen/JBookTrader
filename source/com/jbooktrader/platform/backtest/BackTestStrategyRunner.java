@@ -1,8 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
-
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 

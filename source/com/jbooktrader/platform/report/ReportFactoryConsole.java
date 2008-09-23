@@ -1,8 +1,8 @@
 package com.jbooktrader.platform.report;
 
-import java.io.PrintWriter;
+import com.jbooktrader.platform.model.*;
 
-import com.jbooktrader.platform.model.JBookTraderException;
+import java.io.*;
 
 public class ReportFactoryConsole implements ReportFactory {
 

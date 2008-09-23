@@ -1,15 +1,10 @@
 package com.jbooktrader.platform.report;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
 
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.preferences.JBTPreferences;
-import com.jbooktrader.platform.preferences.PreferencesHolder;
-import com.jbooktrader.platform.startup.JBookTrader;
+import java.io.*;
 
 public class ReportFactoryFile implements ReportFactory {
     private final static String FILE_SEP = System.getProperty("file.separator");
@@ -17,7 +12,7 @@ public class ReportFactoryFile implements ReportFactory {
 
     public Report newReport(String fileName) throws JBookTraderException {
         String reportRendererClass = PreferencesHolder.getInstance().get(JBTPreferences.ReportRenderer);
-        
+
         ReportRenderer renderer;
         try {
             Class<? extends ReportRenderer> clazz = Class.forName(reportRendererClass).asSubclass(ReportRenderer.class);
@@ -25,9 +20,9 @@ public class ReportFactoryFile implements ReportFactory {
         } catch (Exception e) {
             throw new JBookTraderException(e);
         }
-        
+
         PrintWriter writer = null;
-        if(!Report.isDisabled()) {
+        if (!Report.isDisabled()) {
             File reportDir = new File(REPORT_DIR);
             if (!reportDir.exists()) {
                 reportDir.mkdir();

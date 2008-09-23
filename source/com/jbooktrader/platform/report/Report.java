@@ -29,7 +29,7 @@ public final class Report {
         if (isDisabled) {
             return;
         }
-        
+
         this.writer = writer;
 
         StringBuilder s = new StringBuilder();
@@ -52,7 +52,7 @@ public final class Report {
     public static void enable() {
         isDisabled = false;
     }
-    
+
     public static boolean isDisabled() {
         return isDisabled;
     }

@@ -1,43 +1,42 @@
 package com.jbooktrader.platform.optimizer;
 
-import java.io.File;
-import java.util.List;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.Dispatcher.*;
+import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
-import com.jbooktrader.platform.model.Dispatcher;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.model.Dispatcher.Mode;
-import com.jbooktrader.platform.startup.JBookTrader;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ClassFinder;
+import java.io.*;
+import java.util.*;
 
 public class CommandLineOptimizer {
-    
+
     private class CommandLineOptimizerProgessIndicator implements OptimizerProgressIndicator {
 
-    	private int oldpercent = -1;
-    	
+        private int oldpercent = -1;
+
         public void enableProgress() {
             System.err.println("Starting to optimize...");
         }
 
         public void setProgress(long counter, long totalSteps, String text, String remainingTime) {
             int percent = (int) (100 * (counter / (double) totalSteps));
-            
-            if(percent!=oldpercent) {
-                System.err.println(text + ": " + percent + "% completed (ETA "+remainingTime+")");
+
+            if (percent != oldpercent) {
+                System.err.println(text + ": " + percent + "% completed (ETA " + remainingTime + ")");
             }
-            oldpercent=percent;
+            oldpercent = percent;
         }
 
         public void setResults(List<OptimizationResult> optimizationResults) {
         }
 
         public void showError(String string) {
-            System.err.println("Error: "+ string);
+            System.err.println("Error: " + string);
         }
 
         public void showMessage(String string) {
-            System.err.println("Info: "+ string);
+            System.err.println("Info: " + string);
         }
 
         public void showProgress(String string) {
@@ -45,13 +44,13 @@ public class CommandLineOptimizer {
         }
 
         public void signalCompleted() {
-            
+
         }
-        
+
     }
-    
+
     public CommandLineOptimizer(String strategyName, String dataFileName, String sortCriteria, String pMinTrades, String optimizerMethodName) throws JBookTraderException, InterruptedException {
-    	
+
         Dispatcher.setMode(Mode.Optimization);
 
         Strategy strategy = ClassFinder.getInstance(strategyName);
@@ -60,26 +59,26 @@ public class CommandLineOptimizer {
         if (!file.exists()) {
             throw new JBookTraderException("Historical file " + "\"" + dataFileName + "\"" + " does not exist.");
         }
-        
+
         int minTrades = Integer.valueOf(pMinTrades).intValue();
-        if(minTrades<1) {
-            JBookTrader.showUsage();
+        if (minTrades < 1) {
+            CommandLineStarter.showUsage();
             return;
         }
 
         PerformanceMetric performanceMetric = PerformanceMetric.getColumn(sortCriteria);
-        if(performanceMetric==null) {
-            JBookTrader.showUsage();
+        if (performanceMetric == null) {
+            CommandLineStarter.showUsage();
             return;
         }
-        
+
         OptimizerRunner optimizerRunner;
         if (optimizerMethodName.equals("bf")) {
             optimizerRunner = new BruteForceOptimizerRunner(new CommandLineOptimizerProgessIndicator(), strategy, strategy.getParams(), dataFileName, performanceMetric, minTrades);
         } else if (optimizerMethodName.equals("dnc")) {
             optimizerRunner = new DivideAndConquerOptimizerRunner(new CommandLineOptimizerProgessIndicator(), strategy, strategy.getParams(), dataFileName, performanceMetric, minTrades);
         } else {
-            JBookTrader.showUsage();
+            CommandLineStarter.showUsage();
             return;
         }
 

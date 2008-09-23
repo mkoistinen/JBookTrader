@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import java.util.List;
+import java.util.*;
 
 public interface OptimizerProgressIndicator {
 

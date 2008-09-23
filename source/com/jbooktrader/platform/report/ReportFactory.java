@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.report;
 
-import com.jbooktrader.platform.model.JBookTraderException;
+import com.jbooktrader.platform.model.*;
 
 public interface ReportFactory {
 
