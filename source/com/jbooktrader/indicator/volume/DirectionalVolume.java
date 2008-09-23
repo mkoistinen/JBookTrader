@@ -34,5 +34,3 @@ public class DirectionalVolume extends Indicator {
         return value;
     }
 }
-
-/* $Id$ */

@@ -407,5 +407,3 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
         MessageDialog.showMessage(this, msg);
     }
 }
-
-/* $Id$ */

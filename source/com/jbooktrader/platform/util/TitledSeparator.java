@@ -17,5 +17,3 @@ public class TitledSeparator extends JPanel {
         add(new JSeparator(), constrants);
     }
 }
-
-/* $Id$ */

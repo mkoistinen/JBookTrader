@@ -69,5 +69,3 @@ public class StrategyParam {
         this.max = max;
     }
 }
-
-/* $Id$ */

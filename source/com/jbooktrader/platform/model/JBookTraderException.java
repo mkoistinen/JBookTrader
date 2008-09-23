@@ -13,5 +13,3 @@ public class JBookTraderException extends Exception {
         super(message, cause);
     }
 }
-
-/* $Id$ */

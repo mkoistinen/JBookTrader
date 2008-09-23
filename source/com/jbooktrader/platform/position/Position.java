@@ -26,5 +26,3 @@ public class Position {
         return avgFillPrice;
     }
 }
-
-/* $Id$ */

@@ -20,5 +20,3 @@ public class NumberFormatterFactory {
         return getNumberFormatter(0, maxFractionDigits);
     }
 }
-
-/* $Id$ */

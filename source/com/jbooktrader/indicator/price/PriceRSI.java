@@ -35,5 +35,3 @@ public class PriceRSI extends Indicator {
         return value;
     }
 }
-
-/* $Id$ */

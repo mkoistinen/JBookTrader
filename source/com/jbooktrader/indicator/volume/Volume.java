@@ -16,5 +16,3 @@ public class Volume extends Indicator {
         return value;
     }
 }
-
-/* $Id$ */

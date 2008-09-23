@@ -20,4 +20,3 @@ public class DepthBalanceEMA extends Indicator {
         return value;
     }
 }
-/* $Id$ */

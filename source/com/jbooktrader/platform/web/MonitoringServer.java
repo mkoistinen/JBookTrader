@@ -25,5 +25,4 @@ public class MonitoringServer {
             MessageDialog.showError(null, "Could not start monitoring server: " + e.getMessage());
         }
     }
-
 }

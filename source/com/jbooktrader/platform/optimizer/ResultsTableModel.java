@@ -65,5 +65,3 @@ public class ResultsTableModel extends TableDataModel {
         fireTableDataChanged();
     }
 }
-
-/* $Id$ */

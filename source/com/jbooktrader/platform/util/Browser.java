@@ -43,5 +43,3 @@ public class Browser {
     }
 
 }
-
-/* $Id$ */

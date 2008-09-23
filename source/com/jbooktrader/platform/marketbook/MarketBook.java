@@ -167,5 +167,3 @@ public class MarketBook {
         }
     }
 }
-
-/* $Id$ */

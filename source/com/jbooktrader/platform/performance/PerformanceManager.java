@@ -174,5 +174,3 @@ public class PerformanceManager {
         previousPosition = position;
     }
 }
-
-/* $Id$ */

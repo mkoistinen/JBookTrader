@@ -311,5 +311,3 @@ public class TraderAssistant {
     }
 
 }
-
-/* $Id$ */

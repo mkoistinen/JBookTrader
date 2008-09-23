@@ -35,5 +35,3 @@ public enum PerformanceMetric {
         return null;
     }
 }
-
-/* $Id$ */

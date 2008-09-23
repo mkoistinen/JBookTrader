@@ -9,5 +9,3 @@ public interface BackTestProgressIndicator {
 
     public void dispose();
 }
-
-/* $Id$ */

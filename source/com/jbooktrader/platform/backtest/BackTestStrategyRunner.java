@@ -52,5 +52,3 @@ public class BackTestStrategyRunner implements Runnable {
         }
     }
 }
-
-/* $Id$ */

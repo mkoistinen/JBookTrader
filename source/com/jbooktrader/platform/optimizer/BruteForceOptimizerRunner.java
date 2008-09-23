@@ -43,5 +43,3 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         }
     }
 }
-
-/* $Id$ */

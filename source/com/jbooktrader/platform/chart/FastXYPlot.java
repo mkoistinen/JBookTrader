@@ -119,5 +119,3 @@ public class FastXYPlot extends XYPlot {
     }
 
 }
-
-/* $Id$ */

@@ -40,5 +40,3 @@ public enum BarSize {
         return null;
     }
 }
-
-/* $Id$ */

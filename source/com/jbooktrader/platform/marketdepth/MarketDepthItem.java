@@ -25,4 +25,4 @@ public class MarketDepthItem {
         this.price = price;
     }
 }
-/* $Id$ */
+

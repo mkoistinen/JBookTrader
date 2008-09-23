@@ -114,5 +114,3 @@ public class Dispatcher {
         return reportFactory.newReport(fileName);
     }
 }
-
-/* $Id$ */

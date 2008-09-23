@@ -99,5 +99,3 @@ public class EWrapperAdapter implements EWrapper {
     }
 
 }
-
-/* $Id$ */

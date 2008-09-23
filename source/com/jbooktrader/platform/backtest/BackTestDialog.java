@@ -170,7 +170,4 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
     public String getFileName() {
         return fileNameText.getText();
     }
-
 }
-
-/* $Id$ */

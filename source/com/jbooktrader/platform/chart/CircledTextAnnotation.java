@@ -68,5 +68,3 @@ public class CircledTextAnnotation extends XYTextAnnotation {
                 getRotationAngle(), getRotationAnchor());
     }
 }
-
-/* $Id$ */

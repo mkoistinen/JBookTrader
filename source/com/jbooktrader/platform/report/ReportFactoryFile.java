@@ -40,5 +40,3 @@ public class ReportFactoryFile implements ReportFactory {
     }
 
 }
-
-/* $Id$ */

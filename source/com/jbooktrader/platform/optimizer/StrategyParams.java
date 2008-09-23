@@ -84,5 +84,3 @@ public class StrategyParams {
         throw new JBookTraderException("Parameter " + name + " is not defined.");
     }
 }
-
-/* $Id$ */

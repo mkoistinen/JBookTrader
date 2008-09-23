@@ -45,10 +45,10 @@ public class Balancer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(EMA_PERIOD, 10, 40, 5, 30);
-        addParam(RSI_PERIOD, 50, 150, 25, 82);
-        addParam(BALANCE_ENTRY, 15, 30, 1, 20);
-        addParam(RSI_ENTRY, 10, 30, 1, 25);
+        addParam(EMA_PERIOD, 10, 40, 5, 43);
+        addParam(RSI_PERIOD, 50, 150, 25, 129);
+        addParam(BALANCE_ENTRY, 15, 30, 1, 21);
+        addParam(RSI_ENTRY, 10, 30, 1, 15);
     }
 
     /**
@@ -66,5 +66,3 @@ public class Balancer extends StrategyES {
         }
     }
 }
-
-/* $Id$ */

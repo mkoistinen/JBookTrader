@@ -38,5 +38,3 @@ public class MarketTimeLine {
         return new SegmentedTimeline(SegmentedTimeline.DAY_SEGMENT_SIZE, 7, 0);
     }
 }
-
-/* $Id$ */

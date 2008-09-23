@@ -100,5 +100,3 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         } while (strategies.size() > 0 && !cancelled);
     }
 }
-
-/* $Id$ */

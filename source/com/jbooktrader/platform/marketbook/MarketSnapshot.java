@@ -71,5 +71,3 @@ public class MarketSnapshot {
     }
 
 }
-
-/* $Id$ */

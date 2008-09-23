@@ -43,5 +43,3 @@ public class ComputationalTimeEstimator {
         return timeLeft;
     }
 }
-
-/* $Id$ */

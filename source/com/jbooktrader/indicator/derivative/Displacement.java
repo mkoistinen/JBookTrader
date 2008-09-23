@@ -29,5 +29,3 @@ public class Displacement extends Indicator {
         return value;
     }
 }
-
-/* $Id$ */

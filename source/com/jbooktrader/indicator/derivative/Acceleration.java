@@ -29,5 +29,3 @@ public class Acceleration extends Indicator {
         return value;
     }
 }
-
-/* $Id$ */

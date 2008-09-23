@@ -285,5 +285,3 @@ public abstract class OptimizerRunner implements Runnable {
         }
     }
 }
-
-/* $Id$ */

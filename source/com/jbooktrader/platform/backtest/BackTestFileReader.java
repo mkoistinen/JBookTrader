@@ -151,5 +151,3 @@ public class BackTestFileReader {
         return new MarketSnapshot(time, lowBalance, highBalance, bestBid, bestAsk, volume, tick);
     }
 }
-
-/* $Id$ */

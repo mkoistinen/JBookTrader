@@ -7,5 +7,3 @@ public interface ModelListener {
 
     void modelChanged(Event event, Object value);
 }
-
-/* $Id$ */

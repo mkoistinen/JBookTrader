@@ -362,5 +362,3 @@ public class PerformanceChart {
     }
 
 }
-
-/* $Id$ */

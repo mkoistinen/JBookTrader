@@ -38,5 +38,3 @@ public class Commission {
         return commission;
     }
 }
-
-/* $Id$ */

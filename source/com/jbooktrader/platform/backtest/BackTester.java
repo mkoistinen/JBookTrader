@@ -63,5 +63,3 @@ public class BackTester {
         Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, strategy);
     }
 }
-
-/* $Id$ */

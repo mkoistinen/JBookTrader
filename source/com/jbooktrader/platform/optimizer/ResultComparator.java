@@ -33,5 +33,3 @@ public class ResultComparator implements Comparator<OptimizationResult> {
         return res;
     }
 }
-
-/* $Id$ */

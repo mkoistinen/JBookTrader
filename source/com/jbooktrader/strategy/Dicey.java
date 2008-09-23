@@ -61,5 +61,3 @@ public class Dicey extends StrategyES {
         }
     }
 }
-
-/* $Id$ */

@@ -97,5 +97,3 @@ public class StrategyTableModel extends TableDataModel {
         addRow(row);
     }
 }
-
-/* $Id$ */

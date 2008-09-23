@@ -78,5 +78,3 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
         return optimizationResults;
     }
 }
-
-/* $Id$ */

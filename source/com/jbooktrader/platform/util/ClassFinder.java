@@ -113,5 +113,3 @@ public class ClassFinder {
         return reportNames;
     }
 }
-
-/* $Id$ */

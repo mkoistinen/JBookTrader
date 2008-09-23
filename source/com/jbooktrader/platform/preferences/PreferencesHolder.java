@@ -35,5 +35,3 @@ public class PreferencesHolder {
         set(pref, String.valueOf(propertyValue));
     }
 }
-
-/* $Id$ */
