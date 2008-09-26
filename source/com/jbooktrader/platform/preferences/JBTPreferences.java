@@ -22,6 +22,12 @@ public enum JBTPreferences {
     To("To", "me@anyprovider.com"),
     EmailSubject("Email Subject", "[JBT Remote Notification]"),
 
+    // Web Access
+    WebAccess("WebAccess", "disabled"),
+    WebAccessPort("Web access port", "1234"),
+    WebAccessUser("Web access user", "admin"),
+    WebAccessPassword("Web access password", "admin"),
+
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
 

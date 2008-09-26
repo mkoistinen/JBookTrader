@@ -1,30 +1,64 @@
 package com.jbooktrader.platform.web;
 
-import java.io.FileInputStream;
-
 import com.jbooktrader.platform.model.Dispatcher;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.startup.JBookTrader;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.util.*;
 import org.mortbay.jetty.*;
+import org.mortbay.jetty.nio.*;
+import org.mortbay.jetty.security.*;
 import org.mortbay.jetty.servlet.*;
-import org.mortbay.xml.XmlConfiguration;
 
 public class MonitoringServer {
-    private static boolean isStarted;
+    private static Server server;
+    private static final String ROLE = "admin";
 
     public static void start() throws JBookTraderException {
-        if (isStarted)
+
+        if (server != null && server.isRunning()) {
             return;
+        }
+
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
+        boolean isEnabled = prefs.get(WebAccess).equalsIgnoreCase("enabled");
+
+        if (!isEnabled) {
+            return;
+        }
 
         try {
-            Server server = new Server();
-            XmlConfiguration configuration = new XmlConfiguration(new FileInputStream(JBookTrader.getAppPath()+"/conf/jetty.xml"));
-            configuration.configure(server);
+
+            server = new Server();
+
+            SecurityHandler securityHandler = new SecurityHandler();
+            ConstraintMapping constraintMapping = new ConstraintMapping();
+            Constraint constraint = new Constraint(Constraint.__BASIC_AUTH, ROLE);
+            constraint.setAuthenticate(true);
+            constraintMapping.setConstraint(constraint);
+            constraintMapping.setPathSpec("/*");
+            securityHandler.setConstraintMappings(new ConstraintMapping[]{constraintMapping});
+
+
+            int port = Integer.parseInt(prefs.get(WebAccessPort));
+            String userName = prefs.get(WebAccessUser);
+            String password = prefs.get(WebAccessPassword);
+
+
+            HashUserRealm userRealm = new HashUserRealm();
+            userRealm.addUserToRole(userName, ROLE);
+            userRealm.put(userName, password);
+            securityHandler.setUserRealm(userRealm);
+            server.setHandler(securityHandler);
+
+            Connector connector = new SelectChannelConnector();
+            connector.setPort(port);
+            server.setConnectors(new Connector[]{connector});
+
             Context context = new Context(server, "/", Context.SESSIONS);
             context.addServlet(new ServletHolder(new JBTServlet()), "/*");
+
             server.start();
-            isStarted = true;
         }
         catch (Exception e) {
             Dispatcher.getReporter().report(e);

@@ -12,10 +12,10 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin;
-    private JSpinner clientIDSpin, heartBeatIntervalSpin;
-    private JPasswordField emailPasswordField;
-    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo;
+    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser;
+    private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
+    private JPasswordField emailPasswordField, webAccessPasswordField;
+    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
         super(parent);
@@ -123,6 +123,20 @@ public class PreferencesDialog extends JDialog {
         SpringUtilities.makeCompactGrid(remoteMonitoringTab, 9, 2, 12, 12, 8, 5);
         setWidth(remoteMonitoringTab, heartBeatIntervalSpin, 65);
 
+        JPanel webAcessTab = new JPanel(new SpringLayout());
+        tabbedPane1.addTab("Web Access", webAcessTab);
+        webAccessCombo = new JComboBox(new String[]{"disabled", "enabled"});
+        webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
+        webAccessUser = new JTextField();
+        webAccessPasswordField = new JPasswordField();
+        add(webAcessTab, WebAccess, webAccessCombo);
+        add(webAcessTab, WebAccessPort, webAccessPortSpin);
+        add(webAcessTab, WebAccessUser, webAccessUser);
+        add(webAcessTab, WebAccessPassword, webAccessPasswordField);
+        SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 5);
+
+
+
         emailTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -156,6 +170,11 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(To, toText.getText());
                     prefs.set(EmailSubject, emailSubjectText.getText());
                     prefs.set(HeartBeatInterval, heartBeatIntervalSpin.getValue().toString());
+
+                    prefs.set(WebAccess, (String) webAccessCombo.getSelectedItem());
+                    prefs.set(WebAccessPort, webAccessPortSpin.getValue().toString());
+                    prefs.set(WebAccessUser, webAccessUser.getText());
+                    prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
                     dispose();
                 } catch (Exception ex) {
                     MessageDialog.showError(PreferencesDialog.this, ex.getMessage());
