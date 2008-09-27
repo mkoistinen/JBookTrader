@@ -31,7 +31,7 @@ public class JBTServlet extends HttpServlet {
         sb.append("</h3>");
 
         sb.append("<table bgcolor=\"#FFFFEE\" cellspacing=\"0\" border=\"1\" width=\"100%\">");
-        sb.append("<tr><th>Strategy<th>Position<th>Trades<th>Max DD<th>Net Profit</tr>");
+        sb.append("<tr bgcolor=\"#FFCC33\"><th>Strategy<th>Position<th>Trades<th>Max DD<th>Net Profit</tr>");
         DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
         for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
