@@ -45,7 +45,7 @@ public class MonitoringServer {
             String password = prefs.get(WebAccessPassword);
 
 
-            HashUserRealm userRealm = new HashUserRealm();
+            HashUserRealm userRealm = new HashUserRealm("JBookTrader");
             userRealm.addUserToRole(userName, ROLE);
             userRealm.put(userName, password);
             securityHandler.setUserRealm(userRealm);
