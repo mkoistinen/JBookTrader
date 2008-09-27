@@ -58,6 +58,7 @@ public class MonitoringServer {
             Context context = new Context(server, "/", Context.SESSIONS);
             context.addServlet(new ServletHolder(new JBTServlet()), "/*");
 
+            server.setSendServerVersion(false);
             server.start();
         }
         catch (Exception e) {
