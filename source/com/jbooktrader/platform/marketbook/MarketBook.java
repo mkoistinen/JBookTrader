@@ -17,10 +17,12 @@ public class MarketBook {
     private final String name;
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
-    private boolean backTestFileWriterDisabled = false;
+    private boolean backTestFileWriterDisabled, canBeSampled;
     private double lowBalance, highBalance, lastBalance;
     private int cumulativeVolume, previousCumulativeVolume;
     private double tick;
+    private double bestBid, bestAsk;
+    
 
     public MarketBook(String name, TimeZone timeZone) {
         this.name = name;
@@ -82,12 +84,24 @@ public class MarketBook {
 
 
     public void reset() {
+        canBeSampled = false;
         bids.clear();
         asks.clear();
     }
 
     private boolean isValid() {
-        return (bids.size() == 5 && asks.size() == 5);
+        Set<Double> uniquePrices = new HashSet<Double>();
+        for (MarketDepthItem item : bids) {
+            uniquePrices.add(item.getPrice());
+        }
+        for (MarketDepthItem item : asks) {
+            uniquePrices.add(item.getPrice());
+        }
+
+        int bidLevels = bids.size();
+        int askLevels = asks.size();
+
+        return (uniquePrices.size() == (bidLevels + askLevels)) && (bidLevels == askLevels);
     }
 
     public int getCumulativeVolume() {
@@ -104,14 +118,12 @@ public class MarketBook {
 
     public MarketSnapshot getNextMarketSnapshot(long time) {
         MarketSnapshot marketSnapshot = null;
-        if (isValid()) {
+        if (canBeSampled) {
             int volume = cumulativeVolume - previousCumulativeVolume;
-            double bestBid = bids.getFirst().getPrice();
-            double bestAsk = asks.getFirst().getPrice();
             marketSnapshot = new MarketSnapshot(time, (int) Math.round(lowBalance), (int) Math.round(highBalance), bestBid, bestAsk, volume,
                     tick);
 
-            // initialize next market depth values
+            // reset values for the next market snapshot
             previousCumulativeVolume = cumulativeVolume;
             highBalance = lowBalance = lastBalance;
         }
@@ -164,6 +176,9 @@ public class MarketBook {
             lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
             lowBalance = Math.min(lastBalance, lowBalance);
             highBalance = Math.max(lastBalance, highBalance);
+            bestBid = bids.getFirst().getPrice();
+            bestAsk = asks.getFirst().getPrice();
+            canBeSampled = true;
         }
     }
 }
