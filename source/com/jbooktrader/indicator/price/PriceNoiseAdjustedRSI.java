@@ -1,17 +1,17 @@
 package com.jbooktrader.indicator.price;
 
-import java.util.List;
+import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.marketbook.*;
 
-import com.jbooktrader.platform.indicator.Indicator;
-import com.jbooktrader.platform.marketbook.MarketSnapshot;
+import java.util.*;
 
 public class PriceNoiseAdjustedRSI extends Indicator {
     private final int periodLength;
-    
+
     public PriceNoiseAdjustedRSI(int periodLength) {
         this.periodLength = periodLength;
     }
-    
+
     @Override
     public double calculate() {
         List<MarketSnapshot> marketSnapshots = marketBook.getAll();

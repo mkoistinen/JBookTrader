@@ -1,12 +1,12 @@
 package com.jbooktrader.indicator.price;
 
-import com.jbooktrader.platform.indicator.Indicator;
+import com.jbooktrader.platform.indicator.*;
 
 public class PriceEMA extends Indicator {
     private final double multiplier;
 
     public PriceEMA(int length) {
-        multiplier = 2. / (length + 1.);        
+        multiplier = 2. / (length + 1.);
     }
 
     @Override

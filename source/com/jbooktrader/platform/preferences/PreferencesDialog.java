@@ -136,7 +136,6 @@ public class PreferencesDialog extends JDialog {
         SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 5);
 
 
-
         emailTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
