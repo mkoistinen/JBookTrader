@@ -30,7 +30,7 @@ public class JBTServlet extends HttpServlet {
         sb.append(", ").append(Dispatcher.getMode()).append(" mode");
         sb.append("</h3>");
 
-        sb.append("<table border=\"1\" width=\"100%\">");
+        sb.append("<table bgcolor=\"#FFFFEE\" cellspacing=\"0\" border=\"1\" width=\"100%\">");
         sb.append("<tr><th>Strategy<th>Position<th>Trades<th>Max DD<th>Net Profit</tr>");
         DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
