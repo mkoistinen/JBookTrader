@@ -18,14 +18,19 @@ public class JBTServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
 
         StringBuilder sb = new StringBuilder();
+        sb.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
         sb.append("<html>");
-        sb.append("<head><title>JBookTrader Web Console</title></head>");
-        sb.append("<center><h3>");
+        sb.append("<head>");
+        sb.append("<title>JBookTrader Web Console</title>");
+        sb.append("<style type=\"text/css\">h3 { text-align: center; }</style>");
+        sb.append("</head>");
+        sb.append("<body>");
+        sb.append("<h3>");
         sb.append(JBookTrader.APP_NAME).append(", version ").append(JBookTrader.VERSION);
         sb.append(", ").append(Dispatcher.getMode()).append(" mode");
-        sb.append("</h3></center>");
+        sb.append("</h3>");
 
-        sb.append("<table border=1 width=100%>");
+        sb.append("<table border=\"1\" width=\"100%\">");
         sb.append("<tr><th>Strategy<th>Position<th>Trades<th>Max DD<th>Net Profit</tr>");
         DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
@@ -42,6 +47,7 @@ public class JBTServlet extends HttpServlet {
         }
 
         sb.append("</table>");
+        sb.append("</body>");
         sb.append("</html>");
         response.getWriter().println(sb);
     }
