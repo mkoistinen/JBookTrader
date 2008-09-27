@@ -5,6 +5,7 @@ import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.startup.*;
 import org.mortbay.jetty.*;
 import org.mortbay.jetty.nio.*;
 import org.mortbay.jetty.security.*;
@@ -45,7 +46,7 @@ public class MonitoringServer {
             String password = prefs.get(WebAccessPassword);
 
 
-            HashUserRealm userRealm = new HashUserRealm("JBookTrader");
+            HashUserRealm userRealm = new HashUserRealm(JBookTrader.APP_NAME);
             userRealm.addUserToRole(userName, ROLE);
             userRealm.put(userName, password);
             securityHandler.setUserRealm(userRealm);
