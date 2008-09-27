@@ -41,8 +41,8 @@ public class Dicey extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 50, 500, 1, 154);
-        addParam(ENTRY, 20, 50, 1, 40);
+        addParam(PERIOD, 50, 500, 1, 180);
+        addParam(ENTRY, 20, 50, 1, 34);
     }
 
     /**
