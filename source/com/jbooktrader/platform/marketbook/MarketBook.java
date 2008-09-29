@@ -17,12 +17,12 @@ public class MarketBook {
     private final String name;
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
-    private boolean backTestFileWriterDisabled, canBeSampled;
+    private boolean backTestFileWriterDisabled, isResetting;
     private double lowBalance, highBalance, lastBalance;
     private int cumulativeVolume, previousCumulativeVolume;
     private double tick;
     private double bestBid, bestAsk;
-    
+
 
     public MarketBook(String name, TimeZone timeZone) {
         this.name = name;
@@ -30,6 +30,7 @@ public class MarketBook {
         marketSnapshots = new LinkedList<MarketSnapshot>();
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
+        isResetting = true;
     }
 
     public MarketBook() {
@@ -84,24 +85,45 @@ public class MarketBook {
 
 
     public void reset() {
-        canBeSampled = false;
+        isResetting = true;
         bids.clear();
         asks.clear();
     }
 
     private boolean isValid() {
-        Set<Double> uniquePrices = new HashSet<Double>();
-        for (MarketDepthItem item : bids) {
-            uniquePrices.add(item.getPrice());
-        }
-        for (MarketDepthItem item : asks) {
-            uniquePrices.add(item.getPrice());
-        }
-
         int bidLevels = bids.size();
         int askLevels = asks.size();
+        if (bidLevels != askLevels) {
+            // This may happen when the "delete" operation was performed,
+            // but the "insert" operation was not yet completed, or vice versa.
+            return false;
+        }
 
-        return (uniquePrices.size() == (bidLevels + askLevels)) && (bidLevels == askLevels);
+        // The bid price of level N must be smaller than the bid price of level N-1
+        double previousLevelBidPrice = bids.getFirst().getPrice();
+        for (int itemIndex = 1; itemIndex < bidLevels; itemIndex++) {
+            double price = bids.get(itemIndex).getPrice();
+            if (price >= previousLevelBidPrice) {
+                return false;
+            } else {
+               previousLevelBidPrice = price;
+            }
+        }
+
+        // The ask price of level N must be greater than the ask price of level N-1
+        double previousLevelAskPrice = asks.getFirst().getPrice();
+        for (int itemIndex = 1; itemIndex < askLevels; itemIndex++) {
+            double price = asks.get(itemIndex).getPrice();
+            if (price <= previousLevelAskPrice) {
+                return false;
+            } else {
+               previousLevelAskPrice = price;
+            }
+        }
+
+        double bestBid = bids.getFirst().getPrice();
+        double bestAsk = asks.getFirst().getPrice();
+        return (bestBid < bestAsk);
     }
 
     public int getCumulativeVolume() {
@@ -118,7 +140,7 @@ public class MarketBook {
 
     public MarketSnapshot getNextMarketSnapshot(long time) {
         MarketSnapshot marketSnapshot = null;
-        if (canBeSampled) {
+        if (!isResetting) {
             int volume = cumulativeVolume - previousCumulativeVolume;
             marketSnapshot = new MarketSnapshot(time, (int) Math.round(lowBalance), (int) Math.round(highBalance), bestBid, bestAsk, volume,
                     tick);
@@ -178,7 +200,7 @@ public class MarketBook {
             highBalance = Math.max(lastBalance, highBalance);
             bestBid = bids.getFirst().getPrice();
             bestAsk = asks.getFirst().getPrice();
-            canBeSampled = true;
+            isResetting = false;
         }
     }
 }
