@@ -111,4 +111,13 @@
     </javadoc>
   </target>
 
+
+  <target name="test" depends="compile">
+    <junit fork="yes" haltonfailure="yes">
+      <test name="com.jbooktrader.platform.test.MarketBookTest" />
+      <formatter type="plain" usefile="false" />
+      <classpath refid="run.classpath" />
+    </junit>
+  </target>
+
 </project>

@@ -90,10 +90,10 @@ public class MarketBook {
         asks.clear();
     }
 
-    private boolean isValid() {
+    public boolean isValid() {
         int bidLevels = bids.size();
         int askLevels = asks.size();
-        if (bidLevels != askLevels) {
+        if (bidLevels != askLevels || bidLevels == 0 || askLevels == 0) {
             // This may happen when the "delete" operation was performed,
             // but the "insert" operation was not yet completed, or vice versa.
             return false;
