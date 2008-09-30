@@ -7,8 +7,12 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.RequestLog;
+import org.mortbay.jetty.Response;
 
-public final class Report {
+
+public final class Report implements RequestLog {
     private final String fieldStart, fieldEnd, rowStart, rowEnd, fieldBreak;
     private final ReportRenderer renderer;
     private final SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
@@ -57,7 +61,8 @@ public final class Report {
         return isDisabled;
     }
 
-    private void report(StringBuilder message) {
+    // synchronized because called by public void log() from RequestLog jetty interface
+    synchronized private void report(StringBuilder message) {
         StringBuilder s = new StringBuilder();
         s.append(rowStart);
         s.append(fieldStart).append(df.format(getDate())).append(fieldEnd);
@@ -125,6 +130,69 @@ public final class Report {
             writer.println(s);
             writer.flush();
         }
+    }
+
+    public void log(Request request, Response response) {
+        // Inspired from http://jetty.mortbay.org/xref/org/mortbay/jetty/NCSARequestLog.html
+        StringBuilder buf = new StringBuilder();
+        buf.append(request.getServerName());
+        buf.append(' ');
+        buf.append(request.getRemoteAddr());
+        buf.append(" - ");
+        String user = request.getRemoteUser();
+        buf.append((user == null)? " - " : user);
+        buf.append(" [");
+        buf.append(request.getTimeStampBuffer().toString());
+        buf.append("] \"");
+        buf.append(request.getMethod());
+        buf.append(' ');
+        buf.append(request.getUri());
+        buf.append(' ');
+        buf.append(request.getProtocol());
+        buf.append("\" ");
+        int status = response.getStatus();
+        if (status<=0)
+        {
+            status=404;
+        }
+        buf.append(status);
+        long responseLength=response.getContentCount();
+        if (responseLength >=0)
+        {
+            buf.append(' ');
+            buf.append(responseLength);
+        }
+        report(buf);
+    }
+
+    public boolean isFailed() {
+        return false;
+    }
+
+    public boolean isRunning() {
+        return true;
+    }
+
+    public boolean isStarted() {
+        return true;
+    }
+
+    public boolean isStarting() {
+        return false;
+    }
+
+    public boolean isStopped() {
+        return false;
+    }
+
+    public boolean isStopping() {
+        return false;
+    }
+
+    public void start() throws Exception {
+    }
+
+    public void stop() throws Exception {
     }
 
 }
