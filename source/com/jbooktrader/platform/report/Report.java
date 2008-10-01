@@ -40,7 +40,7 @@ public final class Report implements RequestLog {
         s.append(emphasisStart).append("New Report Started: ").append(df.format(getDate())).append(emphasisEnd);
         reportDescription(s.toString());
         s = new StringBuilder();
-        s.append(emphasisStart).append("JBT Version: ").append(JBookTrader.VERSION).append(emphasisEnd);
+        s.append(emphasisStart).append(JBookTrader.APP_NAME).append(" Version: ").append(JBookTrader.VERSION).append(emphasisEnd);
         s.append(rootStart);
         reportDescription(s.toString());
     }
