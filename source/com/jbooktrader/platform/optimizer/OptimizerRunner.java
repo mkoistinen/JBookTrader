@@ -153,7 +153,7 @@ public abstract class OptimizerRunner implements Runnable {
             return;
         }
 
-        Report.enable();
+        Dispatcher.enableReport();
         String fileName = strategyName + "Optimizer";
         Report optimizerReport = Dispatcher.createReport(fileName);
 
@@ -193,7 +193,7 @@ public abstract class OptimizerRunner implements Runnable {
 
             optimizerReport.report(columns);
         }
-        Report.disable();
+        Dispatcher.disableReport();
     }
 
     private void showResults() {

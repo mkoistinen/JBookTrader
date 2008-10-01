@@ -6,6 +6,10 @@ import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
 
+/**
+ * Create a report that write events into the reports directory
+ * @author Florent Guiliani
+ */
 public class ReportFactoryFile implements ReportFactory {
     private final static String FILE_SEP = System.getProperty("file.separator");
     private final static String REPORT_DIR = JBookTrader.getAppPath() + FILE_SEP + "reports" + FILE_SEP;
@@ -22,7 +26,7 @@ public class ReportFactoryFile implements ReportFactory {
         }
 
         PrintWriter writer = null;
-        if (!Report.isDisabled()) {
+        if (!Dispatcher.isReportDisabled()) {
             File reportDir = new File(REPORT_DIR);
             if (!reportDir.exists()) {
                 reportDir.mkdir();
@@ -36,7 +40,7 @@ public class ReportFactoryFile implements ReportFactory {
             }
         }
 
-        return new Report(renderer, writer);
+        return new SingleReport(renderer, writer);
     }
 
 }

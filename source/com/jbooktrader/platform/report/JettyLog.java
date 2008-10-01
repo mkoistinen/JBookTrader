@@ -4,8 +4,9 @@ import org.mortbay.log.Logger;
 
 import com.jbooktrader.platform.model.Dispatcher;
 
-/*
+/**
  * Inspired from http://www.mortbay.org/jetty/jetty-6/xref/org/mortbay/log/StdErrLog.html
+ * @author Florent Guiliani 
  */
 public class JettyLog implements Logger {
 
