@@ -56,7 +56,7 @@ public final class BackTestFileWriter {
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         } catch (IOException ioe) {
-            throw new JBookTraderException("Could not write to file " + fileName);
+            throw new JBookTraderException("Could not write to file " + fullFileName);
         }
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);

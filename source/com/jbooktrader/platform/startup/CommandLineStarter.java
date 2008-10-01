@@ -22,7 +22,7 @@ public class CommandLineStarter {
             pmList.append("  '" + pm.getName() + "'\n");
         }
 
-        throw new JBookTraderException("Usage: JBookTrader <JBookTraderDirectory>\n" +
+        throw new JBookTraderException("Usage: CommandLineStarter <JBookTraderDirectory>\n" +
                 "  * Add the following options to run one or more strategy in forward test mode:\n" +
                 "    --forwardtest OneStrategy [AnotherStrategy ...]\n" +
                 "  * Add the following options to live trade one or more strategy:\n" +
@@ -34,10 +34,10 @@ public class CommandLineStarter {
                 "\n" +
                 "Examples:\n" +
                 "$> JBookTrader /work/jbt\n" +
-                "$> JBookTrader /work/jbt --forwardtest Strategy1 Strategy2\n" +
-                "$> JBookTrader /work/jbt --trade Strategy1 Strategy2\n" +
-                "$> JBookTrader /work/jbt --backtest MyStrategy /marketdata/ES.txt\n" +
-                "$> JBookTrader /work/jbt --optimize MyStrategy /marketdata/ES.txt 'Profit Factor' 100 bf\n" +
+                "$> CommandLineStarter /work/jbt --forwardtest Strategy1 Strategy2\n" +
+                "$> CommandLineStarter /work/jbt --trade Strategy1 Strategy2\n" +
+                "$> CommandLineStarter /work/jbt --backtest MyStrategy /marketdata/ES.txt\n" +
+                "$> CommandLineStarter /work/jbt --optimize MyStrategy /marketdata/ES.txt 'Profit Factor' 100 bf\n" +
                 "\n" +
                 "Available SortCriteria are:\n" + pmList.toString() +
                 "\n" +
@@ -55,9 +55,15 @@ public class CommandLineStarter {
         new CommandLineStrategyRunner(mode, strategyNames);
     }
 
-
-    public static void start(String[] args) {
+    public static void main(String[] args) {
+        
+        MessageDialog.setConsoleMode(true);
+        
         try {
+            if(args.length>=1) {
+                JBookTrader.setAppPath(args[0]);
+            }
+
             // Launch command line backtester
             if (args.length == 4 && args[1].equals("--backtest")) {
                 Dispatcher.setReportFactory(new ReportFactoryConsole());
@@ -82,12 +88,12 @@ public class CommandLineStarter {
             else if (args.length != 1) {
                 showUsage();
             }
-
         } catch (Throwable t) {
             MessageDialog.showError(null, t.getMessage());
             if (Dispatcher.getReporter() != null) {
                 Dispatcher.getReporter().report(t);
             }
+            System.exit(-1);
         }
     }
 }

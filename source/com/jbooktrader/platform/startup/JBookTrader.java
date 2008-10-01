@@ -52,27 +52,24 @@ public class JBookTrader {
             FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
 
             if (channel.tryLock() == null) {
-                MessageDialog.showMessage(null, APP_NAME + " is already running.");
-                return;
+                throw new JBookTraderException(APP_NAME + " is already running.");
             }
 
             if (args.length >= 1) {
-                JBookTrader.appPath = args[0];
-            }
-
-            if (args.length == 1) {
+                setAppPath(args[0]);
                 Dispatcher.setReportFactory(new ReportFactoryFile());
                 Dispatcher.setReporter("EventReport");
                 // Launch JBT GUI
                 new JBookTrader();
             } else {
-                CommandLineStarter.start(args);
+                throw new JBookTraderException("You omit to pass the JBT path in command line argument.");
             }
         } catch (Throwable t) {
             MessageDialog.showError(null, t.getMessage());
             if (Dispatcher.getReporter() != null) {
                 Dispatcher.getReporter().report(t);
             }
+            System.exit(-1);
         }
     }
 
@@ -80,4 +77,7 @@ public class JBookTrader {
         return JBookTrader.appPath;
     }
 
+    public static void setAppPath(String appPath) {
+        JBookTrader.appPath = appPath;
+    }
 }

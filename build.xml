@@ -61,13 +61,13 @@
   </target>
 
   <target name="run" depends="compile" description="Run JBT in GUI mode">
-    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true" failonerror="true">
       <arg path="${basedir}"/>
     </java>
   </target>
 
   <target name="forwardtest" depends="compile" description="Run JBT in command line forwardtest mode">
-    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+    <java classname="com.jbooktrader.platform.startup.CommandLineStarter" classpathref="run.classpath" fork="true" failonerror="true">
       <arg path="${basedir}"/>
       <arg value="--forwardtest"/>
       <arg line="${strategies}"/>
@@ -75,7 +75,7 @@
   </target>
 
   <target name="trade" depends="compile" description="Run JBT in command line live trade mode">
-    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+    <java classname="com.jbooktrader.platform.startup.CommandLineStarter" classpathref="run.classpath" fork="true" failonerror="true">
       <arg path="${basedir}"/>
       <arg value="--trade"/>
       <arg line="${strategies}"/>
@@ -83,7 +83,7 @@
   </target>
 
   <target name="backtest" depends="compile" description="Run a backtest in command line mode">
-    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+    <java classname="com.jbooktrader.platform.startup.CommandLineStarter" classpathref="run.classpath" fork="true" failonerror="true">
       <arg path="${basedir}"/>
       <arg value="--backtest"/>
       <arg value="${strategy}"/>
@@ -92,7 +92,7 @@
   </target>
 
   <target name="optimize" depends="compile" description="Run the optimizer in command line mode">
-    <java classname="com.jbooktrader.platform.startup.JBookTrader" classpathref="run.classpath" fork="true">
+    <java classname="com.jbooktrader.platform.startup.CommandLineStarter" classpathref="run.classpath" fork="true" failonerror="true">
       <arg path="${basedir}"/>
       <arg value="--optimize"/>
       <arg value="${strategy}"/>
