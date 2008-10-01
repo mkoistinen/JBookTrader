@@ -27,6 +27,8 @@ public enum JBTPreferences {
     WebAccessPort("Web access port", "1234"),
     WebAccessUser("Web access user", "admin"),
     WebAccessPassword("Web access password", "admin"),
+    WebAccessHTTPS("Web access HTTPS","disabled"),
+    WebAccessSSLCertificate("Web access SSL Certificate",""),
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),

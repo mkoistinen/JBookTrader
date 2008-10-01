@@ -12,10 +12,10 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser;
+    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser, webAccessSSLCertificate;
     private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
     private JPasswordField emailPasswordField, webAccessPasswordField;
-    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo;
+    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo, webAccessHTTPSCombo;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
         super(parent);
@@ -129,11 +129,26 @@ public class PreferencesDialog extends JDialog {
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();
+        webAccessHTTPSCombo = new JComboBox(new String[]{"disabled", "enabled"});
+        webAccessSSLCertificate = new JTextField();
+        webAccessSSLCertificate.setText(prefs.get(WebAccessSSLCertificate));
+        JButton chooseCertificate = new JButton("...");
+        chooseCertificate.addActionListener( new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                FileChooser.fillInTextField(webAccessSSLCertificate, "Select your SSL certificate", webAccessSSLCertificate.getText());
+            }
+        } );
+        JPanel sslPanel = new JPanel(new SpringLayout());
+        sslPanel.add(webAccessSSLCertificate);
+        sslPanel.add(chooseCertificate);
+        SpringUtilities.makeCompactGrid(sslPanel, 1, 2, 0, 0, 8, 5);
         add(webAcessTab, WebAccess, webAccessCombo);
         add(webAcessTab, WebAccessPort, webAccessPortSpin);
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
-        SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 5);
+        add(webAcessTab, WebAccessHTTPS, webAccessHTTPSCombo);
+        genericAdd(webAcessTab, WebAccessSSLCertificate, sslPanel);
+        SpringUtilities.makeCompactGrid(webAcessTab, 6, 2, 12, 12, 8, 5);
 
 
         emailTestButton.addActionListener(new ActionListener() {
@@ -174,6 +189,8 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(WebAccessPort, webAccessPortSpin.getValue().toString());
                     prefs.set(WebAccessUser, webAccessUser.getText());
                     prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
+                    prefs.set(WebAccessHTTPS, (String) webAccessHTTPSCombo.getSelectedItem());
+                    prefs.set(WebAccessSSLCertificate, webAccessSSLCertificate.getText());
                     dispose();
                 } catch (Exception ex) {
                     MessageDialog.showError(PreferencesDialog.this, ex.getMessage());
