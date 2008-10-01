@@ -32,6 +32,10 @@ public class MonitoringServer {
 
         try {
 
+            // Configure Jetty logging to use JBT EventReport.
+            // see http://docs.codehaus.org/display/JETTY/Debugging
+            System.setProperty("org.mortbay.log.class", "com.jbooktrader.platform.report.JettyLog");
+            
             server = new Server();
 
             // Help on Handlers : http://jetty.mortbay.org/xref/org/mortbay/jetty/handler/package-summary.html
