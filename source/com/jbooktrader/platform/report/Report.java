@@ -131,9 +131,11 @@ public final class Report implements RequestLog {
         }
     }
 
+    /// Jetty RequestLog interface
     public void log(Request request, Response response) {
         // Inspired from http://jetty.mortbay.org/xref/org/mortbay/jetty/NCSARequestLog.html
         StringBuilder buf = new StringBuilder();
+        buf.append("Jetty ");
         buf.append(request.getServerName());
         buf.append(' ');
         buf.append(request.getRemoteAddr());
@@ -164,33 +166,41 @@ public final class Report implements RequestLog {
         report(buf);
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public boolean isFailed() {
         return false;
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public boolean isRunning() {
         return true;
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public boolean isStarted() {
         return true;
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public boolean isStarting() {
         return false;
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public boolean isStopped() {
         return false;
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public boolean isStopping() {
         return false;
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public void start() throws Exception {
     }
 
+    /// Jetty RequestLog interface, useless for JBT
     public void stop() throws Exception {
     }
 

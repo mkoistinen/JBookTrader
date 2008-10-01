@@ -14,7 +14,7 @@ public class MessageDialog {
     
     public static void showMessage(Component parent, String msg) {
         if(consoleMode) {
-            System.err.println("ERROR: "+msg);
+            System.err.println("INFO: "+msg);
         } else {
             JOptionPane.showMessageDialog(parent, msg, JBookTrader.APP_NAME, JOptionPane.INFORMATION_MESSAGE);
         }
