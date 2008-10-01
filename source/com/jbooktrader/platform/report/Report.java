@@ -61,8 +61,7 @@ public final class Report implements RequestLog {
         return isDisabled;
     }
 
-    // synchronized because called by public void log() from RequestLog jetty interface
-    synchronized private void report(StringBuilder message) {
+    private void report(StringBuilder message) {
         StringBuilder s = new StringBuilder();
         s.append(rowStart);
         s.append(fieldStart).append(df.format(getDate())).append(fieldEnd);
