@@ -5,7 +5,6 @@ import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
-import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -197,18 +196,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
 
         selectFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser(JBookTrader.getAppPath());
-                fileChooser.setDialogTitle("Select Historical Data File");
-
-                String filename = getFileName();
-                if (filename.length() != 0) {
-                    fileChooser.setSelectedFile(new File(filename));
-                }
-
-                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                    fileNameText.setText(file.getAbsolutePath());
-                }
+                FileChooser.fillInTextField(fileNameText, "Select Historical Data File", getFileName());
             }
         });
     }
