@@ -13,6 +13,8 @@ public class CommandLineStrategyRunner {
 
     private class CommandLineModelListener implements ModelListener {
 
+        private HashMap<String, Integer> eventCountByStrategy = new HashMap<String,Integer>();
+
         public void modelChanged(Event event, Object value) {
             switch (event) {
                 case ModeChanged:
@@ -40,9 +42,23 @@ public class CommandLineStrategyRunner {
                     System.err.println("ERROR: " + (String) value);
                     break;
                 case StrategyUpdate:
-                    StringBuilder msg = new StringBuilder();
                     Strategy strategy = (Strategy) value;
-                    msg.append(strategy.getName());
+                    String strategyName = strategy.getName();
+                    // Only show 1 out of 10 updates to reduce verbosity
+                    Integer eventCount = eventCountByStrategy.get(strategyName);
+                    if(eventCount==null) {
+                        eventCountByStrategy.put(strategyName, new Integer(0));
+                    }
+                    else {
+                        eventCount++;
+                        eventCountByStrategy.put(strategyName, eventCount);
+                        if(eventCount%10!=0) {
+                            break;
+                        }
+                    }
+
+                    StringBuilder msg = new StringBuilder();
+                    msg.append(strategyName);
                     msg.append(": ");
                     MarketBook marketBook = strategy.getMarketBook();
                     if (marketBook.size() > 0) {
