@@ -134,7 +134,7 @@ public class PerformanceManager {
 
         updatePositionValue(avgFillPrice, position);
 
-        isCompletedTrade = (previousPosition != 0);
+        isCompletedTrade = (previousPosition>0&&position<previousPosition || previousPosition<0&&position>previousPosition);
         if (isCompletedTrade) {
             trades++;
 

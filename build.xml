@@ -26,6 +26,7 @@
   <property name="build.dir" value="${basedir}/bin" />
   <property name="jar.dir" value="${basedir}/lib" />
   <property name="source.dir" value="${basedir}/source" />
+  <property name="reports.dir" value="${basedir}/reports" />
 
   <path id="compile.classpath">
     <fileset dir="${jar.dir}">
@@ -56,6 +57,7 @@
 
   <target name="prepare" description="Create build directories as needed">
     <mkdir dir="${build.dir}" />
+    <mkdir dir="${reports.dir}" />
   </target>
 
   <target name="run" depends="compile" description="Run JBT in GUI mode">
@@ -114,7 +116,11 @@
 
   <target name="test" depends="compile">
     <junit fork="yes" haltonfailure="yes">
-      <test name="com.jbooktrader.platform.test.MarketBookTest" />
+      <batchtest fork="yes" todir="${reports.dir}">
+        <fileset dir="${source.dir}">
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
       <formatter type="plain" usefile="false" />
       <classpath refid="run.classpath" />
     </junit>
