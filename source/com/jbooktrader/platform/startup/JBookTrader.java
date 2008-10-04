@@ -4,7 +4,6 @@ import com.birosoft.liquid.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.util.*;
-//import com.jbooktrader.platform.web.MonitoringServer;
 
 import javax.swing.*;
 import javax.swing.plaf.*;
@@ -40,7 +39,6 @@ public class JBookTrader {
         UIManager.put("TitledBorder.titleColor", color);
 
         new MainFrameController();
-        //MonitoringServer.start();
     }
 
     /**

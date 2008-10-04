@@ -28,9 +28,7 @@ public enum JBTPreferences {
     WebAccessUser("Web access user", "admin"),
     WebAccessPassword("Web access password", "admin"),
     WebAccessHTTPS("Web access HTTPS","disabled"),
-    SSLkeystore("SSL keystore location",""),
-    SSLkeystorePassword("SSL keystore password",""),
-    SSLkeyPassword("SSL key password",""),
+    WebAccessSSLCertificate("Web access SSL Certificate",""),
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
