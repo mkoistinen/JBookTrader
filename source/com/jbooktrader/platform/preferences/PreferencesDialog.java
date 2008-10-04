@@ -12,10 +12,11 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser, webAccessSSLCertificate;
-    private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
-    private JPasswordField emailPasswordField, webAccessPasswordField;
+    private JTextField hostText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser, SSLkeystoreLocation;
+    private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin, portSpin;
+    private JPasswordField emailPasswordField, webAccessPasswordField, SSLkeystorePassword, SSLkeyPassword;
     private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo, webAccessHTTPSCombo;
+    private JButton chooseCertificate;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
         super(parent);
@@ -79,17 +80,19 @@ public class PreferencesDialog extends JDialog {
         JPanel connectionTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("TWS Connection", connectionTab);
         hostText = new JTextField();
-        portText = new JTextField();
+        portSpin = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 1));
         clientIDSpin = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
         accountTypeCombo = new JComboBox(new String[]{"Universal", "Advisor"});
         advisorAccountText = new JTextField();
         add(connectionTab, Host, hostText);
-        add(connectionTab, Port, portText);
+        add(connectionTab, Port, portSpin);
         add(connectionTab, ClientID, clientIDSpin);
         add(connectionTab, AccountType, accountTypeCombo);
         add(connectionTab, AdvisorAccount, advisorAccountText);
         SpringUtilities.makeCompactGrid(connectionTab, 5, 2, 12, 12, 8, 5);
-        setWidth(connectionTab, clientIDSpin, 45);
+        setWidth(connectionTab, clientIDSpin, 100);        
+        setWidth(connectionTab, accountTypeCombo, 100);        
+        setWidth(connectionTab, portSpin, 100);        
 
         JPanel reportingTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Reporting", reportingTab);
@@ -98,6 +101,7 @@ public class PreferencesDialog extends JDialog {
         add(reportingTab, ReportRenderer, reportRendererCombo);
         add(reportingTab, ReportRecycling, reportRecyclingCombo);
         SpringUtilities.makeCompactGrid(reportingTab, 2, 2, 12, 12, 8, 5);
+        setWidth(reportingTab, reportRecyclingCombo, 100);
 
         JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
@@ -121,34 +125,51 @@ public class PreferencesDialog extends JDialog {
         JButton emailTestButton = new JButton("Send a test email");
         remoteMonitoringTab.add(emailTestButton);
         SpringUtilities.makeCompactGrid(remoteMonitoringTab, 9, 2, 12, 12, 8, 5);
-        setWidth(remoteMonitoringTab, heartBeatIntervalSpin, 65);
+        setWidth(remoteMonitoringTab, heartBeatIntervalSpin, 100);
+        setWidth(remoteMonitoringTab, emailMonitoringCombo, 100);
+        setWidth(remoteMonitoringTab, emailTestButton, 200);
+
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Web Access", webAcessTab);
         webAccessCombo = new JComboBox(new String[]{"disabled", "enabled"});
-        webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
+        webAccessPortSpin = new JSpinner(new SpinnerNumberModel(0, 0, 65535, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();
         webAccessHTTPSCombo = new JComboBox(new String[]{"disabled", "enabled"});
-        webAccessSSLCertificate = new JTextField();
-        webAccessSSLCertificate.setText(prefs.get(WebAccessSSLCertificate));
-        JButton chooseCertificate = new JButton("...");
+        SSLkeystoreLocation = new JTextField();
+        SSLkeystoreLocation.setText(prefs.get(JBTPreferences.SSLkeystore));
+        chooseCertificate = new JButton("...");
         chooseCertificate.addActionListener( new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                FileChooser.fillInTextField(webAccessSSLCertificate, "Select your SSL certificate", webAccessSSLCertificate.getText());
+                FileChooser.fillInTextField(SSLkeystoreLocation, "Select your SSL keystore", SSLkeystoreLocation.getText());
             }
         } );
         JPanel sslPanel = new JPanel(new SpringLayout());
-        sslPanel.add(webAccessSSLCertificate);
+        sslPanel.add(SSLkeystoreLocation);
         sslPanel.add(chooseCertificate);
-        SpringUtilities.makeCompactGrid(sslPanel, 1, 2, 0, 0, 8, 5);
+        SpringUtilities.makeCompactGrid(sslPanel, 1, 2, 0, 0, 2, 5);
+        SSLkeystorePassword = new JPasswordField(prefs.get(JBTPreferences.SSLkeystorePassword));
+        SSLkeyPassword = new JPasswordField(prefs.get(JBTPreferences.SSLkeyPassword));
         add(webAcessTab, WebAccess, webAccessCombo);
         add(webAcessTab, WebAccessPort, webAccessPortSpin);
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
         add(webAcessTab, WebAccessHTTPS, webAccessHTTPSCombo);
-        genericAdd(webAcessTab, WebAccessSSLCertificate, sslPanel);
-        SpringUtilities.makeCompactGrid(webAcessTab, 6, 2, 12, 12, 8, 5);
+        genericAdd(webAcessTab, JBTPreferences.SSLkeystore, sslPanel);
+        add(webAcessTab, JBTPreferences.SSLkeystorePassword, SSLkeystorePassword);
+        add(webAcessTab, JBTPreferences.SSLkeyPassword, SSLkeyPassword);
+        SpringUtilities.makeCompactGrid(webAcessTab, 8, 2, 12, 12, 8, 5);
+        setWidth(webAcessTab, webAccessCombo, 100);
+        setWidth(webAcessTab, webAccessPortSpin, 100);
+        setWidth(webAcessTab, webAccessHTTPSCombo, 100);
+        toggleHTTPS();
+        
+        webAccessHTTPSCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                toggleHTTPS();
+            }
+        });
 
 
         emailTestButton.addActionListener(new ActionListener() {
@@ -170,7 +191,7 @@ public class PreferencesDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     prefs.set(Host, hostText.getText());
-                    prefs.set(Port, portText.getText());
+                    prefs.set(Port, portSpin.getValue().toString());
                     prefs.set(ClientID, clientIDSpin.getValue().toString());
                     prefs.set(AccountType, (String) accountTypeCombo.getSelectedItem());
                     prefs.set(AdvisorAccount, advisorAccountText.getText());
@@ -190,7 +211,9 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(WebAccessUser, webAccessUser.getText());
                     prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
                     prefs.set(WebAccessHTTPS, (String) webAccessHTTPSCombo.getSelectedItem());
-                    prefs.set(WebAccessSSLCertificate, webAccessSSLCertificate.getText());
+                    prefs.set(JBTPreferences.SSLkeystore, SSLkeystoreLocation.getText());
+                    prefs.set(JBTPreferences.SSLkeystorePassword, new String(SSLkeyPassword.getPassword()));
+                    prefs.set(JBTPreferences.SSLkeyPassword, new String(SSLkeyPassword.getPassword()));
                     dispose();
                 } catch (Exception ex) {
                     MessageDialog.showError(PreferencesDialog.this, ex.getMessage());
@@ -219,4 +242,16 @@ public class PreferencesDialog extends JDialog {
             throw new JBookTraderException("The first argument to makeGrid must use SpringLayout.");
         }
     }
+    
+    private void toggleHTTPS() {
+        boolean enabled = webAccessHTTPSCombo.getSelectedItem().toString().equals("enabled");
+        SSLkeystoreLocation.setEditable(enabled);
+        SSLkeystorePassword.setEditable(enabled);
+        SSLkeyPassword.setEditable(enabled);
+        chooseCertificate.setEnabled(enabled);
+        Color color = enabled ? Color.white : Color.gray;
+        SSLkeyPassword.setBackground(color);
+        SSLkeystorePassword.setBackground(color);
+        SSLkeystoreLocation.setBackground(color);
+    }    
 }

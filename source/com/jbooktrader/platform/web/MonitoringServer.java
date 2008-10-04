@@ -79,9 +79,20 @@ public class MonitoringServer {
             server.setHandler(handlers);
 
             // Create the connector aka the server socket
-            int port = Integer.parseInt(prefs.get(WebAccessPort));
-            Connector connector = new SelectChannelConnector();
-            connector.setPort(port);
+            Connector connector;
+            if(prefs.get(JBTPreferences.WebAccessHTTPS).equals("enabled")) {
+                SslSelectChannelConnector sslconnector = new SslSelectChannelConnector();
+                sslconnector.setKeystore(prefs.get(JBTPreferences.SSLkeystore));
+                sslconnector.setPassword(prefs.get(JBTPreferences.SSLkeystorePassword));
+                sslconnector.setKeyPassword(prefs.get(JBTPreferences.SSLkeyPassword));
+                connector = sslconnector;
+            }
+            else {
+                connector = new SelectChannelConnector();
+            }
+
+            connector.setPort(Integer.parseInt(prefs.get(WebAccessPort)));
+                        
             server.setConnectors(new Connector[]{connector});
 
             // Tune and start the Embedded Jetty HTTP Server 
