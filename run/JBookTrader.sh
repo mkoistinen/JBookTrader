@@ -31,9 +31,4 @@ find source -name "*.java"  | xargs javac -cp "$CLASSPATH" -d bin
 JVM_OPTS="-XX:+AggressiveHeap"
 [ -x "$(which uname)" ] && [ "$(uname -m)" == "x86_64" ] && JVM_OPTS="$JVM_OPTS -d64"
 
-MAINCLASS=com.jbooktrader.platform.startup.JBookTrader
-if [ "$*" ]; then
-    MAINCLASS=com.jbooktrader.platform.startup.CommandLineStarter
-fi
-
-exec java -cp "$CLASSPATH:$(pwd)/bin" $JVM_OPTS $MAINCLASS "$(pwd)" "$@"
+exec java -cp "$CLASSPATH:$(pwd)/bin" $JVM_OPTS com.jbooktrader.platform.startup.JBookTrader "$(pwd)" "$@"

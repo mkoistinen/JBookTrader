@@ -16,12 +16,12 @@ import java.util.*;
 public class BackTester {
     private final Strategy strategy;
     private final BackTestFileReader backTestFileReader;
-    private final BackTestProgressIndicator backTestProgressIndicator;
+    private final BackTestDialog backTestDialog;
 
-    public BackTester(Strategy strategy, BackTestFileReader backTestFileReader, BackTestProgressIndicator backTestProgressIndicator) {
+    public BackTester(Strategy strategy, BackTestFileReader backTestFileReader, BackTestDialog backTestDialog) {
         this.strategy = strategy;
         this.backTestFileReader = backTestFileReader;
-        this.backTestProgressIndicator = backTestProgressIndicator;
+        this.backTestDialog = backTestDialog;
     }
 
     public void execute() {
@@ -29,7 +29,6 @@ public class BackTester {
         PositionManager positionManager = strategy.getPositionManager();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
-        strategy.getPerformanceManager().setTradingDays(backTestFileReader.getTradingDays());
 
         long marketDepthCounter = 0;
         LinkedList<MarketSnapshot> marketSnapshots = backTestFileReader.getAll();
@@ -52,7 +51,7 @@ public class BackTester {
 
             positionManager.trade();
             if (marketDepthCounter % 10000 == 0) {
-                backTestProgressIndicator.setProgress(marketDepthCounter, size, "Running back test");
+                backTestDialog.setProgress(marketDepthCounter, size, "Running back test");
             }
         }
 

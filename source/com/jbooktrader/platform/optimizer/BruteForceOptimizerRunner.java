@@ -10,8 +10,8 @@ import java.util.*;
  */
 public class BruteForceOptimizerRunner extends OptimizerRunner {
 
-    public BruteForceOptimizerRunner(OptimizerProgressIndicator optimizerProgressIndicator, Strategy strategy, StrategyParams params, String dataFileName, PerformanceMetric sortCriteria, int minTrades) throws JBookTraderException {
-        super(optimizerProgressIndicator, strategy, params, dataFileName, sortCriteria, minTrades);
+    public BruteForceOptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
+        super(optimizerDialog, strategy, params);
     }
 
     public void optimize() throws JBookTraderException {

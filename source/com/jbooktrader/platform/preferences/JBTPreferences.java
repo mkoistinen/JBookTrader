@@ -27,8 +27,6 @@ public enum JBTPreferences {
     WebAccessPort("Web access port", "1234"),
     WebAccessUser("Web access user", "admin"),
     WebAccessPassword("Web access password", "admin"),
-    WebAccessHTTPS("Web access HTTPS","disabled"),
-    WebAccessSSLCertificate("Web access SSL Certificate",""),
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
@@ -56,7 +54,12 @@ public enum JBTPreferences {
     OptimizationMapWidth("optimization.map.width", "-1"),
     OptimizationMapHeight("optimization.map.height", "-1"),
     OptimizationMapX("optimization.map.x", "-1"),
-    OptimizationMapY("optimization.map.y", "-1");
+    OptimizationMapY("optimization.map.y", "-1"),
+
+    // Collective2
+    Collective2Password("C2Password", ""),
+    Collective2Strategies("C2Strategies", "");
+
 
     private final String name, defaultValue;
 

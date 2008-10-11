@@ -22,7 +22,6 @@ public class StrategyReportManager {
     private final PositionManager positionManager;
     private final PerformanceManager performanceManager;
     private Report strategyReport;
-    private boolean strategyReportDisabled = false;
 
     public StrategyReportManager(Strategy strategy) {
         this.strategy = strategy;
@@ -50,13 +49,10 @@ public class StrategyReportManager {
     }
 
     public void report() {
-        if (strategyReportDisabled) return;
         if (strategyReport == null) {
             try {
-                strategyReport = Dispatcher.createReport(strategy.getName());
+                strategyReport = new Report(strategy.getName());
             } catch (JBookTraderException e) {
-                strategyReportDisabled = true;
-                // in order to make sure this is logged in EventReport
                 throw new RuntimeException(e);
             }
             strategyReport.report(strategyReportHeaders);

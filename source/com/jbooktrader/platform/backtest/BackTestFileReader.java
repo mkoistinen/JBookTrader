@@ -13,8 +13,7 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
-    private final static long GAP = 8 * 60 * 60 * 1000;
-    public final static int COLUMNS = 8;
+    public final static int COLUMNS = 5;
     private static final String LINE_SEP = System.getProperty("line.separator");
 
     private final LinkedList<MarketSnapshot> marketSnapshots;
@@ -22,8 +21,6 @@ public class BackTestFileReader {
     private SimpleDateFormat sdf;
     private volatile boolean cancelled;
     private BufferedReader reader;
-    private int tradingDays;
-
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
         marketSnapshots = new LinkedList<MarketSnapshot>();
@@ -40,10 +37,6 @@ public class BackTestFileReader {
 
     public LinkedList<MarketSnapshot> getAll() {
         return marketSnapshots;
-    }
-
-    public int getTradingDays() {
-        return tradingDays;
     }
 
     private void getTimeZone(String line) throws JBookTraderException {
@@ -136,18 +129,11 @@ public class BackTestFileReader {
             }
         }
 
-        long difference = time - previousTime;
-        if (difference > GAP) {
-            tradingDays++;
-        }
-
-        int lowBalance = Integer.parseInt(st.nextToken());
-        int highBalance = Integer.parseInt(st.nextToken());
+        int balance = Integer.parseInt(st.nextToken());
         double bestBid = Double.parseDouble(st.nextToken());
         double bestAsk = Double.parseDouble(st.nextToken());
-        int volume = Integer.parseInt(st.nextToken());
-        double tick = Double.parseDouble(st.nextToken());
 
-        return new MarketSnapshot(time, lowBalance, highBalance, bestBid, bestAsk, volume, tick);
+        return new MarketSnapshot(time, balance, bestBid, bestAsk);
     }
 }
+

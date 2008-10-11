@@ -11,7 +11,7 @@ public abstract class Indicator {
     protected MarketBook marketBook;
     protected double value;
 
-    public abstract double calculate();
+    public abstract void calculate();
 
     protected Indicator() {
     }

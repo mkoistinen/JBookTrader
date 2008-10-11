@@ -165,8 +165,7 @@ public class CMEDataConverter {
 
         String messageType = line.substring(33, 35);
         boolean isLimitOrderMessage = messageType.equals("MA");
-        boolean isTradeMessage = messageType.equals("M6");
-        if (!(isLimitOrderMessage || isTradeMessage)) {
+        if (!isLimitOrderMessage) {
             return;
         }
 
@@ -189,11 +188,6 @@ public class CMEDataConverter {
                     groupStart += 72;
                 }
             }
-        }
-
-        if (isTradeMessage) {
-            int cumulativeVolume = Integer.parseInt(line.substring(116, 128));
-            marketBook.updateVolume(cumulativeVolume);
         }
     }
 }

@@ -16,15 +16,13 @@ public class Dispatcher {
     }
 
     private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
-    private static boolean isReportDisabled;
     private static Report eventReport;
     private static Trader trader;
     private static Mode mode;
     private static int activeStrategies;
-    private static ReportFactory reportFactory = new ReportFactoryConsole();
 
     public static void setReporter(String eventReportFileName) throws JBookTraderException {
-        eventReport = reportFactory.newReport(eventReportFileName);
+        eventReport = new Report(eventReportFileName);
     }
 
     public static void addListener(ModelListener listener) {
@@ -76,16 +74,16 @@ public class Dispatcher {
         // Disable all reporting when JBT runs in optimization mode. The optimizer runs
         // thousands of strategies, and the amount of data to report would be enormous.
         if (mode == Mode.Optimization) {
-            disableReport();
+            Report.disable();
         } else {
-            enableReport();
+            Report.enable();
         }
 
         if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-            getTrader().getAssistant().connect();
+            trader.getAssistant().connect();
             MonitoringServer.start();
         } else {
-            getTrader().getAssistant().disconnect();
+            trader.getAssistant().disconnect();
         }
         fireModelChanged(ModelListener.Event.ModeChanged, null);
 
@@ -102,30 +100,4 @@ public class Dispatcher {
             fireModelChanged(ModelListener.Event.StrategiesEnd, null);
         }
     }
-
-    public static void setReportFactory(ReportFactory reportFactory) {
-        Dispatcher.reportFactory = reportFactory;
-    }
-
-    public static ReportFactory getReportFactory() {
-        return reportFactory;
-    }
-
-    public static Report createReport(String fileName) throws JBookTraderException {
-        return reportFactory.newReport(fileName);
-    }
-    
-
-    public static void disableReport() {
-        isReportDisabled = true;
-    }
-
-    public static void enableReport() {
-        isReportDisabled = false;
-    }
-    
-    public static boolean isReportDisabled() {
-        return isReportDisabled;
-    }
-    
 }

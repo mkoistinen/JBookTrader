@@ -133,29 +133,6 @@ public class Trader extends EWrapperAdapter {
 
 
     @Override
-    public void tickSize(int tickerId, int tickType, int size) {
-        try {
-            if (tickType == TickType.VOLUME && size != 0) {
-                MarketBook marketBook = traderAssistant.getMarketBook(tickerId);
-                marketBook.updateVolume(size);
-            }
-        } catch (Throwable t) {
-            eventReport.report(t);
-        }
-    }
-
-    public void tickPrice(int tickerId, int field, double price, int canAutoExecute) {
-        try {
-            if (field == TickType.LAST) {
-                traderAssistant.updateIndexes(tickerId, price);
-            }
-        } catch (Throwable t) {
-            eventReport.report(t);
-        }
-    }
-
-
-    @Override
     public void nextValidId(int orderId) {
         traderAssistant.setOrderID(orderId);
     }

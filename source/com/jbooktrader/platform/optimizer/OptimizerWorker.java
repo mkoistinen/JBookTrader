@@ -60,7 +60,6 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
         }
 
         int minTrades = optimizerRunner.getMinTrades();
-        int tradingDays = optimizerRunner.getBackTestFileReader().getTradingDays();
         for (Strategy strategy : strategies) {
             strategy.closePosition();
             strategy.getPositionManager().trade();
@@ -69,7 +68,6 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
             PerformanceManager performanceManager = strategy.getPerformanceManager();
             int trades = performanceManager.getTrades();
             if (trades >= minTrades) {
-                performanceManager.setTradingDays(tradingDays);
                 OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
                 optimizationResults.add(optimizationResult);
             }

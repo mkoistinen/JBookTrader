@@ -3,6 +3,7 @@ package com.jbooktrader.platform.backtest;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -14,7 +15,7 @@ import java.io.*;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class BackTestDialog extends JDialog implements BackTestProgressIndicator {
+public class BackTestDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
     private final PreferencesHolder prefs;
     private Strategy strategy;
@@ -31,7 +32,7 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
         pack();
         assignListeners();
 
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(parent);
         setVisible(true);
     }
 
@@ -70,7 +71,8 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
         File file = new File(historicalFileName);
         if (!file.exists()) {
             fileNameText.requestFocus();
-            throw new JBookTraderException("Historical file " + "\"" + historicalFileName + "\"" + " does not exist.");
+            String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
+            throw new JBookTraderException(msg);
         }
     }
 
@@ -81,7 +83,7 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
                 try {
                     prefs.set(BackTesterFileName, fileNameText.getText());
                     setOptions();
-                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy, getFileName());
+                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy);
                     new Thread(btsr).start();
                 } catch (Exception ex) {
                     MessageDialog.showError(BackTestDialog.this, ex.getMessage());
@@ -109,7 +111,18 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
 
         selectFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                FileChooser.fillInTextField(fileNameText, "Select Historical Data File", getFileName());
+                JFileChooser fileChooser = new JFileChooser(JBookTrader.getAppPath());
+                fileChooser.setDialogTitle("Select Historical Data File");
+
+                String filename = getFileName();
+                if (filename.length() != 0) {
+                    fileChooser.setSelectedFile(new File(filename));
+                }
+
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    fileNameText.setText(file.getAbsolutePath());
+                }
             }
         });
     }
@@ -158,4 +171,5 @@ public class BackTestDialog extends JDialog implements BackTestProgressIndicator
     public String getFileName() {
         return fileNameText.getText();
     }
+
 }

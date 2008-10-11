@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.strategy;
 
 import com.ib.client.*;
+import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
@@ -30,6 +31,8 @@ public abstract class Strategy {
     private boolean isActive;
     private int position;
     private long time;
+    private boolean isC2enabled;
+    private String c2SystemId;
 
     /**
      * Framework calls this method when order book changes.
@@ -82,6 +85,13 @@ public abstract class Strategy {
                 eventReport.report(getName() + ": " + msg);
             }
         }
+    }
+
+    public void setCollective2() {
+        C2TableModel c2TableModel = new C2TableModel();
+        C2Value c2Value = c2TableModel.getStrategy(name);
+        isC2enabled = c2Value.getIsEnabled();
+        c2SystemId = c2Value.getId();
     }
 
 
@@ -150,6 +160,15 @@ public abstract class Strategy {
 
     public String getName() {
         return name;
+    }
+
+
+    public boolean isC2enabled() {
+        return isC2enabled;
+    }
+
+    public String getC2SystemId() {
+        return c2SystemId;
     }
 
     public void process() {

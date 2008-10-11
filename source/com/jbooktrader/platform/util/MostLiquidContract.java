@@ -31,52 +31,6 @@ public class MostLiquidContract {
         frontMonths.put(Calendar.NOVEMBER, Calendar.DECEMBER);
     }
 
-    public static void main(String[] args) {
-        boolean allTestsPassed = true;
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.set(Calendar.YEAR, 2007);
-        calendar.set(Calendar.MONTH, Calendar.SEPTEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 12);
-        String mostLiquid = getMostLiquid(calendar);
-        if (!mostLiquid.equals("200709")) {
-            allTestsPassed = false;
-        }
-
-        calendar.set(Calendar.YEAR, 2007);
-        calendar.set(Calendar.MONTH, Calendar.SEPTEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 13);
-        mostLiquid = getMostLiquid(calendar);
-        if (!mostLiquid.equals("200712")) {
-            allTestsPassed = false;
-        }
-
-        calendar.set(Calendar.YEAR, 2006);
-        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 6);
-        mostLiquid = getMostLiquid(calendar);
-        if (!mostLiquid.equals("200612")) {
-            allTestsPassed = false;
-        }
-
-        calendar.set(Calendar.YEAR, 2006);
-        calendar.set(Calendar.MONTH, Calendar.DECEMBER);
-        calendar.set(Calendar.DAY_OF_MONTH, 13);
-        mostLiquid = getMostLiquid(calendar);
-        if (!mostLiquid.equals("200703")) {
-            allTestsPassed = false;
-        }
-
-
-        if (allTestsPassed) {
-            MessageDialog.showMessage(null, "All tests passed.");
-        } else {
-            MessageDialog.showError(null, "One or more tests failed.");
-        }
-
-
-    }
-
     private static boolean keepCurrent(Calendar asOfDate) {
         boolean keepCurrent = false;
 
@@ -117,7 +71,7 @@ public class MostLiquidContract {
      * For the contracts whose volume shifts from the front contract to the back contract
      * on the day preceding the 2nd Friday of expiration month of the front contract.
      */
-    private static String getMostLiquid(Calendar asOfDate) {
+    public static String getMostLiquid(Calendar asOfDate) {
 
         int monthNow = asOfDate.get(Calendar.MONTH);
         int yearNow = asOfDate.get(Calendar.YEAR);

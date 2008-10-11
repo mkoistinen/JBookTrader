@@ -35,12 +35,13 @@ public class OptimizationMap {
     private final List<OptimizationResult> optimizationResults;
 
     private JFreeChart chart;
-    private JComboBox horizontalCombo, verticalCombo, colorMapCombo;
+    private JComboBox horizontalCombo, verticalCombo, caseCombo, colorMapCombo;
     private double min, max;
     private ChartPanel chartPanel;
 
 
-    public OptimizationMap(JDialog parent, Strategy strategy, List<OptimizationResult> optimizationResults, PerformanceMetric sortPerformanceMetric) {
+    public OptimizationMap(JDialog parent, Strategy strategy, List<OptimizationResult> optimizationResults,
+                           PerformanceMetric sortPerformanceMetric) {
         prefs = PreferencesHolder.getInstance();
         this.parent = parent;
         this.strategy = strategy;
@@ -79,6 +80,11 @@ public class OptimizationMap {
         horizontalCombo.setSelectedIndex(0);
         verticalCombo.setSelectedIndex(1);
 
+        JLabel caseLabel = new JLabel("Case:", JLabel.TRAILING);
+        caseCombo = new JComboBox(new String[]{"Best", "Worst"});
+        caseCombo.setSelectedIndex(0);
+        caseLabel.setLabelFor(caseCombo);
+
 
         JLabel colorMapLabel = new JLabel("Color map:", JLabel.TRAILING);
         colorMapCombo = new JComboBox(new String[]{"Heat", "Grey"});
@@ -88,14 +94,14 @@ public class OptimizationMap {
         chartOptionsPanel.add(horizontalCombo);
         chartOptionsPanel.add(verticalLabel);
         chartOptionsPanel.add(verticalCombo);
+        chartOptionsPanel.add(caseLabel);
+        chartOptionsPanel.add(caseCombo);
         chartOptionsPanel.add(colorMapLabel);
         chartOptionsPanel.add(colorMapCombo);
-
 
         SpringUtilities.makeOneLineGrid(chartOptionsPanel);
         northPanel.add(chartOptionsPanel);
         SpringUtilities.makeTopOneLineGrid(northPanel);
-
 
         chartPanel = new ChartPanel(chart);
         TitledBorder chartBorder = BorderFactory.createTitledBorder(etchedBorder, "Optimization Map");
@@ -133,6 +139,11 @@ public class OptimizationMap {
             }
         });
 
+        caseCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                repaint();
+            }
+        });
 
         colorMapCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -195,6 +206,8 @@ public class OptimizationMap {
 
         int index = 0;
         min = max = getMetric(optimizationResults.get(index));
+        int selectedsCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
+
         for (OptimizationResult optimizationResult : optimizationResults) {
             StrategyParams params = optimizationResult.getParams();
 
@@ -207,7 +220,11 @@ public class OptimizationMap {
 
 
             if (value != null) {
-                z[index] = Math.max(value, z[index]);
+                if (selectedsCase == 0) {
+                    z[index] = Math.max(value, z[index]);
+                } else if (selectedsCase == 1) {
+                    z[index] = Math.min(value, z[index]);
+                }
             }
 
             values.put(key, z[index]);

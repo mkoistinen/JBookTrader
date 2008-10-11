@@ -5,6 +5,7 @@ import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -18,14 +19,13 @@ import java.util.List;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class OptimizerDialog extends JDialog implements OptimizerProgressIndicator {
+public class OptimizerDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
-    private JTextField fileNameText;
-    private JSpinner minTradesText;
+    private JTextField fileNameText, minTradesText;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
     private JProgressBar progressBar;
@@ -49,7 +49,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
         initParams();
         pack();
         assignListeners();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(parent);
         setVisible(true);
     }
 
@@ -97,6 +97,17 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
             String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
             throw new JBookTraderException(msg);
         }
+
+        try {
+            int minTrades = Integer.parseInt(minTradesText.getText());
+            if (minTrades < 2) {
+                minTradesText.requestFocus();
+                throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be greater or equal to 2.");
+            }
+        } catch (NumberFormatException nfe) {
+            minTradesText.requestFocus();
+            throw new JBookTraderException("\"" + "Minimum trades" + "\"" + " must be an integer.");
+        }
     }
 
     private void setParamTableColumns() {
@@ -119,7 +130,7 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
             public void actionPerformed(ActionEvent e) {
                 try {
                     prefs.set(OptimizerFileName, fileNameText.getText());
-                    prefs.set(OptimizerMinTrades, minTradesText.getValue().toString());
+                    prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
                     setOptions();
@@ -127,9 +138,9 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
 
                     int optimizationMethod = optimizationMethodCombo.getSelectedIndex();
                     if (optimizationMethod == 0) {
-                        optimizerRunner = new BruteForceOptimizerRunner(OptimizerDialog.this, strategy, params, getFileName(), getSortCriteria(), getMinTrades());
+                        optimizerRunner = new BruteForceOptimizerRunner(OptimizerDialog.this, strategy, params);
                     } else if (optimizationMethod == 1) {
-                        optimizerRunner = new DivideAndConquerOptimizerRunner(OptimizerDialog.this, strategy, params, getFileName(), getSortCriteria(), getMinTrades());
+                        optimizerRunner = new DivideAndConquerOptimizerRunner(OptimizerDialog.this, strategy, params);
                     }
 
                     new Thread(optimizerRunner).start();
@@ -196,7 +207,18 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
 
         selectFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                FileChooser.fillInTextField(fileNameText, "Select Historical Data File", getFileName());
+                JFileChooser fileChooser = new JFileChooser(JBookTrader.getAppPath());
+                fileChooser.setDialogTitle("Select Historical Data File");
+
+                String filename = getFileName();
+                if (filename.length() != 0) {
+                    fileChooser.setSelectedFile(new File(filename));
+                }
+
+                if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                    File file = fileChooser.getSelectedFile();
+                    fileNameText.setText(file.getAbsolutePath());
+                }
             }
         });
     }
@@ -277,7 +299,8 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
         }
 
         JLabel minTradesLabel = new JLabel("Minimum trades: ");
-        minTradesText = new JSpinner(new SpinnerNumberModel(prefs.getInt(OptimizerMinTrades), 2, 1000000, 1));
+        minTradesText = new JTextField("50");
+        minTradesText.setText(prefs.get(OptimizerMinTrades));
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
@@ -378,20 +401,12 @@ public class OptimizerDialog extends JDialog implements OptimizerProgressIndicat
     }
 
     public int getMinTrades() {
-        return ((SpinnerNumberModel) minTradesText.getModel()).getNumber().intValue();
+        return Integer.parseInt(minTradesText.getText());
     }
 
 
     public PerformanceMetric getSortCriteria() {
         String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
         return PerformanceMetric.getColumn(selectedItem);
-    }
-
-    public void showError(String msg) {
-        MessageDialog.showError(this, msg);
-    }
-
-    public void showMessage(String msg) {
-        MessageDialog.showMessage(this, msg);
     }
 }

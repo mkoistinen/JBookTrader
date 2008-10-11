@@ -11,8 +11,7 @@ public class DepthBalance extends Indicator {
     }
 
     @Override
-    public double calculate() {
-        value = marketBook.getLastMarketSnapshot().getMidBalance();
-        return value;
+    public void calculate() {
+        value = marketBook.getLastMarketSnapshot().getBalance();
     }
 }

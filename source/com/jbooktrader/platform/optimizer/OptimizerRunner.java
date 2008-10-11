@@ -17,7 +17,7 @@ import java.util.concurrent.*;
  */
 public abstract class OptimizerRunner implements Runnable {
     protected final int STRATEGIES_PER_PROCESSOR = 250;
-    private final OptimizerProgressIndicator optimizerProgressIndicator;
+    private final OptimizerDialog optimizerDialog;
     protected final LinkedList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected final Constructor<?> strategyConstructor;
@@ -30,7 +30,6 @@ public abstract class OptimizerRunner implements Runnable {
     private final NumberFormat nf2, nf0;
     private final String strategyName;
     private final int minTrades;
-    private final String dataFileName;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private BackTestFileReader backTestFileReader;
@@ -46,8 +45,8 @@ public abstract class OptimizerRunner implements Runnable {
         }
     }
 
-    OptimizerRunner(OptimizerProgressIndicator optimizerProgressIndicator, Strategy strategy, StrategyParams params, String dataFileName, PerformanceMetric sortCriteria, int minTrades) throws JBookTraderException {
-        this.optimizerProgressIndicator = optimizerProgressIndicator;
+    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
+        this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
         optimizationResults = new LinkedList<OptimizationResult>();
@@ -69,9 +68,8 @@ public abstract class OptimizerRunner implements Runnable {
             throw new JBookTraderException("Could not find strategy constructor for " + strategy.getClass().getName());
         }
 
-        resultComparator = new ResultComparator(sortCriteria);
-        this.minTrades = minTrades;
-        this.dataFileName = dataFileName;
+        resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
+        minTrades = optimizerDialog.getMinTrades();
         progressExecutor = Executors.newSingleThreadScheduledExecutor();
         executor = Executors.newFixedThreadPool(availableProcessors);
     }
@@ -140,7 +138,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     public void cancel() {
-        optimizerProgressIndicator.showProgress("Stopping optimization...");
+        optimizerDialog.showProgress("Stopping optimization...");
         cancelled = true;
     }
 
@@ -153,16 +151,16 @@ public abstract class OptimizerRunner implements Runnable {
             return;
         }
 
-        Dispatcher.enableReport();
+        Report.enable();
         String fileName = strategyName + "Optimizer";
-        Report optimizerReport = Dispatcher.createReport(fileName);
+        Report optimizerReport = new Report(fileName);
 
         optimizerReport.reportDescription("Strategy parameters:");
         for (StrategyParam param : strategyParams.getAll()) {
             optimizerReport.reportDescription(param.toString());
         }
-        optimizerReport.reportDescription("Minimum trades for strategy inclusion: " + minTrades);
-        optimizerReport.reportDescription("Back data file: " + dataFileName);
+        optimizerReport.reportDescription("Minimum trades for strategy inclusion: " + optimizerDialog.getMinTrades());
+        optimizerReport.reportDescription("Back data file: " + optimizerDialog.getFileName());
 
         List<String> otpimizerReportHeaders = new ArrayList<String>();
         StrategyParams params = optimizationResults.iterator().next().getParams();
@@ -193,7 +191,7 @@ public abstract class OptimizerRunner implements Runnable {
 
             optimizerReport.report(columns);
         }
-        Dispatcher.disableReport();
+        Report.disable();
     }
 
     private void showResults() {
@@ -201,12 +199,12 @@ public abstract class OptimizerRunner implements Runnable {
         while (optimizationResults.size() > MAX_RESULTS) {
             optimizationResults.removeLast();
         }
-        optimizerProgressIndicator.setResults(optimizationResults);
+        optimizerDialog.setResults(optimizationResults);
     }
 
     private void showFastProgress(long counter, String text) {
         String remainingTime = (counter == totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
-        optimizerProgressIndicator.setProgress(counter, totalSteps, text, remainingTime);
+        optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
     }
 
     public synchronized void iterationsCompleted(long iterationsCompleted) {
@@ -250,10 +248,10 @@ public abstract class OptimizerRunner implements Runnable {
     public void run() {
         try {
             optimizationResults.clear();
-            optimizerProgressIndicator.setResults(optimizationResults);
-            optimizerProgressIndicator.enableProgress();
-            optimizerProgressIndicator.showProgress("Scanning historical data file...");
-            backTestFileReader = new BackTestFileReader(dataFileName);
+            optimizerDialog.setResults(optimizationResults);
+            optimizerDialog.enableProgress();
+            optimizerDialog.showProgress("Scanning historical data file...");
+            backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
             backTestFileReader.load();
             lineCount = backTestFileReader.getAll().size();
 
@@ -261,27 +259,26 @@ public abstract class OptimizerRunner implements Runnable {
                 return;
             }
 
-            optimizerProgressIndicator.showProgress("Starting optimization ...");
+            optimizerDialog.showProgress("Starting optimization ...");
             progressExecutor.scheduleWithFixedDelay(new ProgressRunner(), 0, 1, TimeUnit.SECONDS);
             long start = System.currentTimeMillis();
             optimize();
             long end = System.currentTimeMillis();
             progressExecutor.shutdownNow();
-            executor.shutdownNow();
 
             if (!cancelled) {
-                optimizerProgressIndicator.showProgress("Saving optimization results ...");
+                optimizerDialog.showProgress("Saving optimization results ...");
                 saveToFile();
                 long totalTimeInSecs = (end - start) / 1000;
                 showFastProgress(totalSteps, "Optimization");
-                optimizerProgressIndicator.showMessage("Optimization completed successfully in " + totalTimeInSecs + " seconds.");
+                MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
-            optimizerProgressIndicator.showError(t.toString());
+            MessageDialog.showError(optimizerDialog, t.toString());
         } finally {
             progressExecutor.shutdownNow();
-            optimizerProgressIndicator.signalCompleted();
+            optimizerDialog.signalCompleted();
         }
     }
 }

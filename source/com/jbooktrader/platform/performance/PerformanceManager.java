@@ -24,7 +24,6 @@ public class PerformanceManager {
     private double tradeProfit, grossProfit, grossLoss, netProfit, netProfitAsOfPreviousTrade;
     private double peakNetProfit, maxDrawdown;
     private boolean isCompletedTrade;
-    private int tradingDays;
     private double sumTradeProfit, sumTradeProfitSquared;
 
 
@@ -33,15 +32,10 @@ public class PerformanceManager {
         this.multiplier = multiplier;
         this.commission = commission;
         netProfitHistory = new NetProfitHistory();
-        tradingDays = 1;
     }
 
     public int getTrades() {
         return trades;
-    }
-
-    public void setTradingDays(int tradingDays) {
-        this.tradingDays = tradingDays;
     }
 
     public boolean getIsCompletedTrade() {
@@ -104,8 +98,7 @@ public class PerformanceManager {
         if (trades > 0) {
             double stdev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
             if (stdev != 0) {
-                double tradesPerDay = trades / (double) tradingDays;
-                pi = 100 * Math.sqrt(tradesPerDay) * getAverageProfitPerTrade() / stdev;
+                pi = Math.sqrt((double) trades) * getAverageProfitPerTrade() / stdev;
             }
         }
 
@@ -134,7 +127,7 @@ public class PerformanceManager {
 
         updatePositionValue(avgFillPrice, position);
 
-        isCompletedTrade = (previousPosition>0&&position<previousPosition || previousPosition<0&&position>previousPosition);
+        isCompletedTrade = (previousPosition > 0 && position < previousPosition || previousPosition < 0 && position > previousPosition);
         if (isCompletedTrade) {
             trades++;
 

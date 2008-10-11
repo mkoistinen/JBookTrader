@@ -2,7 +2,6 @@ package com.jbooktrader.platform.startup;
 
 import com.birosoft.liquid.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
@@ -16,8 +15,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "5.09";
-    public static final String RELEASE_DATE = "September 27, 2008";
+    public static final String VERSION = "6.01";
+    public static final String RELEASE_DATE = "October 11, 2008";
     private static String appPath;
 
     /**
@@ -38,6 +37,8 @@ public class JBookTrader {
         UIManager.put("Label.foreground", color);
         UIManager.put("TitledBorder.titleColor", color);
 
+        Dispatcher.setReporter("EventReport");
+
         new MainFrameController();
     }
 
@@ -52,24 +53,19 @@ public class JBookTrader {
             FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
 
             if (channel.tryLock() == null) {
-                throw new JBookTraderException(APP_NAME + " is already running.");
+                MessageDialog.showMessage(null, APP_NAME + " is already running.");
+                return;
             }
 
-            if (args.length >= 1) {
-                setAppPath(args[0]);
-                Dispatcher.setReportFactory(new ReportFactoryFile());
-                Dispatcher.setReporter("EventReport");
-                // Launch JBT GUI
-                new JBookTrader();
-            } else {
-                throw new JBookTraderException("You omit to pass the JBT path in command line argument.");
+            if (args.length != 1) {
+                String msg = "Exactly one argument must be passed. Usage: JBookTrader <JBookTraderDirectory>";
+                throw new JBookTraderException(msg);
             }
+            JBookTrader.appPath = args[0];
+            new JBookTrader();
         } catch (Throwable t) {
             MessageDialog.showError(null, t.getMessage());
-            if (Dispatcher.getReporter() != null) {
-                Dispatcher.getReporter().report(t);
-            }
-            System.exit(-1);
+            Dispatcher.getReporter().report(t);
         }
     }
 
@@ -77,7 +73,4 @@ public class JBookTrader {
         return JBookTrader.appPath;
     }
 
-    public static void setAppPath(String appPath) {
-        JBookTrader.appPath = appPath;
-    }
 }

@@ -7,7 +7,7 @@ public enum PerformanceMetric {
     MaxDD("Max DD", 0),
     PF("Profit Factor", 2),
     Kelly("Kelly", 0),
-    PI("PI", 0);
+    PI("PI", 2);
 
     private final String name;
     private final int precision;

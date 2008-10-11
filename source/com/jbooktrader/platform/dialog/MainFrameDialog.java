@@ -155,7 +155,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     }
 
 
-    private void populateStrategies() throws JBookTraderException {
+    private void populateStrategies() {
         for (Strategy strategy : ClassFinder.getStrategies()) {
             strategyTableModel.addStrategy(strategy);
         }

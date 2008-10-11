@@ -1,16 +1,14 @@
 package com.jbooktrader.platform.test;
 
-import java.util.TimeZone;
-
-import com.jbooktrader.platform.marketbook.MarketBook;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.marketdepth.*;
+import org.junit.*;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.*;
 
 /**
-  * unit tests for com.jbooktrader.platform.marketbook.MarketBook
-  */
+ * unit tests for com.jbooktrader.platform.marketbook.MarketBook
+ */
 
 public class MarketBookTest {
 
@@ -32,8 +30,8 @@ public class MarketBookTest {
      */
     @Test
     public void testInvalidWhenCorruptAsks() {
-        final double[] bids = { 3.0, 2.0, 1.0 };
-        final double[] asks = { 10.0, 11.0, 4.0 };
+        final double[] bids = {3.0, 2.0, 1.0};
+        final double[] asks = {10.0, 11.0, 4.0};
         final MarketBook marketBook = new MarketBook("Test", TimeZone.getDefault());
 
         for (int i = 0; i < 3; i++) {
@@ -49,8 +47,8 @@ public class MarketBookTest {
      */
     @Test
     public void testInvalidWhenCorruptBids() {
-        final double[] bids = { 3.0, 4.0, 1.0 };
-        final double[] asks = { 10.0, 11.0, 12.0 };
+        final double[] bids = {3.0, 4.0, 1.0};
+        final double[] asks = {10.0, 11.0, 12.0};
         final MarketBook marketBook = new MarketBook("Test", TimeZone.getDefault());
 
         for (int i = 0; i < 3; i++) {
@@ -66,8 +64,8 @@ public class MarketBookTest {
      */
     @Test
     public void testInvalidWhenCorruptSpread() {
-        final double[] bids = { 10.0, 9.0, 8.0 };
-        final double[] asks = { 10.0, 11.0, 12.0 };
+        final double[] bids = {10.0, 9.0, 8.0};
+        final double[] asks = {10.0, 11.0, 12.0};
         final MarketBook marketBook = new MarketBook("Test", TimeZone.getDefault());
 
         for (int i = 0; i < 3; i++) {
@@ -76,15 +74,15 @@ public class MarketBookTest {
         }
         Assert.assertEquals(false, marketBook.isValid());
     }
-    
+
     /**
      * Tests that the market book is invalid when not balanced, and valid when
      * balanced.
      */
     @Test
     public void testValidOnlyWhenBalanced() {
-        final double[] bids = { 5.0, 4.0, 3.0, 2.0, 1.0 };
-        final double[] asks = { 6.0, 7.0, 8.0, 9.0, 10.0, 11.0};
+        final double[] bids = {5.0, 4.0, 3.0, 2.0, 1.0};
+        final double[] asks = {6.0, 7.0, 8.0, 9.0, 10.0, 11.0};
         final MarketBook marketBook = new MarketBook("Test", TimeZone.getDefault());
 
         // Add each bid, ensuring it is invalid (because there are no ask prices)

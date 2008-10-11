@@ -13,10 +13,8 @@ public class DepthBalanceEMA extends Indicator {
     }
 
     @Override
-    public double calculate() {
-        int balance = marketBook.getLastMarketSnapshot().getMidBalance();
+    public void calculate() {
+        int balance = marketBook.getLastMarketSnapshot().getBalance();
         value += (balance - value) * multiplier;
-
-        return value;
     }
 }

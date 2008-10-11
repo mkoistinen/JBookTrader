@@ -2,7 +2,6 @@ package com.jbooktrader.platform.marketbook;
 
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketdepth.*;
-import com.jbooktrader.platform.marketindex.*;
 import com.jbooktrader.platform.model.*;
 
 import java.util.*;
@@ -17,10 +16,8 @@ public class MarketBook {
     private final String name;
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
-    private boolean backTestFileWriterDisabled, isResetting;
+    private boolean isResetting;
     private double lowBalance, highBalance, lastBalance;
-    private int cumulativeVolume, previousCumulativeVolume;
-    private double tick;
     private double bestBid, bestAsk;
 
 
@@ -38,13 +35,10 @@ public class MarketBook {
     }
 
     public void save(MarketSnapshot marketSnapshot) {
-        if (backTestFileWriterDisabled) return;
         if (backTestFileWriter == null) {
             try {
                 backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
             } catch (JBookTraderException e) {
-                backTestFileWriterDisabled = true;
-                // in order to make sure this is logged in EventReport
                 throw new RuntimeException(e);
             }
         }
@@ -106,7 +100,7 @@ public class MarketBook {
             if (price >= previousLevelBidPrice) {
                 return false;
             } else {
-               previousLevelBidPrice = price;
+                previousLevelBidPrice = price;
             }
         }
 
@@ -117,17 +111,13 @@ public class MarketBook {
             if (price <= previousLevelAskPrice) {
                 return false;
             } else {
-               previousLevelAskPrice = price;
+                previousLevelAskPrice = price;
             }
         }
 
         double bestBid = bids.getFirst().getPrice();
         double bestAsk = asks.getFirst().getPrice();
         return (bestBid < bestAsk);
-    }
-
-    public int getCumulativeVolume() {
-        return cumulativeVolume;
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
@@ -139,33 +129,17 @@ public class MarketBook {
     }
 
     public MarketSnapshot getNextMarketSnapshot(long time) {
-        MarketSnapshot marketSnapshot = null;
-        if (!isResetting) {
-            int volume = cumulativeVolume - previousCumulativeVolume;
-            marketSnapshot = new MarketSnapshot(time, (int) Math.round(lowBalance), (int) Math.round(highBalance), bestBid, bestAsk, volume,
-                    tick);
-
-            // reset values for the next market snapshot
-            previousCumulativeVolume = cumulativeVolume;
-            highBalance = lowBalance = lastBalance;
+        if (isResetting) {
+            return null;
         }
+
+        int balance = (int) Math.round((lowBalance + highBalance) / 2);
+        MarketSnapshot marketSnapshot = new MarketSnapshot(time, balance, bestBid, bestAsk);
+        // reset values for the next market snapshot
+        highBalance = lowBalance = lastBalance;
+
 
         return marketSnapshot;
-    }
-
-    public void updateIndex(MarketIndex marketIndex, double value) {
-        switch (marketIndex) {
-            case Tick:
-                tick = value;
-                break;
-        }
-    }
-
-    public void updateVolume(int cumulativeVolume) {
-        if (previousCumulativeVolume == 0) {
-            previousCumulativeVolume = cumulativeVolume;
-        }
-        this.cumulativeVolume = cumulativeVolume;
     }
 
     public void updateDepth(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {

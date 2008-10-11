@@ -18,7 +18,7 @@ public class ClassFinder {
      * JBookTrader will know how to run a trading strategy as long as that
      * strategy is implemented in a class that extends the base Strategy class.
      */
-    private static List<String> getClasses(String packageName) throws JBookTraderException {
+    private static List<String> getClasses(String packageName) {
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
         List<String> classNames = new ArrayList<String>();
 
@@ -27,18 +27,15 @@ public class ClassFinder {
             try {
                 file = new File(url.toURI());
             } catch (URISyntaxException urise) {
-                throw new JBookTraderException(url + " is not a valid URI");
+                throw new RuntimeException(url + " is not a valid URI");
             }
             if (file.isDirectory()) {
                 File packageDir = new File(file.getPath() + '/' + packageName);
                 if (packageDir.exists()) {
                     for (File f : packageDir.listFiles()) {
                         String className = f.getName();
-                        int extIndex = className.lastIndexOf(".class");
-                        if(extIndex>0) {
-                            className = className.substring(0, extIndex);
-                            classNames.add(className);
-                        }
+                        className = className.substring(0, className.lastIndexOf(".class"));
+                        classNames.add(className);
                     }
                 }
             }
@@ -68,14 +65,9 @@ public class ClassFinder {
         }
     }
 
-    public static List<Strategy> getStrategies() throws JBookTraderException {
+    public static List<Strategy> getStrategies() {
         List<Strategy> strategies = new ArrayList<Strategy>();
-        List<String> strategyNames;
-        try {
-            strategyNames = getClasses("com/jbooktrader/strategy/");
-        } catch (Exception e) {
-            throw new JBookTraderException(e);
-        }
+        List<String> strategyNames = getClasses("com/jbooktrader/strategy/");
 
         for (String strategyName : strategyNames) {
             try {
@@ -86,30 +78,30 @@ public class ClassFinder {
             } catch (Exception e) {
                 String msg = "Could not create strategy " + strategyName + ": ";
                 msg += (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
-                throw new JBookTraderException(msg);
+                throw new RuntimeException(msg);
             }
         }
+
         return strategies;
     }
 
-    public static Vector<String> getReportRenderers() throws JBookTraderException {
-        Vector<String> reportNames = new Vector<String>();
+    public static List<String> getReportRenderers() {
+        List<String> reportNames = new ArrayList<String>();
 
         for (String className : getClasses("com/jbooktrader/platform/report")) {
+            String fullClassName = "com.jbooktrader.platform.report." + className;
+            Class<?> clazz;
             try {
-                String fullClassName = "com.jbooktrader.platform.report." + className;
-                Class<?> clazz = Class.forName(fullClassName);
-                boolean interfaceFound = false;
-                for (Class<?> implementedInterface : clazz.getInterfaces()) {
-                    if (implementedInterface.getName().equals("com.jbooktrader.platform.report.ReportRenderer")) {
-                        interfaceFound = true;
-                        break;
-                    }
-                }
-                if (interfaceFound) {
+                clazz = Class.forName(fullClassName);
+            } catch (ClassNotFoundException cnfe) {
+                throw new RuntimeException(cnfe);
+            }
+
+            for (Class<?> implementedInterface : clazz.getInterfaces()) {
+                if (implementedInterface.getName().equals("com.jbooktrader.platform.report.ReportRenderer")) {
                     reportNames.add(fullClassName);
+                    break;
                 }
-            } catch (Exception e) {
             }
         }
 

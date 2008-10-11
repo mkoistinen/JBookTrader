@@ -18,7 +18,7 @@ public class Displacement extends Indicator {
     }
 
     @Override
-    public double calculate() {
+    public void calculate() {
         double parentValue = parentIndicator.getValue();
         history.add(parentValue);
         if (history.size() > period) {
@@ -26,6 +26,5 @@ public class Displacement extends Indicator {
         }
 
         value = history.getLast() - history.getFirst();
-        return value;
     }
 }

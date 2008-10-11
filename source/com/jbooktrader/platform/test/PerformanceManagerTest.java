@@ -1,19 +1,16 @@
 package com.jbooktrader.platform.test;
 
+import com.ib.client.*;
+import com.jbooktrader.platform.commission.*;
+import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 import static org.junit.Assert.*;
-
-import org.junit.Test;
-
-import com.ib.client.Contract;
-import com.jbooktrader.platform.commission.Commission;
-import com.jbooktrader.platform.commission.CommissionFactory;
-import com.jbooktrader.platform.marketbook.MarketBook;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.platform.performance.PerformanceManager;
-import com.jbooktrader.platform.schedule.TradingSchedule;
-import com.jbooktrader.platform.strategy.Strategy;
-import com.jbooktrader.platform.util.ContractFactory;
+import org.junit.*;
 
 public class PerformanceManagerTest {
 
@@ -27,7 +24,7 @@ public class PerformanceManagerTest {
             int multiplier = 50;// contract multiplier
             Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
             setStrategy(contract, tradingSchedule, multiplier, commission);
-            
+
             setMarketBook(new MarketBook());
         }
 
@@ -38,16 +35,17 @@ public class PerformanceManagerTest {
         @Override
         protected void setParams() {
         }
-        
+
     }
-    
+
     /**
      * Test the trade count algorithm
+     *
      * @throws JBookTraderException
      */
     @Test
     public void testUpdateOnTrade() throws JBookTraderException {
-        int trades=0;
+        int trades = 0;
         DummyStrategy strategy = new DummyStrategy(new StrategyParams());
         PerformanceManager pm = strategy.getPerformanceManager();
         assertEquals(trades, pm.getTrades());
@@ -55,11 +53,11 @@ public class PerformanceManagerTest {
         // 0 -> 1
         pm.updateOnTrade(1, 1.0, 1);
         assertEquals(trades, pm.getTrades());
-        
+
         // 1 -> 2
         pm.updateOnTrade(1, 1.0, 2);
         assertEquals(trades, pm.getTrades());
-        
+
         // 2 -> 1
         trades++;
         pm.updateOnTrade(1, 1.0, 1);
@@ -69,15 +67,15 @@ public class PerformanceManagerTest {
         trades++;
         pm.updateOnTrade(1, 1.0, 0);
         assertEquals(trades, pm.getTrades());
-        
+
         // 0 -> -1
         pm.updateOnTrade(1, 1.0, -1);
         assertEquals(trades, pm.getTrades());
-        
+
         // -1 -> -2
         pm.updateOnTrade(1, 1.0, -2);
         assertEquals(trades, pm.getTrades());
-        
+
         // -2 -> -1
         trades++;
         pm.updateOnTrade(1, 1.0, -1);
@@ -92,7 +90,7 @@ public class PerformanceManagerTest {
         trades++;
         pm.updateOnTrade(1, 1.0, -1);
         assertEquals(trades, pm.getTrades());
-        
+
         // -1 -> 0
         trades++;
         pm.updateOnTrade(1, 1.0, 0);

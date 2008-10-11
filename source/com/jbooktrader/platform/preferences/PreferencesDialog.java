@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.preferences;
 
+import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
@@ -8,14 +9,16 @@ import com.jbooktrader.platform.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser, webAccessSSLCertificate;
+    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser;
     private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
-    private JPasswordField emailPasswordField, webAccessPasswordField;
-    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo, webAccessHTTPSCombo;
+    private JPasswordField emailPasswordField, webAccessPasswordField, c2PasswordField;
+    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo;
+    private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
         super(parent);
@@ -63,13 +66,6 @@ public class PreferencesDialog extends JDialog {
         JButton cancelButton = new JButton("Cancel");
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
-
-        JPanel noticePanel = new JPanel();
-        JLabel noticeLabel = new JLabel("Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.");
-        noticeLabel.setForeground(Color.red);
-        noticePanel.add(noticeLabel);
-
-        getContentPane().add(noticePanel, BorderLayout.NORTH);
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 
@@ -93,7 +89,8 @@ public class PreferencesDialog extends JDialog {
 
         JPanel reportingTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Reporting", reportingTab);
-        reportRendererCombo = new JComboBox(ClassFinder.getReportRenderers());
+        List<String> reportRenderers = ClassFinder.getReportRenderers();
+        reportRendererCombo = new JComboBox(reportRenderers.toArray(new String[reportRenderers.size()]));
         reportRecyclingCombo = new JComboBox(new String[]{"Append", "New"});
         add(reportingTab, ReportRenderer, reportRendererCombo);
         add(reportingTab, ReportRecycling, reportRecyclingCombo);
@@ -129,27 +126,24 @@ public class PreferencesDialog extends JDialog {
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();
-        webAccessHTTPSCombo = new JComboBox(new String[]{"disabled", "enabled"});
-        webAccessSSLCertificate = new JTextField();
-        webAccessSSLCertificate.setText(prefs.get(WebAccessSSLCertificate));
-        JButton chooseCertificate = new JButton("...");
-        chooseCertificate.addActionListener( new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                FileChooser.fillInTextField(webAccessSSLCertificate, "Select your SSL certificate", webAccessSSLCertificate.getText());
-            }
-        } );
-        JPanel sslPanel = new JPanel(new SpringLayout());
-        sslPanel.add(webAccessSSLCertificate);
-        sslPanel.add(chooseCertificate);
-        SpringUtilities.makeCompactGrid(sslPanel, 1, 2, 0, 0, 8, 5);
         add(webAcessTab, WebAccess, webAccessCombo);
         add(webAcessTab, WebAccessPort, webAccessPortSpin);
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
-        add(webAcessTab, WebAccessHTTPS, webAccessHTTPSCombo);
-        genericAdd(webAcessTab, WebAccessSSLCertificate, sslPanel);
-        SpringUtilities.makeCompactGrid(webAcessTab, 6, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 5);
 
+        JPanel c2Tab = new JPanel(new SpringLayout());
+        tabbedPane1.addTab("Collective2", c2Tab);
+        JPanel passwordPanel = new JPanel(new SpringLayout());
+        c2PasswordField = new JPasswordField();
+        add(passwordPanel, Collective2Password, c2PasswordField);
+        SpringUtilities.makeCompactGrid(passwordPanel, 1, 2, 0, 8, 4, 0);
+        JScrollPane scrollPane = new JScrollPane();
+        c2Tab.add(passwordPanel);
+        c2Tab.add(scrollPane);
+        SpringUtilities.makeCompactGrid(c2Tab, 2, 1, 12, 12, 12, 12);
+        c2TableModel = new C2TableModel();
+        scrollPane.getViewport().add(new JTable(c2TableModel));
 
         emailTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -174,8 +168,10 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(ClientID, clientIDSpin.getValue().toString());
                     prefs.set(AccountType, (String) accountTypeCombo.getSelectedItem());
                     prefs.set(AdvisorAccount, advisorAccountText.getText());
+
                     prefs.set(ReportRenderer, (String) reportRendererCombo.getSelectedItem());
                     prefs.set(ReportRecycling, (String) reportRecyclingCombo.getSelectedItem());
+
                     prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
                     prefs.set(SMTPSHost, emailSMTPSHost.getText());
                     prefs.set(EmailLogin, emailLogin.getText());
@@ -189,8 +185,13 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(WebAccessPort, webAccessPortSpin.getValue().toString());
                     prefs.set(WebAccessUser, webAccessUser.getText());
                     prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
-                    prefs.set(WebAccessHTTPS, (String) webAccessHTTPSCombo.getSelectedItem());
-                    prefs.set(WebAccessSSLCertificate, webAccessSSLCertificate.getText());
+
+                    prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
+                    prefs.set(Collective2Strategies, c2TableModel.getStrategies());
+
+                    String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
+                    MessageDialog.showMessage(PreferencesDialog.this, msg);
+
                     dispose();
                 } catch (Exception ex) {
                     MessageDialog.showError(PreferencesDialog.this, ex.getMessage());
@@ -206,7 +207,6 @@ public class PreferencesDialog extends JDialog {
 
 
         setPreferredSize(new Dimension(500, 380));
-
     }
 
     private void setWidth(JPanel p, Component c, int width) throws JBookTraderException {

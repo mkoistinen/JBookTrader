@@ -56,7 +56,7 @@ public final class BackTestFileWriter {
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         } catch (IOException ioe) {
-            throw new JBookTraderException("Could not write to file " + fullFileName);
+            throw new JBookTraderException("Could not write to file " + fileName);
         }
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
@@ -66,12 +66,9 @@ public final class BackTestFileWriter {
     public void write(MarketSnapshot marketSnapshot, boolean flush) {
         StringBuilder sb = new StringBuilder();
         sb.append(dateFormat.format(new Date(marketSnapshot.getTime()))).append(",");
-        sb.append(marketSnapshot.getLowBalance()).append(",");
-        sb.append(marketSnapshot.getHighBalance()).append(",");
+        sb.append(marketSnapshot.getBalance()).append(",");
         sb.append(decimalFormat.format(marketSnapshot.getBestBid())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getBestAsk())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getVolume())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getTick()));
+        sb.append(decimalFormat.format(marketSnapshot.getBestAsk()));
 
         writer.println(sb);
         if (flush) {
@@ -90,7 +87,6 @@ public final class BackTestFileWriter {
 
     public void write(MarketBook marketBook) {
         if (writer != null) {
-
             writeHeader();
 
             for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
@@ -109,12 +105,9 @@ public final class BackTestFileWriter {
         header.append("# Each line represents a 1-second snapshot of the market and contains ").append(BackTestFileReader.COLUMNS).append(" columns:").append(LINE_SEP);
         header.append("# 1. date in the MMddyy format").append(LINE_SEP);
         header.append("# 2. time in the HHmmss format").append(LINE_SEP);
-        header.append("# 3. period's lowest book balance").append(LINE_SEP);
-        header.append("# 4. period's highest book balance").append(LINE_SEP);
-        header.append("# 5. best bid price at the period's end").append(LINE_SEP);
-        header.append("# 6. best ask price at the period's end").append(LINE_SEP);
-        header.append("# 7. period's volume of traded contracts").append(LINE_SEP);
-        header.append("# 8. NYSE TICK at the period's end").append(LINE_SEP);
+        header.append("# 3. book balance").append(LINE_SEP);
+        header.append("# 4. best bid").append(LINE_SEP);
+        header.append("# 5. best ask").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

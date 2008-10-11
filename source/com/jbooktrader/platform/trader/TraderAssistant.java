@@ -2,7 +2,6 @@ package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.marketindex.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.position.*;
@@ -23,7 +22,6 @@ public class TraderAssistant {
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
     private final Map<String, Integer> tickers;
-    private final Map<Integer, String> indexes;
     private final HashSet<Integer> subscribedTickers;
     private final Map<Integer, MarketBook> marketBooks;
     private final Report eventReport;
@@ -32,7 +30,7 @@ public class TraderAssistant {
     private EClientSocket socket;
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
-    private boolean isConnected, indexesRequested;
+    private boolean isConnected;
 
     public TraderAssistant(Trader trader) {
         this.trader = trader;
@@ -43,7 +41,6 @@ public class TraderAssistant {
         tickers = new HashMap<String, Integer>();
         marketBooks = new HashMap<Integer, MarketBook>();
         subscribedTickers = new HashSet<Integer>();
-        indexes = new HashMap<Integer, String>();
 
         PreferencesHolder prefs = PreferencesHolder.getInstance();
 
@@ -159,31 +156,6 @@ public class TraderAssistant {
         return marketBook;
     }
 
-    public void updateIndexes(int tickerId, double value) {
-        if (indexes.containsKey(tickerId)) {
-            String ticker = indexes.get(tickerId);
-            MarketIndex marketIndex = MarketIndex.getMarketIndex(ticker);
-            for (MarketBook marketBook : marketBooks.values()) {
-                marketBook.updateIndex(marketIndex, value);
-            }
-        }
-    }
-
-
-    private void requestIndexes() {
-        try {
-            for (MarketIndex marketIndex : MarketIndex.values()) {
-                Contract contract = marketIndex.getContract();
-                tickerId++;
-                indexes.put(tickerId, contract.m_symbol);
-                socket.reqMktData(tickerId, contract, "", false);
-                eventReport.report("Requested market data for " + contract.m_symbol);
-            }
-        } finally {
-            indexesRequested = true;
-        }
-    }
-
 
     private synchronized void requestMarketData(Strategy strategy) {
         Contract contract = strategy.getContract();
@@ -196,10 +168,6 @@ public class TraderAssistant {
             String msg = "Requested market depth and market data for instrument " + instrument;
             eventReport.report(msg);
         }
-
-        if (!indexesRequested) {
-            requestIndexes();
-        }
     }
 
     public synchronized void addStrategy(Strategy strategy) {
@@ -211,6 +179,7 @@ public class TraderAssistant {
             HeartBeatSender.getInstance().addStrategy(strategy);
             String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
             eventReport.report(msg);
+            strategy.setCollective2();
             requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);
             strategy.setIsActive(true);
@@ -222,7 +191,6 @@ public class TraderAssistant {
         strategies.clear();
         openOrders.clear();
         tickers.clear();
-        indexes.clear();
         subscribedTickers.clear();
         marketBooks.clear();
     }

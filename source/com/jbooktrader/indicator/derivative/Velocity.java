@@ -16,12 +16,10 @@ public class Velocity extends Indicator {
     }
 
     @Override
-    public double calculate() {
+    public void calculate() {
         double parentValue = parentIndicator.getValue();
         fast += (parentValue - fast) * fastMultiplier;
         slow += (parentValue - slow) * slowMultiplier;
         value = fast - slow;
-
-        return value;
     }
 }
