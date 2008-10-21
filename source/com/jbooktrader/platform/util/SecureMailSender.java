@@ -12,10 +12,9 @@ import java.util.*;
  * Sends SSL Mail
  */
 public class SecureMailSender {
-    private final static Properties props = new Properties();
-    private final String host, login, password, subject, sender, recipient;
+    private final Properties props;
+    private final String user, password, subject, recipient;
     private final boolean isEnabled;
-    private final static PreferencesHolder prefs = PreferencesHolder.getInstance();
     private static SecureMailSender instance;
 
     // inner class
@@ -28,32 +27,27 @@ public class SecureMailSender {
 
         public void run() {
             try {
-                send(false);
-            } catch (Throwable t) {
-                Dispatcher.getReporter().report("Email notification failed.");
-                Dispatcher.getReporter().report(t);
-            }
-        }
+                Session mailSession = Session.getDefaultInstance(props);
+                //mailSession.setDebug(true); // sends debugging info to System.out
 
-        public void send(boolean debug) throws JBookTraderException {
-            Session mailSession = Session.getDefaultInstance(props);
-            mailSession.setDebug(debug);
-
-            MimeMessage message = new MimeMessage(mailSession);
-            try {
+                MimeMessage message = new MimeMessage(mailSession);
                 message.setSubject(subject);
                 message.setContent(content, "text/plain");
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
-                message.setFrom(new InternetAddress(sender));
+                message.addFrom(new Address[] {new InternetAddress(user)});
 
                 Transport transport = mailSession.getTransport();
-                transport.connect(host, login, password);
+                transport.connect(user, password);
 
                 transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));
                 transport.close();
-            } catch (MessagingException me) {
-                throw new JBookTraderException(me);
+
+                Dispatcher.getReporter().report("Email notification sent");
+            } catch (Throwable t) {
+                Dispatcher.getReporter().report("Email notification failed");
+                Dispatcher.getReporter().report(t);
             }
+
         }
     }
 
@@ -65,33 +59,25 @@ public class SecureMailSender {
     }
 
     // private constructor for noninstantiability
-    private SecureMailSender(String smtpsHost, String login, String password, String from, String to, String subject) {
-        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
-        props.setProperty("mail.transport.protocol", "smtps");
-        props.setProperty("mail.smtps.auth", "true");
-
-        this.host = smtpsHost;
-        this.login = login;
-        this.sender = from;
-        this.recipient = to;
-        this.password = password;
-        this.subject = subject;
-    }
-
-    // private constructor for noninstantiability
     private SecureMailSender() {
-        this(prefs.get(SMTPSHost), prefs.get(EmailLogin), prefs.get(EmailPassword), prefs.get(From), prefs.get(To), prefs.get(EmailSubject));
-    }
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
+        isEnabled = prefs.get(EmailMonitoring).equalsIgnoreCase("enabled");
 
+        props = new Properties();
+        props.put("mail.transport.protocol", "smtps");
+        props.put("mail.smtps.host", "smtp.gmail.com");
+        props.put("mail.smtps.auth", "true");
+
+        user = prefs.get(From);
+        recipient = prefs.get(To);
+        password = prefs.get(EmailPassword);
+        subject = prefs.get(EmailSubject);
+    }
 
     public void send(String content) {
         if (isEnabled) {
             new Mailer(content).start();
         }
-    }
-
-    static public void test(String smtpsHost, String login, String password, String from, String to, String subject) throws JBookTraderException {
-        new SecureMailSender(smtpsHost, login, password, from, to, subject).new Mailer("JBT remote notification email test.").send(true);
     }
 
 }

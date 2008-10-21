@@ -93,17 +93,12 @@ public class PreferencesDialog extends JDialog {
         emailSubjectText = new JTextField();
         heartBeatIntervalSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         add(remoteMonitoringTab, EmailMonitoring, emailMonitoringCombo);
-        add(remoteMonitoringTab, SMTPSHost, emailSMTPSHost);
-        add(remoteMonitoringTab, EmailLogin, emailLogin);
         add(remoteMonitoringTab, EmailPassword, emailPasswordField);
         add(remoteMonitoringTab, From, fromText);
         add(remoteMonitoringTab, To, toText);
         add(remoteMonitoringTab, EmailSubject, emailSubjectText);
         add(remoteMonitoringTab, HeartBeatInterval, heartBeatIntervalSpin);
-        remoteMonitoringTab.add(new JLabel("Email test:"));
-        JButton emailTestButton = new JButton("Send a test email");
-        remoteMonitoringTab.add(emailTestButton);
-        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 9, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 6, 2, 12, 12, 8, 5);
         setWidth(remoteMonitoringTab, heartBeatIntervalSpin, 65);
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
@@ -131,21 +126,6 @@ public class PreferencesDialog extends JDialog {
         c2TableModel = new C2TableModel();
         scrollPane.getViewport().add(new JTable(c2TableModel));
 
-        emailTestButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    SecureMailSender.test(emailSMTPSHost.getText(), emailLogin.getText(), new String(emailPasswordField.getPassword()),
-                            fromText.getText(), toText.getText(), emailSubjectText.getText());
-                    MessageDialog.showMessage(null, "Email notification sent.");
-                } catch (Exception ex) {
-                    MessageDialog.showMessage(null, "Email notification failed: " + ex);
-                } finally {
-                    setCursor(Cursor.getDefaultCursor());
-                }
-            }
-        });
-
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -154,8 +134,6 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(ClientID, clientIDSpin.getValue().toString());
 
                     prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
-                    prefs.set(SMTPSHost, emailSMTPSHost.getText());
-                    prefs.set(EmailLogin, emailLogin.getText());
                     prefs.set(EmailPassword, new String(emailPasswordField.getPassword()));
                     prefs.set(From, fromText.getText());
                     prefs.set(To, toText.getText());
