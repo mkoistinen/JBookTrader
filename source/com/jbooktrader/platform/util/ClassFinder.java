@@ -84,27 +84,4 @@ public class ClassFinder {
 
         return strategies;
     }
-
-    public static List<String> getReportRenderers() {
-        List<String> reportNames = new ArrayList<String>();
-
-        for (String className : getClasses("com/jbooktrader/platform/report")) {
-            String fullClassName = "com.jbooktrader.platform.report." + className;
-            Class<?> clazz;
-            try {
-                clazz = Class.forName(fullClassName);
-            } catch (ClassNotFoundException cnfe) {
-                throw new RuntimeException(cnfe);
-            }
-
-            for (Class<?> implementedInterface : clazz.getInterfaces()) {
-                if (implementedInterface.getName().equals("com.jbooktrader.platform.report.ReportRenderer")) {
-                    reportNames.add(fullClassName);
-                    break;
-                }
-            }
-        }
-
-        return reportNames;
-    }
 }

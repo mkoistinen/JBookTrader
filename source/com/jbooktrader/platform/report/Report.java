@@ -1,8 +1,6 @@
 package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.ReportRenderer;
-import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
@@ -14,30 +12,17 @@ public final class Report {
     private final static String FILE_SEP = System.getProperty("file.separator");
     private final static String REPORT_DIR = JBookTrader.getAppPath() + FILE_SEP + "reports" + FILE_SEP;
     private final String fieldStart, fieldEnd, rowStart, rowEnd, fieldBreak;
-    private final ReportRenderer renderer;
+
     private final SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
     private PrintWriter writer;
     private static boolean isDisabled;
 
     public Report(String fileName) throws JBookTraderException {
-        String reportRendererClass = PreferencesHolder.getInstance().get(ReportRenderer);
-
-        try {
-            Class<? extends ReportRenderer> clazz = Class.forName(reportRendererClass).asSubclass(ReportRenderer.class);
-            renderer = clazz.newInstance();
-        } catch (Exception e) {
-            throw new JBookTraderException(e);
-        }
-
-        fieldStart = renderer.getFieldStart();
-        fieldEnd = renderer.getFieldEnd();
-        rowStart = renderer.getRowStart();
-        rowEnd = renderer.getRowEnd();
-        fieldBreak = renderer.getFieldBreak();
-        String emphasisStart = renderer.getEmphasisStart();
-        String emphasisEnd = renderer.getEmphasisEnd();
-        String rootStart = renderer.getRootStart();
-        String fileExtension = renderer.getFileExtension();
+        fieldStart = "<td>";
+        fieldEnd = "</td>";
+        rowStart = "<tr>";
+        rowEnd = "</tr>";
+        fieldBreak = "<br>";
 
 
         if (isDisabled) {
@@ -49,23 +34,19 @@ public final class Report {
             reportDir.mkdir();
         }
 
-        String fullFileName = REPORT_DIR + fileName + "." + fileExtension;
+        String fullFileName = REPORT_DIR + fileName + ".htm";
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         } catch (IOException ioe) {
             throw new JBookTraderException(ioe);
         }
         StringBuilder s = new StringBuilder();
-        s.append(emphasisStart).append("New Report Started: ").append(df.format(getDate())).append(emphasisEnd);
+        s.append("<b>").append("New Report Started: ").append(df.format(getDate())).append("</b>");
         reportDescription(s.toString());
         s = new StringBuilder();
-        s.append(emphasisStart).append("JBT Version: ").append(JBookTrader.VERSION).append(emphasisEnd);
-        s.append(rootStart);
+        s.append("<b>").append("JBT Version: ").append(JBookTrader.VERSION).append("</b>");
+        s.append("<table border=1 width=100%>");
         reportDescription(s.toString());
-    }
-
-    public ReportRenderer getRenderer() {
-        return renderer;
     }
 
     public static void disable() {
