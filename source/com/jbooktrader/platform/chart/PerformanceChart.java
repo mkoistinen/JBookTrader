@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Multi-plot strategy performance chart which combines price,
- * indicators, executions, and P&L.
+ * indicators, executions, and net profit.
  */
 
 public class PerformanceChart {
@@ -200,7 +200,7 @@ public class PerformanceChart {
 
         tradesVisibilityCheck = new JCheckBox("Show trades");
         tradesVisibilityCheck.setSelected(true);
-        pnlVisibilityCheck = new JCheckBox("Show P&L");
+        pnlVisibilityCheck = new JCheckBox("Show net profit");
         pnlVisibilityCheck.setSelected(true);
 
         chartOptionsPanel.add(chartTypeLabel);
@@ -339,11 +339,11 @@ public class PerformanceChart {
             annotations.add(trade);
         }
 
-        // P&L plot
+        // Net profit plot
         TimeSeriesCollection profitAndLossCollection = new TimeSeriesCollection();
         TimeSeries profitAndLoss = performanceChartData.getProfitAndLossSeries();
         profitAndLossCollection.addSeries(profitAndLoss);
-        NumberAxis pnlAxis = new NumberAxis("P&L");
+        NumberAxis pnlAxis = new NumberAxis("Net Profit");
         pnlAxis.setAutoRangeIncludesZero(false);
         StandardXYItemRenderer pnlRenderer = new StandardXYItemRenderer();
         pnlPlot = new FastXYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);

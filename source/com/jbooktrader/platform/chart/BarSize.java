@@ -17,7 +17,7 @@ public enum BarSize {
     private final String name;
     private final int barSize;
 
-    BarSize(String name, int barSize) {
+    private BarSize(String name, int barSize) {
         this.name = name;
         this.barSize = barSize;
     }

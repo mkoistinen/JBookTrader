@@ -7,9 +7,6 @@ import com.jbooktrader.platform.indicator.*;
  */
 public class DepthBalance extends Indicator {
 
-    public DepthBalance() {
-    }
-
     @Override
     public void calculate() {
         value = marketBook.getLastMarketSnapshot().getBalance();

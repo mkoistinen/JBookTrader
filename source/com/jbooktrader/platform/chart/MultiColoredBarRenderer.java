@@ -12,10 +12,7 @@ import java.awt.geom.*;
  * This functionality is not yet available in JFreeChart, thus the need for a
  * custom renderer.
  */
-public class MultiColoredBarRenderer extends HighLowRenderer {
-    private static final Color BULLISH_COLOR = Color.GREEN;
-    private static final Color BEARISH_COLOR = Color.RED;
-    private static final Color NEUTRAL_COLOR = Color.YELLOW;
+class MultiColoredBarRenderer extends HighLowRenderer {
     private OHLCDataset dataset;
 
     @Override
@@ -23,9 +20,9 @@ public class MultiColoredBarRenderer extends HighLowRenderer {
         double open = dataset.getOpenValue(series, item);
         double close = dataset.getCloseValue(series, item);
         if (open == close) {
-            return NEUTRAL_COLOR;
+            return Color.YELLOW;
         } else {
-            return (close > open) ? BULLISH_COLOR : BEARISH_COLOR;
+            return (close > open) ? Color.GREEN : Color.RED;
         }
     }
 

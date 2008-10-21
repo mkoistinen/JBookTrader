@@ -14,6 +14,7 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         super(optimizerDialog, strategy, params);
     }
 
+    @Override
     public void optimize() throws JBookTraderException {
         LinkedList<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();

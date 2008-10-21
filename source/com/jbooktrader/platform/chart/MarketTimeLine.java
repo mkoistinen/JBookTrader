@@ -19,9 +19,9 @@ public class MarketTimeLine {
 
     public SegmentedTimeline getNormalHours() {
         SegmentedTimeline timeline = new SegmentedTimeline(SEGMENT_SIZE, 1, 0);
-        long previousTime = marketBook.getAll().get(0).getTime();
+        long previousTime = marketBook.getSnapshots().get(0).getTime();
 
-        for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
+        for (MarketSnapshot marketSnapshot : marketBook.getSnapshots()) {
             long marketDepthTime = marketSnapshot.getTime();
             long difference = marketDepthTime - previousTime;
             if (difference > MAX_GAP) {

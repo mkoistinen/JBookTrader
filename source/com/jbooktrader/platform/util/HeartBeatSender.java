@@ -13,7 +13,7 @@ public class HeartBeatSender {
     private final List<Strategy> strategies;
     private static HeartBeatSender instance;
 
-    class Sender implements Runnable {
+    private class Sender implements Runnable {
         public void run() {
             long instant = System.currentTimeMillis();
             boolean isInTradingPeriod = false;

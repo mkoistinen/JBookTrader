@@ -8,7 +8,7 @@ import com.jbooktrader.platform.util.*;
 
 /**
  * Performance manager evaluates trading strategy performance based on statistics
- * which include various factors, such P&L, maximum drawdown, profit factor, etc.
+ * which include various factors, such as net profit, maximum drawdown, profit factor, etc.
  */
 public class PerformanceManager {
     private final int multiplier;
@@ -127,7 +127,9 @@ public class PerformanceManager {
 
         updatePositionValue(avgFillPrice, position);
 
-        isCompletedTrade = (previousPosition > 0 && position < previousPosition || previousPosition < 0 && position > previousPosition);
+        isCompletedTrade = (previousPosition > 0 && position < previousPosition);
+        isCompletedTrade = isCompletedTrade || (previousPosition < 0 && position > previousPosition);
+
         if (isCompletedTrade) {
             trades++;
 

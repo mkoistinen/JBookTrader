@@ -381,8 +381,7 @@ public class OptimizerDialog extends JDialog {
             TableColumnModel resultsColumnModel = resultsTable.getColumnModel();
             for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
                 int columnIndex = performanceMetric.ordinal() + params;
-                resultsColumnModel.getColumn(columnIndex).setCellRenderer(
-                        new NumberRenderer(performanceMetric.getPrecision()));
+                resultsColumnModel.getColumn(columnIndex).setCellRenderer(new NumberRenderer(performanceMetric.getPrecision()));
             }
         } catch (Exception e) {
             Dispatcher.getReporter().report(e);

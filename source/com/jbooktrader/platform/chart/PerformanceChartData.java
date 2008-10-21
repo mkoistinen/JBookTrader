@@ -23,8 +23,8 @@ public class PerformanceChartData {
 
     public TimeSeries getProfitAndLossSeries() {
         NetProfitHistory netProfitHistory = strategy.getPerformanceManager().getProfitAndLossHistory();
-        TimeSeries ts = new TimeSeries("P&L", Second.class);
-        ts.setRangeDescription("P&L");
+        TimeSeries ts = new TimeSeries("Net Profit", Second.class);
+        ts.setRangeDescription("Net Profit");
 
         for (TimedValue profitAndLoss : netProfitHistory.getHistory()) {
             ts.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
@@ -39,12 +39,10 @@ public class PerformanceChartData {
         List<Bar> priceBars = new ArrayList<Bar>();
 
         Bar bar = null;
-        for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
+        for (MarketSnapshot marketSnapshot : marketBook.getSnapshots()) {
             long time = marketSnapshot.getTime();
-            double open, close;
-            open = close = marketSnapshot.getMidPrice();
-            double low = marketSnapshot.getBestBid();
-            double high = marketSnapshot.getBestAsk();
+            double open, high, low, close;
+            open = high = low = close = marketSnapshot.getPrice();
 
             // Integer division gives us the number of whole periods
             long completedPeriods = time / frequency;

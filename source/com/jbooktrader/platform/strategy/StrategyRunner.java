@@ -14,7 +14,7 @@ public class StrategyRunner {
     private static StrategyRunner instance;
 
 
-    class SnapshotRunner implements Runnable {
+    class SnapshotHandler implements Runnable {
         public void run() {
             try {
                 if (marketBooks != null) {
@@ -50,7 +50,7 @@ public class StrategyRunner {
         traderAssistant = Dispatcher.getTrader().getAssistant();
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new SnapshotRunner(), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(new SnapshotHandler(), 0, 1, TimeUnit.SECONDS);
     }
 
     public void addListener(Strategy strategy) {
