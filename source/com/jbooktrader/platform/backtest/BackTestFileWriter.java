@@ -67,8 +67,7 @@ public final class BackTestFileWriter {
         StringBuilder sb = new StringBuilder();
         sb.append(dateFormat.format(new Date(marketSnapshot.getTime()))).append(",");
         sb.append(marketSnapshot.getBalance()).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getBestBid())).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getBestAsk()));
+        sb.append(decimalFormat.format(marketSnapshot.getPrice()));
 
         writer.println(sb);
         if (flush) {
@@ -89,7 +88,7 @@ public final class BackTestFileWriter {
         if (writer != null) {
             writeHeader();
 
-            for (MarketSnapshot marketSnapshot : marketBook.getAll()) {
+            for (MarketSnapshot marketSnapshot : marketBook.getSnapshots()) {
                 write(marketSnapshot, false);
             }
             writer.flush();
@@ -106,8 +105,7 @@ public final class BackTestFileWriter {
         header.append("# 1. date in the MMddyy format").append(LINE_SEP);
         header.append("# 2. time in the HHmmss format").append(LINE_SEP);
         header.append("# 3. book balance").append(LINE_SEP);
-        header.append("# 4. best bid").append(LINE_SEP);
-        header.append("# 5. best ask").append(LINE_SEP);
+        header.append("# 4. price").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

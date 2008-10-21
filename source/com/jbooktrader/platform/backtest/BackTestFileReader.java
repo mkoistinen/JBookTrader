@@ -13,12 +13,13 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
-    public final static int COLUMNS = 5;
+    public final static int COLUMNS = 4;
     private static final String LINE_SEP = System.getProperty("line.separator");
 
     private final LinkedList<MarketSnapshot> marketSnapshots;
     private long previousTime;
     private SimpleDateFormat sdf;
+    private double bidAskSpread;
     private volatile boolean cancelled;
     private BufferedReader reader;
 
@@ -39,7 +40,7 @@ public class BackTestFileReader {
         return marketSnapshots;
     }
 
-    private void getTimeZone(String line) throws JBookTraderException {
+    private void setTimeZone(String line) throws JBookTraderException {
         String timeZone = line.substring(line.indexOf('=') + 1);
         TimeZone tz = TimeZone.getTimeZone(timeZone);
         if (!tz.getID().equals(timeZone)) {
@@ -51,6 +52,11 @@ public class BackTestFileReader {
         // Enforce strict interpretation of date and time formats
         sdf.setLenient(false);
         sdf.setTimeZone(tz);
+    }
+
+    private void setBidAskSpread(String line) {
+        bidAskSpread = Double.valueOf(line.substring(line.indexOf('=') + 1));
+        Dispatcher.getTrader().getAssistant().setBidAskSpread(bidAskSpread);
     }
 
     public void load() throws JBookTraderException {
@@ -71,8 +77,13 @@ public class BackTestFileReader {
                     marketSnapshots.add(marketSnapshot);
                 }
 
-                if (isProperty && line.startsWith("timeZone")) {
-                    getTimeZone(line);
+                if (isProperty) {
+                    if (line.startsWith("timeZone")) {
+                        setTimeZone(line);
+                    }
+                    if (line.startsWith("bidAskSpread")) {
+                        setBidAskSpread(line);
+                    }
                 }
             }
         } catch (IOException ioe) {
@@ -105,6 +116,12 @@ public class BackTestFileReader {
             throw new JBookTraderException(msg);
         }
 
+        if (bidAskSpread == 0) {
+            String msg = "Property " + "\"bidAskSpread\"" + " is not defined in the data file." + LINE_SEP;
+            throw new JBookTraderException(msg);
+        }
+
+
         StringTokenizer st = new StringTokenizer(line, ",");
 
         int tokenCount = st.countTokens();
@@ -130,10 +147,9 @@ public class BackTestFileReader {
         }
 
         int balance = Integer.parseInt(st.nextToken());
-        double bestBid = Double.parseDouble(st.nextToken());
-        double bestAsk = Double.parseDouble(st.nextToken());
+        double price = Double.parseDouble(st.nextToken());
 
-        return new MarketSnapshot(time, balance, bestBid, bestAsk);
+        return new MarketSnapshot(time, balance, price);
     }
 }
 
