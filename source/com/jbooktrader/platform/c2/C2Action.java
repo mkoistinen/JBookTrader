@@ -4,7 +4,9 @@ public enum C2Action {
     BuyToOpen("BTO"),
     SellToOpen("STO"),
     BuyToClose("BTC"),
-    SellToClose("STC");
+    SellToClose("STC"),
+    Reverse("reverse");
+
 
     private final String code;
 

@@ -32,7 +32,7 @@ public class Collective2Sender extends Thread {
     }
 
     private void send(URL url) throws IOException {
-        report.report("submitting trade Collective2.com");
+        report.report("submitting signal to Collective2");
         URLConnection connection = url.openConnection();
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -68,7 +68,8 @@ public class Collective2Sender extends Thread {
                     urls.poll();
                 } catch (IOException e) {
                     try {
-                        // the job is still in the queue, retry again in half a second
+                        // the job is still in the queue, retry again in one second
+                        report.report(e);
                         report.report("Failed sending trade to Collective2, will retry in 1 second.");
                         sleep(1000);
                     } catch (InterruptedException ie) {
