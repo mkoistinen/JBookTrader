@@ -5,12 +5,6 @@ public enum JBTPreferences {
     Host("Host", "localhost"),
     Port("Port", "7496"),
     ClientID("Client ID", "0"),
-    AccountType("Account type", "Universal"),
-    AdvisorAccount("Advisor account", ""),
-
-    // Reporting
-    ReportRenderer("Report renderer", "com.jbooktrader.platform.report.HTMLReportRenderer"),
-    ReportRecycling("Report recycling", "Append"),
 
     // Remote monitoring
     EmailMonitoring("Monitoring", "disabled"),
@@ -63,7 +57,7 @@ public enum JBTPreferences {
 
     private final String name, defaultValue;
 
-    JBTPreferences(String name, String defaultValue) {
+    private JBTPreferences(String name, String defaultValue) {
         this.name = name;
         this.defaultValue = defaultValue;
     }

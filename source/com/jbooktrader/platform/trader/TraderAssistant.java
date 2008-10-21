@@ -17,7 +17,7 @@ import java.util.*;
 
 
 public class TraderAssistant {
-    private final String host, advisorAccountID;
+    private final String host;
     private final int port, clientID;
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
@@ -31,6 +31,7 @@ public class TraderAssistant {
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isConnected;
+    private double bidAskSpread;
 
     public TraderAssistant(Trader trader) {
         this.trader = trader;
@@ -43,10 +44,6 @@ public class TraderAssistant {
         subscribedTickers = new HashSet<Integer>();
 
         PreferencesHolder prefs = PreferencesHolder.getInstance();
-
-        boolean isAdvisorAccountUsed = prefs.get(AccountType).equalsIgnoreCase("advisor");
-        advisorAccountID = (isAdvisorAccountUsed) ? prefs.get(AdvisorAccount) : "";
-
         host = prefs.get(Host);
         port = Integer.valueOf(prefs.get(Port));
         clientID = Integer.valueOf(prefs.get(ClientID));
@@ -199,6 +196,10 @@ public class TraderAssistant {
         this.accountCode = accountCode;
     }
 
+    public void setBidAskSpread(double bidAskSpread) {
+        this.bidAskSpread = bidAskSpread;
+    }
+
     private synchronized void placeOrder(Contract contract, Order order, Strategy strategy) {
         try {
             orderID++;
@@ -213,10 +214,10 @@ public class TraderAssistant {
             if (mode == Trade) {
                 socket.placeOrder(orderID, contract, order);
             } else {
-                MarketSnapshot md = strategy.getMarketBook().getLastMarketSnapshot();
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
-                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? md.getBestAsk() : md.getBestBid();
+                double price = strategy.getMarketBook().getLastMarketSnapshot().getPrice();
+                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? (price + bidAskSpread / 2) : (price - bidAskSpread / 2);
                 trader.execDetails(orderID, contract, execution);
             }
         } catch (Throwable t) {
@@ -230,9 +231,6 @@ public class TraderAssistant {
         order.m_action = action;
         order.m_totalQuantity = quantity;
         order.m_orderType = "MKT";
-        if (advisorAccountID.length() != 0) {
-            order.m_account = advisorAccountID;
-        }
         placeOrder(contract, order, strategy);
     }
 
@@ -251,7 +249,7 @@ public class TraderAssistant {
     }
 
     private void checkAccountType() throws JBookTraderException {
-        socket.reqAccountUpdates(true, advisorAccountID);
+        socket.reqAccountUpdates(true, "");
 
         try {
             synchronized (trader) {
@@ -263,7 +261,7 @@ public class TraderAssistant {
             throw new JBookTraderException(ie);
         }
 
-        socket.reqAccountUpdates(false, advisorAccountID);
+        socket.reqAccountUpdates(false, "");
         boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getMode() == Trade;
         if (isRealTrading) {
             String lineSep = System.getProperty("line.separator");

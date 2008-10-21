@@ -9,15 +9,14 @@ import com.jbooktrader.platform.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.List;
 
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, advisorAccountText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser;
+    private JTextField hostText, portText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser;
     private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
     private JPasswordField emailPasswordField, webAccessPasswordField, c2PasswordField;
-    private JComboBox accountTypeCombo, reportRecyclingCombo, emailMonitoringCombo, reportRendererCombo, webAccessCombo;
+    private JComboBox emailMonitoringCombo, webAccessCombo;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -77,24 +76,11 @@ public class PreferencesDialog extends JDialog {
         hostText = new JTextField();
         portText = new JTextField();
         clientIDSpin = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
-        accountTypeCombo = new JComboBox(new String[]{"Universal", "Advisor"});
-        advisorAccountText = new JTextField();
         add(connectionTab, Host, hostText);
         add(connectionTab, Port, portText);
         add(connectionTab, ClientID, clientIDSpin);
-        add(connectionTab, AccountType, accountTypeCombo);
-        add(connectionTab, AdvisorAccount, advisorAccountText);
-        SpringUtilities.makeCompactGrid(connectionTab, 5, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(connectionTab, 3, 2, 12, 12, 8, 5);
         setWidth(connectionTab, clientIDSpin, 45);
-
-        JPanel reportingTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Reporting", reportingTab);
-        List<String> reportRenderers = ClassFinder.getReportRenderers();
-        reportRendererCombo = new JComboBox(reportRenderers.toArray(new String[reportRenderers.size()]));
-        reportRecyclingCombo = new JComboBox(new String[]{"Append", "New"});
-        add(reportingTab, ReportRenderer, reportRendererCombo);
-        add(reportingTab, ReportRecycling, reportRecyclingCombo);
-        SpringUtilities.makeCompactGrid(reportingTab, 2, 2, 12, 12, 8, 5);
 
         JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
@@ -166,11 +152,6 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(Host, hostText.getText());
                     prefs.set(Port, portText.getText());
                     prefs.set(ClientID, clientIDSpin.getValue().toString());
-                    prefs.set(AccountType, (String) accountTypeCombo.getSelectedItem());
-                    prefs.set(AdvisorAccount, advisorAccountText.getText());
-
-                    prefs.set(ReportRenderer, (String) reportRendererCombo.getSelectedItem());
-                    prefs.set(ReportRecycling, (String) reportRecyclingCombo.getSelectedItem());
 
                     prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
                     prefs.set(SMTPSHost, emailSMTPSHost.getText());
