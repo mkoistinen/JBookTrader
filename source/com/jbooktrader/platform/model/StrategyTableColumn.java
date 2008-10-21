@@ -3,8 +3,7 @@ package com.jbooktrader.platform.model;
 public enum StrategyTableColumn {
     Strategy("Strategy", String.class),
     Symbol("Symbol", String.class),
-    BestBid("Bid", Double.class),
-    BestAsk("Ask", Double.class),
+    Price("Price", Double.class),
     Position("Position", Integer.class),
     Trades("Trades", Integer.class),
     MaxDD("Max DD", Double.class),

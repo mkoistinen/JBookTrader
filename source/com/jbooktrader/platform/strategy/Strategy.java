@@ -187,7 +187,7 @@ public abstract class Strategy {
             }
 
             positionManager.trade();
-            performanceManager.updatePositionValue(marketSnapshot.getMidPrice(), positionManager.getPosition());
+            performanceManager.updatePositionValue(marketSnapshot.getPrice(), positionManager.getPosition());
             Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
         }
     }

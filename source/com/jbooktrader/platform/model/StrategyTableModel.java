@@ -72,8 +72,7 @@ public class StrategyTableModel extends TableDataModel {
         MarketBook marketBook = strategy.getMarketBook();
         if (marketBook.size() > 0) {
             MarketSnapshot lastMarketSnapshot = marketBook.getLastMarketSnapshot();
-            setValueAtFast(lastMarketSnapshot.getBestBid(), row, BestBid.ordinal());
-            setValueAtFast(lastMarketSnapshot.getBestAsk(), row, BestAsk.ordinal());
+            setValueAtFast(lastMarketSnapshot.getPrice(), row, Price.ordinal());
         }
 
         PositionManager positionManager = strategy.getPositionManager();

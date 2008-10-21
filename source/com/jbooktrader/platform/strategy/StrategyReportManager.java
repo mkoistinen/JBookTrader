@@ -38,8 +38,7 @@ public class StrategyReportManager {
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Time & Date");
         strategyReportHeaders.add("Trade #");
-        strategyReportHeaders.add("Best Bid");
-        strategyReportHeaders.add("Best Ask");
+        strategyReportHeaders.add("Price");
         strategyReportHeaders.add("Position");
         strategyReportHeaders.add("Avg Fill Price");
         strategyReportHeaders.add("Commission");
@@ -63,8 +62,7 @@ public class StrategyReportManager {
 
         strategyReportColumns.clear();
         strategyReportColumns.add(isCompletedTrade ? performanceManager.getTrades() : "--");
-        strategyReportColumns.add(df5.format(marketSnapshot.getBestBid()));
-        strategyReportColumns.add(df5.format(marketSnapshot.getBestAsk()));
+        strategyReportColumns.add(df5.format(marketSnapshot.getPrice()));
         strategyReportColumns.add(positionManager.getPosition());
         strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));

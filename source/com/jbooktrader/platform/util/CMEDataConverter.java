@@ -25,6 +25,7 @@ public class CMEDataConverter {
     private static final String INVALID_PRICE = "999999999999999999";
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final MarketBook marketBook;
+    private final MarketDepth marketDepth;
 
     private final BackTestFileWriter backTestFileWriter;
     private final BufferedReader reader;
@@ -51,6 +52,7 @@ public class CMEDataConverter {
 
         this.contract = contract;
         marketBook = new MarketBook();
+        marketDepth = marketBook.getMarketDepth();
 
         cmeDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         cmeDateFormat.setLenient(false);
@@ -58,9 +60,10 @@ public class CMEDataConverter {
 
         instant = Calendar.getInstance(TimeZone.getTimeZone("America/New_York"));
 
+
         for (int level = 0; level < 5; level++) {
-            marketBook.updateDepth(level, MarketDepthOperation.Insert, MarketDepthSide.Bid, 0, 0);
-            marketBook.updateDepth(level, MarketDepthOperation.Insert, MarketDepthSide.Ask, 0, 0);
+            marketDepth.update(level, MarketDepthOperation.Insert, MarketDepthSide.Bid, 0, 0);
+            marketDepth.update(level, MarketDepthOperation.Insert, MarketDepthSide.Ask, 0, 0);
         }
 
         String outFilename = "unzipped.cme";
@@ -182,8 +185,8 @@ public class CMEDataConverter {
                         double askPrice = Integer.valueOf(askPriceS) / 100d;
                         int bidSize = Integer.parseInt(line.substring(groupStart + 82, groupStart + 94));
                         int askSize = Integer.parseInt(line.substring(groupStart + 140, groupStart + 152));
-                        marketBook.updateDepth(level, MarketDepthOperation.Update, MarketDepthSide.Bid, bidPrice, bidSize);
-                        marketBook.updateDepth(level, MarketDepthOperation.Update, MarketDepthSide.Ask, askPrice, askSize);
+                        marketDepth.update(level, MarketDepthOperation.Update, MarketDepthSide.Bid, bidPrice, bidSize);
+                        marketDepth.update(level, MarketDepthOperation.Update, MarketDepthSide.Ask, askPrice, askSize);
                     }
                     groupStart += 72;
                 }
