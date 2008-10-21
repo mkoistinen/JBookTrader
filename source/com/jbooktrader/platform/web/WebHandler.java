@@ -6,17 +6,14 @@ import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
+import com.sun.net.httpserver.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
 import java.io.*;
 import java.text.*;
 
-public class JBTServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
-        response.setStatus(HttpServletResponse.SC_OK);
+public class WebHandler implements HttpHandler {
 
+    public void handle(HttpExchange httpExchange) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
         sb.append("<html>");
@@ -49,6 +46,11 @@ public class JBTServlet extends HttpServlet {
         sb.append("</table>");
         sb.append("</body>");
         sb.append("</html>");
-        response.getWriter().println(sb);
+
+        String response = sb.toString();
+        httpExchange.sendResponseHeaders(200, response.length());
+        OutputStream os = httpExchange.getResponseBody();
+        os.write(response.getBytes());
+        os.close();
     }
 }
