@@ -13,6 +13,7 @@ public abstract class Indicator {
 
     public abstract void calculate();
 
+
     protected Indicator() {
     }
 
@@ -35,4 +36,7 @@ public abstract class Indicator {
         return value;
     }
 
+    public void reset() {
+        value = 0;
+    }
 }
