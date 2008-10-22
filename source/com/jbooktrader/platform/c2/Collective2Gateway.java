@@ -23,11 +23,11 @@ public class Collective2Gateway {
 
     public void send(int currentPosition, int newPosition) {
         Collective2Sender c2Sender = Collective2Sender.getInstance();
-        C2Action c2Action;
+        C2Action c2Action = null;
         int quantity;
 
         if (currentPosition * newPosition < 0) {
-            c2Action = Reverse;
+            // reverse
             quantity = Math.abs(newPosition);
         } else {
             quantity = Math.abs(newPosition - currentPosition);
@@ -37,6 +37,7 @@ public class Collective2Gateway {
                 c2Action = (currentPosition > 0) ? SellToClose : SellToOpen;
             }
         }
+        
         try {
             URL url = createURL(c2Action, quantity);
             c2Sender.submit(url);
@@ -49,14 +50,14 @@ public class Collective2Gateway {
         StringBuffer params;
         try {
             params = new StringBuffer(COLLECTIVE2_URL);
-            if (c2Action == Reverse) {
+            if (c2Action == null) {
                 params.append("?cmd=reverse");
             } else {
                 params.append("?cmd=signal");
             }
             params.append("&systemid=").append(systemId);
             params.append("&pw=").append(URLEncoder.encode(password, "US-ASCII"));
-            if (c2Action != Reverse) {
+            if (c2Action != null) {
                 params.append("&action=").append(URLEncoder.encode(c2Action.getCode(), "US-ASCII"));
             }
             params.append("&quant=").append(Integer.toString(quantity));
