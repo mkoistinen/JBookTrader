@@ -77,7 +77,7 @@ public class AboutDialog extends JDialog {
         aboutPanel.add(authorValueLabel);
 
         JLabel emailLabel = new JLabel("Email:", JLabel.TRAILING);
-        JLabel emailValueLabel = new JLabel("nonlinear5@yahoo.com");
+        JLabel emailValueLabel = new JLabel("eugene.kononov@gmail.com");
         emailValueLabel.setForeground(Color.BLACK);
         emailLabel.setLabelFor(productValueLabel);
         aboutPanel.add(emailLabel);
