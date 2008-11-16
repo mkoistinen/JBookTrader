@@ -2,7 +2,6 @@ package com.jbooktrader.platform.optimizer;
 
 public enum PerformanceMetric {
     Trades("Trades", 0),
-    Exposure("Exposure", 0),
     NetProfit("Net Profit", 0),
     MaxDD("Max DD", 0),
     PF("Profit Factor", 2),

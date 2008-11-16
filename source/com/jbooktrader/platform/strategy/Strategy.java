@@ -2,6 +2,7 @@ package com.jbooktrader.platform.strategy;
 
 import com.ib.client.*;
 import com.jbooktrader.platform.c2.*;
+import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
@@ -12,6 +13,7 @@ import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
+import com.jbooktrader.platform.trader.*;
 
 /**
  * Base class for all classes that implement trading strategies.
@@ -28,6 +30,7 @@ public abstract class Strategy {
     private PerformanceManager performanceManager;
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
+    private PerformanceChartData performanceChartData;
     private boolean isActive;
     private int position;
     private long time;
@@ -137,21 +140,31 @@ public abstract class Strategy {
 
     protected void addIndicator(Indicator indicator) {
         indicatorManager.addIndicator(indicator);
+        performanceChartData.addIndicator(indicator);
     }
 
-    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission) {
+    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread, BarSize barSize) {
         this.contract = contract;
         contract.m_multiplier = String.valueOf(multiplier);
         this.tradingSchedule = tradingSchedule;
+        performanceChartData = new PerformanceChartData(barSize);
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
         strategyReportManager = new StrategyReportManager(this);
-        marketBook = Dispatcher.getTrader().getAssistant().createMarketBook(this);
+        TraderAssistant traderAssistant = Dispatcher.getTrader().getAssistant();
+        marketBook = traderAssistant.createMarketBook(this);
+        traderAssistant.setBidAskSpread(bidAskSpread);
         indicatorManager = new IndicatorManager();
+
     }
 
     public MarketBook getMarketBook() {
         return marketBook;
+    }
+
+
+    public PerformanceChartData getPerformanceChartData() {
+        return performanceChartData;
     }
 
     public Contract getContract() {
@@ -172,8 +185,8 @@ public abstract class Strategy {
     }
 
     public void process() {
-        if (isActive() && marketBook.size() > 0) {
-            MarketSnapshot marketSnapshot = marketBook.getLastMarketSnapshot();
+        if (isActive() && !marketBook.isEmpty()) {
+            MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
             setTime(instant);
             indicatorManager.updateIndicators();

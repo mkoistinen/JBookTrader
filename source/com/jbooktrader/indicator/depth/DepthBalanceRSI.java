@@ -18,7 +18,7 @@ public class DepthBalanceRSI extends Indicator {
 
     @Override
     public void calculate() {
-        double balance = marketBook.getLastMarketSnapshot().getBalance();
+        double balance = marketBook.getSnapshot().getBalance();
         if (previousBalance != 0) {
             double change = balance - previousBalance;
             double up = (change > 0) ? change : 0;
@@ -33,5 +33,13 @@ public class DepthBalanceRSI extends Indicator {
         previousBalance = balance;
         value -= 50;
     }
+
+    @Override
+    public void reset() {
+        previousBalance = 0;
+        emaUp = emaDown = 0;
+    }
+
+
 }
 

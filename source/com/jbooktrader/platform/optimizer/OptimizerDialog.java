@@ -129,7 +129,7 @@ public class OptimizerDialog extends JDialog {
         optimizeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    prefs.set(OptimizerFileName, fileNameText.getText());
+                    prefs.set(BackTesterFileName, fileNameText.getText());
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
@@ -240,7 +240,7 @@ public class OptimizerDialog extends JDialog {
 
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
-        fileNameText.setText(prefs.get(OptimizerFileName));
+        fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
         selectFileButton.setPreferredSize(new Dimension(23, 23));
         fileNameLabel.setLabelFor(fileNameText);

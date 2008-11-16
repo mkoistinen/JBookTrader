@@ -8,6 +8,7 @@ public class MarketSnapshot {
     private final int balance;
     private final double price;
 
+
     public MarketSnapshot(long time, int balance, double price) {
         this.time = time;
         this.balance = balance;

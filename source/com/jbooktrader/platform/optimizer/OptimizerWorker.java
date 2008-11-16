@@ -30,9 +30,9 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
             strategy.setMarketBook(marketBook);
         }
 
-        LinkedList<MarketSnapshot> snapshots = optimizerRunner.getBackTestFileReader().getAll();
+        List<MarketSnapshot> snapshots = optimizerRunner.getSnapshots();
         for (MarketSnapshot marketSnapshot : snapshots) {
-            marketBook.add(marketSnapshot);
+            marketBook.setSnapshot(marketSnapshot);
             long time = marketSnapshot.getTime();
             boolean inSchedule = tradingSchedule.contains(time);
 

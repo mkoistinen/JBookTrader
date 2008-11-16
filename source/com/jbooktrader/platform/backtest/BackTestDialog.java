@@ -56,16 +56,6 @@ public class BackTestDialog extends JDialog {
         progressBar.setString(progressText);
     }
 
-    @Override
-    public void dispose() {
-        // References must be explicitely set to null, otherwise memory will leak. This is
-        // a little strange, but I could not find other ways to prevent the leak.
-        // todo: use profiler to see what's holding on to BackTestDialog after it's disposed
-        btsr = null;
-        strategy = null;
-        super.dispose();
-    }
-
     private void setOptions() throws JBookTraderException {
         String historicalFileName = fileNameText.getText();
         File file = new File(historicalFileName);

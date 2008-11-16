@@ -142,6 +142,7 @@ public class TraderAssistant {
         Integer ticker = tickers.get(instrument);
         MarketBook marketBook;
         if (ticker == null) {
+
             marketBook = new MarketBook(instrument, strategy.getTradingSchedule().getTimeZone());
             tickerId++;
             tickers.put(instrument, tickerId);
@@ -216,7 +217,7 @@ public class TraderAssistant {
             } else {
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
-                double price = strategy.getMarketBook().getLastMarketSnapshot().getPrice();
+                double price = strategy.getMarketBook().getSnapshot().getPrice();
                 execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? (price + bidAskSpread / 2) : (price - bidAskSpread / 2);
                 trader.execDetails(orderID, contract, execution);
             }

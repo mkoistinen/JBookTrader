@@ -18,7 +18,7 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
     public void optimize() throws JBookTraderException {
         LinkedList<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();
-        long totalSteps = (long) lineCount * taskSize;
+        long totalSteps = snapshotCount * taskSize;
         setTotalSteps(totalSteps);
         setTotalStrategies(taskSize);
 

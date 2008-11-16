@@ -161,19 +161,10 @@ public class CMEDataConverter {
             return;
         }
 
-        boolean isSpecifiedContract = (line.substring(49, 69).trim().equals(contract));
-        if (!isSpecifiedContract) {
-            return;
-        }
+        boolean isSpecifiedContract = line.substring(49, 69).trim().equals(contract);
+        boolean isLimitOrderMessage = line.substring(33, 35).equals("MA");
 
-        String messageType = line.substring(33, 35);
-        boolean isLimitOrderMessage = messageType.equals("MA");
-        if (!isLimitOrderMessage) {
-            return;
-        }
-
-
-        if (isLimitOrderMessage) {
+        if (isSpecifiedContract && isLimitOrderMessage) {
             int groupStart = 0;
             for (int level = 0; level < 5; level++) {
                 if (line.charAt(76 + level) == '1') {

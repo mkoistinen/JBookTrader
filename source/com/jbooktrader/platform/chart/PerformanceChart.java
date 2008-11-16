@@ -46,12 +46,12 @@ public class PerformanceChart {
     private FastXYPlot pricePlot, pnlPlot;
     private CandlestickRenderer candleRenderer;
     private MultiColoredBarRenderer mcbRenderer;
-    private JComboBox chartTypeCombo, timeLineCombo, timeZoneCombo, barSizeCombo;
+    private JComboBox chartTypeCombo, timeLineCombo, timeZoneCombo;
     private JCheckBox tradesVisibilityCheck, pnlVisibilityCheck;
 
     public PerformanceChart(JFrame parent, Strategy strategy) {
         indicatorPlots = new ArrayList<FastXYPlot>();
-        performanceChartData = new PerformanceChartData(strategy);
+        performanceChartData = strategy.getPerformanceChartData();
         prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
         createChartFrame(parent);
@@ -70,7 +70,7 @@ public class PerformanceChart {
 
     private void setTimeline() {
         int timeLineType = timeLineCombo.getSelectedIndex();
-        MarketTimeLine mtl = new MarketTimeLine(strategy.getMarketBook());
+        MarketTimeLine mtl = new MarketTimeLine(strategy);
         SegmentedTimeline segmentedTimeline = (timeLineType == 0) ? mtl.getAllHours() : mtl.getNormalHours();
         dateAxis.setTimeline(segmentedTimeline);
     }
@@ -87,34 +87,6 @@ public class PerformanceChart {
                 setRenderer();
             }
         });
-
-        barSizeCombo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-
-                String item = (String) barSizeCombo.getSelectedItem();
-                BarSize barSize = BarSize.getBarSize(item);
-
-                if (barSize == BarSize.Second1) {
-                    int bookSize = strategy.getMarketBook().size();
-                    if (bookSize > 1000000) {// about 2 months of 1-second data
-                        String msg = "Bar size is too small for this historical data set.";
-                        MessageDialog.showError(chartFrame, msg);
-                        return;
-                    }
-                }
-
-                long frequency = barSize.getSize();
-                OHLCDataset priceDataset = performanceChartData.getPriceDataset(frequency);
-                pricePlot.setDataset(priceDataset);
-
-                int index = -1;
-                for (ChartableIndicator chartableIndicator : strategy.getIndicatorManager().getIndicators()) {
-                    OHLCDataset ds = performanceChartData.getIndicatorDataset(chartableIndicator, frequency);
-                    indicatorPlots.get(++index).setDataset(ds);
-                }
-            }
-        });
-
 
         timeLineCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -181,15 +153,6 @@ public class PerformanceChart {
         chartTypeCombo = new JComboBox(new String[]{"Candle", "OHLC"});
         chartTypeLabel.setLabelFor(chartTypeCombo);
 
-        JLabel barSizeLabel = new JLabel("Bar Size:", JLabel.TRAILING);
-        barSizeCombo = new JComboBox();
-        for (BarSize barSize : BarSize.values()) {
-            barSizeCombo.addItem(barSize.getName());
-        }
-        barSizeLabel.setLabelFor(barSizeCombo);
-        barSizeCombo.setSelectedIndex(4);
-
-
         JLabel timeLineLabel = new JLabel("Timeline:", JLabel.TRAILING);
         timeLineCombo = new JComboBox(new String[]{"All Hours", "Trading Hours"});
         timeLineLabel.setLabelFor(timeLineCombo);
@@ -205,8 +168,6 @@ public class PerformanceChart {
 
         chartOptionsPanel.add(chartTypeLabel);
         chartOptionsPanel.add(chartTypeCombo);
-        chartOptionsPanel.add(barSizeLabel);
-        chartOptionsPanel.add(barSizeCombo);
         chartOptionsPanel.add(timeLineLabel);
         chartOptionsPanel.add(timeLineCombo);
         chartOptionsPanel.add(timeZoneLabel);
@@ -284,19 +245,13 @@ public class PerformanceChart {
 
         dateAxis = new DateAxis();
 
-        setTimeline();
-        setTimeZone();
-
         // parent plot
         combinedPlot = new CombinedDomainXYPlot(dateAxis);
         combinedPlot.setGap(10.0);
         combinedPlot.setOrientation(PlotOrientation.VERTICAL);
 
-        String item = (String) barSizeCombo.getSelectedItem();
-        long frequency = BarSize.getBarSize(item).getSize();
-
         // price plot
-        OHLCDataset priceDataset = performanceChartData.getPriceDataset(frequency);
+        OHLCDataset priceDataset = performanceChartData.getPriceDataset();
         NumberAxis priceAxis = new NumberAxis("Price");
         priceAxis.setAutoRangeIncludesZero(false);
         pricePlot = new FastXYPlot(priceDataset, dateAxis, priceAxis, null);
@@ -304,10 +259,10 @@ public class PerformanceChart {
         combinedPlot.add(pricePlot, PRICE_PLOT_WEIGHT);
 
         // indicator plots
-        for (ChartableIndicator chartableIndicator : strategy.getIndicatorManager().getIndicators()) {
-            NumberAxis indicatorAxis = new NumberAxis(chartableIndicator.getName());
+        for (Indicator indicator : strategy.getIndicatorManager().getIndicators()) {
+            NumberAxis indicatorAxis = new NumberAxis(indicator.getName());
             indicatorAxis.setLabelFont(new Font("Arial Narrow", Font.PLAIN, 11));
-            OHLCDataset ds = performanceChartData.getIndicatorDataset(chartableIndicator, frequency);
+            OHLCDataset ds = performanceChartData.getIndicatorDataset(indicator);
             FastXYPlot indicatorPlot = new FastXYPlot(ds, dateAxis, indicatorAxis, null);
             indicatorPlot.setBackgroundPaint(BACKGROUND_COLOR);
             combinedPlot.add(indicatorPlot);
@@ -352,6 +307,9 @@ public class PerformanceChart {
 
         combinedPlot.setDomainAxis(dateAxis);
         setRenderer();
+
+        setTimeline();
+        setTimeZone();
 
         // Finally, create the chart
         chart = new JFreeChart("", JFreeChart.DEFAULT_TITLE_FONT, combinedPlot, false);

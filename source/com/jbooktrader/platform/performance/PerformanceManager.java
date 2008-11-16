@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.performance;
 
+import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
@@ -14,10 +15,9 @@ public class PerformanceManager {
     private final int multiplier;
     private final Commission commission;
     private final Strategy strategy;
-    private final NetProfitHistory netProfitHistory;
+    private final PerformanceChartData performanceChartData;
 
     private int trades, profitableTrades, previousPosition;
-    private long exposureStart, totalExposure;
     private double tradeCommission, totalCommission;
     private double positionValue;
     private double totalBought, totalSold;
@@ -31,7 +31,7 @@ public class PerformanceManager {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
-        netProfitHistory = new NetProfitHistory();
+        performanceChartData = strategy.getPerformanceChartData();
     }
 
     public int getTrades() {
@@ -74,10 +74,6 @@ public class PerformanceManager {
         return totalSold - totalBought + positionValue - totalCommission;
     }
 
-    public NetProfitHistory getProfitAndLossHistory() {
-        return netProfitHistory;
-    }
-
     public double getKellyCriterion() {
         int unprofitableTrades = trades - profitableTrades;
         double kellyCriterion = 0;
@@ -103,11 +99,6 @@ public class PerformanceManager {
         }
 
         return pi;
-    }
-
-    public double getExposure() {
-        int size = strategy.getMarketBook().size();
-        return (size == 0) ? 0 : 100 * totalExposure / (double) size;
     }
 
     public void updatePositionValue(double price, int position) {
@@ -152,18 +143,10 @@ public class PerformanceManager {
             }
         }
 
-        if ((Dispatcher.getMode() != Optimization)) {
+
+        if (Dispatcher.getMode() == BackTest) {
             long time = strategy.getTime();
-            netProfitHistory.add(new TimedValue(time, netProfit));
-        }
-
-        int index = strategy.getMarketBook().size();
-        if (previousPosition == 0) {
-            exposureStart = index;
-        }
-
-        if (position == 0) {
-            totalExposure += (index - exposureStart);
+            performanceChartData.updateNetProfit(new TimedValue(time, netProfit));
         }
 
         previousPosition = position;

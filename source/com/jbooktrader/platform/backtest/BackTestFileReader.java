@@ -2,7 +2,6 @@ package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.report.*;
 
 import java.io.*;
 import java.text.*;
@@ -15,16 +14,17 @@ import java.util.*;
 public class BackTestFileReader {
     public final static int COLUMNS = 4;
     private static final String LINE_SEP = System.getProperty("line.separator");
-
-    private final LinkedList<MarketSnapshot> marketSnapshots;
     private long previousTime;
     private SimpleDateFormat sdf;
-    private double bidAskSpread;
     private volatile boolean cancelled;
     private BufferedReader reader;
+    private long snapshotCount;
+    private final String fileName;
+    private long firstMarketLine;
+    private long lineNumber;
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
-        marketSnapshots = new LinkedList<MarketSnapshot>();
+        this.fileName = fileName;
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
         } catch (FileNotFoundException fnfe) {
@@ -36,8 +36,8 @@ public class BackTestFileReader {
         cancelled = true;
     }
 
-    public LinkedList<MarketSnapshot> getAll() {
-        return marketSnapshots;
+    public long getSnapshotCount() {
+        return snapshotCount;
     }
 
     private void setTimeZone(String line) throws JBookTraderException {
@@ -54,15 +54,8 @@ public class BackTestFileReader {
         sdf.setTimeZone(tz);
     }
 
-    private void setBidAskSpread(String line) {
-        bidAskSpread = Double.valueOf(line.substring(line.indexOf('=') + 1));
-        Dispatcher.getTrader().getAssistant().setBidAskSpread(bidAskSpread);
-    }
-
-    public void load() throws JBookTraderException {
-        Report report = Dispatcher.getReporter();
+    public void scan() throws JBookTraderException {
         String line = "";
-        int lineNumber = 0;
 
         try {
             while ((line = reader.readLine()) != null && !cancelled) {
@@ -72,23 +65,48 @@ public class BackTestFileReader {
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                    MarketSnapshot marketSnapshot = toMarketDepth(line);
-                    previousTime = marketSnapshot.getTime();
-                    marketSnapshots.add(marketSnapshot);
+                    snapshotCount++;
+                    if (firstMarketLine == 0) {
+                        firstMarketLine = lineNumber;
+                    }
                 }
 
                 if (isProperty) {
                     if (line.startsWith("timeZone")) {
                         setTimeZone(line);
                     }
-                    if (line.startsWith("bidAskSpread")) {
-                        setBidAskSpread(line);
-                    }
                 }
             }
+
+            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+            for (int i = 1; i < firstMarketLine; i++) {
+                reader.readLine();
+            }
+            lineNumber = firstMarketLine;
+
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not read data file");
-        } catch (Exception e) {
+        }
+
+    }
+
+
+    public MarketSnapshot next() {
+        String line = "";
+        MarketSnapshot marketSnapshot = null;
+
+        try {
+            line = reader.readLine();
+            if (line != null) {
+                marketSnapshot = toMarketDepth(line);
+                previousTime = marketSnapshot.getTime();
+                lineNumber++;
+            } else {
+                reader.close();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException("Could not read data file");
+        } catch (JBookTraderException e) {
             String errorMsg = "";
             if (lineNumber > 0) {
                 errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
@@ -99,14 +117,10 @@ public class BackTestFileReader {
                 description = e.toString();
             }
             errorMsg += description;
-            throw new JBookTraderException(errorMsg);
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException ioe) {
-                report.report(ioe);
-            }
+            throw new RuntimeException(errorMsg);
         }
+
+        return marketSnapshot;
     }
 
 
@@ -115,12 +129,6 @@ public class BackTestFileReader {
             String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
             throw new JBookTraderException(msg);
         }
-
-        if (bidAskSpread == 0) {
-            String msg = "Property " + "\"bidAskSpread\"" + " is not defined in the data file." + LINE_SEP;
-            throw new JBookTraderException(msg);
-        }
-
 
         StringTokenizer st = new StringTokenizer(line, ",");
 
@@ -148,7 +156,6 @@ public class BackTestFileReader {
 
         int balance = Integer.parseInt(st.nextToken());
         double price = Double.parseDouble(st.nextToken());
-
         return new MarketSnapshot(time, balance, price);
     }
 }

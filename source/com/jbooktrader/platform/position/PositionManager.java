@@ -81,8 +81,11 @@ public class PositionManager {
         orderExecutionPending = false;
 
         Dispatcher.Mode mode = Dispatcher.getMode();
-        if (mode != Optimization) {
+        if (mode == BackTest) {
             positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
+        }
+
+        if (mode != Optimization) {
             strategy.getStrategyReportManager().report();
         }
 
@@ -115,6 +118,8 @@ public class PositionManager {
             int newPosition = strategy.getPosition();
             int quantity = newPosition - position;
             if (quantity != 0) {
+                orderExecutionPending = true;
+
                 if (strategy.isC2enabled()) {
                     Dispatcher.Mode mode = Dispatcher.getMode();
                     if (mode == Trade || mode == ForwardTest) {
@@ -123,7 +128,7 @@ public class PositionManager {
                     }
                 }
 
-                orderExecutionPending = true;
+
                 String action = (quantity > 0) ? "BUY" : "SELL";
                 Contract contract = strategy.getContract();
                 traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);

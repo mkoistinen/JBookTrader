@@ -21,7 +21,7 @@ import java.net.*;
 public class MainFrameDialog extends JFrame implements ModelListener {
     private final Toolkit toolkit;
     private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
-    private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem, saveBookMenuItem;
+    private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem;
     private StrategyTableModel strategyTableModel;
     private JTable strategyTable;
     private JPopupMenu popupMenu;
@@ -73,7 +73,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
                 backTestMenuItem.setEnabled(false);
                 optimizeMenuItem.setEnabled(false);
-                saveBookMenuItem.setEnabled(true);
                 chartMenuItem.setEnabled(true);
                 break;
             case StrategiesEnd:
@@ -115,10 +114,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
     public void tradeAction(ActionListener action) {
         tradeMenuItem.addActionListener(action);
-    }
-
-    public void saveMarketBookAction(ActionListener action) {
-        saveBookMenuItem.addActionListener(action);
     }
 
     public void chartAction(ActionListener action) {
@@ -221,16 +216,13 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         forwardTestMenuItem = new JMenuItem("Forward Test", getImageIcon("forwardTest.png"));
         tradeMenuItem = new JMenuItem("Trade");
         chartMenuItem = new JMenuItem("Chart", getImageIcon("chart.png"));
-        saveBookMenuItem = new JMenuItem("Save Book", getImageIcon("save.png"));
 
         popupMenu.add(infoMenuItem);
         popupMenu.addSeparator();
         popupMenu.add(optimizeMenuItem);
         popupMenu.add(backTestMenuItem);
         popupMenu.add(forwardTestMenuItem);
-        popupMenu.addSeparator();
         popupMenu.add(chartMenuItem);
-        popupMenu.add(saveBookMenuItem);
         popupMenu.addSeparator();
         popupMenu.add(tradeMenuItem);
 
@@ -261,7 +253,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         status.setForeground(Color.GRAY);
         add(status, BorderLayout.SOUTH);
         setPreferredSize(new Dimension(500, 309));
-        setTitle(JBookTrader.APP_NAME + " " + JBookTrader.VERSION);
+        setTitle(JBookTrader.APP_NAME);
         pack();
         setLocationRelativeTo(null);
     }

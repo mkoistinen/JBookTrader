@@ -7,17 +7,21 @@ import com.jbooktrader.platform.marketbook.*;
  * Base class for all classes implementing technical indicators.
  */
 public abstract class Indicator {
+    private final String name;
     protected Indicator parentIndicator;
     protected MarketBook marketBook;
     protected double value;
 
     public abstract void calculate();
 
+    public abstract void reset();
 
     protected Indicator() {
+        name = getClass().getSimpleName();
     }
 
     protected Indicator(Indicator parentIndicator) {
+        this();
         this.parentIndicator = parentIndicator;
     }
 
@@ -36,7 +40,8 @@ public abstract class Indicator {
         return value;
     }
 
-    public void reset() {
-        value = 0;
+
+    public String getName() {
+        return name;
     }
 }

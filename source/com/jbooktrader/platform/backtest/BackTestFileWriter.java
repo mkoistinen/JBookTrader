@@ -84,19 +84,6 @@ public final class BackTestFileWriter {
         writer.println(header);
     }
 
-    public void write(MarketBook marketBook) {
-        if (writer != null) {
-            writeHeader();
-
-            for (MarketSnapshot marketSnapshot : marketBook.getSnapshots()) {
-                write(marketSnapshot, false);
-            }
-            writer.flush();
-            close();
-            MessageDialog.showMessage(null, "Historical market depth data has been saved.");
-        }
-    }
-
     private StringBuilder getHeader() {
         StringBuilder header = new StringBuilder();
         String appInfo = JBookTrader.APP_NAME + ", version " + JBookTrader.VERSION;

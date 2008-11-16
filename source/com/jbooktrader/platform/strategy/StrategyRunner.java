@@ -8,11 +8,10 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class StrategyRunner {
-    private final List<Strategy> strategies;
+    private final Collection<Strategy> strategies;
     private final TraderAssistant traderAssistant;
     private Collection<MarketBook> marketBooks;
     private static StrategyRunner instance;
-
 
     class SnapshotHandler implements Runnable {
         public void run() {
@@ -22,8 +21,8 @@ public class StrategyRunner {
                         long time = System.currentTimeMillis();
                         MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(time);
                         if (marketSnapshot != null) {
-                            marketBook.add(marketSnapshot);
-                            marketBook.save(marketSnapshot);
+                            marketBook.setSnapshot(marketSnapshot);
+                            marketBook.saveSnapshot(marketSnapshot);
                         }
                     }
 

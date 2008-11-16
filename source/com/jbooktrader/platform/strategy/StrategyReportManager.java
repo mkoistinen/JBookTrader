@@ -57,7 +57,7 @@ public class StrategyReportManager {
             strategyReport.report(strategyReportHeaders);
         }
 
-        MarketSnapshot marketSnapshot = strategy.getMarketBook().getLastMarketSnapshot();
+        MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
         boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
 
         strategyReportColumns.clear();

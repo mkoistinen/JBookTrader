@@ -22,4 +22,10 @@ public class Velocity extends Indicator {
         slow += (parentValue - slow) * slowMultiplier;
         value = fast - slow;
     }
+
+    @Override
+    public void reset() {
+        fast = slow = parentIndicator.getValue();
+        value = 0;
+    }
 }

@@ -37,7 +37,7 @@ public class Collective2Gateway {
                 c2Action = (currentPosition > 0) ? SellToClose : SellToOpen;
             }
         }
-        
+
         try {
             URL url = createURL(c2Action, quantity);
             c2Sender.submit(url);

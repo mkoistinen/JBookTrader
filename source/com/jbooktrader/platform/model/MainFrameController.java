@@ -3,7 +3,6 @@ package com.jbooktrader.platform.model;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.marketbook.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -198,40 +197,17 @@ public class MainFrameController {
             }
         });
 
-        mainViewDialog.saveMarketBookAction(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    Strategy strategy = getSelectedRowStrategy();
-                    MarketBook book = strategy.getMarketBook();
-                    if (book.size() != 0) {
-                        BackTestFileWriter backTestFileWriter = new BackTestFileWriter(strategy);
-                        backTestFileWriter.write(book);
-                    } else {
-                        String msg = "The book for this strategy is empty. Please run a strategy first.";
-                        MessageDialog.showMessage(mainViewDialog, msg);
-                    }
-                } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
-                } finally {
-                    mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                }
-
-            }
-        });
-
         mainViewDialog.chartAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = getSelectedRowStrategy();
-                    MarketBook book = strategy.getMarketBook();
-                    if (book.size() != 0) {
+                    if (!strategy.getPerformanceChartData().isEmpty()) {
                         PerformanceChart spChart = new PerformanceChart(mainViewDialog, strategy);
                         JFrame chartFrame = spChart.getChart();
                         chartFrame.setVisible(true);
                     } else {
-                        String msg = "There is no data to chart. Please run a strategy first.";
+                        String msg = "There is no data to chart. Please run a back test first.";
                         MessageDialog.showMessage(mainViewDialog, msg);
                     }
                 } catch (Throwable t) {

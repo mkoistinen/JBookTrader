@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
@@ -21,7 +22,7 @@ public abstract class OptimizerRunner implements Runnable {
     protected final LinkedList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected final Constructor<?> strategyConstructor;
-    protected int lineCount;
+    protected long snapshotCount;
     protected boolean cancelled;
     protected final int availableProcessors;
 
@@ -32,7 +33,7 @@ public abstract class OptimizerRunner implements Runnable {
     private final int minTrades;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
-    private BackTestFileReader backTestFileReader;
+    private final List<MarketSnapshot> snapshots;
     private long completedSteps;
     private long totalSteps, totalStrategies;
     private ExecutorService executor;
@@ -50,6 +51,7 @@ public abstract class OptimizerRunner implements Runnable {
         this.strategyName = strategy.getName();
         this.strategyParams = params;
         optimizationResults = new LinkedList<OptimizationResult>();
+        snapshots = new LinkedList<MarketSnapshot>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
         availableProcessors = Runtime.getRuntime().availableProcessors();
@@ -92,8 +94,9 @@ public abstract class OptimizerRunner implements Runnable {
         return minTrades;
     }
 
-    public BackTestFileReader getBackTestFileReader() {
-        return backTestFileReader;
+
+    public List<MarketSnapshot> getSnapshots() {
+        return snapshots;
     }
 
     void execute(List<Strategy> strategies) throws JBookTraderException {
@@ -182,7 +185,6 @@ public abstract class OptimizerRunner implements Runnable {
             }
 
             columns.add(optimizationResult.getTrades());
-            columns.add(nf0.format(optimizationResult.getExposure()));
             columns.add(nf0.format(optimizationResult.getNetProfit()));
             columns.add(nf0.format(optimizationResult.getMaxDrawdown()));
             columns.add(nf2.format(optimizationResult.getProfitFactor()));
@@ -251,12 +253,22 @@ public abstract class OptimizerRunner implements Runnable {
             optimizerDialog.setResults(optimizationResults);
             optimizerDialog.enableProgress();
             optimizerDialog.showProgress("Scanning historical data file...");
-            backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
-            backTestFileReader.load();
-            lineCount = backTestFileReader.getAll().size();
+            BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
+            backTestFileReader.scan();
+            snapshotCount = backTestFileReader.getSnapshotCount();
 
-            if (cancelled) {
-                return;
+            MarketSnapshot marketSnapshot;
+            long count = 0;
+            String progressMessage = "Loading historical data file, ";
+            while ((marketSnapshot = backTestFileReader.next()) != null) {
+                snapshots.add(marketSnapshot);
+                count++;
+                if (count % 100000 == 0) {
+                    optimizerDialog.setProgress(count, snapshotCount, progressMessage + count + " lines read: ");
+                }
+                if (cancelled) {
+                    return;
+                }
             }
 
             optimizerDialog.showProgress("Starting optimization ...");

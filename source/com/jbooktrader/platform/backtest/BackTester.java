@@ -1,14 +1,13 @@
 package com.jbooktrader.platform.backtest;
 
 
+import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
-
-import java.util.*;
 
 /**
  * This class is responsible for running the strategy against historical market data
@@ -29,20 +28,23 @@ public class BackTester {
         PositionManager positionManager = strategy.getPositionManager();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
+        PerformanceChartData performanceChartData = strategy.getPerformanceChartData();
 
         long marketDepthCounter = 0;
-        LinkedList<MarketSnapshot> marketSnapshots = backTestFileReader.getAll();
-        int size = marketSnapshots.size();
+        long size = backTestFileReader.getSnapshotCount();
 
-        for (MarketSnapshot marketSnapshot : marketSnapshots) {
+        MarketSnapshot marketSnapshot;
+        while ((marketSnapshot = backTestFileReader.next()) != null) {
             marketDepthCounter++;
-            marketBook.add(marketSnapshot);
-            long instant = marketBook.getLastMarketSnapshot().getTime();
+            marketBook.setSnapshot(marketSnapshot);
+            performanceChartData.updatePrice(marketSnapshot);
+            long instant = marketSnapshot.getTime();
             strategy.setTime(instant);
             indicatorManager.updateIndicators();
+            performanceChartData.updateIndicators(indicatorManager.getIndicators(), instant);
 
             if (tradingSchedule.contains(instant)) {
-                if (strategy.getIndicatorManager().hasValidIndicators()) {
+                if (indicatorManager.hasValidIndicators()) {
                     strategy.onBookChange();
                 }
             } else {

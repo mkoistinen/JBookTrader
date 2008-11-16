@@ -50,7 +50,6 @@ public final class StrategyInformationDialog extends JDialog {
         PerformanceManager pm = strategy.getPerformanceManager();
         add(performancePanel, "Position", strategy.getPositionManager().getPosition());
         add(performancePanel, "Trades", pm.getTrades());
-        add(performancePanel, "Exposure", nf2.format(pm.getExposure()));
         add(performancePanel, "% Profitable", nf2.format(pm.getPercentProfitableTrades()));
         add(performancePanel, "Average trade", nf2.format(pm.getAverageProfitPerTrade()));
         add(performancePanel, "Net Profit", nf2.format(pm.getNetProfit()));

@@ -70,8 +70,8 @@ public class StrategyTableModel extends TableDataModel {
         final int row = getRowForStrategy(strategy);
 
         MarketBook marketBook = strategy.getMarketBook();
-        if (marketBook.size() > 0) {
-            MarketSnapshot lastMarketSnapshot = marketBook.getLastMarketSnapshot();
+        if (!marketBook.isEmpty()) {
+            MarketSnapshot lastMarketSnapshot = marketBook.getSnapshot();
             setValueAtFast(lastMarketSnapshot.getPrice(), row, Price.ordinal());
         }
 

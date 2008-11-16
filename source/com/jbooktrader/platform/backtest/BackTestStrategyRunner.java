@@ -36,7 +36,7 @@ public class BackTestStrategyRunner implements Runnable {
             backTestDialog.enableProgress();
             backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
             backTestDialog.showProgress("Reading historical data file...");
-            backTestFileReader.load();
+            backTestFileReader.scan();
             if (!cancelled) {
                 backTestDialog.showProgress("Running back test...");
                 BackTester backTester = new BackTester(strategy, backTestFileReader, backTestDialog);

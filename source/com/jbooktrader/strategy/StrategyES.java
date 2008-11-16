@@ -1,6 +1,7 @@
 package com.jbooktrader.strategy;
 
 import com.ib.client.*;
+import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -20,8 +21,9 @@ public abstract class StrategyES extends Strategy {
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
         int multiplier = 50;// contract multiplier
+        double bidAskSpread = 0.25; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
-        setStrategy(contract, tradingSchedule, multiplier, commission);
+        setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread, BarSize.Minute1);
     }
 
 }
