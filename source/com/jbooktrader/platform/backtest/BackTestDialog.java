@@ -18,7 +18,7 @@ import java.io.*;
 public class BackTestDialog extends JDialog {
     private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
     private final PreferencesHolder prefs;
-    private Strategy strategy;
+    private final Strategy strategy;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JProgressBar progressBar;
@@ -128,6 +128,7 @@ public class BackTestDialog extends JDialog {
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
+        selectFileButton.setPreferredSize(new Dimension(24, 24));
         fileNameLabel.setLabelFor(fileNameText);
         northPanel.add(fileNameLabel);
         northPanel.add(fileNameText);

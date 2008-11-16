@@ -13,7 +13,7 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, fromText, toText, emailSubjectText, emailSMTPSHost, emailLogin, webAccessUser;
+    private JTextField hostText, portText, fromText, toText, emailSubjectText, webAccessUser;
     private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
     private JPasswordField emailPasswordField, webAccessPasswordField, c2PasswordField;
     private JComboBox emailMonitoringCombo, webAccessCombo;
@@ -85,8 +85,6 @@ public class PreferencesDialog extends JDialog {
         JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
         emailMonitoringCombo = new JComboBox(new String[]{"disabled", "enabled"});
-        emailSMTPSHost = new JTextField();
-        emailLogin = new JTextField();
         emailPasswordField = new JPasswordField();
         fromText = new JTextField();
         toText = new JTextField();

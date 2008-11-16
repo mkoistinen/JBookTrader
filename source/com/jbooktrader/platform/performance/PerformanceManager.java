@@ -76,17 +76,17 @@ public class PerformanceManager {
 
     public double getKellyCriterion() {
         int unprofitableTrades = trades - profitableTrades;
-        double kellyCriterion = 0;
         if (profitableTrades > 0 && unprofitableTrades > 0) {
             double aveProfit = grossProfit / profitableTrades;
             double aveLoss = grossLoss / unprofitableTrades;
             double winLossRatio = aveProfit / aveLoss;
             double probabilityOfWin = profitableTrades / (double) trades;
-            kellyCriterion = probabilityOfWin - (1 - probabilityOfWin) / winLossRatio;
+            double kellyCriterion = probabilityOfWin - (1 - probabilityOfWin) / winLossRatio;
             kellyCriterion *= 100;
+            return kellyCriterion;
+        } else {
+            return 0;
         }
-
-        return kellyCriterion;
     }
 
     public double getPerformanceIndex() {
@@ -145,8 +145,7 @@ public class PerformanceManager {
 
 
         if (Dispatcher.getMode() == BackTest) {
-            long time = strategy.getTime();
-            performanceChartData.updateNetProfit(new TimedValue(time, netProfit));
+            performanceChartData.updateNetProfit(new TimedValue(strategy.getTime(), netProfit));
         }
 
         previousPosition = position;

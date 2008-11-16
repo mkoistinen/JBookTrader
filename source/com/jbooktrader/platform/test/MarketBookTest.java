@@ -19,8 +19,8 @@ public class MarketBookTest {
         MarketBook marketBook = new MarketBook();
         MarketDepth marketDepth = marketBook.getMarketDepth();
 
-        Assert.assertEquals(true, marketBook.isEmpty());
-        Assert.assertEquals(false, marketDepth.isValid());
+        Assert.assertTrue(marketBook.isEmpty());
+        Assert.assertFalse(marketDepth.isValid());
     }
 
 
@@ -39,7 +39,7 @@ public class MarketBookTest {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Bid, bids[i], 50);
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[i], 50);
         }
-        Assert.assertEquals(false, marketDepth.isValid());
+        Assert.assertFalse(marketDepth.isValid());
     }
 
     /**
@@ -57,7 +57,7 @@ public class MarketBookTest {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Bid, bids[i], 50);
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[i], 50);
         }
-        Assert.assertEquals(false, marketDepth.isValid());
+        Assert.assertFalse(marketDepth.isValid());
     }
 
     /**
@@ -75,7 +75,7 @@ public class MarketBookTest {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Bid, bids[i], 50);
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[i], 50);
         }
-        Assert.assertEquals(false, marketDepth.isValid());
+        Assert.assertFalse(marketDepth.isValid());
     }
 
     /**
@@ -93,27 +93,27 @@ public class MarketBookTest {
         // at each step.
         for (int i = 0; i < 5; i++) {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Bid, bids[i], 50);
-            Assert.assertEquals(false, marketDepth.isValid());
+            Assert.assertFalse(marketDepth.isValid());
         }
 
         // Add the first four ask prices, ensuring it is invalid (because it is
         // not balanced) at each step.
         for (int i = 0; i < 4; i++) {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[i], 50);
-            Assert.assertEquals(false, marketDepth.isValid());
+            Assert.assertFalse(marketDepth.isValid());
         }
 
         // Add the fifth ask, balancing the book
         marketDepth.update(4, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[4], 50);
-        Assert.assertEquals(true, marketDepth.isValid());
+        Assert.assertTrue(marketDepth.isValid());
 
         // Add the sixth ask, unbalancing the book
         marketDepth.update(5, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[5], 50);
-        Assert.assertEquals(false, marketDepth.isValid());
+        Assert.assertFalse(marketDepth.isValid());
 
         // Remove the sixth ask, re-balancing the book
         marketDepth.update(5, MarketDepthOperation.Delete, MarketDepthSide.Ask, asks[5], 50);
-        Assert.assertEquals(true, marketDepth.isValid());
+        Assert.assertTrue(marketDepth.isValid());
     }
 
 }

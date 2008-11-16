@@ -17,8 +17,8 @@ public class PerformanceChartData {
     private final BarSize barSize;
     private final List<OHLCDataItem> prices;
     private Bar priceBar;
-    private Map<String, Bar> indicatorBars;
-    private Map<String, List<OHLCDataItem>> indicators;
+    private final Map<String, Bar> indicatorBars;
+    private final Map<String, List<OHLCDataItem>> indicators;
 
     public PerformanceChartData(BarSize barSize) {
         this.barSize = barSize;

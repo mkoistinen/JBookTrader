@@ -14,14 +14,12 @@ import java.util.*;
 public class BackTestFileReader {
     public final static int COLUMNS = 4;
     private static final String LINE_SEP = System.getProperty("line.separator");
+    private final String fileName;
     private long previousTime;
     private SimpleDateFormat sdf;
     private volatile boolean cancelled;
     private BufferedReader reader;
-    private long snapshotCount;
-    private final String fileName;
-    private long firstMarketLine;
-    private long lineNumber;
+    private long snapshotCount, firstMarketLine, lineNumber;
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
         this.fileName = fileName;
@@ -55,7 +53,7 @@ public class BackTestFileReader {
     }
 
     public void scan() throws JBookTraderException {
-        String line = "";
+        String line;
 
         try {
             while ((line = reader.readLine()) != null && !cancelled) {

@@ -56,7 +56,6 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
             if (optimizerRunner.isCancelled()) {
                 break;
             }
-
         }
 
         int minTrades = optimizerRunner.getMinTrades();

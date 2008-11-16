@@ -21,7 +21,7 @@ public enum BarSize {
         this.barSize = barSize;
     }
 
-    public String getName() {
+    protected String getName() {
         return name;
     }
 

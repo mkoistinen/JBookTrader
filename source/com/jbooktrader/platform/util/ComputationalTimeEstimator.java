@@ -8,6 +8,7 @@ import java.util.*;
  */
 public class ComputationalTimeEstimator {
     private final static long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
+    private final static long MIN_ITERATIONS = 15000000;
     private final long startTime;
     private final SimpleDateFormat sdf;
     private long totalIterations;
@@ -26,7 +27,7 @@ public class ComputationalTimeEstimator {
     public String getTimeLeft(long iterationsSoFar) {
         String timeLeft = "";
 
-        if (iterationsSoFar > 0) {
+        if (iterationsSoFar > MIN_ITERATIONS) {
             long elapsedTime = System.currentTimeMillis() - startTime;
             double millisPerIteration = (double) elapsedTime / iterationsSoFar;
             long remainingMillis = (long) (millisPerIteration * (totalIterations - iterationsSoFar));

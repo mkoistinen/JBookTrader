@@ -259,12 +259,12 @@ public abstract class OptimizerRunner implements Runnable {
 
             MarketSnapshot marketSnapshot;
             long count = 0;
-            String progressMessage = "Loading historical data file, ";
+            String progressMessage = "Loading historical data file: ";
             while ((marketSnapshot = backTestFileReader.next()) != null) {
                 snapshots.add(marketSnapshot);
                 count++;
-                if (count % 100000 == 0) {
-                    optimizerDialog.setProgress(count, snapshotCount, progressMessage + count + " lines read: ");
+                if (count % 50000 == 0) {
+                    optimizerDialog.setProgress(count, snapshotCount, progressMessage);
                 }
                 if (cancelled) {
                     return;

@@ -15,7 +15,7 @@ import java.util.*;
  * Writes historical market data to a file which is used for
  * backtesting and optimization of trading strategies.
  */
-public final class BackTestFileWriter {
+public class BackTestFileWriter {
     private static final String FILE_SEP = System.getProperty("file.separator");
     private static final String LINE_SEP = System.getProperty("line.separator");
     private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";

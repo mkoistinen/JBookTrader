@@ -60,7 +60,7 @@ public class IndicatorManager {
     }
 
 
-    public void resetIndicators() {
+    private void resetIndicators() {
         for (Indicator indicator : indicators) {
             indicator.reset();
         }

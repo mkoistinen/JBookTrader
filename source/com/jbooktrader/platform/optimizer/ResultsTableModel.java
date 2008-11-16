@@ -33,11 +33,6 @@ public class ResultsTableModel extends TableDataModel {
         return false;
     }
 
-    @Override
-    public synchronized Object getValueAt(int row, int column) {
-        return super.getValueAt(row, column);
-    }
-
     public synchronized void setResults(List<OptimizationResult> optimizationResults) {
         removeAllData();
 
