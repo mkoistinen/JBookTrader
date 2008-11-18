@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -18,11 +17,7 @@ public class BackTestStrategyRunner implements Runnable {
     public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
-
-        boolean isOptimizationMode = (Dispatcher.getMode() == Optimization);
-        if (!isOptimizationMode) {
-            Dispatcher.getTrader().getAssistant().addStrategy(strategy);
-        }
+        Dispatcher.getTrader().getAssistant().addStrategy(strategy);
     }
 
     public void cancel() {
@@ -35,7 +30,7 @@ public class BackTestStrategyRunner implements Runnable {
         try {
             backTestDialog.enableProgress();
             backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
-            backTestDialog.showProgress("Reading historical data file...");
+            backTestDialog.showProgress("Scanning historical data file...");
             backTestFileReader.scan();
             if (!cancelled) {
                 backTestDialog.showProgress("Running back test...");

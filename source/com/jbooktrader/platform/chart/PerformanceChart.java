@@ -222,8 +222,6 @@ public class PerformanceChart {
         if (chartState >= 0) {
             chartFrame.setExtendedState(chartState);
         }
-
-
     }
 
 

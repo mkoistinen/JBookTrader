@@ -8,7 +8,6 @@ import com.jbooktrader.platform.marketbook.*;
  */
 public abstract class Indicator {
     private final String name;
-    protected Indicator parentIndicator;
     protected MarketBook marketBook;
     protected double value;
 
@@ -18,11 +17,6 @@ public abstract class Indicator {
 
     protected Indicator() {
         name = getClass().getSimpleName();
-    }
-
-    protected Indicator(Indicator parentIndicator) {
-        this();
-        this.parentIndicator = parentIndicator;
     }
 
     public void setMarketBook(MarketBook marketBook) {
@@ -39,7 +33,6 @@ public abstract class Indicator {
     public double getValue() {
         return value;
     }
-
 
     public String getName() {
         return name;

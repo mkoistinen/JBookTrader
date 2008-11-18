@@ -18,7 +18,6 @@ import java.util.concurrent.*;
  */
 public abstract class OptimizerRunner implements Runnable {
     protected final int STRATEGIES_PER_PROCESSOR = 250;
-    private final OptimizerDialog optimizerDialog;
     protected final LinkedList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected final Constructor<?> strategyConstructor;
@@ -31,11 +30,11 @@ public abstract class OptimizerRunner implements Runnable {
     private final NumberFormat nf2, nf0;
     private final String strategyName;
     private final int minTrades;
+    private final OptimizerDialog optimizerDialog;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private final List<MarketSnapshot> snapshots;
-    private long completedSteps;
-    private long totalSteps, totalStrategies;
+    private long completedSteps, totalSteps, totalStrategies;
     private ExecutorService executor;
 
     class ProgressRunner implements Runnable {

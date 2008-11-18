@@ -12,8 +12,7 @@ public class MarketTimeLine {
      * Gaps less than MAX_GAP will be ignored, gaps greater than MAX_GAP will be removed
      */
     private static final long MAX_GAP = 12 * 60 * 60 * 1000;// 12 hours
-    private static final long SEGMENT_SIZE = SegmentedTimeline.FIFTEEN_MINUTE_SEGMENT_SIZE;
-    private static final long GAP_BUFFER = SEGMENT_SIZE;
+    private static final long SEGMENT_SIZE = SegmentedTimeline.HOUR_SEGMENT_SIZE;
     private final Strategy strategy;
 
     public MarketTimeLine(Strategy strategy) {
@@ -24,14 +23,13 @@ public class MarketTimeLine {
         SegmentedTimeline timeline = new SegmentedTimeline(SEGMENT_SIZE, 1, 0);
         List<OHLCDataItem> items = strategy.getPerformanceChartData().getPrices();
 
-
         long previousTime = items.get(0).getDate().getTime();
 
         for (OHLCDataItem item : items) {
             long time = item.getDate().getTime();
             long difference = time - previousTime;
             if (difference > MAX_GAP) {
-                timeline.addException(previousTime + GAP_BUFFER, time - GAP_BUFFER);
+                timeline.addException(previousTime + SEGMENT_SIZE, time - SEGMENT_SIZE);
             }
             previousTime = time;
         }

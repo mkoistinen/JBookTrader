@@ -77,7 +77,7 @@ public class BackTestFileReader {
             }
 
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
-            for (int i = 1; i < firstMarketLine; i++) {
+            for (int lineCount = 1; lineCount < firstMarketLine; lineCount++) {
                 reader.readLine();
             }
             lineNumber = firstMarketLine;

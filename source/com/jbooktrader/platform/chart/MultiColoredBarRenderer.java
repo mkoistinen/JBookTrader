@@ -12,7 +12,7 @@ import java.awt.geom.*;
  * This functionality is not yet available in JFreeChart, thus the need for a
  * custom renderer.
  */
-class MultiColoredBarRenderer extends HighLowRenderer {
+public class MultiColoredBarRenderer extends HighLowRenderer {
     private OHLCDataset dataset;
 
     @Override

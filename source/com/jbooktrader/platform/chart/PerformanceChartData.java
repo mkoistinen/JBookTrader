@@ -55,8 +55,8 @@ public class PerformanceChartData {
     public void updateIndicators(List<Indicator> indicatorsToUpdate, long time) {
         long frequency = barSize.getSize();
         for (Indicator indicator : indicatorsToUpdate) {
-            double open, high, low, close;
-            open = high = low = close = indicator.getValue();
+
+            double value = indicator.getValue();
 
             // Integer division gives us the number of whole periods
             long completedPeriods = time / frequency;
@@ -64,7 +64,7 @@ public class PerformanceChartData {
 
             Bar indicatorBar = indicatorBars.get(indicator.getName());
             if (indicatorBar == null) {
-                indicatorBar = new Bar(barTime, open, high, low, close);
+                indicatorBar = new Bar(barTime, value);
                 indicatorBars.put(indicator.getName(), indicatorBar);
             }
 
@@ -73,13 +73,13 @@ public class PerformanceChartData {
                 OHLCDataItem item = new OHLCDataItem(date, indicatorBar.getOpen(), indicatorBar.getHigh(), indicatorBar.getLow(), indicatorBar.getClose(), 0);
                 List<OHLCDataItem> ind = indicators.get(indicator.getName());
                 ind.add(item);
-                indicatorBar = new Bar(barTime, open, high, low, close);
+                indicatorBar = new Bar(barTime, value);
                 indicatorBars.put(indicator.getName(), indicatorBar);
             }
 
-            indicatorBar.setClose(close);
-            indicatorBar.setLow(Math.min(low, indicatorBar.getLow()));
-            indicatorBar.setHigh(Math.max(high, indicatorBar.getHigh()));
+            indicatorBar.setClose(value);
+            indicatorBar.setLow(Math.min(value, indicatorBar.getLow()));
+            indicatorBar.setHigh(Math.max(value, indicatorBar.getHigh()));
         }
 
     }
@@ -88,27 +88,26 @@ public class PerformanceChartData {
     public void updatePrice(MarketSnapshot marketSnapshot) {
         long frequency = barSize.getSize();
         long time = marketSnapshot.getTime();
-        double open, high, low, close;
-        open = high = low = close = marketSnapshot.getPrice();
+        double price = marketSnapshot.getPrice();
 
         // Integer division gives us the number of whole periods
         long completedPeriods = time / frequency;
         long barTime = (completedPeriods + 1) * frequency;
 
         if (priceBar == null) {
-            priceBar = new Bar(barTime, open, high, low, close);
+            priceBar = new Bar(barTime, price);
         }
 
         if (barTime > priceBar.getTime()) {
             Date date = new Date(priceBar.getTime());
             OHLCDataItem item = new OHLCDataItem(date, priceBar.getOpen(), priceBar.getHigh(), priceBar.getLow(), priceBar.getClose(), 0);
             prices.add(item);
-            priceBar = new Bar(barTime, open, high, low, close);
+            priceBar = new Bar(barTime, price);
         }
 
-        priceBar.setClose(close);
-        priceBar.setLow(Math.min(low, priceBar.getLow()));
-        priceBar.setHigh(Math.max(high, priceBar.getHigh()));
+        priceBar.setClose(price);
+        priceBar.setLow(Math.min(price, priceBar.getLow()));
+        priceBar.setHigh(Math.max(price, priceBar.getHigh()));
     }
 
     public OHLCDataset getPriceDataset() {
