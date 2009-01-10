@@ -10,10 +10,9 @@ import com.jbooktrader.platform.marketbook.*;
 public class BalanceVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;
     private double fast, slow;
-    private final DepthBalance depthBalance;
+    private DepthBalance depthBalance;
 
-    public BalanceVelocity(DepthBalance depthBalance, int fastPeriod, int slowPeriod) {
-        this.depthBalance = depthBalance;
+    public BalanceVelocity(int fastPeriod, int slowPeriod) {
         fastMultiplier = 2. / (fastPeriod + 1.);
         slowMultiplier = 2. / (slowPeriod + 1.);
     }
@@ -21,6 +20,7 @@ public class BalanceVelocity extends Indicator {
     @Override
     public void setMarketBook(MarketBook marketBook) {
         super.setMarketBook(marketBook);
+        depthBalance = new DepthBalance();
         depthBalance.setMarketBook(marketBook);
     }
 

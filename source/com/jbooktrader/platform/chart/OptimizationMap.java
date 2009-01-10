@@ -81,13 +81,13 @@ public class OptimizationMap {
         verticalCombo.setSelectedIndex(1);
 
         JLabel caseLabel = new JLabel("Case:", JLabel.TRAILING);
-        caseCombo = new JComboBox(new String[]{"Best", "Worst"});
+        caseCombo = new JComboBox(new String[] {"Best", "Worst"});
         caseCombo.setSelectedIndex(0);
         caseLabel.setLabelFor(caseCombo);
 
 
         JLabel colorMapLabel = new JLabel("Color map:", JLabel.TRAILING);
-        colorMapCombo = new JComboBox(new String[]{"Heat", "Grey"});
+        colorMapCombo = new JComboBox(new String[] {"Heat", "Grey"});
         colorMapLabel.setLabelFor(colorMapCombo);
 
         chartOptionsPanel.add(horizontalLabel);
@@ -236,12 +236,12 @@ public class OptimizationMap {
         }
 
         DefaultXYZDataset dataset = new DefaultXYZDataset();
-        dataset.addSeries("optimization", new double[][]{x, y, z});
+        dataset.addSeries("optimization", new double[][] {x, y, z});
 
         return dataset;
     }
 
-    public class HeatPaintScale implements PaintScale {
+    private class HeatPaintScale implements PaintScale {
         public Paint getPaint(double z) {
             double normalizedZ = (z - min) / (max - min);
             double brightness = 1;

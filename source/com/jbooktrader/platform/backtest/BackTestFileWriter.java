@@ -63,16 +63,14 @@ public class BackTestFileWriter {
     }
 
 
-    public void write(MarketSnapshot marketSnapshot, boolean flush) {
+    public void write(MarketSnapshot marketSnapshot) {
         StringBuilder sb = new StringBuilder();
         sb.append(dateFormat.format(new Date(marketSnapshot.getTime()))).append(",");
         sb.append(marketSnapshot.getBalance()).append(",");
         sb.append(decimalFormat.format(marketSnapshot.getPrice()));
 
         writer.println(sb);
-        if (flush) {
-            writer.flush();
-        }
+        writer.flush();
     }
 
     public void close() {

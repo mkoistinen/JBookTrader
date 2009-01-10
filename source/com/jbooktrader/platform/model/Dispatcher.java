@@ -85,8 +85,8 @@ public class Dispatcher {
         } else {
             trader.getAssistant().disconnect();
         }
-        fireModelChanged(ModelListener.Event.ModeChanged, null);
 
+        fireModelChanged(ModelListener.Event.ModeChanged, null);
     }
 
     public static synchronized void strategyStarted() {

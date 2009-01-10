@@ -23,7 +23,7 @@ public class Browser {
                 String[] browsers = {"firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"};
                 String selectedBrowser = null;
                 for (String browser : browsers) {
-                    String[] command = new String[]{"which", browser};
+                    String[] command = new String[] {"which", browser};
                     if (Runtime.getRuntime().exec(command).waitFor() == 0) {
                         selectedBrowser = browser;
                         break;
@@ -33,7 +33,7 @@ public class Browser {
                 if (selectedBrowser == null) {
                     throw new JBookTraderException("Could not find web browser");
                 } else {
-                    Runtime.getRuntime().exec(new String[]{selectedBrowser, url});
+                    Runtime.getRuntime().exec(new String[] {selectedBrowser, url});
                 }
             }
         } catch (Exception e) {

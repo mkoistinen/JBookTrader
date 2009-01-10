@@ -29,8 +29,6 @@ import java.util.List;
 
 public class PerformanceChart {
     private static final int PRICE_PLOT_WEIGHT = 3;
-    private static final int ANNOTATION_RADIUS = 6;
-    private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, 11);
     private static final Paint BACKGROUND_COLOR = new GradientPaint(0, 0, new Color(0, 0, 176), 0, 0, Color.BLACK);
 
     private final Strategy strategy;
@@ -150,15 +148,15 @@ public class PerformanceChart {
         chartOptionsPanel.setBorder(chartOptionsBorder);
 
         JLabel chartTypeLabel = new JLabel("Chart Type:", JLabel.TRAILING);
-        chartTypeCombo = new JComboBox(new String[]{"Candle", "OHLC"});
+        chartTypeCombo = new JComboBox(new String[] {"Candle", "OHLC"});
         chartTypeLabel.setLabelFor(chartTypeCombo);
 
         JLabel timeLineLabel = new JLabel("Timeline:", JLabel.TRAILING);
-        timeLineCombo = new JComboBox(new String[]{"All Hours", "Trading Hours"});
+        timeLineCombo = new JComboBox(new String[] {"All Hours", "Trading Hours"});
         timeLineLabel.setLabelFor(timeLineCombo);
 
         JLabel timeZoneLabel = new JLabel("Time Zone:", JLabel.TRAILING);
-        timeZoneCombo = new JComboBox(new String[]{"Exchange", "Local"});
+        timeZoneCombo = new JComboBox(new String[] {"Exchange", "Local"});
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
         tradesVisibilityCheck = new JCheckBox("Show trades");
@@ -272,22 +270,7 @@ public class PerformanceChart {
             long time = position.getTime();
             double aveFill = position.getAvgFillPrice();
             int quantity = position.getPosition();
-
-            Color bkColor = Color.YELLOW;
-            if (quantity > 0) {
-                bkColor = Color.GREEN;
-            } else if (quantity < 0) {
-                bkColor = Color.RED;
-            }
-
-            String annotationText = String.valueOf(Math.abs(quantity));
-
-            CircledTextAnnotation trade = new CircledTextAnnotation(annotationText, time, aveFill, ANNOTATION_RADIUS);
-            trade.setFont(ANNOTATION_FONT);
-            trade.setBkColor(bkColor);
-            trade.setPaint(Color.BLACK);
-            trade.setTextAnchor(TextAnchor.CENTER);
-
+            CircledTextAnnotation trade = new CircledTextAnnotation(quantity, time, aveFill);
             pricePlot.addAnnotation(trade);
             annotations.add(trade);
         }

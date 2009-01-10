@@ -16,14 +16,26 @@ import java.awt.geom.*;
  * at a point in time.
  */
 public class CircledTextAnnotation extends XYTextAnnotation {
-    private final int radius;
+    private static final Font ANNOTATION_FONT = new Font("SansSerif", Font.BOLD, 11);
+    private static final int ANNOTATION_RADIUS = 6;
     private final Stroke circleStroke = new BasicStroke(1);
     private final Paint circleColor = new Color(250, 240, 150);
     private Color color;
 
-    public CircledTextAnnotation(String text, double x, double y, int radius) {
-        super(text, x, y);
-        this.radius = radius;
+    public CircledTextAnnotation(int quantity, double x, double y) {
+        super(String.valueOf(Math.abs(quantity)), x, y);
+
+        Color bkColor = Color.YELLOW;
+        if (quantity > 0) {
+            bkColor = Color.GREEN;
+        } else if (quantity < 0) {
+            bkColor = Color.RED;
+        }
+
+        setBkColor(bkColor);
+        setFont(ANNOTATION_FONT);
+        setPaint(Color.BLACK);
+        setTextAnchor(TextAnchor.CENTER);
     }
 
     public void setBkColor(Color color) {
@@ -45,10 +57,10 @@ public class CircledTextAnnotation extends XYTextAnnotation {
             anchorY = tempAnchor;
         }
 
-        double x = anchorX - radius;
-        double y = anchorY - radius;
-        double width = radius * 2.0;
-        double height = radius * 2.0;
+        double x = anchorX - ANNOTATION_RADIUS;
+        double y = anchorY - ANNOTATION_RADIUS;
+        double width = ANNOTATION_RADIUS * 2.0;
+        double height = ANNOTATION_RADIUS * 2.0;
 
         g2.setColor(color);
         g2.fill(new Ellipse2D.Double(x, y, width, height));

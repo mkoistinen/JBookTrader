@@ -3,7 +3,6 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -34,12 +33,14 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         List<Strategy> strategies = new LinkedList<Strategy>();
         List<StrategyParams> topParams = new ArrayList<StrategyParams>();
         int chunkSize = STRATEGIES_PER_PROCESSOR * availableProcessors;
-        int numberOfCandidates = (int) Math.min(Math.sqrt(chunkSize), bestParamsList.size());
+        int numberOfCandidates = (int) (chunkSize / Math.pow(2, dimensions));
+
 
         do {
 
             tasks.clear();
-            int partsPerDimension = (int) Math.max(2, Math.pow((double) chunkSize / numberOfCandidates, 1. / dimensions));
+            int partsPerDimension = (bestParamsList.size() == 1) ? (int) Math.pow(chunkSize, 1. / dimensions) : 2;
+
             for (StrategyParams params : bestParamsList) {
                 for (StrategyParam param : params.getAll()) {
                     int step = Math.max(1, (param.getMax() - param.getMin()) / (partsPerDimension - 1));
@@ -52,14 +53,8 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             for (StrategyParams params : tasks) {
                 if (!uniqueParams.contains(params)) {
                     uniqueParams.add(params);
-                    try {
-                        Strategy strategy = (Strategy) strategyConstructor.newInstance(params);
-                        strategies.add(strategy);
-                    } catch (InvocationTargetException ite) {
-                        throw new JBookTraderException(new Exception(ite.getCause()));
-                    } catch (Exception e) {
-                        throw new JBookTraderException(e);
-                    }
+                    Strategy strategy = getStrategyInstance(params);
+                    strategies.add(strategy);
                 }
             }
 
@@ -76,8 +71,8 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             }
 
             topParams.clear();
-            numberOfCandidates = (int) Math.min(Math.sqrt(chunkSize), optimizationResults.size());
-            for (int index = 0; index < numberOfCandidates; index++) {
+            int maxIndex = Math.min(numberOfCandidates, optimizationResults.size());
+            for (int index = 0; index < maxIndex; index++) {
                 topParams.add(optimizationResults.get(index).getParams());
             }
 
@@ -93,7 +88,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                     int max = Math.min(originalParam.getMax(), value + displacement);
                     param.setMin(min);
                     param.setMax(max);
-                    bestParams.add(name, min, max, 0, value);
+                    bestParams.add(name, min, max, 0, 0);
                 }
                 bestParamsList.add(bestParams);
             }

@@ -53,30 +53,6 @@ public class MainFrameController {
         }
     }
 
-    private String getSelectedStrategyName() throws JBookTraderException {
-        int selectedRow = strategyTable.getSelectedRow();
-        if (selectedRow < 0) {
-            throw new JBookTraderException("No strategy is selected.");
-        }
-        return strategyTableModel.getStrategyNameForRow(selectedRow);
-    }
-
-
-    private Strategy getSelectedRowStrategy() throws JBookTraderException {
-        int selectedRow = strategyTable.getSelectedRow();
-        if (selectedRow < 0) {
-            throw new JBookTraderException("No strategy is selected.");
-        }
-
-        Strategy strategy = strategyTableModel.getStrategyForRow(selectedRow);
-        if (strategy == null) {
-            String msg = "Please run this strategy first.";
-            throw new JBookTraderException(msg);
-        }
-
-        return strategy;
-    }
-
     private Strategy createSelectedRowStrategy() throws JBookTraderException {
         int selectedRow = strategyTable.getSelectedRow();
         if (selectedRow < 0) {
@@ -156,7 +132,11 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent ae) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    String name = getSelectedStrategyName();
+                    int selectedRow = strategyTable.getSelectedRow();
+                    if (selectedRow < 0) {
+                        throw new JBookTraderException("No strategy is selected.");
+                    }
+                    String name = strategyTableModel.getStrategyNameForRow(selectedRow);
                     Dispatcher.setMode(Optimization);
                     new OptimizerDialog(mainViewDialog, name);
                 } catch (Throwable t) {
@@ -201,7 +181,17 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent e) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    Strategy strategy = getSelectedRowStrategy();
+                    int selectedRow = strategyTable.getSelectedRow();
+                    if (selectedRow < 0) {
+                        throw new JBookTraderException("No strategy is selected.");
+                    }
+
+                    Strategy strategy = strategyTableModel.getStrategyForRow(selectedRow);
+                    if (strategy == null) {
+                        String msg = "Please run this strategy first.";
+                        throw new JBookTraderException(msg);
+                    }
+
                     if (!strategy.getPerformanceChartData().isEmpty()) {
                         PerformanceChart spChart = new PerformanceChart(mainViewDialog, strategy);
                         JFrame chartFrame = spChart.getChart();

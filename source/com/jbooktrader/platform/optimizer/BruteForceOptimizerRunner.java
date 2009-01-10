@@ -3,7 +3,6 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
 
-import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -30,15 +29,8 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
             strategies.clear();
             while (!tasks.isEmpty() && strategies.size() != chunkSize) {
                 StrategyParams params = tasks.removeFirst();
-                try {
-                    Strategy strategy = (Strategy) strategyConstructor.newInstance(params);
-                    strategies.add(strategy);
-                } catch (InvocationTargetException ite) {
-                    throw new JBookTraderException(ite.getCause());
-                } catch (Exception e) {
-                    throw new JBookTraderException(e);
-                }
-
+                Strategy strategy = getStrategyInstance(params);
+                strategies.add(strategy);
             }
             execute(strategies);
         }

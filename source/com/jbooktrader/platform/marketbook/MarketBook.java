@@ -38,7 +38,7 @@ public class MarketBook {
                 throw new RuntimeException(e);
             }
         }
-        backTestFileWriter.write(marketSnapshot, true);
+        backTestFileWriter.write(marketSnapshot);
     }
 
     public boolean isEmpty() {

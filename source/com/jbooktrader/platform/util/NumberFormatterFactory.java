@@ -4,19 +4,16 @@ import java.text.*;
 
 public class NumberFormatterFactory {
 
-    private static DecimalFormat getNumberFormatter(int minFractionDigits, int maxFractionDigits) {
+    public static DecimalFormat getNumberFormatter(int maxFractionDigits) {
         DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance();
         DecimalFormatSymbols decimalFormatSeparator = new DecimalFormatSymbols();
         decimalFormatSeparator.setDecimalSeparator('.');
         decimalFormat.setGroupingUsed(false);
-        decimalFormat.setMinimumFractionDigits(minFractionDigits);
+        decimalFormat.setMinimumFractionDigits(0);
         decimalFormat.setMaximumFractionDigits(maxFractionDigits);
         decimalFormat.setDecimalFormatSymbols(decimalFormatSeparator);
 
         return decimalFormat;
     }
 
-    public static DecimalFormat getNumberFormatter(int maxFractionDigits) {
-        return getNumberFormatter(0, maxFractionDigits);
-    }
 }

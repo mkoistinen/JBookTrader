@@ -36,10 +36,10 @@ public class BackTestDialog extends JDialog {
         setVisible(true);
     }
 
-    public void setProgress(long count, long iterations, String text) {
+    public void setProgress(long count, long iterations) {
         int percent = (int) (100 * (count / (double) iterations));
         progressBar.setValue(percent);
-        progressBar.setString(text + ": " + percent + "%");
+        progressBar.setString("Running back test: " + percent + "%");
     }
 
     public void enableProgress() {
@@ -56,23 +56,19 @@ public class BackTestDialog extends JDialog {
         progressBar.setString(progressText);
     }
 
-    private void setOptions() throws JBookTraderException {
-        String historicalFileName = fileNameText.getText();
-        File file = new File(historicalFileName);
-        if (!file.exists()) {
-            fileNameText.requestFocus();
-            String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
-            throw new JBookTraderException(msg);
-        }
-    }
-
     private void assignListeners() {
 
         backTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
                     prefs.set(BackTesterFileName, fileNameText.getText());
-                    setOptions();
+                    String historicalFileName = fileNameText.getText();
+                    File file = new File(historicalFileName);
+                    if (!file.exists()) {
+                        fileNameText.requestFocus();
+                        String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
+                        throw new JBookTraderException(msg);
+                    }
                     btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy);
                     new Thread(btsr).start();
                 } catch (Exception ex) {

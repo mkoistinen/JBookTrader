@@ -67,53 +67,30 @@ public class FastXYPlot extends XYPlot {
             RectangleEdge rangeEdge = getDomainAxisEdge();
             int width = (int) dataArea.getWidth();
 
-            SeriesRenderingOrder seriesOrder = getSeriesRenderingOrder();
-            if (seriesOrder == SeriesRenderingOrder.REVERSE) {
-                //render series in reverse order
-                for (int pass = 0; pass < passCount; pass++) {
-                    int seriesCount = dataset.getSeriesCount();
-                    for (int series = seriesCount - 1; series >= 0; series--) {
-                        int firstItem = 0;
-                        int lastItem = dataset.getItemCount(series) - 1;
-                        if (lastItem == -1) {
-                            continue;
-                        }
-                        if (state.getProcessVisibleItemsOnly()) {
-                            int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
-                            firstItem = itemBounds[0];
-                            lastItem = itemBounds[1];
-                        }
-                        int items = lastItem - firstItem + 1;
-                        boolean renderAll = items < 2 * width;
-                        for (int item = firstItem; item <= lastItem; item++) {
-                            if (renderAll || !hasRendered(dataset, xAxis, yAxis, domainEdge, rangeEdge, dataArea, series, item, width)) {
-                                renderer.drawItem(g2, state, dataArea, info, this, xAxis, yAxis, dataset, series, item, crosshairState, pass);
-                            }
-                        }
+
+            for (int pass = 0; pass < passCount; pass++) {
+                int seriesCount = dataset.getSeriesCount();
+                for (int series = seriesCount - 1; series >= 0; series--) {
+                    int firstItem = 0;
+                    int lastItem = dataset.getItemCount(series) - 1;
+                    if (lastItem == -1) {
+                        continue;
                     }
-                }
-            } else {
-                //render series in forward order
-                for (int pass = 0; pass < passCount; pass++) {
-                    int seriesCount = dataset.getSeriesCount();
-                    for (int series = 0; series < seriesCount; series++) {
-                        int firstItem = 0;
-                        int lastItem = dataset.getItemCount(series) - 1;
-                        if (state.getProcessVisibleItemsOnly()) {
-                            int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
-                            firstItem = itemBounds[0];
-                            lastItem = itemBounds[1];
-                        }
-                        int items = lastItem - firstItem + 1;
-                        boolean renderAll = items < 2 * width;
-                        for (int item = firstItem; item <= lastItem; item++) {
-                            if (renderAll || !hasRendered(dataset, xAxis, yAxis, domainEdge, rangeEdge, dataArea, series, item, width)) {
-                                renderer.drawItem(g2, state, dataArea, info, this, xAxis, yAxis, dataset, series, item, crosshairState, pass);
-                            }
+                    if (state.getProcessVisibleItemsOnly()) {
+                        int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, xAxis.getLowerBound(), xAxis.getUpperBound());
+                        firstItem = itemBounds[0];
+                        lastItem = itemBounds[1];
+                    }
+                    int items = lastItem - firstItem + 1;
+                    boolean renderAll = items < 2 * width;
+                    for (int item = firstItem; item <= lastItem; item++) {
+                        if (renderAll || !hasRendered(dataset, xAxis, yAxis, domainEdge, rangeEdge, dataArea, series, item, width)) {
+                            renderer.drawItem(g2, state, dataArea, info, this, xAxis, yAxis, dataset, series, item, crosshairState, pass);
                         }
                     }
                 }
             }
+
         }
         return foundData;
     }

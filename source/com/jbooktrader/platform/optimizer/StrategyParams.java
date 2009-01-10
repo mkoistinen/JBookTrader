@@ -21,11 +21,8 @@ public class StrategyParams {
         StrategyParams that = (StrategyParams) o;
         boolean allSame = true;
         for (StrategyParam param : params) {
-            int value = param.getValue();
-            int thatValue;
             try {
-                thatValue = that.get(param.getName()).getValue();
-                if (value != thatValue) {
+                if (param.getValue() != that.get(param.getName()).getValue()) {
                     allSame = false;
                     break;
                 }

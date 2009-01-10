@@ -50,7 +50,7 @@ public class ClassFinder {
             String className = "com.jbooktrader.strategy." + name;
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
             if (!Modifier.isAbstract(clazz.getModifiers())) {
-                Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
+                Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
                 Constructor<?> constructor = clazz.getConstructor(parameterTypes);
                 return (Strategy) constructor.newInstance(new StrategyParams());
             } else {

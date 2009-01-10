@@ -63,7 +63,7 @@ public class Collective2Gateway {
             params.append("&quant=").append(Integer.toString(quantity));
             //todo: pass in instrument and symbol
             params.append("&instrument=future");
-            params.append("&symbol=").append(URLEncoder.encode("@ESZ8", "US-ASCII"));
+            params.append("&symbol=").append(URLEncoder.encode("@ESH9", "US-ASCII"));
         } catch (UnsupportedEncodingException e) {
             throw new Collective2Exception(e);
         }

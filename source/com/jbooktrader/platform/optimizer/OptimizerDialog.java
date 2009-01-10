@@ -276,7 +276,7 @@ public class OptimizerDialog extends JDialog {
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
         JLabel optimizationMethodLabel = new JLabel("Search method: ");
-        optimizationMethodCombo = new JComboBox(new String[]{"Brute force", "Divide & Conquer"});
+        optimizationMethodCombo = new JComboBox(new String[] {"Brute force", "Divide & Conquer"});
         String optimizerMethod = prefs.get(OptimizerMethod);
         if (optimizerMethod.length() > 0) {
             optimizationMethodCombo.setSelectedItem(optimizerMethod);
@@ -287,7 +287,7 @@ public class OptimizerDialog extends JDialog {
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
-        String[] sortFactors = new String[]{PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName()};
+        String[] sortFactors = new String[] {PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName()};
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);

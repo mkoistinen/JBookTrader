@@ -53,7 +53,7 @@ public class BackTester {
 
             positionManager.trade();
             if (marketDepthCounter % 10000 == 0) {
-                backTestDialog.setProgress(marketDepthCounter, size, "Running back test");
+                backTestDialog.setProgress(marketDepthCounter, size);
             }
         }
 

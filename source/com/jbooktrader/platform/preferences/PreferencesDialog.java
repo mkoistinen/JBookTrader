@@ -84,7 +84,7 @@ public class PreferencesDialog extends JDialog {
 
         JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
-        emailMonitoringCombo = new JComboBox(new String[]{"disabled", "enabled"});
+        emailMonitoringCombo = new JComboBox(new String[] {"disabled", "enabled"});
         emailPasswordField = new JPasswordField();
         fromText = new JTextField();
         toText = new JTextField();
@@ -101,7 +101,7 @@ public class PreferencesDialog extends JDialog {
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Web Access", webAcessTab);
-        webAccessCombo = new JComboBox(new String[]{"disabled", "enabled"});
+        webAccessCombo = new JComboBox(new String[] {"disabled", "enabled"});
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();

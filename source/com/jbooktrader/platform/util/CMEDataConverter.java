@@ -19,7 +19,7 @@ import java.util.zip.*;
  * http://www.cme.com/files/SDKRLCMessageSpecs.pdf
  */
 public class CMEDataConverter {
-    private static final long RECORDING_START = 9 * 60;// 9:00
+    private static final long RECORDING_START = 8 * 60 + 30;// 8:30
     private static final long RECORDING_END = 16 * 60 + 15;// 16:15
     private static final long UPDATING_START = RECORDING_START - 60;
     private static final String INVALID_PRICE = "999999999999999999";
@@ -108,14 +108,15 @@ public class CMEDataConverter {
         int samples = 0;
         try {
             long previousTime = 0;
+
             while ((line = reader.readLine()) != null) {
                 lineNumber++;
                 try {
                     parse(line);
                     if ((time - previousTime) >= samplingFrequency) {
                         MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(time);
-                        if (isRecordable()) {
-                            backTestFileWriter.write(marketSnapshot, true);
+                        if (isRecordable() && marketSnapshot != null) {
+                            backTestFileWriter.write(marketSnapshot);
                             samples++;
                         }
                         previousTime = time;

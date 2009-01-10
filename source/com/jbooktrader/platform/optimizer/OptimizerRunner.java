@@ -20,12 +20,12 @@ public abstract class OptimizerRunner implements Runnable {
     protected final int STRATEGIES_PER_PROCESSOR = 250;
     protected final LinkedList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
-    protected final Constructor<?> strategyConstructor;
     protected long snapshotCount;
     protected boolean cancelled;
     protected final int availableProcessors;
 
-    private static final int MAX_RESULTS = 10000;// max number of rows in the "optimization results" table
+    private static final int MAX_RESULTS = 250000;// max number of rows in the "optimization results" table
+    private final Constructor<?> strategyConstructor;
     private final ScheduledExecutorService progressExecutor;
     private final NumberFormat nf2, nf0;
     private final String strategyName;
@@ -61,7 +61,7 @@ public abstract class OptimizerRunner implements Runnable {
         } catch (ClassNotFoundException cnfe) {
             throw new JBookTraderException("Could not find class " + strategy.getClass().getName());
         }
-        Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
+        Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
 
         try {
             strategyConstructor = clazz.getConstructor(parameterTypes);
@@ -74,6 +74,17 @@ public abstract class OptimizerRunner implements Runnable {
         progressExecutor = Executors.newSingleThreadScheduledExecutor();
         executor = Executors.newFixedThreadPool(availableProcessors);
     }
+
+    protected Strategy getStrategyInstance(StrategyParams params) throws JBookTraderException {
+        try {
+            return (Strategy) strategyConstructor.newInstance(params);
+        } catch (InvocationTargetException ite) {
+            throw new JBookTraderException(ite.getCause());
+        } catch (Exception e) {
+            throw new JBookTraderException(e);
+        }
+    }
+
 
     protected abstract void optimize() throws JBookTraderException;
 

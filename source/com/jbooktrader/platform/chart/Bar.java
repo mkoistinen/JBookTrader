@@ -8,7 +8,7 @@ public class Bar {
     private final double open;
     private double high, low, close;
 
-    public Bar(long time, double open, double high, double low, double close) {
+    private Bar(long time, double open, double high, double low, double close) {
         this.time = time;
         this.open = open;
         this.high = high;
