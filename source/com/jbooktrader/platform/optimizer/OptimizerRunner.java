@@ -17,14 +17,14 @@ import java.util.concurrent.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    protected final int STRATEGIES_PER_PROCESSOR = 250;
+    protected final int STRATEGIES_PER_PROCESSOR = 125;
     protected final LinkedList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected long snapshotCount;
     protected boolean cancelled;
     protected final int availableProcessors;
 
-    private static final int MAX_RESULTS = 250000;// max number of rows in the "optimization results" table
+    private static final int MAX_SAVED_RESULTS = 100;// max number of results in the optimization results file
     private final Constructor<?> strategyConstructor;
     private final ScheduledExecutorService progressExecutor;
     private final NumberFormat nf2, nf0;
@@ -147,7 +147,9 @@ public abstract class OptimizerRunner implements Runnable {
                 throw new JBookTraderException(e);
             }
         }
-        showResults();
+
+        Collections.sort(optimizationResults, resultComparator);
+        optimizerDialog.setResults(optimizationResults);
     }
 
     public void cancel() {
@@ -186,7 +188,9 @@ public abstract class OptimizerRunner implements Runnable {
         }
         optimizerReport.report(otpimizerReportHeaders);
 
-        for (OptimizationResult optimizationResult : optimizationResults) {
+        int maxIndex = Math.min(MAX_SAVED_RESULTS, optimizationResults.size());
+        for (int index = 0; index < maxIndex; index++) {
+            OptimizationResult optimizationResult = optimizationResults.get(index);
             params = optimizationResult.getParams();
 
             List<Object> columns = new ArrayList<Object>();
@@ -204,14 +208,6 @@ public abstract class OptimizerRunner implements Runnable {
             optimizerReport.report(columns);
         }
         Report.disable();
-    }
-
-    private void showResults() {
-        Collections.sort(optimizationResults, resultComparator);
-        while (optimizationResults.size() > MAX_RESULTS) {
-            optimizationResults.removeLast();
-        }
-        optimizerDialog.setResults(optimizationResults);
     }
 
     private void showFastProgress(long counter, String text) {
