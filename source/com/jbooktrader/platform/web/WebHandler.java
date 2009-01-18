@@ -9,6 +9,7 @@ import com.jbooktrader.platform.util.*;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
+import java.net.*;
 import java.text.*;
 
 public class WebHandler implements HttpHandler {
@@ -48,7 +49,7 @@ public class WebHandler implements HttpHandler {
         sb.append("</html>");
 
         String response = sb.toString();
-        httpExchange.sendResponseHeaders(200, response.length());
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
         OutputStream os = httpExchange.getResponseBody();
         os.write(response.getBytes());
         os.close();
