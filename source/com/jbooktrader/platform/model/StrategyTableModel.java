@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.model;
 
+import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.performance.*;
@@ -91,7 +92,12 @@ public class StrategyTableModel extends TableDataModel {
     public void addStrategy(Strategy strategy) {
         Object[] row = new Object[getColumnCount()];
         row[Strategy.ordinal()] = strategy.getName();
-        row[Symbol.ordinal()] = strategy.getContract().m_symbol;
+        Contract contract = strategy.getContract();
+        String symbol = contract.m_symbol;
+        if (contract.m_currency != null) {
+            symbol += "." + contract.m_currency;
+        }
+        row[Symbol.ordinal()] = symbol;
         addRow(row);
     }
 }

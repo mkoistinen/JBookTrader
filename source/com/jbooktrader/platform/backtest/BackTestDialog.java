@@ -72,7 +72,7 @@ public class BackTestDialog extends JDialog {
                     btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy);
                     new Thread(btsr).start();
                 } catch (Exception ex) {
-                    MessageDialog.showError(BackTestDialog.this, ex.getMessage());
+                    MessageDialog.showError(BackTestDialog.this, ex);
                 }
             }
         });

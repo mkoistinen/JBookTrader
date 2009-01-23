@@ -38,8 +38,7 @@ public class BackTestStrategyRunner implements Runnable {
                 backTester.execute();
             }
         } catch (Throwable t) {
-            Dispatcher.getReporter().report(t);
-            MessageDialog.showError(backTestDialog, t.toString());
+            MessageDialog.showError(backTestDialog, t);
         } finally {
             backTestDialog.dispose();
         }

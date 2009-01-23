@@ -1,6 +1,5 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
@@ -27,7 +26,7 @@ public class Equalizer1 extends StrategyES {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        balanceVelocityInd = new BalanceVelocity(new DepthBalance(), getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(balanceVelocityInd);
     }
 

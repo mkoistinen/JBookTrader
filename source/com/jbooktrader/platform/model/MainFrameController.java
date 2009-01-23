@@ -66,7 +66,7 @@ public class MainFrameController {
             Browser.openURL(url);
         } catch (Throwable t) {
             Dispatcher.getReporter().report(t);
-            MessageDialog.showError(mainViewDialog, t.getMessage());
+            MessageDialog.showError(mainViewDialog, t);
         }
     }
 
@@ -104,7 +104,7 @@ public class MainFrameController {
 
                     new StrategyInformationDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -121,7 +121,7 @@ public class MainFrameController {
                     Dispatcher.setMode(BackTest);
                     new BackTestDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -140,7 +140,7 @@ public class MainFrameController {
                     Dispatcher.setMode(Optimization);
                     new OptimizerDialog(mainViewDialog, name);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -155,7 +155,7 @@ public class MainFrameController {
                     Dispatcher.setMode(ForwardTest);
                     Dispatcher.getTrader().getAssistant().addStrategy(strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -170,7 +170,7 @@ public class MainFrameController {
                     Dispatcher.setMode(Trade);
                     Dispatcher.getTrader().getAssistant().addStrategy(strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -201,7 +201,7 @@ public class MainFrameController {
                         MessageDialog.showMessage(mainViewDialog, msg);
                     }
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -214,7 +214,7 @@ public class MainFrameController {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     new PreferencesDialog(mainViewDialog);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -252,7 +252,7 @@ public class MainFrameController {
                 try {
                     new AboutDialog(mainViewDialog);
                 } catch (Throwable t) {
-                    MessageDialog.showError(mainViewDialog, t.getMessage());
+                    MessageDialog.showError(mainViewDialog, t);
                 }
             }
         });
