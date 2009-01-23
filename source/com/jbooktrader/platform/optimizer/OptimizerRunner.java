@@ -292,8 +292,7 @@ public abstract class OptimizerRunner implements Runnable {
                 MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
-            Dispatcher.getReporter().report(t);
-            MessageDialog.showError(optimizerDialog, t.toString());
+            MessageDialog.showError(optimizerDialog, t);
         } finally {
             progressExecutor.shutdownNow();
             optimizerDialog.signalCompleted();

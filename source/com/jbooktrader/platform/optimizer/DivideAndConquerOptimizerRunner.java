@@ -78,7 +78,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 for (StrategyParam param : params.getAll()) {
                     String name = param.getName();
                     int value = param.getValue();
-                    int displacement = Math.max(1, param.getStep() / 3);
+                    int displacement = Math.max(1, (param.getMax() - param.getMin()) / 3);
                     StrategyParam originalParam = strategyParams.get(name);
                     param.setMin(Math.max(originalParam.getMin(), value - displacement));
                     param.setMax(Math.min(originalParam.getMax(), value + displacement));
