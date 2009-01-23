@@ -135,10 +135,28 @@ public class TraderAssistant {
         }
     }
 
+    public String makeInstrument(Contract contract) {
+        String instrument = contract.m_symbol;
+        if (contract.m_currency != null) {
+            instrument += "-" + contract.m_currency;
+        }
+        if (contract.m_exchange != null) {
+            instrument += "-" + contract.m_exchange;
+        }
+        if (contract.m_secType != null) {
+            instrument += "-" + contract.m_secType;
+        }
+        if (contract.m_expiry != null) {
+            instrument += "-" + contract.m_expiry;
+        }
+
+        return instrument;
+    }
 
     public synchronized MarketBook createMarketBook(Strategy strategy) {
         Contract contract = strategy.getContract();
-        String instrument = contract.m_symbol + "-" + contract.m_exchange + "-" + contract.m_secType + "-" + contract.m_expiry;
+
+        String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
         MarketBook marketBook;
         if (ticker == null) {
@@ -157,7 +175,7 @@ public class TraderAssistant {
 
     private synchronized void requestMarketData(Strategy strategy) {
         Contract contract = strategy.getContract();
-        String instrument = contract.m_symbol + "-" + contract.m_exchange + "-" + contract.m_secType + "-" + contract.m_expiry;
+        String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
         if (!subscribedTickers.contains(ticker)) {
             subscribedTickers.add(ticker);
