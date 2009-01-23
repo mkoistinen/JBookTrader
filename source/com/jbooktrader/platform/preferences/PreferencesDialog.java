@@ -151,7 +151,7 @@ public class PreferencesDialog extends JDialog {
 
                     dispose();
                 } catch (Exception ex) {
-                    MessageDialog.showError(PreferencesDialog.this, ex.getMessage());
+                    MessageDialog.showError(PreferencesDialog.this, ex);
                 }
             }
         });

@@ -26,7 +26,7 @@ public class MonitoringServer {
                     Dispatcher.getReporter().report("Monitoring server started");
                 } catch (Exception e) {
                     Dispatcher.getReporter().report(e);
-                    MessageDialog.showError(null, "Could not start monitoring server: " + e.getMessage());
+                    MessageDialog.showError(null, "Could not start monitoring server: " + e);
                 }
             }
         }

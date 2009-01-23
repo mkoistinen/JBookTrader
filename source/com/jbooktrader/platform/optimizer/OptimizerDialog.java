@@ -145,7 +145,7 @@ public class OptimizerDialog extends JDialog {
 
                     new Thread(optimizerRunner).start();
                 } catch (Exception ex) {
-                    MessageDialog.showError(OptimizerDialog.this, ex.getMessage());
+                    MessageDialog.showError(OptimizerDialog.this, ex);
                 }
             }
         });
@@ -163,7 +163,7 @@ public class OptimizerDialog extends JDialog {
                     JDialog chartFrame = optimizationMap.getChartFrame();
                     chartFrame.setVisible(true);
                 } catch (Exception ex) {
-                    MessageDialog.showError(OptimizerDialog.this, ex.getMessage());
+                    MessageDialog.showError(OptimizerDialog.this, ex);
                 }
             }
         });
@@ -384,8 +384,7 @@ public class OptimizerDialog extends JDialog {
                 resultsColumnModel.getColumn(columnIndex).setCellRenderer(new NumberRenderer(performanceMetric.getPrecision()));
             }
         } catch (Exception e) {
-            Dispatcher.getReporter().report(e);
-            MessageDialog.showError(this, e.getMessage());
+            MessageDialog.showError(this, e);
         }
     }
 
