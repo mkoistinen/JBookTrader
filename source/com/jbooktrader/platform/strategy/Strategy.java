@@ -215,4 +215,17 @@ public abstract class Strategy {
 
         return sb.toString();
     }
+
+    public String indicatorsState() {
+        String indicatorsState = "";
+        for (Indicator indicator : indicatorManager.getIndicators()) {
+            if (!indicatorsState.isEmpty()) {
+                indicatorsState += ",";
+            }
+
+            indicatorsState += (int) indicator.getValue();
+        }
+        return indicatorsState;
+    }
+
 }

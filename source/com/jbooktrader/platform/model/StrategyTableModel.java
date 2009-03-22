@@ -78,6 +78,7 @@ public class StrategyTableModel extends TableDataModel {
 
         PositionManager positionManager = strategy.getPositionManager();
         PerformanceManager performanceManager = strategy.getPerformanceManager();
+        setValueAtFast(strategy.indicatorsState(), row, Indicators.ordinal());
         setValueAtFast(positionManager.getPosition(), row, Position.ordinal());
         setValueAtFast(performanceManager.getTrades(), row, Trades.ordinal());
         setValueAtFast(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());

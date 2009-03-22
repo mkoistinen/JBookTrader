@@ -239,6 +239,9 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr0);
         NumberRenderer nr5 = new NumberRenderer(5);
         columnModel.getColumn(Price.ordinal()).setCellRenderer(nr5);
+        DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
+        tableCellRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        columnModel.getColumn(Indicators.ordinal()).setCellRenderer(tableCellRenderer);
 
         // Make some columns wider than the rest, so that the info fits in.
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);

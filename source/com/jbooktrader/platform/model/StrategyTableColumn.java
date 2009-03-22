@@ -4,6 +4,7 @@ public enum StrategyTableColumn {
     Strategy("Strategy", String.class),
     Symbol("Symbol", String.class),
     Price("Price", Double.class),
+    Indicators("Indicators", String.class),
     Position("Position", Integer.class),
     Trades("Trades", Integer.class),
     MaxDD("Max DD", Double.class),
