@@ -17,10 +17,6 @@ public class Hybrid1 extends StrategyES {
     private static final String FAST_PERIOD = "FastPeriod";
     private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-    private static final String MULTIPLIER = "Multiplier";
-
-    // Strategy parameters values
-    private final double multiplier;
     private final int entry;
 
 
@@ -28,7 +24,6 @@ public class Hybrid1 extends StrategyES {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        multiplier = getParam(MULTIPLIER) / 10d;
         priceVelocityInd = new PriceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         depthBalanceInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(priceVelocityInd);
@@ -43,10 +38,9 @@ public class Hybrid1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 20, 40, 50, 27);
-        addParam(SLOW_PERIOD, 8000, 12000, 100, 9453);
-        addParam(ENTRY, 24, 28, 1, 26);
-        addParam(MULTIPLIER, 14, 23, 1, 18);
+        addParam(FAST_PERIOD, 22, 35, 1, 30);
+        addParam(SLOW_PERIOD, 9300, 12000, 5, 10727);
+        addParam(ENTRY, 21, 27, 1, 23);
     }
 
     /**
@@ -55,10 +49,11 @@ public class Hybrid1 extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double velocity = depthBalanceInd.getValue() + multiplier * priceVelocityInd.getValue();
-        if (velocity >= entry) {
+        double velocity = depthBalanceInd.getValue();
+        double pv = priceVelocityInd.getValue();
+        if (velocity >= entry && pv > 0) {
             setPosition(1);
-        } else if (velocity <= -entry) {
+        } else if (velocity <= -entry && pv < 0) {
             setPosition(-1);
         }
     }
