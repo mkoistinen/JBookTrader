@@ -19,8 +19,9 @@ import java.util.zip.*;
  * http://www.cme.com/files/SDKRLCMessageSpecs.pdf
  */
 public class CMEDataConverter {
-    private static final long RECORDING_START = 8 * 60 + 30;// 8:30
+    private static final long RECORDING_START = 8 * 60;// 8:00 (start 1.5 hours before regular opening hour)
     private static final long RECORDING_END = 16 * 60 + 15;// 16:15
+
     private static final long UPDATING_START = RECORDING_START - 60;
     private static final String INVALID_PRICE = "999999999999999999";
     private static final String LINE_SEP = System.getProperty("line.separator");
