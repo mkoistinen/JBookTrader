@@ -32,9 +32,9 @@ public class Browser {
 
                 if (selectedBrowser == null) {
                     throw new JBookTraderException("Could not find web browser");
-                } else {
-                    Runtime.getRuntime().exec(new String[] {selectedBrowser, url});
                 }
+
+                Runtime.getRuntime().exec(new String[] {selectedBrowser, url});
             }
         } catch (Exception e) {
             String msg = ERR_MSG + System.getProperty("line.separator") + e.getLocalizedMessage();

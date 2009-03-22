@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
+import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.util.*;
@@ -32,6 +33,15 @@ public final class StrategyInformationDialog extends JDialog {
         add(panel, fieldName, String.valueOf(fieldValue));
     }
 
+    private void add(JPanel panel, String fieldName, double fieldValue) {
+        add(panel, fieldName, String.valueOf(fieldValue));
+    }
+
+    private void makeCompactGrid(JPanel panel) {
+        SpringUtilities.makeCompactGrid(panel, panel.getComponentCount() / 2, 2, 12, 12, 5, 5);
+    }
+
+
     private void init() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Strategy Information - " + strategy.getName());
@@ -57,7 +67,7 @@ public final class StrategyInformationDialog extends JDialog {
         add(performancePanel, "Profit Factor", nf2.format(pm.getProfitFactor()));
         add(performancePanel, "Kelly", nf2.format(pm.getKellyCriterion()));
         add(performancePanel, "Perf. Index", nf2.format(pm.getPerformanceIndex()));
-        SpringUtilities.makeCompactGrid(performancePanel, performancePanel.getComponentCount() / 2, 2, 12, 12, 5, 5);
+        makeCompactGrid(performancePanel);
 
 
         JPanel securityPanel = new JPanel(new SpringLayout());
@@ -67,19 +77,27 @@ public final class StrategyInformationDialog extends JDialog {
         add(securityPanel, "Exchange", strategy.getContract().m_exchange);
         add(securityPanel, "Multiplier", strategy.getContract().m_multiplier);
         add(securityPanel, "Commission", strategy.getPerformanceManager().getCommission().toString());
-
-        SpringUtilities.makeCompactGrid(securityPanel, securityPanel.getComponentCount() / 2, 2, 12, 12, 5, 5);
+        makeCompactGrid(securityPanel);
 
         JPanel parametersPanel = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Parameters", parametersPanel);
         StrategyParams params = strategy.getParams();
         add(parametersPanel, "Schedule", strategy.getTradingSchedule().toString());
-
         for (StrategyParam param : params.getAll()) {
             add(parametersPanel, param.getName(), param.getValue());
         }
+        makeCompactGrid(parametersPanel);
 
-        SpringUtilities.makeCompactGrid(parametersPanel, parametersPanel.getComponentCount() / 2, 2, 12, 12, 5, 5);
+
+        JPanel indicatorsPanel = new JPanel(new SpringLayout());
+        tabbedPane1.addTab("Indicators", indicatorsPanel);
+        for (Indicator indicator : strategy.getIndicatorManager().getIndicators()) {
+            add(indicatorsPanel, indicator.getName(), indicator.getValue());
+        }
+        makeCompactGrid(indicatorsPanel);
+
         getContentPane().setPreferredSize(new Dimension(450, 400));
     }
+
+
 }
