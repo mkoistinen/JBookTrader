@@ -30,13 +30,13 @@ public class BalanceVelocity extends Indicator {
         double depthBalanceValue = depthBalance.getValue();
         fast += (depthBalanceValue - fast) * fastMultiplier;
         slow += (depthBalanceValue - slow) * slowMultiplier;
+
         value = fast - slow;
     }
 
     @Override
     public void reset() {
-        depthBalance.calculate();
-        fast = slow = depthBalance.getValue();
+        fast = slow = 0;
         value = 0;
     }
 }

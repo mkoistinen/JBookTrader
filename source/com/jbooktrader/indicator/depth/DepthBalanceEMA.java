@@ -20,7 +20,7 @@ public class DepthBalanceEMA extends Indicator {
 
     @Override
     public void reset() {
-        value = marketBook.getSnapshot().getBalance();
+        value = 0;
     }
 
 }
