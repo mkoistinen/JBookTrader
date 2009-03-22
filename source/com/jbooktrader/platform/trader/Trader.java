@@ -16,9 +16,11 @@ import java.util.*;
 public class Trader extends EWrapperAdapter {
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
+    private final String previousErrorMessage;
 
     public Trader() {
         traderAssistant = new TraderAssistant(this);
+        previousErrorMessage = "";
         eventReport = Dispatcher.getReporter();
     }
 
@@ -82,14 +84,22 @@ public class Trader extends EWrapperAdapter {
     public void error(int id, int errorCode, String errorMsg) {
         try {
             String msg = errorCode + ": " + errorMsg;
+            if (msg.equals(previousErrorMessage)) {
+                // ignore duplicate error messages
+                return;
+            }
+
             eventReport.report(msg);
 
             if (errorCode == 1100) {// Connectivity between IB and TWS has been lost.
                 traderAssistant.setIsConnected(false);
             }
 
-            // handle errors 1101 and 1102
-            boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102);
+            // Errors 1101 and 1102 are sent when connectivity is restored. However, sometimes TWS fails
+            // to send them, and in those situations we would be waiting forever. To avoid this, we also
+            // listen for error code 2104 which indicates that market data is restored, which we can
+            // interpret as restored connection.
+            boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102 || errorCode == 2104);
             if (isConnectivityRestored) {
                 eventReport.report("Checking for executions while TWS was disconnected from the IB server.");
                 traderAssistant.requestExecutions();
@@ -112,6 +122,7 @@ public class Trader extends EWrapperAdapter {
             if (requiresNotification) {
                 SecureMailSender.getInstance().send(msg);
             }
+
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
