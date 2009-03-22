@@ -34,8 +34,10 @@ public class ClassFinder {
                 if (packageDir.exists()) {
                     for (File f : packageDir.listFiles()) {
                         String className = f.getName();
-                        className = className.substring(0, className.lastIndexOf(".class"));
-                        classNames.add(className);
+                        if (className.endsWith(".class")) {
+                            className = className.substring(0, className.lastIndexOf(".class"));
+                            classNames.add(className);
+                        }
                     }
                 }
             }
