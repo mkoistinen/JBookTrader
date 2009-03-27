@@ -44,6 +44,9 @@ public class EWrapperAdapter implements EWrapper {
     public void openOrder(int orderId, Contract contract, Order order, OrderState orderState) {
     }
 
+    public void openOrderEnd() {
+    }
+
     public void updateAccountValue(String key, String value, String currency, String accountName) {
     }
 
@@ -53,16 +56,28 @@ public class EWrapperAdapter implements EWrapper {
     public void updateAccountTime(String timeStamp) {
     }
 
+    public void accountDownloadEnd(String accountName) {
+    }
+
     public void nextValidId(int orderId) {
     }
 
-    public void contractDetails(ContractDetails contractDetails) {
+    public void contractDetails(int reqId, ContractDetails contractDetails) {
+    }
+
+    public void contractDetailsEnd(int reqId) {
+    }
+
+    public void bondContractDetails(int reqId, ContractDetails contractDetails) {
     }
 
     public void bondContractDetails(ContractDetails contractDetails) {
     }
 
-    public void execDetails(int orderId, Contract contract, Execution execution) {
+    public void execDetails(int reqId, Contract contract, Execution execution) {
+    }
+
+    public void execDetailsEnd(int reqId) {
     }
 
     public void updateMktDepth(int tickerId, int position, int operation, int side, double price, int size) {
@@ -97,5 +112,12 @@ public class EWrapperAdapter implements EWrapper {
 
     public void currentTime(long time) {
     }
+
+    public void fundamentalData(int reqId, String data) {
+    }
+
+    public void deltaNeutralValidation(int reqId, UnderComp underComp) {
+    }
+
 
 }
