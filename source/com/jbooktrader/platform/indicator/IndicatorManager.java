@@ -42,7 +42,9 @@ public class IndicatorManager {
         long lastSnapshotTime = marketBook.getSnapshot().getTime();
 
         if (lastSnapshotTime - previousSnapshotTime > GAP_SIZE) {
-            resetIndicators();
+            for (Indicator indicator : indicators) {
+                indicator.reset();
+            }
         }
         previousSnapshotTime = lastSnapshotTime;
 
@@ -56,13 +58,6 @@ public class IndicatorManager {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }
-    }
-
-
-    private void resetIndicators() {
-        for (Indicator indicator : indicators) {
-            indicator.reset();
         }
     }
 }
