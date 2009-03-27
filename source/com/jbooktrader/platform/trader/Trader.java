@@ -73,21 +73,25 @@ public class Trader extends EWrapperAdapter {
 
     @Override
     public void execDetailsEnd(int reqId) {
-        Map<Integer, OpenOrder> openOrders = traderAssistant.getOpenOrders();
+        try {
+            Map<Integer, OpenOrder> openOrders = traderAssistant.getOpenOrders();
 
-        for (OpenOrder openOrder : openOrders.values()) {
-            String msg = "Execution for order " + openOrder.getId() + " was not found.";
-            msg += " In all likelihood, this is because the order was placed while TWS was disconnected from the server.";
-            msg += " This order will be removed and another one will be submitted. The strategy will continue to run normally.";
-            eventReport.report(msg);
-            Strategy strategy = openOrder.getStrategy();
-            PositionManager positionManager = strategy.getPositionManager();
-            positionManager.resetOrderExecutionPending();
+            for (OpenOrder openOrder : openOrders.values()) {
+                String msg = "Execution for order " + openOrder.getId() + " was not found.";
+                msg += " In all likelihood, this is because the order was placed while TWS was disconnected from the server.";
+                msg += " This order will be removed and another one will be submitted. The strategy will continue to run normally.";
+                eventReport.report(msg);
+                Strategy strategy = openOrder.getStrategy();
+                PositionManager positionManager = strategy.getPositionManager();
+                positionManager.resetOrderExecutionPending();
+            }
+
+            openOrders.clear();
+        } catch (Throwable t) {
+            // Do not allow exceptions come back to the socket -- it will cause disconnects
+            eventReport.report(t);
         }
-
-        openOrders.clear();
     }
-
 
     @Override
     public void error(Exception e) {
