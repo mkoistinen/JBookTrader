@@ -113,8 +113,12 @@ public class PositionManager {
         }
     }
 
+    public void resetOrderExecutionPending() {
+        orderExecutionPending = false;
+    }
+
     public void trade() {
-        if (traderAssistant.isConnected() && !orderExecutionPending) {
+        if (!orderExecutionPending) {
             int newPosition = strategy.getPosition();
             int quantity = newPosition - position;
             if (quantity != 0) {

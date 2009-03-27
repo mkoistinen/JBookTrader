@@ -124,11 +124,11 @@ public class TraderAssistant {
      */
     public void requestExecutions() {
         try {
-            eventReport.report("Requested executions.");
             for (OpenOrder openOrder : openOrders.values()) {
                 openOrder.reset();
+                eventReport.report("Requesting executions for open order " + openOrder.getId());
+                socket.reqExecutions(openOrder.getId(), new ExecutionFilter());
             }
-            socket.reqExecutions(new ExecutionFilter());
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
@@ -179,7 +179,7 @@ public class TraderAssistant {
         Integer ticker = tickers.get(instrument);
         if (!subscribedTickers.contains(ticker)) {
             subscribedTickers.add(ticker);
-            socket.reqMktDepth(ticker, contract, 5);
+            socket.reqMktDepth(ticker, contract, 10);
             socket.reqMktData(ticker, contract, "", false);
             String msg = "Requested market depth and market data for instrument " + instrument;
             eventReport.report(msg);
@@ -237,7 +237,8 @@ public class TraderAssistant {
                 execution.m_shares = order.m_totalQuantity;
                 double price = strategy.getMarketBook().getSnapshot().getPrice();
                 execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? (price + bidAskSpread / 2) : (price - bidAskSpread / 2);
-                trader.execDetails(orderID, contract, execution);
+                execution.m_orderId = orderID;
+                trader.execDetails(0, contract, execution);
             }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects

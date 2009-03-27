@@ -16,7 +16,7 @@ import java.util.*;
 public class Trader extends EWrapperAdapter {
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
-    private final String previousErrorMessage;
+    private String previousErrorMessage;
 
     public Trader() {
         traderAssistant = new TraderAssistant(this);
@@ -51,8 +51,9 @@ public class Trader extends EWrapperAdapter {
 
 
     @Override
-    public void execDetails(int orderId, Contract contract, Execution execution) {
+    public void execDetails(int reqId, Contract contract, Execution execution) {
         try {
+            int orderId = execution.m_orderId;
             Map<Integer, OpenOrder> openOrders = traderAssistant.getOpenOrders();
             OpenOrder openOrder = openOrders.get(orderId);
             if (openOrder != null) {
@@ -69,6 +70,24 @@ public class Trader extends EWrapperAdapter {
             eventReport.report(t);
         }
     }
+
+    @Override
+    public void execDetailsEnd(int reqId) {
+        Map<Integer, OpenOrder> openOrders = traderAssistant.getOpenOrders();
+
+        for (OpenOrder openOrder : openOrders.values()) {
+            String msg = "Execution for order " + openOrder.getId() + " was not found.";
+            msg += " In all likelihood, this is because the order was placed while TWS was disconnected from the server.";
+            msg += " This order will be removed and another one will be submitted. The strategy will continue to run normally.";
+            eventReport.report(msg);
+            Strategy strategy = openOrder.getStrategy();
+            PositionManager positionManager = strategy.getPositionManager();
+            positionManager.resetOrderExecutionPending();
+        }
+
+        openOrders.clear();
+    }
+
 
     @Override
     public void error(Exception e) {
@@ -89,6 +108,7 @@ public class Trader extends EWrapperAdapter {
                 return;
             }
 
+            previousErrorMessage = msg;
             eventReport.report(msg);
 
             if (errorCode == 1100) {// Connectivity between IB and TWS has been lost.
@@ -101,8 +121,10 @@ public class Trader extends EWrapperAdapter {
             // interpret as restored connection.
             boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102 || errorCode == 2104);
             if (isConnectivityRestored) {
-                eventReport.report("Checking for executions while TWS was disconnected from the IB server.");
-                traderAssistant.requestExecutions();
+                if (!traderAssistant.getOpenOrders().isEmpty()) {
+                    eventReport.report("Checking for executions while TWS was disconnected from the IB server.");
+                    traderAssistant.requestExecutions();
+                }
                 traderAssistant.setIsConnected(true);
             }
 
