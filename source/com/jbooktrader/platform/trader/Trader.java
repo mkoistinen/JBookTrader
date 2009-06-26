@@ -133,7 +133,7 @@ public class Trader extends EWrapperAdapter {
             }
 
             if (errorCode == 317) {// Market depth data has been reset
-                traderAssistant.getStrategy(id).getMarketBook().getMarketDepth().reset();
+                traderAssistant.getMarketBook(id).getMarketDepth().reset();
                 eventReport.report("Market depth data has been reset.");
             }
 
