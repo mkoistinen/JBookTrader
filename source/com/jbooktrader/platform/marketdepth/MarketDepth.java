@@ -12,6 +12,7 @@ public class MarketDepth {
     private boolean isResetting;
     private double lowBalance, highBalance, lastBalance;
     private double midPointPrice;
+    private int cumulativeBid,  cumulativeAsk;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
@@ -28,28 +29,23 @@ public class MarketDepth {
     public boolean isValid() {
         int bidLevels = bids.size();
         int askLevels = asks.size();
-        if (bidLevels != askLevels) {
-            // This may happen when the "delete" operation was performed,
-            // but the "insert" operation was not yet completed, or vice versa.
-            return false;
-        }
 
-        // The bid price of level N must be smaller than the bid price of level N-1
+        // The bid price of level N must be smaller or equal to the bid price of level N-1
         double previousLevelBidPrice = bids.getFirst().getPrice();
         for (int itemIndex = 1; itemIndex < bidLevels; itemIndex++) {
             double price = bids.get(itemIndex).getPrice();
-            if (price >= previousLevelBidPrice) {
+            if (price > previousLevelBidPrice) {
                 return false;
             } else {
                 previousLevelBidPrice = price;
             }
         }
 
-        // The ask price of level N must be greater than the ask price of level N-1
+        // The ask price of level N must be greater or equal to the ask price of level N-1
         double previousLevelAskPrice = asks.getFirst().getPrice();
         for (int itemIndex = 1; itemIndex < askLevels; itemIndex++) {
             double price = asks.get(itemIndex).getPrice();
-            if (price <= previousLevelAskPrice) {
+            if (price < previousLevelAskPrice) {
                 return false;
             } else {
                 previousLevelAskPrice = price;
@@ -69,32 +65,41 @@ public class MarketDepth {
         return cumulativeSize;
     }
 
+    public int getCumulativeBid() {
+        return cumulativeBid;
+    }
+
+    public int getCumulativeAsk() {
+        return cumulativeAsk;
+    }
 
     public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
         List<MarketDepthItem> items = (side == MarketDepthSide.Bid) ? bids : asks;
+        int levels = items.size();
+
         switch (operation) {
             case Insert:
-                if (position <= items.size()) {
+                if (position <= levels) {
                     items.add(position, new MarketDepthItem(size, price));
                 }
                 break;
             case Update:
-                if (position < items.size()) {
+                if (position < levels) {
                     MarketDepthItem item = items.get(position);
                     item.setSize(size);
                     item.setPrice(price);
                 }
                 break;
             case Delete:
-                if (position < items.size()) {
+                if (position < levels) {
                     items.remove(position);
                 }
                 break;
         }
 
         if (operation == MarketDepthOperation.Update && isValid()) {
-            int cumulativeBid = getCumulativeSize(bids);
-            int cumulativeAsk = getCumulativeSize(asks);
+            cumulativeBid = getCumulativeSize(bids);
+            cumulativeAsk = getCumulativeSize(asks);
             double totalDepth = cumulativeBid + cumulativeAsk;
 
             lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
@@ -111,7 +116,7 @@ public class MarketDepth {
             return null;
         }
 
-        int balance = (int) Math.round((lowBalance + highBalance) / 2);
+        int balance = (int) Math.round((lowBalance + highBalance) / 2d);
         MarketSnapshot marketSnapshot = new MarketSnapshot(time, balance, midPointPrice);
         // reset values for the next market snapshot
         highBalance = lowBalance = lastBalance;
