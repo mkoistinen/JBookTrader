@@ -8,28 +8,26 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Equalizer2 extends StrategyES {
+public class Hybrid extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, priceVelocityInd;
+    private final Indicator priceVelocityInd, depthBalanceInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "FastPeriod";
     private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-
-    // Strategy parameters values
     private final int entry;
 
 
-    public Equalizer2(StrategyParams optimizationParams) throws JBookTraderException {
+    public Hybrid(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         priceVelocityInd = new PriceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(balanceVelocityInd);
+        depthBalanceInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(priceVelocityInd);
+        addIndicator(depthBalanceInd);
     }
 
     /**
@@ -40,9 +38,9 @@ public class Equalizer2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 30, 80, 50, 55);
-        addParam(SLOW_PERIOD, 10000, 14000, 100, 11694);
-        addParam(ENTRY, 28, 36, 1, 32);
+        addParam(FAST_PERIOD, 1, 1000, 1, 843);
+        addParam(SLOW_PERIOD, 500, 8000, 5, 1666);
+        addParam(ENTRY, 1, 20, 1, 1);
     }
 
     /**
@@ -51,10 +49,11 @@ public class Equalizer2 extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue() + priceVelocityInd.getValue();
-        if (balanceVelocity >= entry) {
+        double velocity = depthBalanceInd.getValue();
+        double pv = priceVelocityInd.getValue();
+        if (velocity >= entry && pv > 0) {
             setPosition(1);
-        } else if (balanceVelocity <= -entry) {
+        } else if (velocity <= -entry && pv < 0) {
             setPosition(-1);
         }
     }

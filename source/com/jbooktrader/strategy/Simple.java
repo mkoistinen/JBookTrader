@@ -1,6 +1,6 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.velocity.*;
+import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -8,28 +8,23 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Equalizer3 extends StrategyES {
+public class Simple extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, priceVelocityInd;
+    private final Indicator depthBalanceEMAInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
+    private static final String PERIOD = "Period";
     private static final String ENTRY = "Entry";
-
-    // Strategy parameters values
     private final int entry;
 
 
-    public Equalizer3(StrategyParams optimizationParams) throws JBookTraderException {
+    public Simple(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        priceVelocityInd = new PriceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(balanceVelocityInd);
-        addIndicator(priceVelocityInd);
+        depthBalanceEMAInd = new DepthBalanceEMA(getParam(PERIOD));
+        addIndicator(depthBalanceEMAInd);
     }
 
     /**
@@ -40,9 +35,8 @@ public class Equalizer3 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 30, 80, 50, 55);
-        addParam(SLOW_PERIOD, 7000, 14000, 100, 9000);
-        addParam(ENTRY, 20, 40, 1, 26);
+        addParam(PERIOD, 100, 2000, 1, 992);
+        addParam(ENTRY, 5, 20, 1, 11);
     }
 
     /**
@@ -51,10 +45,10 @@ public class Equalizer3 extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue() + priceVelocityInd.getValue();
-        if (balanceVelocity >= entry) {
+        double depthBalanceEMA = depthBalanceEMAInd.getValue();
+        if (depthBalanceEMA >= entry) {
             setPosition(1);
-        } else if (balanceVelocity <= -entry) {
+        } else if (depthBalanceEMA <= -entry) {
             setPosition(-1);
         }
     }
