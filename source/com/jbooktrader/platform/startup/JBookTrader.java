@@ -15,8 +15,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "6.09";
-    public static final String RELEASE_DATE = "June 26, 2009";
+    public static final String VERSION = "6.10";
+    public static final String RELEASE_DATE = "July 3, 2009";
     private static String appPath;
 
     /**
@@ -37,7 +37,7 @@ public class JBookTrader {
         UIManager.put("Label.foreground", color);
         UIManager.put("TitledBorder.titleColor", color);
 
-        Dispatcher.setReporter("EventReport");
+        Dispatcher.setReporter();
 
         new MainFrameController();
     }
