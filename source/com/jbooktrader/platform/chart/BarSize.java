@@ -30,9 +30,9 @@ public enum BarSize {
     }
 
 
-    static public BarSize getBarSize(String name) {
+    public static BarSize getBarSize(String name) {
         for (BarSize barSize : values()) {
-            if (barSize.getName().equals(name)) {
+            if (barSize.name.equals(name)) {
                 return barSize;
             }
         }

@@ -18,7 +18,7 @@ public class ClassFinder {
      * JBookTrader will know how to run a trading strategy as long as that
      * strategy is implemented in a class that extends the base Strategy class.
      */
-    private static List<String> getClasses(String packageName) {
+    private static List<String> getClasses() {
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
         List<String> classNames = new ArrayList<String>();
 
@@ -30,7 +30,7 @@ public class ClassFinder {
                 throw new RuntimeException(url + " is not a valid URI");
             }
             if (file.isDirectory()) {
-                File packageDir = new File(file.getPath() + '/' + packageName);
+                File packageDir = new File(file.getPath() + "/com/jbooktrader/strategy/");
                 if (packageDir.exists()) {
                     for (File f : packageDir.listFiles()) {
                         String className = f.getName();
@@ -69,7 +69,7 @@ public class ClassFinder {
 
     public static List<Strategy> getStrategies() {
         List<Strategy> strategies = new ArrayList<Strategy>();
-        List<String> strategyNames = getClasses("com/jbooktrader/strategy/");
+        List<String> strategyNames = getClasses();
 
         for (String strategyName : strategyNames) {
             try {

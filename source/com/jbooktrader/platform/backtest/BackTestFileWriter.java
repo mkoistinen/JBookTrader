@@ -3,10 +3,8 @@ package com.jbooktrader.platform.backtest;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
-import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
-import javax.swing.*;
 import java.io.*;
 import java.text.*;
 import java.util.*;
@@ -22,24 +20,6 @@ public class BackTestFileWriter {
     private final DecimalFormat decimalFormat;
     private SimpleDateFormat dateFormat;
     private PrintWriter writer;
-
-    public BackTestFileWriter(Strategy strategy) throws JBookTraderException {
-        decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
-        JFileChooser fileChooser = new JFileChooser(MARKET_DATA_DIR);
-        fileChooser.setDialogTitle("Save historical market depth " + strategy.getName());
-
-        if (fileChooser.showDialog(null, "Save") == JFileChooser.APPROVE_OPTION) {
-            dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
-            dateFormat.setTimeZone(strategy.getTradingSchedule().getTimeZone());
-            File file = fileChooser.getSelectedFile();
-            String fileName = file.getAbsolutePath();
-            try {
-                writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, false)));
-            } catch (IOException ioe) {
-                throw new JBookTraderException("Could not write to file " + fileName);
-            }
-        }
-    }
 
     public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws JBookTraderException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);

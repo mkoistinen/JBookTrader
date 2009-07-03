@@ -21,8 +21,8 @@ public class Dispatcher {
     private static Mode mode;
     private static int activeStrategies;
 
-    public static void setReporter(String eventReportFileName) throws JBookTraderException {
-        eventReport = new Report(eventReportFileName);
+    public static void setReporter() throws JBookTraderException {
+        eventReport = new Report("EventReport");
     }
 
     public static void addListener(ModelListener listener) {
