@@ -74,6 +74,8 @@ public class StrategyTableModel extends TableDataModel {
         if (!marketBook.isEmpty()) {
             MarketSnapshot lastMarketSnapshot = marketBook.getSnapshot();
             setValueAtFast(lastMarketSnapshot.getPrice(), row, Price.ordinal());
+            setValueAtFast(marketBook.getMarketDepth().getCumulativeBid(), row, CumulativeBid.ordinal());
+            setValueAtFast(marketBook.getMarketDepth().getCumulativeAsk(), row, CumulativeAsk.ordinal());
         }
 
         PositionManager positionManager = strategy.getPositionManager();
