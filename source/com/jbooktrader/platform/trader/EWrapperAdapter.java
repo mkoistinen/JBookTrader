@@ -119,5 +119,8 @@ public class EWrapperAdapter implements EWrapper {
     public void deltaNeutralValidation(int reqId, UnderComp underComp) {
     }
 
+    public void tickSnapshotEnd(int reqId) {
+    }
+
 
 }
