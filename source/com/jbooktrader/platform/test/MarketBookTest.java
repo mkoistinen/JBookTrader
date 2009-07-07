@@ -83,37 +83,29 @@ public class MarketBookTest {
      * balanced.
      */
     @Test
-    public void testValidOnlyWhenBalanced() {
+    public void testValidOnlyWhenNotEmpty() {
         double[] bids = {5.0, 4.0, 3.0, 2.0, 1.0};
         double[] asks = {6.0, 7.0, 8.0, 9.0, 10.0, 11.0};
         MarketBook marketBook = new MarketBook();
         MarketDepth marketDepth = marketBook.getMarketDepth();
 
-        // Add each bid, ensuring it is invalid (because there are no ask prices)
-        // at each step.
+        // Add bids
         for (int i = 0; i < 5; i++) {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Bid, bids[i], 50);
             Assert.assertFalse(marketDepth.isValid());
         }
 
-        // Add the first four ask prices, ensuring it is invalid (because it is
-        // not balanced) at each step.
-        for (int i = 0; i < 4; i++) {
+        // Add asks
+        for (int i = 0; i < 5; i++) {
             marketDepth.update(i, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[i], 50);
-            Assert.assertFalse(marketDepth.isValid());
+            Assert.assertTrue(marketDepth.isValid());
         }
 
-        // Add the fifth ask, balancing the book
-        marketDepth.update(4, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[4], 50);
-        Assert.assertTrue(marketDepth.isValid());
-
-        // Add the sixth ask, unbalancing the book
-        marketDepth.update(5, MarketDepthOperation.Insert, MarketDepthSide.Ask, asks[5], 50);
+        // Delete bids
+        for (int i = 0; i < 5; i++) {
+            marketDepth.update(0, MarketDepthOperation.Delete, MarketDepthSide.Bid, bids[i], 50);
+        }
         Assert.assertFalse(marketDepth.isValid());
-
-        // Remove the sixth ask, re-balancing the book
-        marketDepth.update(5, MarketDepthOperation.Delete, MarketDepthSide.Ask, asks[5], 50);
-        Assert.assertTrue(marketDepth.isValid());
     }
 
 }

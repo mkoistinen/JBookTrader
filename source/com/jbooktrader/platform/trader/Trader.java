@@ -93,6 +93,17 @@ public class Trader extends EWrapperAdapter {
         }
     }
 
+    public void contractDetails(int id, ContractDetails contractDetails) {
+        String lineSep = "<br>";
+        StringBuilder details = new StringBuilder("Contract details:").append(lineSep);
+        details.append("Trading class: ").append(contractDetails.m_tradingClass).append(lineSep);
+        details.append("Valid exchanges: ").append(contractDetails.m_validExchanges).append(lineSep);
+        details.append("Long name: ").append(contractDetails.m_longName).append(lineSep);
+        details.append("Market name: ").append(contractDetails.m_marketName).append(lineSep);
+        details.append("Min tick: ").append(contractDetails.m_minTick).append(lineSep);
+        eventReport.report(details.toString());
+    }
+
     @Override
     public void error(Exception e) {
         eventReport.report(e.toString());
@@ -144,10 +155,6 @@ public class Trader extends EWrapperAdapter {
                 Dispatcher.fireModelChanged(ModelListener.Event.Error, "IB reported: " + errorMsg);
             }
 
-            boolean requiresNotification = (errorCode != 2104 && errorCode != 2106 && errorCode != 2107 && errorCode != 317);
-            if (requiresNotification) {
-                SecureMailSender.getInstance().send(msg);
-            }
 
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
