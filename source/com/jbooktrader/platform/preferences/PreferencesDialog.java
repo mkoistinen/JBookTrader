@@ -13,10 +13,10 @@ import java.awt.event.*;
 public class PreferencesDialog extends JDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, fromText, toText, emailSubjectText, webAccessUser;
-    private JSpinner clientIDSpin, heartBeatIntervalSpin, webAccessPortSpin;
-    private JPasswordField emailPasswordField, webAccessPasswordField, c2PasswordField;
-    private JComboBox emailMonitoringCombo, webAccessCombo;
+    private JTextField hostText, portText, webAccessUser;
+    private JSpinner clientIDSpin, webAccessPortSpin;
+    private JPasswordField webAccessPasswordField, c2PasswordField;
+    private JComboBox webAccessCombo;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -82,23 +82,6 @@ public class PreferencesDialog extends JDialog {
         SpringUtilities.makeCompactGrid(connectionTab, 3, 2, 12, 12, 8, 5);
         setWidth(connectionTab, clientIDSpin, 45);
 
-        JPanel remoteMonitoringTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Remote monitoring", remoteMonitoringTab);
-        emailMonitoringCombo = new JComboBox(new String[] {"disabled", "enabled"});
-        emailPasswordField = new JPasswordField();
-        fromText = new JTextField();
-        toText = new JTextField();
-        emailSubjectText = new JTextField();
-        heartBeatIntervalSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
-        add(remoteMonitoringTab, EmailMonitoring, emailMonitoringCombo);
-        add(remoteMonitoringTab, EmailPassword, emailPasswordField);
-        add(remoteMonitoringTab, From, fromText);
-        add(remoteMonitoringTab, To, toText);
-        add(remoteMonitoringTab, EmailSubject, emailSubjectText);
-        add(remoteMonitoringTab, HeartBeatInterval, heartBeatIntervalSpin);
-        SpringUtilities.makeCompactGrid(remoteMonitoringTab, 6, 2, 12, 12, 8, 5);
-        setWidth(remoteMonitoringTab, heartBeatIntervalSpin, 65);
-
         JPanel webAcessTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Web Access", webAcessTab);
         webAccessCombo = new JComboBox(new String[] {"disabled", "enabled"});
@@ -130,13 +113,6 @@ public class PreferencesDialog extends JDialog {
                     prefs.set(Host, hostText.getText());
                     prefs.set(Port, portText.getText());
                     prefs.set(ClientID, clientIDSpin.getValue().toString());
-
-                    prefs.set(EmailMonitoring, (String) emailMonitoringCombo.getSelectedItem());
-                    prefs.set(EmailPassword, new String(emailPasswordField.getPassword()));
-                    prefs.set(From, fromText.getText());
-                    prefs.set(To, toText.getText());
-                    prefs.set(EmailSubject, emailSubjectText.getText());
-                    prefs.set(HeartBeatInterval, heartBeatIntervalSpin.getValue().toString());
 
                     prefs.set(WebAccess, (String) webAccessCombo.getSelectedItem());
                     prefs.set(WebAccessPort, webAccessPortSpin.getValue().toString());

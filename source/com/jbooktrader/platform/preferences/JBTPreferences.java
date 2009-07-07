@@ -6,14 +6,6 @@ public enum JBTPreferences {
     Port("Port", "7496"),
     ClientID("Client ID", "0"),
 
-    // Remote monitoring
-    EmailMonitoring("Monitoring", "disabled"),
-    HeartBeatInterval("Heartbeat Interval", "60"),
-    From("From", "me@gmail.com"),
-    EmailPassword("Email Password", ""),
-    To("To", "me@anyprovider.com"),
-    EmailSubject("Email Subject", "[JBT Remote Notification]"),
-
     // Web Access
     WebAccess("Web Access", "disabled"),
     WebAccessPort("Web Access Port", "1234"),

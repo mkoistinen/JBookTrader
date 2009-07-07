@@ -96,20 +96,6 @@ public class PositionManager {
             msg.append("Avg Fill Price: ").append(avgFillPrice).append(". ");
             msg.append("Position: ").append(getPosition());
             eventReport.report(msg.toString());
-
-            // remote email notification, if enabled
-            boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
-            String notification = "Event type: Trade" + LINE_SEP;
-            notification += "Time sent: " + simpleDateFormat.format(System.currentTimeMillis()) + LINE_SEP;
-            notification += "Strategy: " + strategy.getName() + LINE_SEP;
-            notification += "Position: " + position + LINE_SEP;
-            notification += "Price: " + avgFillPrice + LINE_SEP;
-            notification += "Trades: " + nf2.format(performanceManager.getTrades()) + LINE_SEP;
-            String tradeNetProfit = isCompletedTrade ? nf2.format(performanceManager.getTradeProfit()) : "--";
-            notification += "Trade net profit: " + tradeNetProfit + LINE_SEP;
-            notification += "Total net profit: " + nf2.format(performanceManager.getNetProfit()) + LINE_SEP;
-
-            SecureMailSender.getInstance().send(notification);
         }
     }
 
