@@ -22,8 +22,7 @@ public class PerformanceChartData {
 
     public PerformanceChartData(BarSize barSize) {
         this.barSize = barSize;
-        netProfit = new TimeSeries("Net Profit", Second.class);
-        netProfit.setRangeDescription("Net Profit");
+        netProfit = new TimeSeries("Net Profit");
         prices = new ArrayList<OHLCDataItem>();
         indicatorBars = new HashMap<String, Bar>();
         indicators = new HashMap<String, List<OHLCDataItem>>();
