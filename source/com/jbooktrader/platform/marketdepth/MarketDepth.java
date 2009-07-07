@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.*;
 
 import java.util.*;
 
@@ -12,7 +13,6 @@ public class MarketDepth {
     private boolean isResetting;
     private double lowBalance, highBalance, lastBalance;
     private double midPointPrice;
-    private int cumulativeBid,  cumulativeAsk;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
@@ -29,6 +29,10 @@ public class MarketDepth {
     public boolean isValid() {
         int bidLevels = bids.size();
         int askLevels = asks.size();
+
+        if (bidLevels == 0 || askLevels == 0) {
+            return false;
+        }
 
         // The bid price of level N must be smaller or equal to the bid price of level N-1
         double previousLevelBidPrice = bids.getFirst().getPrice();
@@ -65,12 +69,8 @@ public class MarketDepth {
         return cumulativeSize;
     }
 
-    public int getCumulativeBid() {
-        return cumulativeBid;
-    }
-
-    public int getCumulativeAsk() {
-        return cumulativeAsk;
+    public String getMarketDepthAsString() {
+        return getCumulativeSize(bids) + "-" + getCumulativeSize(asks);
     }
 
     public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
@@ -97,9 +97,10 @@ public class MarketDepth {
                 break;
         }
 
+
         if (operation == MarketDepthOperation.Update && isValid()) {
-            cumulativeBid = getCumulativeSize(bids);
-            cumulativeAsk = getCumulativeSize(asks);
+            int cumulativeBid = getCumulativeSize(bids);
+            int cumulativeAsk = getCumulativeSize(asks);
             double totalDepth = cumulativeBid + cumulativeAsk;
 
             lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
@@ -107,6 +108,7 @@ public class MarketDepth {
             highBalance = Math.max(lastBalance, highBalance);
             midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
             isResetting = false;
+            
         }
     }
 

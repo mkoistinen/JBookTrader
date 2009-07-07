@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.dialog;
 
 
+import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
@@ -241,6 +242,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         columnModel.getColumn(Price.ordinal()).setCellRenderer(nr5);
         DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
         tableCellRenderer.setHorizontalAlignment(JLabel.RIGHT);
+        columnModel.getColumn(MarketDepth.ordinal()).setCellRenderer(tableCellRenderer);
         columnModel.getColumn(Indicators.ordinal()).setCellRenderer(tableCellRenderer);
 
         // Make some columns wider than the rest, so that the info fits in.

@@ -8,6 +8,7 @@ import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.marketdepth.*;
 
 import javax.swing.*;
 import java.util.*;
@@ -74,17 +75,18 @@ public class StrategyTableModel extends TableDataModel {
         if (!marketBook.isEmpty()) {
             MarketSnapshot lastMarketSnapshot = marketBook.getSnapshot();
             setValueAtFast(lastMarketSnapshot.getPrice(), row, Price.ordinal());
-            setValueAtFast(marketBook.getMarketDepth().getCumulativeBid(), row, CumulativeBid.ordinal());
-            setValueAtFast(marketBook.getMarketDepth().getCumulativeAsk(), row, CumulativeAsk.ordinal());
+            setValueAtFast(marketBook.getMarketDepth().getMarketDepthAsString(), row, MarketDepth.ordinal());
         }
 
-        PositionManager positionManager = strategy.getPositionManager();
-        PerformanceManager performanceManager = strategy.getPerformanceManager();
         setValueAtFast(strategy.indicatorsState(), row, Indicators.ordinal());
-        setValueAtFast(positionManager.getPosition(), row, Position.ordinal());
+        setValueAtFast(strategy.getPositionManager().getPosition(), row, Position.ordinal());
+
+        PerformanceManager performanceManager = strategy.getPerformanceManager();
         setValueAtFast(performanceManager.getTrades(), row, Trades.ordinal());
         setValueAtFast(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
         setValueAtFast(performanceManager.getNetProfit(), row, NetProfit.ordinal());
+        setValueAtFast(performanceManager.getProfitFactor(), row, ProfitFactor.ordinal());
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 fireTableRowsUpdated(row, row);

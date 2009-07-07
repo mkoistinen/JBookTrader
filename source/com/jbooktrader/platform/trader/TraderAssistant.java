@@ -83,7 +83,6 @@ public class TraderAssistant {
         return strategy;
     }
 
-
     public void connect() throws JBookTraderException {
         if (socket == null || !socket.isConnected()) {
             eventReport.report("Connecting to TWS");
@@ -160,7 +159,6 @@ public class TraderAssistant {
         Integer ticker = tickers.get(instrument);
         MarketBook marketBook;
         if (ticker == null) {
-
             marketBook = new MarketBook(instrument, strategy.getTradingSchedule().getTimeZone());
             tickerId++;
             tickers.put(instrument, tickerId);
@@ -172,16 +170,17 @@ public class TraderAssistant {
         return marketBook;
     }
 
-
     private synchronized void requestMarketData(Strategy strategy) {
         Contract contract = strategy.getContract();
         String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
         if (!subscribedTickers.contains(ticker)) {
             subscribedTickers.add(ticker);
+            socket.reqContractDetails(strategy.getContract().m_conId, strategy.getContract());
+            String msg = "Requested contract details for instrument " + instrument;
+            eventReport.report(msg);
             socket.reqMktDepth(ticker, contract, 10);
-            socket.reqMktData(ticker, contract, "", false);
-            String msg = "Requested market depth and market data for instrument " + instrument;
+            msg = "Requested market depth for instrument " + instrument;
             eventReport.report(msg);
         }
     }
@@ -192,7 +191,6 @@ public class TraderAssistant {
         strategies.put(nextStrategyID, strategy);
         Dispatcher.Mode mode = Dispatcher.getMode();
         if (mode == ForwardTest || mode == Trade) {
-            HeartBeatSender.getInstance().addStrategy(strategy);
             String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
             eventReport.report(msg);
             strategy.setCollective2();
@@ -248,6 +246,7 @@ public class TraderAssistant {
 
     public void placeMarketOrder(Contract contract, int quantity, String action, Strategy strategy) {
         Order order = new Order();
+        order.m_overridePercentageConstraints = true;
         order.m_action = action;
         order.m_totalQuantity = quantity;
         order.m_orderType = "MKT";
