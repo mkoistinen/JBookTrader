@@ -15,10 +15,10 @@ public enum JBTPreferences {
     EmailSubject("Email Subject", "[JBT Remote Notification]"),
 
     // Web Access
-    WebAccess("Web access", "disabled"),
-    WebAccessPort("Web access port", "1234"),
-    WebAccessUser("Web access user", "admin"),
-    WebAccessPassword("Web access password", "admin"),
+    WebAccess("Web Access", "disabled"),
+    WebAccessPort("Web Access Port", "1234"),
+    WebAccessUser("Web Access User", "admin"),
+    WebAccessPassword("Web Access Password", "admin"),
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
@@ -48,8 +48,8 @@ public enum JBTPreferences {
     OptimizationMapY("optimization.map.y", "-1"),
 
     // Collective2
-    Collective2Password("C2Password", ""),
-    Collective2Strategies("C2Strategies", "");
+    Collective2Password("C2 Password", ""),
+    Collective2Strategies("C2 Strategies", "");
 
 
     private final String name, defaultValue;
