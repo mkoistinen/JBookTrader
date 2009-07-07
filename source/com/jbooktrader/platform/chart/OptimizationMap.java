@@ -87,7 +87,7 @@ public class OptimizationMap {
 
 
         JLabel colorMapLabel = new JLabel("Color map:", JLabel.TRAILING);
-        colorMapCombo = new JComboBox(new String[] {"Heat", "Grey"});
+        colorMapCombo = new JComboBox(new String[] {"Heat", "Gray"});
         colorMapLabel.setLabelFor(colorMapCombo);
 
         chartOptionsPanel.add(horizontalLabel);
@@ -261,7 +261,7 @@ public class OptimizationMap {
         }
     }
 
-    public class GreyPaintScale implements PaintScale {
+    public class GrayPaintScale implements PaintScale {
         public Paint getPaint(double z) {
             double normalizedZ = z - min;
             double clrs = 255.0 / (max - min);
@@ -299,7 +299,7 @@ public class OptimizationMap {
                 paintScale = new HeatPaintScale();
                 break;
             case 1:
-                paintScale = new GreyPaintScale();
+                paintScale = new GrayPaintScale();
                 break;
 
         }
