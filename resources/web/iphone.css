@@ -1,0 +1,48 @@
+body { 
+	background: white url(pinstripes.png) repeat; 
+	margin: 0; 
+	font-family: Helvetica; color: black; 
+	overflow: hidden; -webkit-text-size-adjust: none;
+}    		 
+h1 { 
+	background: url(toolbar.png) #6d84a2 repeat-x; 
+	box-sizing: border-box; 
+	margin: 0; padding: 10px; 
+	line-height: 20px; 
+	font-size: 20px; 
+	font-weight: bold; 
+	text-align: center; 
+	text-shadow: rgba(0, 0, 0, 0.6) 0px -1px 0; 
+	text-overflow: ellipsis; 
+	color: #FFFFFF; 
+	border-bottom: 1px solid #2d3642;
+}
+table { 
+	background-color: white; 
+	border-style: none; 
+	border-collapse: collapse; 
+	width: 100%
+}
+th { 
+	background-color: rgb(255, 204, 51); 
+	font: bold 14px/20px Helvetica,sans-serif; 
+	padding: 8px; 
+	border-width: 0px 1px;
+}
+td { 
+	background-color: white; 
+	padding: 8px; font: bold 14px/20px Helvetica,sans-serif; 
+	border-bottom: 1px solid #E0E0E0;
+}
+td.summary { 
+	background-color: #6d84a2; 
+	color: white; 
+	font: italic bold 14px/20px Helvetica,sans-serif; 
+	padding: 8px; 
+	border-bottom: 1px solid black;
+}
+p.version { 
+	font: 10px/12px Helvetica,sans-serif;
+	padding-left: 8px;
+	color: black;
+}

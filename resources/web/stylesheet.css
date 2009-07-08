@@ -1,0 +1,25 @@
+h1 { 
+	text-align: center;
+}
+table { 
+	background-color: white; 
+	border-style: none; 
+	border-collapse: collapse; 
+	width: 100%
+}
+th { 
+	background-color: rgb(255, 204, 51); 
+	padding: 5px; 
+	border: 1px solid black;
+}
+td { 
+	background-color: white;
+	padding: 5px;
+	border: 1px solid black;
+}
+td.summary { 
+	background-color: #6d84a2;
+	color: white; 
+	padding: 8px; 
+	border-bottom: 1px solid black; 
+}
