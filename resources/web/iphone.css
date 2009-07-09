@@ -41,8 +41,23 @@ td.summary {
 	padding: 8px; 
 	border-bottom: 1px solid black;
 }
-p.version { 
-	font: 10px/12px Helvetica,sans-serif;
+a {
+	display:inline-block;
+	line-height: 20px;
+	padding-right: 15px;
+	background:transparent url(link.png) center right no-repeat;
+	text-decoration: none;
+	color: black;
+}
+.version { 
+	font: 12px/20px Helvetica,sans-serif;
 	padding-left: 8px;
 	color: black;
+	float: left;
+}
+.eventReport {
+	font: 12px/20px Helvetica,sans-serif;
+	padding-right: 8px;
+	color: black;
+	float: right;
 }
