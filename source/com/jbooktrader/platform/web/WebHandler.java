@@ -18,8 +18,7 @@ public class WebHandler implements HttpHandler {
 
     public void handle(HttpExchange httpExchange) throws IOException {
         String requestURI = httpExchange.getRequestURI().toString().trim();
-        String userAgent = httpExchange.getRequestHeaders().getFirst("User-Agent");
-        boolean iPhone = userAgent.contains("iPhone");
+        boolean isIPhone = httpExchange.getRequestHeaders().getFirst("User-Agent").contains("iPhone");
 
         StringBuilder response = new StringBuilder();
         String fileType = requestURI.toLowerCase();
@@ -27,7 +26,7 @@ public class WebHandler implements HttpHandler {
         isSupportedType = isSupportedType || fileType.contains(".ico") || fileType.contains(".css") || fileType.contains(".js");
 
         // The page...
-        if (requestURI.equalsIgnoreCase("/") || requestURI.equalsIgnoreCase("/index.html")) {
+        if (requestURI.equals("/") || requestURI.equalsIgnoreCase("/index.html")) {
 
             // We'll respond to any unknown request with the main page
             response.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n");
@@ -35,7 +34,7 @@ public class WebHandler implements HttpHandler {
             response.append("<head>\n");
             response.append("<title>JBookTrader Web Console</title>\n");
 
-            if (iPhone) {
+            if (isIPhone) {
                 response.append("<link rel=\"apple-touch-icon\" href=\"apple-touch-icon.png\" />\n");
                 response.append("<meta name=\"viewport\" content=\"width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;\" />\n");
                 response.append("<link media=\"screen\" rel=\"stylesheet\" type=\"text/css\" href=\"iPhone.css\" />\n");
@@ -96,9 +95,6 @@ public class WebHandler implements HttpHandler {
      * Handles HTTP requests for files (images, css, js, etc.)
      * The files must reside in resources/web/
      *
-     * @param httpExchange
-     * @param requestURI
-     * @throws IOException
      */
     private void handleFile(HttpExchange httpExchange, String requestURI) throws IOException {
 
@@ -123,19 +119,8 @@ public class WebHandler implements HttpHandler {
         }
 
         responseHeaders.set("Content-Type", contentType + ";charset=utf-8");
-
-        long fileLength = 0;
-
-        try {
-            File temp = new File(resource.toString());
-            fileLength = temp.length();
-        }
-        catch (Exception e) {
-            System.out.println(e);
-        }
-
-        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, fileLength);
-
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, (new File(resource.toString()).length()));
+        
         OutputStream responseBody = httpExchange.getResponseBody();
         try {
             FileInputStream file = new FileInputStream(resource.toString());
@@ -143,12 +128,10 @@ public class WebHandler implements HttpHandler {
 
             byte buffer[] = new byte[8192];
             int bytesRead;
-            while ((bytesRead = bis.read(buffer)) != -1)
+            while ((bytesRead = bis.read(buffer)) != -1) {
                 responseBody.write(buffer, 0, bytesRead);
+            }
             bis.close();
-        }
-        catch (Exception e) {
-            System.out.println(e);
         }
         finally {
             responseBody.flush();
