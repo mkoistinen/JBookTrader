@@ -11,9 +11,20 @@ import java.util.*;
  * Acts as the dispatcher of the services.
  */
 public class Dispatcher {
+
     public enum Mode {
-        Trade, BackTest, ForwardTest, Optimization
+        Trade("Trading"), BackTest("Back Testing"), ForwardTest("Forward Testing"), Optimization("Optimizing");
+        private final String name;
+
+        private Mode(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
+
 
     private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
     private static Report eventReport;
