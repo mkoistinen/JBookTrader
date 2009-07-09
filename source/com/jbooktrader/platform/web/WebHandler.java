@@ -158,11 +158,10 @@ public class WebHandler implements HttpHandler {
      * Handles HTTP requests for files (images, css, js, etc.)
      */
     private boolean handleFile(HttpExchange httpExchange, String resource, Type fileType) throws IOException {
-
-        Headers responseHeaders = httpExchange.getResponseHeaders();
         File file = new File(resource);
-        
         if (!file.exists()) { return false; }
+        
+        Headers responseHeaders = httpExchange.getResponseHeaders();
         
         responseHeaders.set("Content-Type", fileType.getContentType() + ";charset=utf-8");
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, file.length());
