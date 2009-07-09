@@ -38,7 +38,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         switch (event) {
             case ModeChanged:
                 String subTitle = "";
-                subTitle = Dispatcher.getMode().getName();
+                subTitle = Dispatcher.getMode().getPresentParticiple();
                 setTitle(JBookTrader.APP_NAME + " - [" + subTitle + "]");
                 break;
             case Error:
