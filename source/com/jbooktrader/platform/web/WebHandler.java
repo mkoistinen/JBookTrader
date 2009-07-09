@@ -53,12 +53,12 @@ public class WebHandler implements HttpHandler {
             response.append("<tr><th>Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th>Net Profit</th></tr>");
             DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
-            double totalPNL = 0.0;
+            double totalNetProfit = 0.0;
 
             for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
                 PositionManager positionManager = strategy.getPositionManager();
                 PerformanceManager performanceManager = strategy.getPerformanceManager();
-                totalPNL += performanceManager.getNetProfit();
+                totalNetProfit += performanceManager.getNetProfit();
 
                 response.append("<tr>\n");
                 response.append("<td>").append(strategy.getName()).append("</td>");
@@ -70,7 +70,7 @@ public class WebHandler implements HttpHandler {
             }
 
             response.append("<tr><td class=\"summary\" colspan=\"4\">Summary</td>");
-            response.append("<td class=\"summary\" style=\"text-align: right\">").append(df.format(totalPNL)).append("</td>\n");
+            response.append("<td class=\"summary\" style=\"text-align: right\">").append(df.format(totalNetProfit)).append("</td>\n");
 
             response.append("</table>\n");
             response.append("<p class=\"version\">JBookTrader version ").append(JBookTrader.VERSION).append("</p>\n");
@@ -98,7 +98,7 @@ public class WebHandler implements HttpHandler {
      */
     private void handleFile(HttpExchange httpExchange, String requestURI) throws IOException {
 
-        StringBuilder resource = new StringBuilder(WEBROOT).append(requestURI);
+        String resource = WEBROOT + requestURI;
 
         String requestURILower = requestURI.toLowerCase();
         Headers responseHeaders = httpExchange.getResponseHeaders();
@@ -119,11 +119,11 @@ public class WebHandler implements HttpHandler {
         }
 
         responseHeaders.set("Content-Type", contentType + ";charset=utf-8");
-        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, (new File(resource.toString()).length()));
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, (new File(resource).length()));
         
         OutputStream responseBody = httpExchange.getResponseBody();
         try {
-            FileInputStream file = new FileInputStream(resource.toString());
+            FileInputStream file = new FileInputStream(resource);
             BufferedInputStream bis = new BufferedInputStream(file);
 
             byte buffer[] = new byte[8192];
