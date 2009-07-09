@@ -25,13 +25,13 @@ td.summary {
 }
 .version { 
 	font: 10px/12px Helvetica,sans-serif;
-	padding-left: 8px;
-	color: black;
-	float: left;
-}
-.eventReport {
-	font: 10px/12px Helvetica,sans-serif;
 	padding-right: 8px;
 	color: black;
 	float: right;
+}
+.eventReport {
+	font: 10px/12px Helvetica,sans-serif;
+	padding-left: 8px;
+	color: black;
+	float: left;
 }
