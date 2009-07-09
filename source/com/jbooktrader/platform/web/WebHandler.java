@@ -73,8 +73,7 @@ public class WebHandler implements HttpHandler {
         
         // First, redirect for default page
         if (resource == null || resource.equals("") || resource.equals("/")) {
-        	response.append("File not found");
-        	httpExchange.getResponseHeaders().set("Location", "/index.html");
+        	httpExchange.getResponseHeaders().add("Location", "/index.html");
         	httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_MOVED_PERM, response.length());
         }
         
@@ -108,11 +107,13 @@ public class WebHandler implements HttpHandler {
             DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
             double totalNetProfit = 0.0;
+            int totalTrades = 0;
 
             for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
                 PositionManager positionManager = strategy.getPositionManager();
                 PerformanceManager performanceManager = strategy.getPerformanceManager();
                 totalNetProfit += performanceManager.getNetProfit();
+                totalTrades += performanceManager.getTrades();
 
                 response.append("<tr>\n");
                 response.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\">").append(strategy.getName()).append("</a></td>");
@@ -123,7 +124,8 @@ public class WebHandler implements HttpHandler {
                 response.append("</tr>\n");
             }
 
-            response.append("<tr><td class=\"summary\" colspan=\"4\">Summary</td>");
+            response.append("<tr><td class=\"summary\" colspan=\"2\">Summary</td>");
+            response.append("<td class=\"summary\" colspan=\"1\" style=\"text-align: right\">").append(totalTrades).append("</td><td class=\"summary\"><!-- skip this colum --></td>");
             response.append("<td class=\"summary\" style=\"text-align: right\">").append(df.format(totalNetProfit)).append("</td>\n");
 
             response.append("</table>\n");
@@ -133,20 +135,20 @@ public class WebHandler implements HttpHandler {
             response.append("</body>\n");
             response.append("</html>\n");
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
-        } 
+        }
         
         // ALL dynamic pages must be in the if/then/else sequence above this point
         // Static resources from here down
         
         else if (fileType != Type.UNKNOWN) {
             if (!handleFile(httpExchange, absoluteResource, fileType)) {
-            	response.append("File not found");
             	httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length());
+            	response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
             }
         } else {
             // Huh?
-            response.append("File not found");
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length());
+        	response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
         }
 
         OutputStream os = httpExchange.getResponseBody();
@@ -163,7 +165,7 @@ public class WebHandler implements HttpHandler {
         
         Headers responseHeaders = httpExchange.getResponseHeaders();
         
-        responseHeaders.set("Content-Type", fileType.getContentType() + ";charset=utf-8");
+        responseHeaders.add("Content-Type", fileType.getContentType() + ";charset=utf-8");
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, file.length());
         
         OutputStream responseBody = httpExchange.getResponseBody();
