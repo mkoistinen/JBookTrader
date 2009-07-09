@@ -23,3 +23,15 @@ td.summary {
 	padding: 8px; 
 	border-bottom: 1px solid black; 
 }
+.version { 
+	font: 10px/12px Helvetica,sans-serif;
+	padding-left: 8px;
+	color: black;
+	float: left;
+}
+.eventReport {
+	font: 10px/12px Helvetica,sans-serif;
+	padding-right: 8px;
+	color: black;
+	float: right;
+}
