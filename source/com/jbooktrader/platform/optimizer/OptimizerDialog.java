@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.chart.*;
+import com.jbooktrader.platform.dialog.JBTDialog;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -19,7 +20,7 @@ import java.util.List;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class OptimizerDialog extends JDialog {
+public class OptimizerDialog extends JBTDialog {
     private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;

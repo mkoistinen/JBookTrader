@@ -17,16 +17,33 @@ public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
     public static final String VERSION = "6.11";
     public static final String RELEASE_DATE = "July 7, 2009";
+	public static final double MAC_MENUBAR_HEIGHT = 22;
     private static String appPath;
+    private static boolean onMac = false;
 
     /**
      * Instantiates the necessary parts of the application: the application model,
      * views, and controller.
      */
     private JBookTrader() throws JBookTraderException {
+        // Are we on an Apple Mac?
+        String name = System.getProperty("os.name").toLowerCase();
+        onMac = name.startsWith("mac os x");
+
         try {
-            LiquidLookAndFeel.setLiquidDecorations(true, "mac");
-            UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");
+            if (onMac) {
+                // Menu bar at top of screen
+                System.setProperty("apple.laf.useScreenMenuBar", "true");
+
+                // Set application name
+                System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_NAME);
+
+                // Set default look and feel.
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } else {
+                LiquidLookAndFeel.setLiquidDecorations(true, "mac");
+                UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");
+            }
         } catch (Throwable t) {
             String msg = t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.";
             MessageDialog.showMessage(null, msg);
@@ -71,5 +88,14 @@ public class JBookTrader {
     public static String getAppPath() {
         return JBookTrader.appPath;
     }
+
+    /**
+     * Are we running on an Apple Mac?
+     *
+     * @return true/false
+     */
+    public static boolean onMac() {
+        return JBookTrader.onMac;
+     }
 
 }

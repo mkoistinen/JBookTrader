@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.backtest;
 
+import com.jbooktrader.platform.dialog.JBTDialog;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
@@ -15,7 +16,7 @@ import java.io.*;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class BackTestDialog extends JDialog {
+public class BackTestDialog extends JBTDialog {
     private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
     private final PreferencesHolder prefs;
     private final Strategy strategy;

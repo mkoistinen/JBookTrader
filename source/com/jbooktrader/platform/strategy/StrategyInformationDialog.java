@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
+import com.jbooktrader.platform.dialog.JBTDialog;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
@@ -9,7 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.*;
 
-public final class StrategyInformationDialog extends JDialog {
+public final class StrategyInformationDialog extends JBTDialog {
     private final Strategy strategy;
 
     public StrategyInformationDialog(JFrame parent, Strategy strategy) {

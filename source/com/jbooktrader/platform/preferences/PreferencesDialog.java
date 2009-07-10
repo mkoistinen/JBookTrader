@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.preferences;
 
 import com.jbooktrader.platform.c2.*;
+import com.jbooktrader.platform.dialog.JBTDialog;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
@@ -10,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class PreferencesDialog extends JDialog {
+public class PreferencesDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
     private JTextField hostText, portText, webAccessUser;

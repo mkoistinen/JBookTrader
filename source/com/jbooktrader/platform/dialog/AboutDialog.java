@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * Dialog to show the application info, system info, and IB API info.
  */
-public class AboutDialog extends JDialog {
+public class AboutDialog extends JBTDialog {
 
     /* inner class to define the "about" model */
     private class AboutTableModel extends TableDataModel {
