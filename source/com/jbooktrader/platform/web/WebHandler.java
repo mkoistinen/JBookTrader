@@ -11,6 +11,11 @@ import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
 import java.text.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class WebHandler implements HttpHandler {
 
@@ -70,34 +75,73 @@ public class WebHandler implements HttpHandler {
             response.append("</h1>\n");
 
             response.append("<table>");
-            response.append("<tr><th>Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th>Net Profit</th></tr>");
+            response.append("<tr><th>Symbol/Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th>Net Profit</th></tr>");
             DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
             double totalNetProfit = 0.0;
             int totalTrades = 0;
 
+            // First, make a list of the securities in use.
+            HashMap<String, Double> symbols = new HashMap<String, Double>();
+            
             for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
-                PositionManager positionManager = strategy.getPositionManager();
-                PerformanceManager performanceManager = strategy.getPerformanceManager();
-                totalNetProfit += performanceManager.getNetProfit();
-                totalTrades += performanceManager.getTrades();
+            	String symbol = strategy.getContract().m_symbol;
+            	double quote = strategy.getMarketBook().getSnapshot().getPrice();
+            	if (!symbols.containsKey(symbol)) symbols.put(symbol, quote);
+            }
+            
+            // Sort the securities alphabetically...
+            List<String> symbolKeys = new ArrayList<String>(symbols.keySet());
+            Collections.sort(symbolKeys);
 
-                response.append("<tr>\n");
-                response.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\">").append(strategy.getName()).append("</a></td>");
-                response.append("<td align=\"right\">").append(positionManager.getPosition()).append("</td>");
-                response.append("<td align=\"right\">").append(performanceManager.getTrades()).append("</td>");
-                response.append("<td align=\"right\">").append(df.format(performanceManager.getMaxDrawdown())).append("</td>");
-                response.append("<td align=\"right\">").append(df.format(performanceManager.getNetProfit())).append("</td>\n");
-                response.append("</tr>\n");
+            // Sort the strategies too...
+            Collection<Strategy> strategies = Dispatcher.getTrader().getAssistant().getAllStrategies();
+            List<Strategy> strategyList = new ArrayList<Strategy>(strategies);
+            Collections.sort(strategyList);
+
+            for (String symbol : symbolKeys) {
+            	StringBuilder symbolBlock = new StringBuilder();
+            	int symbolPosition = 0;
+            	double symbolNetProfit = 0.0;
+            	
+            	for (Strategy strategy : strategyList) {
+            		if (strategy.getContract().m_symbol.equals(symbol)) {
+            			PositionManager positionManager = strategy.getPositionManager();
+            			PerformanceManager performanceManager = strategy.getPerformanceManager();
+            			totalNetProfit += performanceManager.getNetProfit();
+            			totalTrades += performanceManager.getTrades();
+            			symbolPosition += positionManager.getPosition();
+            			symbolNetProfit += performanceManager.getNetProfit();
+            			
+            			symbolBlock.append("<tr class=\"strategy\">\n");
+            			symbolBlock.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\" target=\"_new\">").append(strategy.getName()).append("</a></td>");
+            			symbolBlock.append("<td>").append(positionManager.getPosition()).append("</td>");
+            			symbolBlock.append("<td>").append(performanceManager.getTrades()).append("</td>");
+            			symbolBlock.append("<td>").append(df.format(performanceManager.getMaxDrawdown())).append("</td>");
+            			symbolBlock.append("<td>").append(df.format(performanceManager.getNetProfit())).append("</td>");
+            			symbolBlock.append("</tr>\n");
+            		}
+            	}
+            	
+            	response.append("<tr class=\"symbol\">");
+            	response.append("<td>").append(symbol).append(" (").append(symbols.get(symbol)).append(")</td>");
+            	response.append("<td>").append(symbolPosition).append("</td>");
+            	response.append("<td colspan=\"2\">&nbsp;</td>");
+            	response.append("<td>").append(df.format(symbolNetProfit)).append("</td></tr>\n");
+            	response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
+            	response.append(symbolBlock);
+            	
             }
 
-            response.append("<tr><td class=\"summary\" colspan=\"2\">Summary</td>");
-            response.append("<td class=\"summary\" colspan=\"1\" style=\"text-align: right\">").append(totalTrades).append("</td><td class=\"summary\"><!-- skip this colum --></td>");
-            response.append("<td class=\"summary\" style=\"text-align: right\">").append(df.format(totalNetProfit)).append("</td>\n");
+            response.append("<tr class=\"summary\">");
+            response.append("<td colspan=\"2\">All Strategies</td>");
+            response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
+            response.append("<td class=\"summary\">&nbsp;</td>");
+            response.append("<td>").append(df.format(totalNetProfit)).append("</td></tr>\n");
 
             response.append("</table>\n");
             response.append("<p class=\"version\">JBookTrader version ").append(JBookTrader.VERSION).append("</p>\n");
-            response.append("<p class=\"eventReport\"><a href=\"/reports/EventReport.htm\">Event Report</a></p>\n");
+            response.append("<p class=\"eventReport\"><a href=\"/reports/EventReport.htm\" target=\"_new\">Event Report</a></p>\n");
             response.append("<p>&nbsp;</p>");
             response.append("</body>\n");
             response.append("</html>\n");
@@ -106,16 +150,11 @@ public class WebHandler implements HttpHandler {
 
         // ALL dynamic pages must be in the if/then/else sequence above this point
         // Static resources from here down
-
-        else if (fileType != ContentType.UNKNOWN) {
+        else {
             if (!fileHandler.handleFile(httpExchange, absoluteResource, fileType)) {
+            	response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
                 httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length());
-                response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
             }
-        } else {
-            // Huh?
-            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length());
-            response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
         }
 
         OutputStream os = httpExchange.getResponseBody();
