@@ -19,7 +19,7 @@ import com.jbooktrader.platform.trader.*;
  * Base class for all classes that implement trading strategies.
  */
 
-public abstract class Strategy {
+public abstract class Strategy implements Comparable<Strategy> {
     private final StrategyParams params;
     private MarketBook marketBook;
     private final Report eventReport;
@@ -228,4 +228,10 @@ public abstract class Strategy {
         return indicatorsState;
     }
 
+    // Implementing Comparable interface
+    
+    public int compareTo(Strategy other) {
+    	return getName().compareTo(other.getName());
+    }
+    
 }
