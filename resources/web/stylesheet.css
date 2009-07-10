@@ -1,7 +1,16 @@
 body {
-	background: white url(pinstripes.png) repeat;
-	margin: 0;
+	background: white url(pinstripes.png) repeat; 
 	font-family: Arial, sans-serif;
+	margin: 0; 
+	color: black;
+}
+th p {
+	margin: 0px;
+	padding: 0px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	overflow-x: clip;
 }
 h1 {
 	background: url(toolbar.png) #6d84a2 repeat-x;
@@ -14,60 +23,115 @@ h1 {
 	color: #FFFFFF; 
 	border-bottom: 1px solid #2d3642;
 }
-table { 
+table {
+	table-layout: auto;
 	background-color: white;
 	border-style: none; 
-	border-collapse: collapse; 
+	border-collapse: collapse;
 	width: 100%
 }
+
+/* Odd table rows are rendered in light blue, by default */
 table tr:nth-child(odd) {
 	background-color: #edf1ff;
 }
+
+/* By default, the first cell in each row aligns left with padding */
+tr td:first-child {
+	text-align: left;
+	padding-left: 8px;
+}
+
+/* Completely hide our hidden rows */
+tr.hidden { display: none; }
+
+/*** HEADING ROW ***/
 th {
 	background-color: rgb(255, 204, 51); 
 	font-style: bold;
 	font-size: 14px;
 	line-height: 20px;
-	padding: 3px;
-	padding-right: 8px; 
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 10px;
 	border-width: 0px 1px;
-	width: 20%;
 	text-align: right;
 }
+/* Some overrides... */
+tr th:first-child {
+	text-align: left;
+	padding-left: 8px;
+	width: 30%;
+}
+tr th:nth-child(2) {
+	padding-left: 0px;
+}
+tr th:nth-child(5) {
+	padding-right: 8px;
+}
+
+/* Default table cell */
 td {
-	padding: 3px 8px;
+	padding-top: 4px;
+	padding-bottom: 4px;
 	font-weight: bold;
-	font-size: 13px;
-	line-height: 20px;
-	border-top: 1px solid #E0E0E0;
 	text-align: right;
+	white-space: nowrap;
 }
-tr.summary td { 
-	background-color: #35426a;
-	color: white; 
-	font-weight: bold;
-	font-style: italic;
-	font-size: 14px;
-	line-height: 20px;
-	padding: 3px 8px; 
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
-}
+
+/***  SYMBOL ROWS  ***/
 tr.symbol td {
 	background-color: #4e619b; 
 	color: white; 
-	font-weight: bold;
 	font-size: 12px;
 	line-height: 14px;
-	padding: 3px 8px;
 	border-top: 1px solid black;
-	text-align: right;
 }
-tr th:first-child, tr td:first-child {
+tr.symbol td:first-child {
 	text-align: left;
 	padding-left: 8px;
-	paddign-right: 0px;
+	overflow: clip;
 }
+tr.symbol td:nth-child(4) {
+	padding-right: 8px;
+}
+
+/*** STRATEGY ROWS ***/
+tr.strategy td {
+	color: black;
+	font-size: 13px;
+	line-height: 15px;
+	border-top: 1px solid #E0E0E0;
+}
+tr.strategy td:first-child {
+	text-align: left;
+	padding-left: 20px;
+	overflow: visible;
+	text-overflow: ellipsis;
+}
+tr.strategy td:nth-child(5) {
+	padding-right: 8px;
+}
+
+/*** SUMMARY ROW ***/
+tr.summary td { 
+	background-color: #35426a;
+	color: white; 
+	font-style: italic;
+	font-size: 14px;
+	line-height: 20px;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+tr.summary td:first-child {
+	text-align: left;
+	padding-left: 8px;
+}
+tr.summary td:nth-child(4) {
+	padding-right: 8px;
+}
+
+/* Other */
 .version { 
 	font-size: 12px;
 	line-height: 20px;
@@ -81,12 +145,4 @@ tr th:first-child, tr td:first-child {
 	padding-left: 8px;
 	color: black;
 	float: left;
-}
-a {
-	display:inline-block;
-	line-height: 20px;
-	padding-right: 15px;
-	background:transparent url(link.png) center right no-repeat;
-	text-decoration: none;
-	color: black;
 }
