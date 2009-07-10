@@ -61,9 +61,9 @@ public class WebHandler implements HttpHandler {
 
             if (isIPhone) {
                 response.append("<link rel=\"apple-touch-icon\" href=\"apple-touch-icon.png\" />\n");
-                response.append("<meta name=\"viewport\" content=\"width=320; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;\" />\n");
-                response.append("<link media=\"screen\" rel=\"stylesheet\" type=\"text/css\" href=\"iPhone.css\" />\n");
-                response.append("<script type=\"application/x-javascript\" src=\"iPhone.js\"></script> \n");
+                response.append("<meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;\" />\n");
+                response.append("<link media=\"screen\" rel=\"stylesheet\" type=\"text/css\" href=\"iphone.css\" />\n");
+                response.append("<script type=\"application/x-javascript\" src=\"iphone.js\"></script> \n");
             } else {
                 response.append("<link media=\"screen\" rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\" />\n");
             }
@@ -75,7 +75,7 @@ public class WebHandler implements HttpHandler {
             response.append("</h1>\n");
 
             response.append("<table>");
-            response.append("<tr><th>Symbol/Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th>Net Profit</th></tr>");
+            response.append("<tr><th><p>Strategy</p></th><th><p>Position</p></th><th><p>Trades</p></th><th><p>Max DD</p></th><th><p>Net Profit</p></th></tr>");
             DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
 
             double totalNetProfit = 0.0;
@@ -86,7 +86,14 @@ public class WebHandler implements HttpHandler {
             
             for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
             	String symbol = strategy.getContract().m_symbol;
-            	double quote = strategy.getMarketBook().getSnapshot().getPrice();
+                if (strategy.getContract().m_secType == "CASH") {
+                	symbol += "." + strategy.getContract().m_currency;
+                }
+            	double quote = Double.NaN;
+            	try {
+	                quote = strategy.getMarketBook().getSnapshot().getPrice();
+                }
+                catch (Exception e) { /* we don't care */ }
             	if (!symbols.containsKey(symbol)) symbols.put(symbol, quote);
             }
             
@@ -105,7 +112,11 @@ public class WebHandler implements HttpHandler {
             	double symbolNetProfit = 0.0;
             	
             	for (Strategy strategy : strategyList) {
-            		if (strategy.getContract().m_symbol.equals(symbol)) {
+            		String strategySymbol = strategy.getContract().m_symbol;
+                    if (strategy.getContract().m_secType == "CASH") {
+                    	strategySymbol += "." + strategy.getContract().m_currency;
+                    }
+            		if (strategySymbol.equals(symbol)) {
             			PositionManager positionManager = strategy.getPositionManager();
             			PerformanceManager performanceManager = strategy.getPerformanceManager();
             			totalNetProfit += performanceManager.getNetProfit();
@@ -124,7 +135,14 @@ public class WebHandler implements HttpHandler {
             	}
             	
             	response.append("<tr class=\"symbol\">");
-            	response.append("<td>").append(symbol).append(" (").append(symbols.get(symbol)).append(")</td>");
+            	response.append("<td>").append(symbol).append(" (");
+            	if (symbols.get(symbol).isNaN()) {
+            		response.append("n/a");
+            	}
+            	else {
+            		response.append(symbols.get(symbol));
+            	}
+            	response.append(")</td>");
             	response.append("<td>").append(symbolPosition).append("</td>");
             	response.append("<td colspan=\"2\">&nbsp;</td>");
             	response.append("<td>").append(df.format(symbolNetProfit)).append("</td></tr>\n");
@@ -142,7 +160,6 @@ public class WebHandler implements HttpHandler {
             response.append("</table>\n");
             response.append("<p class=\"version\">JBookTrader version ").append(JBookTrader.VERSION).append("</p>\n");
             response.append("<p class=\"eventReport\"><a href=\"/reports/EventReport.htm\" target=\"_new\">Event Report</a></p>\n");
-            response.append("<p>&nbsp;</p>");
             response.append("</body>\n");
             response.append("</html>\n");
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
