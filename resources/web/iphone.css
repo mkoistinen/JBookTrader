@@ -4,60 +4,87 @@ body {
 	font-family: Helvetica; color: black; 
 	overflow: hidden; -webkit-text-size-adjust: none;
 }    		 
-h1 { 
-	background: url(toolbar.png) #6d84a2 repeat-x; 
-	box-sizing: border-box; 
-	margin: 0; padding: 10px; 
-	line-height: 20px; 
-	font-size: 20px; 
+h1 {
+	background: url(toolbar.png) #6d84a2 repeat-x;
+	margin: 0; padding: 8px; 
+	line-height: 16px; 
+	font-size: 16px; 
 	font-weight: bold; 
 	text-align: center; 
-	text-shadow: rgba(0, 0, 0, 0.6) 0px -1px 0; 
-	text-overflow: ellipsis; 
+	text-shadow: rgba(0, 0, 0, 0.6) 0px -1px 0;
 	color: #FFFFFF; 
 	border-bottom: 1px solid #2d3642;
 }
 table { 
-	background-color: white; 
+	background-color: white;
 	border-style: none; 
 	border-collapse: collapse; 
 	width: 100%
 }
-th { 
+table tr:nth-child(odd) {
+	background-color: #edf1ff;
+}
+th {
 	background-color: rgb(255, 204, 51); 
-	font: bold 14px/20px Helvetica,sans-serif; 
-	padding: 8px; 
+	font-style: bold;
+	font-size: 14px;
+	line-height: 20px;
+	padding: 3px;
+	padding-right: 8px; 
 	border-width: 0px 1px;
+	width: 20%;
+	text-align: right;
 }
-td { 
-	background-color: white; 
-	padding: 8px; font: bold 14px/20px Helvetica,sans-serif; 
-	border-bottom: 1px solid #E0E0E0;
+td {
+	padding: 3px 8px 3px 0px;
+	font-weight: bold;
+	font-size: 13px;
+	border-top: 1px solid #E0E0E0;
+	text-align: right;
 }
-td.summary { 
-	background-color: #6d84a2; 
+tr.hidden { display: none; }
+tr.summary td { 
+	background-color: #35426a;
 	color: white; 
-	font: italic bold 14px/20px Helvetica,sans-serif; 
-	padding: 8px; 
+	font-weight: bold;
+	font-style: italic;
+	font-size: 14px;
+	line-height: 20px;
+	border-top: 1px solid black;
 	border-bottom: 1px solid black;
 }
-a {
-	display:inline-block;
-	line-height: 20px;
-	padding-right: 15px;
-	background:transparent url(link.png) center right no-repeat;
-	text-decoration: none;
-	color: black;
+tr.symbol td {
+	background-color: #4e619b; 
+	color: white; 
+	font-weight: bold;
+	font-size: 12px;
+	line-height: 14px;
+	border-top: 1px solid black;
+	text-align: right;
+}
+tr th:first-child, tr td:first-child {
+	text-align: left;
+	padding-left: 8px;
 }
 .version { 
-	font: 12px/20px Helvetica,sans-serif;
+	font-size: 12px;
+	line-height: 20px;
 	padding-right: 8px;
 	color: black;
 	float: right;
 }
 .eventReport {
-	font: 12px/20px Helvetica,sans-serif;
+	font-size: 12px;
+	line-height: 20px;
 	padding-left: 8px;
 	color: black;
 	float: left;
+}
+a {
+	display:inline-block;
+	line-height: 32px;
+	padding-right: 15px;
+	background:transparent url(link.png) center right no-repeat;
+	text-decoration: none;
+	color: black;
 }
