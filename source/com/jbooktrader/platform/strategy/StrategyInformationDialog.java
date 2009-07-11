@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
-import com.jbooktrader.platform.dialog.JBTDialog;
+import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;

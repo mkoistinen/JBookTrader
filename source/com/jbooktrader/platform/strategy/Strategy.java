@@ -229,9 +229,9 @@ public abstract class Strategy implements Comparable<Strategy> {
     }
 
     // Implementing Comparable interface
-    
+
     public int compareTo(Strategy other) {
-    	return getName().compareTo(other.getName());
+        return getName().compareTo(other.getName());
     }
-    
+
 }

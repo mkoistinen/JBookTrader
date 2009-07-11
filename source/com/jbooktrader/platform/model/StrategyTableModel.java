@@ -4,11 +4,9 @@ import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
-import com.jbooktrader.platform.marketdepth.*;
 
 import javax.swing.*;
 import java.util.*;

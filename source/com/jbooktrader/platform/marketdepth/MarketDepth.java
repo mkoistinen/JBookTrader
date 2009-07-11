@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.model.*;
 
 import java.util.*;
 
@@ -108,7 +107,7 @@ public class MarketDepth {
             highBalance = Math.max(lastBalance, highBalance);
             midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
             isResetting = false;
-            
+
         }
     }
 

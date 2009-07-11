@@ -10,7 +10,6 @@ import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.util.*;

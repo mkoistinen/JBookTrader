@@ -10,19 +10,19 @@ import java.net.*;
  */
 public class FileHandler {
     public boolean handleFile(HttpExchange httpExchange, String resource, ContentType fileType) throws IOException {
-        
-    	if (resource == null) return false;
-    	
+
+        if (resource == null) return false;
+
         File file = new File(resource);
-        
+
         try {
-	        if (!file.exists()) {
-	            return false;
-	        }
+            if (!file.exists()) {
+                return false;
+            }
         }
         catch (Exception e) {
-        	/* We don't really care which one */
-        	return false;
+            /* We don't really care which one */
+            return false;
         }
 
         Headers responseHeaders = httpExchange.getResponseHeaders();

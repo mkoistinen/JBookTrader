@@ -13,11 +13,11 @@ import java.util.*;
 public class Dispatcher {
 
     public enum Mode {
-        Trade("Trade", "Trading"), 
-        BackTest("BackTest", "Back Testing"), 
-        ForwardTest("ForwardTest", "Forward Testing"), 
+        Trade("Trade", "Trading"),
+        BackTest("BackTest", "Back Testing"),
+        ForwardTest("ForwardTest", "Forward Testing"),
         Optimization("Optimize", "Optimizing"); // Note, then enum label here does follow grammar convention
-        
+
         private final String name, presentParticiple;
 
         private Mode(String name, String presentParticiple) {

@@ -11,11 +11,7 @@ import com.sun.net.httpserver.*;
 import java.io.*;
 import java.net.*;
 import java.text.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class WebHandler implements HttpHandler {
 
@@ -83,20 +79,20 @@ public class WebHandler implements HttpHandler {
 
             // First, make a list of the securities in use.
             HashMap<String, Double> symbols = new HashMap<String, Double>();
-            
+
             for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
-            	String symbol = strategy.getContract().m_symbol;
+                String symbol = strategy.getContract().m_symbol;
                 if (strategy.getContract().m_secType == "CASH") {
-                	symbol += "." + strategy.getContract().m_currency;
+                    symbol += "." + strategy.getContract().m_currency;
                 }
-            	double quote = Double.NaN;
-            	try {
-	                quote = strategy.getMarketBook().getSnapshot().getPrice();
+                double quote = Double.NaN;
+                try {
+                    quote = strategy.getMarketBook().getSnapshot().getPrice();
                 }
                 catch (Exception e) { /* we don't care */ }
-            	if (!symbols.containsKey(symbol)) symbols.put(symbol, quote);
+                if (!symbols.containsKey(symbol)) symbols.put(symbol, quote);
             }
-            
+
             // Sort the securities alphabetically...
             List<String> symbolKeys = new ArrayList<String>(symbols.keySet());
             Collections.sort(symbolKeys);
@@ -107,48 +103,47 @@ public class WebHandler implements HttpHandler {
             Collections.sort(strategyList);
 
             for (String symbol : symbolKeys) {
-            	StringBuilder symbolBlock = new StringBuilder();
-            	int symbolPosition = 0;
-            	double symbolNetProfit = 0.0;
-            	
-            	for (Strategy strategy : strategyList) {
-            		String strategySymbol = strategy.getContract().m_symbol;
+                StringBuilder symbolBlock = new StringBuilder();
+                int symbolPosition = 0;
+                double symbolNetProfit = 0.0;
+
+                for (Strategy strategy : strategyList) {
+                    String strategySymbol = strategy.getContract().m_symbol;
                     if (strategy.getContract().m_secType == "CASH") {
-                    	strategySymbol += "." + strategy.getContract().m_currency;
+                        strategySymbol += "." + strategy.getContract().m_currency;
                     }
-            		if (strategySymbol.equals(symbol)) {
-            			PositionManager positionManager = strategy.getPositionManager();
-            			PerformanceManager performanceManager = strategy.getPerformanceManager();
-            			totalNetProfit += performanceManager.getNetProfit();
-            			totalTrades += performanceManager.getTrades();
-            			symbolPosition += positionManager.getPosition();
-            			symbolNetProfit += performanceManager.getNetProfit();
-            			
-            			symbolBlock.append("<tr class=\"strategy\">\n");
-            			symbolBlock.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\" target=\"_new\">").append(strategy.getName()).append("</a></td>");
-            			symbolBlock.append("<td>").append(positionManager.getPosition()).append("</td>");
-            			symbolBlock.append("<td>").append(performanceManager.getTrades()).append("</td>");
-            			symbolBlock.append("<td>").append(df.format(performanceManager.getMaxDrawdown())).append("</td>");
-            			symbolBlock.append("<td>").append(df.format(performanceManager.getNetProfit())).append("</td>");
-            			symbolBlock.append("</tr>\n");
-            		}
-            	}
-            	
-            	response.append("<tr class=\"symbol\">");
-            	response.append("<td>").append(symbol).append(" (");
-            	if (symbols.get(symbol).isNaN()) {
-            		response.append("n/a");
-            	}
-            	else {
-            		response.append(symbols.get(symbol));
-            	}
-            	response.append(")</td>");
-            	response.append("<td>").append(symbolPosition).append("</td>");
-            	response.append("<td colspan=\"2\">&nbsp;</td>");
-            	response.append("<td>").append(df.format(symbolNetProfit)).append("</td></tr>\n");
-            	response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
-            	response.append(symbolBlock);
-            	
+                    if (strategySymbol.equals(symbol)) {
+                        PositionManager positionManager = strategy.getPositionManager();
+                        PerformanceManager performanceManager = strategy.getPerformanceManager();
+                        totalNetProfit += performanceManager.getNetProfit();
+                        totalTrades += performanceManager.getTrades();
+                        symbolPosition += positionManager.getPosition();
+                        symbolNetProfit += performanceManager.getNetProfit();
+
+                        symbolBlock.append("<tr class=\"strategy\">\n");
+                        symbolBlock.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\" target=\"_new\">").append(strategy.getName()).append("</a></td>");
+                        symbolBlock.append("<td>").append(positionManager.getPosition()).append("</td>");
+                        symbolBlock.append("<td>").append(performanceManager.getTrades()).append("</td>");
+                        symbolBlock.append("<td>").append(df.format(performanceManager.getMaxDrawdown())).append("</td>");
+                        symbolBlock.append("<td>").append(df.format(performanceManager.getNetProfit())).append("</td>");
+                        symbolBlock.append("</tr>\n");
+                    }
+                }
+
+                response.append("<tr class=\"symbol\">");
+                response.append("<td>").append(symbol).append(" (");
+                if (symbols.get(symbol).isNaN()) {
+                    response.append("n/a");
+                } else {
+                    response.append(symbols.get(symbol));
+                }
+                response.append(")</td>");
+                response.append("<td>").append(symbolPosition).append("</td>");
+                response.append("<td colspan=\"2\">&nbsp;</td>");
+                response.append("<td>").append(df.format(symbolNetProfit)).append("</td></tr>\n");
+                response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
+                response.append(symbolBlock);
+
             }
 
             response.append("<tr class=\"summary\">");
@@ -169,7 +164,7 @@ public class WebHandler implements HttpHandler {
         // Static resources from here down
         else {
             if (!fileHandler.handleFile(httpExchange, absoluteResource, fileType)) {
-            	response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
+                response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
                 httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length());
             }
         }
