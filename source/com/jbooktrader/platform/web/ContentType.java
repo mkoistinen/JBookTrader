@@ -54,7 +54,7 @@ public enum ContentType {
 
 
     public String toString() {
-        return "Type: " + getExtension() + ", ContentType: " + getContentType();
+        return "Type: " + extension + ", ContentType: " + contentType;
     }
 
 }
