@@ -20,41 +20,17 @@ public class WebHandler implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         URI uri = httpExchange.getRequestURI();
         String resource = uri.getPath();
-
-        FileHandler fileHandler = new FileHandler();
-        String fileName = fileHandler.getFileName(uri);
-        ContentType fileType = ContentType.getContentType(fileName);
-
-        boolean isIPhone = httpExchange.getRequestHeaders().getFirst("User-Agent").contains("iPhone");
-
         StringBuilder response = new StringBuilder();
 
-        // We support a VIRTUAL directory '/reports/' which we manually map onto the reports folder in the class path
-        // This must explicitly be the beginning of the requested resource.  Otherwise, we fold any requests over to
-        // the WEBROOT
-        String absoluteResource;
-        if (resource.startsWith("/reports/")) {
-            absoluteResource = JBookTrader.getAppPath() + resource;
-        } else {
-            absoluteResource = WEBROOT + resource;
-        }
-
-        // First, redirect for default page
-        if (resource.equals("") || resource.equals("/")) {
-            httpExchange.getResponseHeaders().add("Location", "/index.html");
-            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_MOVED_PERM, response.length());
-        }
-
-        // The index.html page...
-        // This is VIRTUAL, it is not on the filesystem.
-        else if (resource.equals("/index.html")) {
-
+        // The index.html page. This is VIRTUAL, it is not on the filesystem.
+        if (resource.equals("/index.html")) {
             // We'll respond to any unknown request with the main page
             response.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n");
             response.append("<html>\n");
             response.append("<head>\n");
             response.append("<title>JBookTrader Web Console</title>\n");
 
+            boolean isIPhone = httpExchange.getRequestHeaders().getFirst("User-Agent").contains("iPhone");
             if (isIPhone) {
                 response.append("<link rel=\"apple-touch-icon\" href=\"apple-touch-icon.png\" />\n");
                 response.append("<meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;\" />\n");
@@ -89,9 +65,12 @@ public class WebHandler implements HttpHandler {
                 double quote = Double.NaN;
                 try {
                     quote = strategy.getMarketBook().getSnapshot().getPrice();
+                } catch (Exception e) {
+                    /* we don't care */
                 }
-                catch (Exception e) { /* we don't care */ }
-                if (!symbols.containsKey(symbol)) symbols.put(symbol, quote);
+                if (!symbols.containsKey(symbol)) {
+                    symbols.put(symbol, quote);
+                }
             }
 
             // Sort the securities alphabetically...
@@ -159,11 +138,26 @@ public class WebHandler implements HttpHandler {
             response.append("</body>\n");
             response.append("</html>\n");
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
-        }
+        } else if (resource.equals("") || resource.equals("/")) {
+            // Redirect for default page
+            httpExchange.getResponseHeaders().add("Location", "/index.html");
+            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_MOVED_PERM, response.length());
+        } else {
+            // Static resources
 
-        // ALL dynamic pages must be in the if/then/else sequence above this point
-        // Static resources from here down
-        else {
+            // We support a VIRTUAL directory '/reports/' which we manually map onto the reports folder in the class path
+            // This must explicitly be the beginning of the requested resource.  Otherwise, we fold any requests over to
+            // the WEBROOT
+            String absoluteResource;
+            if (resource.startsWith("/reports/")) {
+                absoluteResource = JBookTrader.getAppPath() + resource;
+            } else {
+                absoluteResource = WEBROOT + resource;
+            }
+
+            FileHandler fileHandler = new FileHandler();
+            String fileName = fileHandler.getFileName(uri);
+            ContentType fileType = ContentType.getContentType(fileName);
             if (!fileHandler.handleFile(httpExchange, absoluteResource, fileType)) {
                 response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");
                 httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, response.length());
