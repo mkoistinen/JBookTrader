@@ -16,12 +16,11 @@ import java.util.*;
 public class WebHandler implements HttpHandler {
 
     private static final String WEBROOT = JBookTrader.getAppPath() + "/resources/web";
-    private static final String REPORTROOT = JBookTrader.getAppPath() + "/reports";
 
     public void handle(HttpExchange httpExchange) throws IOException {
         URI uri = httpExchange.getRequestURI();
         String resource = uri.getPath();
-        String absoluteResource = "";
+
         FileHandler fileHandler = new FileHandler();
         String fileName = fileHandler.getFileName(uri);
         ContentType fileType = ContentType.getContentType(fileName);
@@ -33,8 +32,9 @@ public class WebHandler implements HttpHandler {
         // We support a VIRTUAL directory '/reports/' which we manually map onto the reports folder in the class path
         // This must explicitly be the beginning of the requested resource.  Otherwise, we fold any requests over to
         // the WEBROOT
+        String absoluteResource;
         if (resource.startsWith("/reports/")) {
-            absoluteResource = resource.replaceFirst("/reports", REPORTROOT);
+            absoluteResource = JBookTrader.getAppPath() + resource;
         } else {
             absoluteResource = WEBROOT + resource;
         }
@@ -67,7 +67,7 @@ public class WebHandler implements HttpHandler {
             response.append("</head>\n");
             response.append("<body>\n");
             response.append("<h1>\n");
-            response.append(JBookTrader.APP_NAME).append(": ").append(Dispatcher.getMode().getPresentParticiple());
+            response.append(JBookTrader.APP_NAME).append(": ").append(Dispatcher.getMode().getName());
             response.append("</h1>\n");
 
             response.append("<table>");
@@ -82,7 +82,8 @@ public class WebHandler implements HttpHandler {
 
             for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
                 String symbol = strategy.getContract().m_symbol;
-                if (strategy.getContract().m_secType == "CASH") {
+
+                if (strategy.getContract().m_secType.equals("CASH")) {
                     symbol += "." + strategy.getContract().m_currency;
                 }
                 double quote = Double.NaN;
@@ -109,7 +110,7 @@ public class WebHandler implements HttpHandler {
 
                 for (Strategy strategy : strategyList) {
                     String strategySymbol = strategy.getContract().m_symbol;
-                    if (strategy.getContract().m_secType == "CASH") {
+                    if (strategy.getContract().m_secType.equals("CASH")) {
                         strategySymbol += "." + strategy.getContract().m_currency;
                     }
                     if (strategySymbol.equals(symbol)) {
