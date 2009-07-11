@@ -11,7 +11,7 @@ import com.jbooktrader.platform.optimizer.*;
 public class Hybrid extends StrategyES {
 
     // Technical indicators
-    private final Indicator priceVelocityInd, depthBalanceInd;
+    private final Indicator priceVelocityInd, balanceVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "FastPeriod";
@@ -25,9 +25,9 @@ public class Hybrid extends StrategyES {
 
         entry = getParam(ENTRY);
         priceVelocityInd = new PriceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        depthBalanceInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(priceVelocityInd);
-        addIndicator(depthBalanceInd);
+        addIndicator(balanceVelocityInd);
     }
 
     /**
@@ -38,9 +38,9 @@ public class Hybrid extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 1000, 1, 843);
-        addParam(SLOW_PERIOD, 500, 8000, 5, 1666);
-        addParam(ENTRY, 1, 20, 1, 1);
+        addParam(FAST_PERIOD, 300, 1000, 1, 550);
+        addParam(SLOW_PERIOD, 100, 12000, 1, 12190);
+        addParam(ENTRY, 1, 15, 1, 3);
     }
 
     /**
@@ -49,11 +49,11 @@ public class Hybrid extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double velocity = depthBalanceInd.getValue();
-        double pv = priceVelocityInd.getValue();
-        if (velocity >= entry && pv > 0) {
+        double balanceVelocity = balanceVelocityInd.getValue();
+        double priceVelocity = priceVelocityInd.getValue();
+        if (balanceVelocity >= entry && priceVelocity > 0) {
             setPosition(1);
-        } else if (velocity <= -entry && pv < 0) {
+        } else if (balanceVelocity <= -entry && priceVelocity < 0) {
             setPosition(-1);
         }
     }
