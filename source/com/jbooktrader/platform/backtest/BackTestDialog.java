@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.backtest;
 
-import com.jbooktrader.platform.dialog.JBTDialog;
+import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
@@ -17,7 +17,7 @@ import java.io.*;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(550, 130);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(650, 170);// minimum frame size
     private final PreferencesHolder prefs;
     private final Strategy strategy;
     private JButton cancelButton, backTestButton, selectFileButton;
@@ -37,19 +37,27 @@ public class BackTestDialog extends JBTDialog {
         setVisible(true);
     }
 
-    public void setProgress(long count, long iterations) {
-        int percent = (int) (100 * (count / (double) iterations));
-        progressBar.setValue(percent);
-        progressBar.setString("Running back test: " + percent + "%");
+    public void setProgress(final long count, final long iterations) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                int percent = (int) (100 * (count / (double) iterations));
+                progressBar.setValue(percent);
+                progressBar.setString("Running back test: " + percent + "%");
+            }
+        });
     }
 
     public void enableProgress() {
-        progressBar.setValue(0);
-        progressBar.setString("Starting back test...");
-        progressBar.setVisible(true);
-        backTestButton.setEnabled(false);
-        cancelButton.setEnabled(true);
-        getRootPane().setDefaultButton(cancelButton);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setValue(0);
+                progressBar.setString("Starting back test...");
+                progressBar.setVisible(true);
+                backTestButton.setEnabled(false);
+                cancelButton.setEnabled(true);
+                getRootPane().setDefaultButton(cancelButton);
+            }
+        });
     }
 
     public void showProgress(String progressText) {

@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.chart.*;
-import com.jbooktrader.platform.dialog.JBTDialog;
+import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -21,7 +21,7 @@ import java.util.List;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(770, 550);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
@@ -54,40 +54,64 @@ public class OptimizerDialog extends JBTDialog {
         setVisible(true);
     }
 
-    public void setProgress(long count, long iterations, String text, String label) {
-        progressLabel.setText(label);
-        int percent = (int) (100 * (count / (double) iterations));
-        progressBar.setValue(percent);
-        progressBar.setString(text + ": " + percent + "% completed");
+    public void setProgress(final long count, final long iterations, final String text, final String label) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressLabel.setText(label);
+                int percent = (int) (100 * (count / (double) iterations));
+                progressBar.setValue(percent);
+                progressBar.setString(text + ": " + percent + "% completed");
+            }
+        });
     }
 
-    public void setProgress(long count, long iterations, String text) {
-        int percent = (int) (100 * (count / (double) iterations));
-        progressBar.setValue(percent);
-        progressBar.setString(text + percent + "%");
+    public void setProgress(final long count, final long iterations, final String text) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                int percent = (int) (100 * (count / (double) iterations));
+                progressBar.setValue(percent);
+                progressBar.setString(text + percent + "%");
+            }
+        });
     }
 
     public void enableProgress() {
-        progressLabel.setText("");
-        progressBar.setValue(0);
-        progressPanel.setVisible(true);
-        optimizeButton.setEnabled(false);
-        cancelButton.setEnabled(true);
-        getRootPane().setDefaultButton(cancelButton);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressLabel.setText("");
+                progressBar.setValue(0);
+                progressPanel.setVisible(true);
+                optimizeButton.setEnabled(false);
+                cancelButton.setEnabled(true);
+                getRootPane().setDefaultButton(cancelButton);
+            }
+        });
+
+
     }
 
-    public void showProgress(String progressText) {
-        progressBar.setValue(0);
-        progressBar.setString(progressText);
+    public void showProgress(final String progressText) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressBar.setValue(0);
+                progressBar.setString(progressText);
+
+            }
+        });
     }
 
 
     public void signalCompleted() {
-        progressPanel.setVisible(false);
-        optimizeButton.setEnabled(true);
-        cancelButton.setEnabled(false);
-        getRootPane().setDefaultButton(optimizationMapButton);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressPanel.setVisible(false);
+                optimizeButton.setEnabled(true);
+                cancelButton.setEnabled(false);
+                getRootPane().setDefaultButton(optimizationMapButton);
+            }
+        });
     }
+
 
     private void setOptions() throws JBookTraderException {
         String historicalFileName = fileNameText.getText();

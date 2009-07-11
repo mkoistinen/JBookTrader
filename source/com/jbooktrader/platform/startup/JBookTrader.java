@@ -1,11 +1,12 @@
 package com.jbooktrader.platform.startup;
 
-import com.birosoft.liquid.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.util.*;
+import org.jvnet.substance.*;
+import org.jvnet.substance.skin.*;
 
 import javax.swing.*;
-import javax.swing.plaf.*;
 import java.io.*;
 import java.nio.channels.*;
 
@@ -17,7 +18,7 @@ public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
     public static final String VERSION = "6.11";
     public static final String RELEASE_DATE = "July 7, 2009";
-	public static final double MAC_MENUBAR_HEIGHT = 22;
+    public static final double MAC_MENUBAR_HEIGHT = 22;
     private static String appPath;
     private static boolean onMac = false;
 
@@ -34,29 +35,45 @@ public class JBookTrader {
             if (onMac) {
                 // Menu bar at top of screen
                 System.setProperty("apple.laf.useScreenMenuBar", "true");
-
                 // Set application name
                 System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_NAME);
-
                 // Set default look and feel.
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } else {
-                LiquidLookAndFeel.setLiquidDecorations(true, "mac");
-                UIManager.setLookAndFeel("com.birosoft.liquid.LiquidLookAndFeel");
+                String currentSkinName = PreferencesHolder.getInstance().get(JBTPreferences.Skin);
+                for (final SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
+                    if (skinInfo.getDisplayName().equals(currentSkinName)) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                try {
+                                    SubstanceLookAndFeel.setSkin(skinInfo.getClassName());
+                                } catch (Exception e) {
+                                    MessageDialog.showError(null, e);
+                                }
+                            }
+                        });
+                        break;
+                    }
+                }
             }
         } catch (Throwable t) {
             String msg = t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.";
             MessageDialog.showMessage(null, msg);
         }
 
-        // Set the color scheme explicitly
-        ColorUIResource color = new ColorUIResource(102, 102, 153);
-        UIManager.put("Label.foreground", color);
-        UIManager.put("TitledBorder.titleColor", color);
 
         Dispatcher.setReporter();
 
-        new MainFrameController();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    new MainFrameController();
+                } catch (Exception e) {
+                    MessageDialog.showError(null, e);
+                }
+            }
+        });
     }
 
     /**
@@ -96,6 +113,6 @@ public class JBookTrader {
      */
     public static boolean onMac() {
         return JBookTrader.onMac;
-     }
+    }
 
 }

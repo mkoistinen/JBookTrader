@@ -1,11 +1,13 @@
 package com.jbooktrader.platform.preferences;
 
 import com.jbooktrader.platform.c2.*;
-import com.jbooktrader.platform.dialog.JBTDialog;
+import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
+import org.jvnet.substance.*;
+import org.jvnet.substance.skin.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -108,6 +110,20 @@ public class PreferencesDialog extends JBTDialog {
         c2TableModel = new C2TableModel();
         scrollPane.getViewport().add(new JTable(c2TableModel));
 
+        JPanel lookAndFeelTab = new JPanel(new SpringLayout());
+        tabbedPane1.addTab("Look & Feel", lookAndFeelTab);
+        final SubstanceSkinComboSelector substanceSkinComboSelector = new SubstanceSkinComboSelector();
+        String skinName = prefs.get(Skin);
+        for (SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
+            if (skinInfo.getDisplayName().equals(skinName)) {
+                substanceSkinComboSelector.setSelectedItem(skinInfo);
+                break;
+            }
+        }
+        genericAdd(lookAndFeelTab, Skin, substanceSkinComboSelector);
+        SpringUtilities.makeCompactGrid(lookAndFeelTab, 1, 2, 12, 12, 8, 5);
+
+
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -122,6 +138,9 @@ public class PreferencesDialog extends JBTDialog {
 
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());
+
+                    SkinInfo skinInfo = (SkinInfo) substanceSkinComboSelector.getSelectedItem();
+                    prefs.set(Skin, skinInfo.getDisplayName());
 
                     String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
                     MessageDialog.showMessage(PreferencesDialog.this, msg);

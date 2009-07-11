@@ -41,7 +41,10 @@ public enum JBTPreferences {
 
     // Collective2
     Collective2Password("C2 Password", ""),
-    Collective2Strategies("C2 Strategies", "");
+    Collective2Strategies("C2 Strategies", ""),
+
+    // Look & Feel
+    Skin("Skin", "Mist Aqua");
 
 
     private final String name, defaultValue;
