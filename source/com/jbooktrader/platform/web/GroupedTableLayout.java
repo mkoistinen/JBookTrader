@@ -19,7 +19,7 @@ public class GroupedTableLayout extends TableLayout {
 
     public void render() {
         response.append("<table>");
-        response.append("<tr><th><p>Strategy</p></th><th><p>Position</p></th><th><p>Trades</p></th><th><p>Max DD</p></th><th><p>Net Profit</p></th></tr>");
+        response.append("<tr><th>Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th class=\"last\">Net Profit</th></tr>");
 
         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
         DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
@@ -33,9 +33,9 @@ public class GroupedTableLayout extends TableLayout {
             if (contract.m_currency != null) {
                 symbol += "." + contract.m_currency;
             }
+            
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
-            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "";
-
+            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
 
             if (!symbols.containsKey(symbol)) {
                 symbols.put(symbol, price);
@@ -74,23 +74,21 @@ public class GroupedTableLayout extends TableLayout {
                     columns.add(positionManager.getPosition());
                     columns.add(performanceManager.getTrades());
                     columns.add(df0.format(performanceManager.getMaxDrawdown()));
-                    columns.add(df0.format(performanceManager.getNetProfit()));
 
                     for (Object column : columns) {
                         symbolBlock.append("<td>").append(column).append("</td>");
                     }
-
+                    
+                    symbolBlock.append("<td class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
                     symbolBlock.append("</tr>\n");
                 }
             }
 
             response.append("<tr class=\"symbol\">");
-            response.append("<td>").append(symbol).append(" (");
-            response.append(symbols.get(symbol));
-            response.append(")</td>");
+            response.append("<td>").append(symbol).append(" (").append(symbols.get(symbol)).append(")</td>");
             response.append("<td>").append(symbolPosition).append("</td>");
             response.append("<td colspan=\"2\">&nbsp;</td>");
-            response.append("<td>").append(df0.format(symbolNetProfit)).append("</td></tr>\n");
+            response.append("<td class=\"last\">").append(df0.format(symbolNetProfit)).append("</td></tr>\n");
             response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
             response.append(symbolBlock);
 
@@ -100,8 +98,8 @@ public class GroupedTableLayout extends TableLayout {
         response.append("<tr class=\"summary\">");
         response.append("<td colspan=\"2\">All Strategies</td>");
         response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
-        response.append("<td class=\"summary\">&nbsp;</td>");
-        response.append("<td>").append(df0.format(totalNetProfit)).append("</td></tr>\n");
+        response.append("<td class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
+        response.append("</tr>\n");
         response.append("</table>");
     }
 

@@ -18,15 +18,20 @@ public class SimpleTableLayout extends TableLayout {
 
     public void render() {
         response.append("<table>");
-        response.append("<tr><th><p>Strategy</p></th><th><p>Symbol</p></th><th><p>Price</p></th><th><p>Position</p></th><th><p>Trades</p></th><th><p>Max DD</p></th><th><p>Net Profit</p></th></tr>");
-        response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
+        response.append("<tr><th>Strategy</th><th>Symbol</th><th>Price</th><th>Position</th><th>Trades</th><th>Max DD</th><th class=\"last\">Net Profit</th></tr>");
 
         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
         DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
 
+        double totalNetProfit = 0.0;
+        int totalTrades = 0;
+        
         for (Strategy strategy : strategies) {
             Contract contract = strategy.getContract();
             String symbol = contract.m_symbol;
+            totalNetProfit += strategy.getPerformanceManager().getNetProfit();
+            totalTrades += strategy.getPerformanceManager().getTrades();
+            
             if (contract.m_currency != null) {
                 symbol += "." + contract.m_currency;
             }
@@ -34,7 +39,7 @@ public class SimpleTableLayout extends TableLayout {
             PositionManager positionManager = strategy.getPositionManager();
             PerformanceManager performanceManager = strategy.getPerformanceManager();
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
-            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "";
+            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
 
             response.append("<tr class=\"strategy\">\n");
 
@@ -45,16 +50,21 @@ public class SimpleTableLayout extends TableLayout {
             columns.add(positionManager.getPosition());
             columns.add(performanceManager.getTrades());
             columns.add(df0.format(performanceManager.getMaxDrawdown()));
-            columns.add(df0.format(performanceManager.getNetProfit()));
 
             for (Object column : columns) {
                 response.append("<td>").append(column).append("</td>");
             }
 
+            response.append("<td class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
             response.append("</tr>\n");
 
         }
 
+        response.append("<tr class=\"summary\">");
+        response.append("<td colspan=\"4\">All Strategies</td>");
+        response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
+        response.append("<td class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
+        response.append("</tr>\n");
         response.append("</table>");
     }
 
