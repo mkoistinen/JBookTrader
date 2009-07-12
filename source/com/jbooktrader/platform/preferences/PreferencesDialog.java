@@ -19,7 +19,7 @@ public class PreferencesDialog extends JBTDialog {
     private JTextField hostText, portText, webAccessUser;
     private JSpinner clientIDSpin, webAccessPortSpin;
     private JPasswordField webAccessPasswordField, c2PasswordField;
-    private JComboBox webAccessCombo;
+    private JComboBox webAccessCombo, tableLayoutCombo;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -91,11 +91,13 @@ public class PreferencesDialog extends JBTDialog {
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();
+        tableLayoutCombo = new JComboBox(new String[] {"simple", "grouped"});
         add(webAcessTab, WebAccess, webAccessCombo);
         add(webAcessTab, WebAccessPort, webAccessPortSpin);
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
-        SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 5);
+        add(webAcessTab, WebAccessTableLayout, tableLayoutCombo);
+        SpringUtilities.makeCompactGrid(webAcessTab, 5, 2, 12, 12, 8, 5);
 
         JPanel c2Tab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Collective2", c2Tab);
@@ -137,6 +139,7 @@ public class PreferencesDialog extends JBTDialog {
                     prefs.set(WebAccessPort, webAccessPortSpin.getValue().toString());
                     prefs.set(WebAccessUser, webAccessUser.getText());
                     prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
+                    prefs.set(WebAccessTableLayout, (String) tableLayoutCombo.getSelectedItem());
 
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());

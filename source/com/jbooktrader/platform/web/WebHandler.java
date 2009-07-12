@@ -1,16 +1,13 @@
 package com.jbooktrader.platform.web;
 
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.preferences.*;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
 import java.net.*;
-import java.text.*;
 import java.util.*;
 
 public class WebHandler implements HttpHandler {
@@ -46,93 +43,25 @@ public class WebHandler implements HttpHandler {
             response.append(JBookTrader.APP_NAME).append(": ").append(Dispatcher.getMode().getName());
             response.append("</h1>\n");
 
-            response.append("<table>");
-            response.append("<tr><th><p>Strategy</p></th><th><p>Position</p></th><th><p>Trades</p></th><th><p>Max DD</p></th><th><p>Net Profit</p></th></tr>");
-            DecimalFormat df = NumberFormatterFactory.getNumberFormatter(0);
-
-            double totalNetProfit = 0.0;
-            int totalTrades = 0;
-
-            // First, make a list of the securities in use.
-            HashMap<String, Double> symbols = new HashMap<String, Double>();
-
-            for (Strategy strategy : Dispatcher.getTrader().getAssistant().getAllStrategies()) {
-                String symbol = strategy.getContract().m_symbol;
-
-                if (strategy.getContract().m_secType.equals("CASH")) {
-                    symbol += "." + strategy.getContract().m_currency;
-                }
-                double quote = Double.NaN;
-                try {
-                    quote = strategy.getMarketBook().getSnapshot().getPrice();
-                } catch (Exception e) {
-                    /* we don't care */
-                }
-                if (!symbols.containsKey(symbol)) {
-                    symbols.put(symbol, quote);
-                }
-            }
-
-            // Sort the securities alphabetically...
-            List<String> symbolKeys = new ArrayList<String>(symbols.keySet());
-            Collections.sort(symbolKeys);
-
-            // Sort the strategies too...
             Collection<Strategy> strategies = Dispatcher.getTrader().getAssistant().getAllStrategies();
             List<Strategy> strategyList = new ArrayList<Strategy>(strategies);
             Collections.sort(strategyList);
 
-            for (String symbol : symbolKeys) {
-                StringBuilder symbolBlock = new StringBuilder();
-                int symbolPosition = 0;
-                double symbolNetProfit = 0.0;
-
-                for (Strategy strategy : strategyList) {
-                    String strategySymbol = strategy.getContract().m_symbol;
-                    if (strategy.getContract().m_secType.equals("CASH")) {
-                        strategySymbol += "." + strategy.getContract().m_currency;
-                    }
-                    if (strategySymbol.equals(symbol)) {
-                        PositionManager positionManager = strategy.getPositionManager();
-                        PerformanceManager performanceManager = strategy.getPerformanceManager();
-                        totalNetProfit += performanceManager.getNetProfit();
-                        totalTrades += performanceManager.getTrades();
-                        symbolPosition += positionManager.getPosition();
-                        symbolNetProfit += performanceManager.getNetProfit();
-
-                        symbolBlock.append("<tr class=\"strategy\">\n");
-                        symbolBlock.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\" target=\"_new\">").append(strategy.getName()).append("</a></td>");
-                        symbolBlock.append("<td>").append(positionManager.getPosition()).append("</td>");
-                        symbolBlock.append("<td>").append(performanceManager.getTrades()).append("</td>");
-                        symbolBlock.append("<td>").append(df.format(performanceManager.getMaxDrawdown())).append("</td>");
-                        symbolBlock.append("<td>").append(df.format(performanceManager.getNetProfit())).append("</td>");
-                        symbolBlock.append("</tr>\n");
-                    }
-                }
-
-                response.append("<tr class=\"symbol\">");
-                response.append("<td>").append(symbol).append(" (");
-                if (symbols.get(symbol).isNaN()) {
-                    response.append("n/a");
-                } else {
-                    response.append(symbols.get(symbol));
-                }
-                response.append(")</td>");
-                response.append("<td>").append(symbolPosition).append("</td>");
-                response.append("<td colspan=\"2\">&nbsp;</td>");
-                response.append("<td>").append(df.format(symbolNetProfit)).append("</td></tr>\n");
-                response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
-                response.append(symbolBlock);
-
+            TableLayout tableLayout = null;
+            PreferencesHolder prefs = PreferencesHolder.getInstance();
+            String tableLayoutPreference = prefs.get(JBTPreferences.WebAccessTableLayout);
+            if (tableLayoutPreference.equals("simple")) {
+                tableLayout = new SimpleTableLayout(response, strategyList);
             }
 
-            response.append("<tr class=\"summary\">");
-            response.append("<td colspan=\"2\">All Strategies</td>");
-            response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
-            response.append("<td class=\"summary\">&nbsp;</td>");
-            response.append("<td>").append(df.format(totalNetProfit)).append("</td></tr>\n");
+            if (tableLayoutPreference.equals("grouped")) {
+                tableLayout = new GroupedTableLayout(response, strategyList);
+            }
 
-            response.append("</table>\n");
+            if (tableLayout != null) {
+                tableLayout.render();
+            }
+
             response.append("<p class=\"version\">JBookTrader version ").append(JBookTrader.VERSION).append("</p>\n");
             response.append("<p class=\"eventReport\"><a href=\"/reports/EventReport.htm\" target=\"_new\">Event Report</a></p>\n");
             response.append("</body>\n");
@@ -143,17 +72,10 @@ public class WebHandler implements HttpHandler {
             httpExchange.getResponseHeaders().add("Location", "/index.html");
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_MOVED_PERM, response.length());
         } else {
-            // Static resources
-
             // We support a VIRTUAL directory '/reports/' which we manually map onto the reports folder in the class path
             // This must explicitly be the beginning of the requested resource.  Otherwise, we fold any requests over to
             // the WEBROOT
-            String absoluteResource;
-            if (resource.startsWith("/reports/")) {
-                absoluteResource = JBookTrader.getAppPath() + resource;
-            } else {
-                absoluteResource = WEBROOT + resource;
-            }
+            String absoluteResource = resource.startsWith("/reports/") ? (JBookTrader.getAppPath() + resource) : (WEBROOT + resource);
 
             FileHandler fileHandler = new FileHandler();
             String fileName = fileHandler.getFileName(uri);
@@ -168,4 +90,5 @@ public class WebHandler implements HttpHandler {
         os.write(response.toString().getBytes());
         os.close();
     }
+
 }

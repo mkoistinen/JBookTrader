@@ -11,6 +11,7 @@ public enum JBTPreferences {
     WebAccessPort("Web Access Port", "1234"),
     WebAccessUser("Web Access User", "admin"),
     WebAccessPassword("Web Access Password", "admin"),
+    WebAccessTableLayout("Table Layout", "simple"),
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
