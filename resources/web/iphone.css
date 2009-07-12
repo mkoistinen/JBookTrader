@@ -39,9 +39,6 @@ tr td:first-child {
 	padding-left: 8px;
 }
 
-/* Completely hide our hidden rows */
-tr.hidden { display: none; }
-
 /*** HEADING ROW ***/
 tr th {
 	background-color: rgb(255, 204, 51); 

@@ -96,7 +96,6 @@ public class GroupedTableLayout extends TableLayout {
             response.append("<td>").append(symbolPosition).append("</td>");
             response.append("<td colspan=\"2\">&nbsp;</td>");
             response.append("<td class=\"last\">").append(df0.format(symbolNetProfit)).append("</td></tr>\n");
-            response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
             response.append(symbolBlock);
         }
 
