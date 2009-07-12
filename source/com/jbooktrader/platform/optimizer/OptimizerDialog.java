@@ -268,7 +268,7 @@ public class OptimizerDialog extends JBTDialog {
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
         selectFileButton.setPreferredSize(new Dimension(32, 32));
-        
+
         fileNameLabel.setLabelFor(fileNameText);
 
         strategyPanel.add(fileNameLabel);

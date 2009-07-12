@@ -220,7 +220,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         strategyTable.setShowGrid(false);
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) strategyTable.getDefaultRenderer(String.class);
         renderer.setHorizontalAlignment(JLabel.RIGHT);
-        
+
         // Make some columns wider than the rest, so that the info fits in.
         TableColumnModel columnModel = strategyTable.getColumnModel();
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
