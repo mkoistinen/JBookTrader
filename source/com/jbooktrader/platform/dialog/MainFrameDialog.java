@@ -217,21 +217,15 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         strategyTableModel = new StrategyTableModel();
         strategyTable = new JTable(strategyTableModel);
         strategyTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // set custom column renderers
-        TableColumnModel columnModel = strategyTable.getColumnModel();
-        NumberRenderer nr0 = new NumberRenderer(0);
-        columnModel.getColumn(NetProfit.ordinal()).setCellRenderer(nr0);
-        columnModel.getColumn(MaxDD.ordinal()).setCellRenderer(nr0);
-        NumberRenderer nr5 = new NumberRenderer(5);
-        columnModel.getColumn(Price.ordinal()).setCellRenderer(nr5);
-        DefaultTableCellRenderer tableCellRenderer = new DefaultTableCellRenderer();
-        tableCellRenderer.setHorizontalAlignment(JLabel.RIGHT);
-        columnModel.getColumn(MarketDepth.ordinal()).setCellRenderer(tableCellRenderer);
-        columnModel.getColumn(Indicators.ordinal()).setCellRenderer(tableCellRenderer);
-
+        strategyTable.setShowGrid(false);
+        DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) strategyTable.getDefaultRenderer(String.class);
+        renderer.setHorizontalAlignment(JLabel.RIGHT);
+        
         // Make some columns wider than the rest, so that the info fits in.
+        TableColumnModel columnModel = strategyTable.getColumnModel();
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
+        columnModel.getColumn(MarketDepth.ordinal()).setPreferredWidth(120);
+        columnModel.getColumn(ProfitFactor.ordinal()).setPreferredWidth(100);
 
         strategyTableScrollPane.getViewport().add(strategyTable);
 

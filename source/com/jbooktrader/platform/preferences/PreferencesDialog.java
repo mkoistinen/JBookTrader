@@ -108,7 +108,9 @@ public class PreferencesDialog extends JBTDialog {
         c2Tab.add(scrollPane);
         SpringUtilities.makeCompactGrid(c2Tab, 2, 1, 12, 12, 12, 12);
         c2TableModel = new C2TableModel();
-        scrollPane.getViewport().add(new JTable(c2TableModel));
+        JTable c2Table = new JTable(c2TableModel);
+        c2Table.setShowGrid(false);
+        scrollPane.getViewport().add(c2Table);
 
         JPanel lookAndFeelTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Look & Feel", lookAndFeelTab);

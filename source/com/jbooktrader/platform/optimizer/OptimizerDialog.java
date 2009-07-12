@@ -21,7 +21,7 @@ import java.util.List;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(770, 550);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(770, 600);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
@@ -267,7 +267,8 @@ public class OptimizerDialog extends JBTDialog {
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
-        selectFileButton.setPreferredSize(new Dimension(23, 23));
+        selectFileButton.setPreferredSize(new Dimension(32, 32));
+        
         fileNameLabel.setLabelFor(fileNameText);
 
         strategyPanel.add(fileNameLabel);
@@ -278,18 +279,13 @@ public class OptimizerDialog extends JBTDialog {
 
         // strategy parametrs panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
-
         JScrollPane paramScrollPane = new JScrollPane();
-
         paramTableModel = new ParamTableModel();
         JTable paramTable = new JTable(paramTableModel);
+        paramTable.setShowGrid(false);
+
         paramTableColumnModel = paramTable.getColumnModel();
         stepColumn = paramTableColumnModel.getColumn(3);
-        TableCellRenderer renderer = new NumberRenderer(0);
-        for (int column = 1; column < paramTableColumnModel.getColumnCount(); column++) {
-            paramTableColumnModel.getColumn(column).setCellRenderer(renderer);
-        }
-
 
         paramScrollPane.getViewport().add(paramTable);
         paramScrollPane.setPreferredSize(new Dimension(0, 90));
@@ -345,6 +341,8 @@ public class OptimizerDialog extends JBTDialog {
         SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 0, 12, 0);
 
         resultsTable = new JTable();
+        resultsTable.setShowGrid(false);
+
         resultsScrollPane.getViewport().add(resultsTable);
 
         progressLabel = new JLabel();
@@ -400,14 +398,8 @@ public class OptimizerDialog extends JBTDialog {
             setParamTableColumns();
             resultsTableModel = new ResultsTableModel(strategy);
             resultsTable.setModel(resultsTableModel);
-
-            // set custom column renderers
-            int params = strategy.getParams().size();
-            TableColumnModel resultsColumnModel = resultsTable.getColumnModel();
-            for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
-                int columnIndex = performanceMetric.ordinal() + params;
-                resultsColumnModel.getColumn(columnIndex).setCellRenderer(new NumberRenderer(performanceMetric.getPrecision()));
-            }
+            DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) resultsTable.getDefaultRenderer(String.class);
+            renderer.setHorizontalAlignment(JLabel.RIGHT);
         } catch (Exception e) {
             MessageDialog.showError(this, e);
         }

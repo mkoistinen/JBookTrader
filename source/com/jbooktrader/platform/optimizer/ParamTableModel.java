@@ -14,14 +14,8 @@ public class ParamTableModel extends TableDataModel {
     }
 
     @Override
-    public void setValueAt(Object value, int row, int col) {
-        if (col > 0) {
-            try {
-                super.setValueAt(Integer.parseInt(value.toString()), row, col);
-            } catch (NumberFormatException nfe) {
-                MessageDialog.showError(null, value + " is not an integer.");
-            }
-        }
+    public Class<?> getColumnClass(int column) {
+        return column == 0 ? String.class : Integer.class;
     }
 
     @Override

@@ -2,7 +2,9 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
+import java.text.*;
 import java.util.*;
 
 /**
@@ -25,7 +27,7 @@ public class ResultsTableModel extends TableDataModel {
 
     @Override
     public Class<?> getColumnClass(int c) {
-        return Double.class;
+        return String.class;
     }
 
     @Override
@@ -46,12 +48,15 @@ public class ResultsTableModel extends TableDataModel {
                 item[++index] = param.getValue();
             }
 
+            DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
+            DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
+
             item[++index] = optimizationResult.getTrades();
-            item[++index] = optimizationResult.getNetProfit();
-            item[++index] = optimizationResult.getMaxDrawdown();
-            item[++index] = optimizationResult.getProfitFactor();
-            item[++index] = optimizationResult.getKellyCriterion();
-            item[++index] = optimizationResult.getPerformanceIndex();
+            item[++index] = df0.format(optimizationResult.getNetProfit());
+            item[++index] = df0.format(optimizationResult.getMaxDrawdown());
+            item[++index] = df2.format(optimizationResult.getProfitFactor());
+            item[++index] = df0.format(optimizationResult.getKellyCriterion());
+            item[++index] = df2.format(optimizationResult.getPerformanceIndex());
 
             addRowFast(item);
         }

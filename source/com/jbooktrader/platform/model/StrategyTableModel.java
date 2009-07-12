@@ -9,6 +9,7 @@ import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
+import java.text.*;
 import java.util.*;
 
 /**
@@ -24,12 +25,6 @@ public class StrategyTableModel extends TableDataModel {
         }
         setSchema(allColumns.toArray(new String[columns.length]));
         traderAssistant = Dispatcher.getTrader().getAssistant();
-    }
-
-    @Override
-    public Class<?> getColumnClass(int col) {
-        StrategyTableColumn column = StrategyTableColumn.values()[col];
-        return column.getColumnClass();
     }
 
     public String getStrategyNameForRow(int row) {
@@ -67,6 +62,9 @@ public class StrategyTableModel extends TableDataModel {
     }
 
     public void update(Strategy strategy) {
+        DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
+        DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
+
         final int row = getRowForStrategy(strategy);
 
         MarketBook marketBook = strategy.getMarketBook();
@@ -81,9 +79,9 @@ public class StrategyTableModel extends TableDataModel {
 
         PerformanceManager performanceManager = strategy.getPerformanceManager();
         setValueAtFast(performanceManager.getTrades(), row, Trades.ordinal());
-        setValueAtFast(performanceManager.getMaxDrawdown(), row, MaxDD.ordinal());
-        setValueAtFast(performanceManager.getNetProfit(), row, NetProfit.ordinal());
-        setValueAtFast(performanceManager.getProfitFactor(), row, ProfitFactor.ordinal());
+        setValueAtFast(df0.format(performanceManager.getMaxDrawdown()), row, MaxDD.ordinal());
+        setValueAtFast(df0.format(performanceManager.getNetProfit()), row, NetProfit.ordinal());
+        setValueAtFast(df2.format(performanceManager.getProfitFactor()), row, ProfitFactor.ordinal());
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
