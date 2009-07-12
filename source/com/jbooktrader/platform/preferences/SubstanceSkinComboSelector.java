@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
+import com.jbooktrader.platform.startup.*;
+
 public class SubstanceSkinComboSelector extends JComboBox {
     public SubstanceSkinComboSelector() {
         // populate the combobox
@@ -29,7 +31,9 @@ public class SubstanceSkinComboSelector extends JComboBox {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        SubstanceLookAndFeel.setSkin(((SkinInfo) SubstanceSkinComboSelector.this.getSelectedItem()).getClassName());
+                        if (!JBookTrader.onMac()) {
+                            SubstanceLookAndFeel.setSkin(((SkinInfo) SubstanceSkinComboSelector.this.getSelectedItem()).getClassName());
+                        }
                     }
                 });
             }
