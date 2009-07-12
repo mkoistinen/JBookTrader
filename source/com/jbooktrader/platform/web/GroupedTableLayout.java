@@ -48,10 +48,12 @@ public class GroupedTableLayout extends TableLayout {
 
         int totalTrades = 0;
         double totalNetProfit = 0;
+
         for (String symbol : symbolKeys) {
             StringBuilder symbolBlock = new StringBuilder();
             int symbolPosition = 0;
             double symbolNetProfit = 0.0;
+            int strategyRowCount = 0; // Reset the odd/even counter on each symbol
 
             for (Strategy strategy : strategies) {
                 String strategySymbol = strategy.getContract().m_symbol;
@@ -67,7 +69,10 @@ public class GroupedTableLayout extends TableLayout {
                     symbolPosition += positionManager.getPosition();
                     symbolNetProfit += performanceManager.getNetProfit();
 
-                    symbolBlock.append("<tr class=\"strategy\">\n");
+                    if (strategyRowCount % 2 == 0)
+                    	symbolBlock.append("<tr class=\"strategy\">\n");
+                    else
+                    	symbolBlock.append("<tr class=\"strategy oddRow\">\n");
 
                     List<Object> columns = new ArrayList<Object>();
                     columns.add("<a href=\"/reports/" + strategy.getName() + ".htm\" target=\"_new\">" + strategy.getName() + "</a>");
@@ -81,6 +86,8 @@ public class GroupedTableLayout extends TableLayout {
                     
                     symbolBlock.append("<td class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
                     symbolBlock.append("</tr>\n");
+                    
+                    strategyRowCount++;
                 }
             }
 
@@ -91,7 +98,6 @@ public class GroupedTableLayout extends TableLayout {
             response.append("<td class=\"last\">").append(df0.format(symbolNetProfit)).append("</td></tr>\n");
             response.append("<tr class=\"hidden\"></tr>"); // This is to keep alternating rows working nicely.
             response.append(symbolBlock);
-
         }
 
 

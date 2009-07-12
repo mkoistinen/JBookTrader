@@ -26,6 +26,8 @@ public class SimpleTableLayout extends TableLayout {
         double totalNetProfit = 0.0;
         int totalTrades = 0;
         
+        int strategyRowCount = 0;
+        
         for (Strategy strategy : strategies) {
             Contract contract = strategy.getContract();
             String symbol = contract.m_symbol;
@@ -41,8 +43,11 @@ public class SimpleTableLayout extends TableLayout {
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
             String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
 
-            response.append("<tr class=\"strategy\">\n");
-
+            if (strategyRowCount % 2 == 0)
+            	response.append("<tr class=\"strategy\">\n");
+            else
+            	response.append("<tr class=\"strategy oddRow\">\n");
+            	
             List<Object> columns = new ArrayList<Object>();
             columns.add("<a href=\"/reports/" + strategy.getName() + ".htm\" target=\"_new\">" + strategy.getName() + "</a>");
             columns.add(symbol);
@@ -58,6 +63,7 @@ public class SimpleTableLayout extends TableLayout {
             response.append("<td class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
             response.append("</tr>\n");
 
+            strategyRowCount++;
         }
 
         response.append("<tr class=\"summary\">");

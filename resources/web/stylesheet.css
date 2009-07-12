@@ -3,7 +3,6 @@ body {
 	margin: 0;
 	font-family: Arial, sans-serif;
 	color: black;
-	padding-bottom: 200px;
 }
 h1 {
 	background: url(toolbar.png) #6d84a2 repeat-x;
@@ -30,7 +29,7 @@ td, th {
 	overflow-x: clip;
 }
 /* Odd table rows are rendered in light blue, by default */
-table tr:nth-child(odd) {
+tr.oddRow td {
 	background-color: #edf1ff;
 }
 
@@ -137,14 +136,16 @@ tr.summary td.last {
 /* Other */
 .version { 
 	font-size: 12px;
-	line-height: 20px;
+	line-height: 14px;
+	padding-top: 3px;
 	padding-right: 8px;
 	color: black;
 	float: right;
 }
 .eventReport {
 	font-size: 12px;
-	line-height: 20px;
+	line-height: 14px;
+	padding-top: 3px;
 	padding-left: 8px;
 	color: black;
 	float: left;
