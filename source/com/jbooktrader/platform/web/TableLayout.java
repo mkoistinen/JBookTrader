@@ -5,12 +5,12 @@ import com.jbooktrader.platform.strategy.*;
 import java.util.*;
 
 public abstract class TableLayout {
-    protected StringBuilder response;
-    protected List<Strategy> strategyList;
+    protected final StringBuilder response;
+    protected final List<Strategy> strategies;
 
-    public TableLayout(StringBuilder response, List<Strategy> strategyList) {
+    public TableLayout(StringBuilder response, List<Strategy> strategies) {
         this.response = response;
-        this.strategyList = strategyList;
+        this.strategies = strategies;
     }
 
     public abstract void render();

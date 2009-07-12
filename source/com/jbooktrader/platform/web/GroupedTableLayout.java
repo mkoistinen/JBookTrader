@@ -1,15 +1,15 @@
 package com.jbooktrader.platform.web;
 
-import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.position.*;
-import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.util.*;
-import com.jbooktrader.platform.marketbook.*;
 import com.ib.client.*;
+import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.position.*;
+import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 
-import java.util.*;
 import java.text.*;
+import java.util.*;
 
 public class GroupedTableLayout extends TableLayout {
 
@@ -24,7 +24,6 @@ public class GroupedTableLayout extends TableLayout {
         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
         DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
 
-        
         // First, make a list of the securities in use.
         HashMap<String, String> symbols = new HashMap<String, String>();
 
@@ -35,7 +34,7 @@ public class GroupedTableLayout extends TableLayout {
                 symbol += "." + contract.m_currency;
             }
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
-            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()): "";
+            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "";
 
 
             if (!symbols.containsKey(symbol)) {
@@ -54,11 +53,12 @@ public class GroupedTableLayout extends TableLayout {
             int symbolPosition = 0;
             double symbolNetProfit = 0.0;
 
-            for (Strategy strategy : strategyList) {
+            for (Strategy strategy : strategies) {
                 String strategySymbol = strategy.getContract().m_symbol;
                 if (strategy.getContract().m_secType.equals("CASH")) {
                     strategySymbol += "." + strategy.getContract().m_currency;
                 }
+
                 if (strategySymbol.equals(symbol)) {
                     PositionManager positionManager = strategy.getPositionManager();
                     PerformanceManager performanceManager = strategy.getPerformanceManager();
@@ -68,11 +68,18 @@ public class GroupedTableLayout extends TableLayout {
                     symbolNetProfit += performanceManager.getNetProfit();
 
                     symbolBlock.append("<tr class=\"strategy\">\n");
-                    symbolBlock.append("<td><a href=\"/reports/").append(strategy.getName()).append(".htm\" target=\"_new\">").append(strategy.getName()).append("</a></td>");
-                    symbolBlock.append("<td>").append(positionManager.getPosition()).append("</td>");
-                    symbolBlock.append("<td>").append(performanceManager.getTrades()).append("</td>");
-                    symbolBlock.append("<td>").append(df0.format(performanceManager.getMaxDrawdown())).append("</td>");
-                    symbolBlock.append("<td>").append(df0.format(performanceManager.getNetProfit())).append("</td>");
+
+                    List<Object> columns = new ArrayList<Object>();
+                    columns.add("<a href=\"/reports/" + strategy.getName() + ".htm\" target=\"_new\">" + strategy.getName() + "</a>");
+                    columns.add(positionManager.getPosition());
+                    columns.add(performanceManager.getTrades());
+                    columns.add(df0.format(performanceManager.getMaxDrawdown()));
+                    columns.add(df0.format(performanceManager.getNetProfit()));
+
+                    for (Object column : columns) {
+                        symbolBlock.append("<td>").append(column).append("</td>");
+                    }
+
                     symbolBlock.append("</tr>\n");
                 }
             }
