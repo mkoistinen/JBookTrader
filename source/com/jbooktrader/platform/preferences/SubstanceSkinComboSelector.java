@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.preferences;
 
+import com.jbooktrader.platform.startup.*;
 import org.jvnet.substance.*;
 import org.jvnet.substance.api.renderers.*;
 import org.jvnet.substance.skin.*;
@@ -14,7 +15,6 @@ public class SubstanceSkinComboSelector extends JComboBox {
         // populate the combobox
         super(new ArrayList<SkinInfo>(SubstanceLookAndFeel.getAllSkins().values()).toArray());
 
-
         // set custom renderer to show the skin display name
         this.setRenderer(new SubstanceDefaultComboBoxRenderer(this) {
             @Override
@@ -22,7 +22,6 @@ public class SubstanceSkinComboSelector extends JComboBox {
                 return super.getListCellRendererComponent(list, ((SkinInfo) value).getDisplayName(), index, isSelected, cellHasFocus);
             }
         });
-
 
         // add an action listener to change skin based on user selection
         this.addActionListener(new ActionListener() {
@@ -32,7 +31,8 @@ public class SubstanceSkinComboSelector extends JComboBox {
                     @Override
                     public void run() {
                         if (isEnabled()) {
-                            SubstanceLookAndFeel.setSkin(((SkinInfo) SubstanceSkinComboSelector.this.getSelectedItem()).getClassName());
+                            String skinName = ((SkinInfo) SubstanceSkinComboSelector.this.getSelectedItem()).getDisplayName();
+                            LookAndFeelManager.setSubstanceSkin(skinName);
                         }
                     }
                 });

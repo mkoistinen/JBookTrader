@@ -64,21 +64,8 @@ public class PreferencesDialog extends JBTDialog {
         }
 
         if (lookAndFeel.equals("Substance")) {
-            String currentSkinName = ((SkinInfo ) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
-            for (final SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
-                if (skinInfo.getDisplayName().equals(currentSkinName)) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                SubstanceLookAndFeel.setSkin(skinInfo.getClassName());
-                            } catch (Exception e) {
-                                MessageDialog.showError(null, e);
-                            }
-                        }
-                    });
-                    break;
-                }
-            }
+            String skinName = ((SkinInfo) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
+            LookAndFeelManager.setSubstanceSkin(skinName);
         }
 
     }

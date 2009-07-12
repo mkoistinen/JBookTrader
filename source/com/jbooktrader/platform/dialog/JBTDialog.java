@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.dialog;
 
-import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
@@ -8,6 +7,7 @@ import java.awt.*;
 
 
 public class JBTDialog extends JDialog {
+    public static final double MAC_MENUBAR_HEIGHT = 22;
 
     public JBTDialog(Frame owner) {
         super(owner);
@@ -18,10 +18,11 @@ public class JBTDialog extends JDialog {
 
         // This is to prevent the dialog from being drawn under the Mac menu bar.
         try {
-            if (JBookTrader.onMac()) {
+            boolean onMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+            if (onMac) {
                 Point point = getLocation();
-                if (point.getY() < JBookTrader.MAC_MENUBAR_HEIGHT) {
-                    point.translate(0, (int) (JBookTrader.MAC_MENUBAR_HEIGHT - point.getY()));
+                if (point.getY() < MAC_MENUBAR_HEIGHT) {
+                    point.translate(0, (int) (MAC_MENUBAR_HEIGHT - point.getY()));
                 }
                 setLocation(point);
             }
