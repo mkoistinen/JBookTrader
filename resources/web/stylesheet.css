@@ -1,16 +1,9 @@
 body {
 	background: white url(pinstripes.png) repeat; 
+	margin: 0;
 	font-family: Arial, sans-serif;
-	margin: 0; 
 	color: black;
-}
-th p {
-	margin: 0px;
-	padding: 0px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	overflow-x: clip;
+	padding-bottom: 200px;
 }
 h1 {
 	background: url(toolbar.png) #6d84a2 repeat-x;
@@ -30,7 +23,12 @@ table {
 	border-collapse: collapse;
 	width: 100%
 }
-
+td, th {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow-x: clip;
+}
 /* Odd table rows are rendered in light blue, by default */
 table tr:nth-child(odd) {
 	background-color: #edf1ff;
@@ -46,14 +44,14 @@ tr td:first-child {
 tr.hidden { display: none; }
 
 /*** HEADING ROW ***/
-th {
+tr th {
 	background-color: rgb(255, 204, 51); 
 	font-style: bold;
 	font-size: 14px;
 	line-height: 20px;
 	padding-top: 3px;
 	padding-bottom: 3px;
-	padding-left: 10px;
+	padding-left: 3px;
 	border-width: 0px 1px;
 	text-align: right;
 }
@@ -61,12 +59,12 @@ th {
 tr th:first-child {
 	text-align: left;
 	padding-left: 8px;
-	width: 30%;
+	width: 25%;
 }
 tr th:nth-child(2) {
 	padding-left: 0px;
 }
-tr th:nth-child(5) {
+tr th.last {
 	padding-right: 8px;
 }
 
@@ -90,10 +88,13 @@ tr.symbol td {
 tr.symbol td:first-child {
 	text-align: left;
 	padding-left: 8px;
-	overflow: clip;
+	overflow: visible;
 }
-tr.symbol td:nth-child(4) {
+tr.symbol td.last {
 	padding-right: 8px;
+}
+tr.symbol span.na {
+	color: #a7b0cd;
 }
 
 /*** STRATEGY ROWS ***/
@@ -107,10 +108,12 @@ tr.strategy td:first-child {
 	text-align: left;
 	padding-left: 20px;
 	overflow: visible;
-	text-overflow: ellipsis;
 }
-tr.strategy td:nth-child(5) {
+tr.strategy td.last {
 	padding-right: 8px;
+}
+tr.strategy span.na {
+	color: #7f7f7f;
 }
 
 /*** SUMMARY ROW ***/
@@ -127,7 +130,7 @@ tr.summary td:first-child {
 	text-align: left;
 	padding-left: 8px;
 }
-tr.summary td:nth-child(4) {
+tr.summary td.last {
 	padding-right: 8px;
 }
 
