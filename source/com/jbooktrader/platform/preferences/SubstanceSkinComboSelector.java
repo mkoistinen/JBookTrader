@@ -9,12 +9,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-import com.jbooktrader.platform.startup.*;
-
 public class SubstanceSkinComboSelector extends JComboBox {
     public SubstanceSkinComboSelector() {
         // populate the combobox
         super(new ArrayList<SkinInfo>(SubstanceLookAndFeel.getAllSkins().values()).toArray());
+
 
         // set custom renderer to show the skin display name
         this.setRenderer(new SubstanceDefaultComboBoxRenderer(this) {
@@ -24,6 +23,7 @@ public class SubstanceSkinComboSelector extends JComboBox {
             }
         });
 
+
         // add an action listener to change skin based on user selection
         this.addActionListener(new ActionListener() {
             @Override
@@ -31,7 +31,7 @@ public class SubstanceSkinComboSelector extends JComboBox {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
-                        if (!JBookTrader.onMac()) {
+                        if (isEnabled()) {
                             SubstanceLookAndFeel.setSkin(((SkinInfo) SubstanceSkinComboSelector.this.getSelectedItem()).getClassName());
                         }
                     }

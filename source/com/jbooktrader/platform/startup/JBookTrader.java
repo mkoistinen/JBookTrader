@@ -32,14 +32,28 @@ public class JBookTrader {
         onMac = name.startsWith("mac os x");
 
         try {
-            if (onMac) {
-                // Menu bar at top of screen
-                System.setProperty("apple.laf.useScreenMenuBar", "true");
-                // Set application name
-                System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_NAME);
-                // Set default look and feel.
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            } else {
+            String lookAndFeel = PreferencesHolder.getInstance().get(JBTPreferences.LookAndFeel);
+
+            if (lookAndFeel.equals("Native")) {
+                if (onMac) {
+                    // Menu bar at top of screen
+                    System.setProperty("apple.laf.useScreenMenuBar", "true");
+                    // Set application name
+                    System.setProperty("com.apple.mrj.application.apple.menu.about.name", APP_NAME);
+                }
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        try {
+                            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                        } catch (Exception e) {
+                            MessageDialog.showError(null, e);
+                        }
+                    }
+                });
+            }
+
+            if (lookAndFeel.equals("Substance")) {
                 String currentSkinName = PreferencesHolder.getInstance().get(JBTPreferences.Skin);
                 for (final SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
                     if (skinInfo.getDisplayName().equals(currentSkinName)) {
@@ -56,6 +70,7 @@ public class JBookTrader {
                     }
                 }
             }
+
         } catch (Throwable t) {
             String msg = t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.";
             MessageDialog.showMessage(null, msg);

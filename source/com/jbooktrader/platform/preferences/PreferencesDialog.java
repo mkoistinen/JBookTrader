@@ -19,7 +19,7 @@ public class PreferencesDialog extends JBTDialog {
     private JTextField hostText, portText, webAccessUser;
     private JSpinner clientIDSpin, webAccessPortSpin;
     private JPasswordField webAccessPasswordField, c2PasswordField;
-    private JComboBox webAccessCombo, tableLayoutCombo;
+    private JComboBox webAccessCombo, tableLayoutCombo, lookAndFeelCombo, substanceSkinComboSelector;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -54,6 +54,33 @@ public class PreferencesDialog extends JBTDialog {
         comp.setMaximumSize(FIELD_DIMENSION);
         panel.add(fieldNameLabel);
         panel.add(comp);
+    }
+
+    private void setLookAndFeel() {
+        String lookAndFeel = (String) lookAndFeelCombo.getSelectedItem();
+
+        if (lookAndFeel.equals("Native")) {
+            MessageDialog.showMessage(null, "Look and Feel will change to native after " + JBookTrader.APP_NAME + " restarts.");
+        }
+
+        if (lookAndFeel.equals("Substance")) {
+            String currentSkinName = ((SkinInfo ) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
+            for (final SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
+                if (skinInfo.getDisplayName().equals(currentSkinName)) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            try {
+                                SubstanceLookAndFeel.setSkin(skinInfo.getClassName());
+                            } catch (Exception e) {
+                                MessageDialog.showError(null, e);
+                            }
+                        }
+                    });
+                    break;
+                }
+            }
+        }
+
     }
 
 
@@ -116,7 +143,9 @@ public class PreferencesDialog extends JBTDialog {
 
         JPanel lookAndFeelTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Look & Feel", lookAndFeelTab);
-        final SubstanceSkinComboSelector substanceSkinComboSelector = new SubstanceSkinComboSelector();
+        lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Native"});
+        add(lookAndFeelTab, LookAndFeel, lookAndFeelCombo);
+        substanceSkinComboSelector = new SubstanceSkinComboSelector();
         String skinName = prefs.get(Skin);
         for (SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
             if (skinInfo.getDisplayName().equals(skinName)) {
@@ -125,7 +154,23 @@ public class PreferencesDialog extends JBTDialog {
             }
         }
         genericAdd(lookAndFeelTab, Skin, substanceSkinComboSelector);
-        SpringUtilities.makeCompactGrid(lookAndFeelTab, 1, 2, 12, 12, 8, 5);
+        if (lookAndFeelCombo.getSelectedItem().equals("Native")) {
+            substanceSkinComboSelector.setEnabled(false);
+        } else {
+            substanceSkinComboSelector.setEnabled(true);
+        }
+        SpringUtilities.makeCompactGrid(lookAndFeelTab, 2, 2, 12, 12, 8, 5);
+
+        lookAndFeelCombo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (lookAndFeelCombo.getSelectedItem().equals("Native")) {
+                    substanceSkinComboSelector.setEnabled(false);
+                } else {
+                    substanceSkinComboSelector.setEnabled(true);
+                }
+                setLookAndFeel();
+            }
+        });
 
 
         okButton.addActionListener(new ActionListener() {
@@ -144,6 +189,7 @@ public class PreferencesDialog extends JBTDialog {
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());
 
+                    prefs.set(LookAndFeel, (String) lookAndFeelCombo.getSelectedItem());
                     SkinInfo skinInfo = (SkinInfo) substanceSkinComboSelector.getSelectedItem();
                     prefs.set(Skin, skinInfo.getDisplayName());
 

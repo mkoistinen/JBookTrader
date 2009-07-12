@@ -45,6 +45,7 @@ public enum JBTPreferences {
     Collective2Strategies("C2 Strategies", ""),
 
     // Look & Feel
+    LookAndFeel("Look & Feel", "Substance"),
     Skin("Skin", "Mist Aqua");
 
 
