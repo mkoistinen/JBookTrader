@@ -21,7 +21,7 @@ import java.util.List;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(770, 600);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(770, 500);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
@@ -50,8 +50,7 @@ public class OptimizerDialog extends JBTDialog {
         initParams();
         pack();
         assignListeners();
-        setLocationRelativeTo(parent);
-        setVisible(true);
+        setLocationRelativeTo(null);
     }
 
     public void setProgress(final long count, final long iterations, final String text, final String label) {
@@ -386,9 +385,7 @@ public class OptimizerDialog extends JBTDialog {
         getContentPane().add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(optimizeButton);
-        getContentPane().setPreferredSize(MIN_SIZE);
-        getContentPane().setMinimumSize(getContentPane().getPreferredSize());
-
+        setMinimumSize(MIN_SIZE);
     }
 
     private void initParams() {

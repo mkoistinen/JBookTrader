@@ -130,6 +130,7 @@ public class MainFrameController {
 
         mainViewDialog.optimizeAction(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
+                OptimizerDialog optimizerDialog = null;
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     int selectedRow = strategyTable.getSelectedRow();
@@ -138,10 +139,27 @@ public class MainFrameController {
                     }
                     String name = strategyTableModel.getStrategyNameForRow(selectedRow);
                     Dispatcher.setMode(Optimization);
-                    new OptimizerDialog(mainViewDialog, name);
+                    optimizerDialog = new OptimizerDialog(mainViewDialog, name);
+
+                    PreferencesHolder prefs = PreferencesHolder.getInstance();
+                    int width = prefs.getInt(OptimizerWindowWidth);
+                    int height = prefs.getInt(OptimizerWindowHeight);
+                    int x = prefs.getInt(OptimizerWindowX);
+                    int y = prefs.getInt(OptimizerWindowY);
+
+                    if (width > 0 && height > 0) {
+                        optimizerDialog.setBounds(x, y, width, height);
+                    }
+                    optimizerDialog.setVisible(true);
                 } catch (Throwable t) {
                     MessageDialog.showError(mainViewDialog, t);
                 } finally {
+                    if (optimizerDialog != null) {
+                        prefs.set(OptimizerWindowWidth, optimizerDialog.getSize().width);
+                        prefs.set(OptimizerWindowHeight, optimizerDialog.getSize().height);
+                        prefs.set(OptimizerWindowX, optimizerDialog.getX());
+                        prefs.set(OptimizerWindowY, optimizerDialog.getY());
+                    }
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }

@@ -236,7 +236,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         JLabel status = new JLabel(" ");
         status.setForeground(Color.GRAY);
         add(status, BorderLayout.SOUTH);
-        setPreferredSize(new Dimension(500, 309));
+        setMinimumSize(new Dimension(600, 200));
         setTitle(JBookTrader.APP_NAME);
         pack();
         setLocationRelativeTo(null);

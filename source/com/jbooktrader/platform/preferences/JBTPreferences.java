@@ -20,6 +20,10 @@ public enum JBTPreferences {
     OptimizerMinTrades("optimizer.minTrades", "50"),
     OptimizerSelectBy("optimizer.selectBy", ""),
     OptimizerMethod("optimizer.method", ""),
+    OptimizerWindowWidth("optimizerwindow.width", "-1"),
+    OptimizerWindowHeight("optimizerwindow.height", "-1"),
+    OptimizerWindowX("optimizerwindow.x", "-1"),
+    OptimizerWindowY("optimizerwindow.y", "-1"),
 
     // Main window
     MainWindowWidth("mainwindow.width", "-1"),
