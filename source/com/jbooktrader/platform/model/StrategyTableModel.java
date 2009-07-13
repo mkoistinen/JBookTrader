@@ -64,13 +64,14 @@ public class StrategyTableModel extends TableDataModel {
     public void update(Strategy strategy) {
         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
         DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
+        DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
 
         final int row = getRowForStrategy(strategy);
 
         MarketBook marketBook = strategy.getMarketBook();
         if (!marketBook.isEmpty()) {
             MarketSnapshot lastMarketSnapshot = marketBook.getSnapshot();
-            setValueAtFast(lastMarketSnapshot.getPrice(), row, Price.ordinal());
+            setValueAtFast(df6.format(lastMarketSnapshot.getPrice()), row, Price.ordinal());
             setValueAtFast(marketBook.getMarketDepth().getMarketDepthAsString(), row, MarketDepth.ordinal());
         }
 
