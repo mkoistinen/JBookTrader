@@ -117,6 +117,10 @@ public class Trader extends EWrapperAdapter {
     public void error(int id, int errorCode, String errorMsg) {
         try {
             String msg = errorCode + ": " + errorMsg;
+            if (id != -1) {
+                msg += " (for id " + id + ")";
+            }
+
             if (msg.equals(previousErrorMessage)) {
                 // ignore duplicate error messages
                 return;
@@ -144,7 +148,7 @@ public class Trader extends EWrapperAdapter {
 
             if (errorCode == 317) {// Market depth data has been reset
                 traderAssistant.getMarketBook(id).getMarketDepth().reset();
-                eventReport.report("Market depth data has been reset.");
+                eventReport.report("Market data for book " + id  + " has been reset.");
             }
 
             // 200: bad contract
