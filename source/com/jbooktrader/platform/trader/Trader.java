@@ -148,7 +148,7 @@ public class Trader extends EWrapperAdapter {
 
             if (errorCode == 317) {// Market depth data has been reset
                 traderAssistant.getMarketBook(id).getMarketDepth().reset();
-                eventReport.report("Market data for book " + id  + " has been reset.");
+                eventReport.report("Market data for book " + id + " has been reset.");
             }
 
             // 200: bad contract
