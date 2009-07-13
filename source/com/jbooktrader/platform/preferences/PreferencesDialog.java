@@ -56,21 +56,6 @@ public class PreferencesDialog extends JBTDialog {
         panel.add(comp);
     }
 
-    private void setLookAndFeel() {
-        String lookAndFeel = (String) lookAndFeelCombo.getSelectedItem();
-
-        if (lookAndFeel.equals("Native")) {
-            MessageDialog.showMessage(null, "Look and Feel will change to native after " + JBookTrader.APP_NAME + " restarts.");
-        }
-
-        if (lookAndFeel.equals("Substance")) {
-            String skinName = ((SkinInfo) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
-            LookAndFeelManager.setSubstanceSkin(skinName);
-        }
-
-    }
-
-
     private void init() throws JBookTraderException {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Preferences");
@@ -152,10 +137,12 @@ public class PreferencesDialog extends JBTDialog {
             public void actionPerformed(ActionEvent e) {
                 if (lookAndFeelCombo.getSelectedItem().equals("Native")) {
                     substanceSkinComboSelector.setEnabled(false);
+                    MessageDialog.showMessage(null, "Look and Feel will change to native after " + JBookTrader.APP_NAME + " restarts.");
                 } else {
                     substanceSkinComboSelector.setEnabled(true);
+                    String skinName = ((SkinInfo) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
+                    LookAndFeelManager.setSubstanceSkin(skinName);
                 }
-                setLookAndFeel();
             }
         });
 

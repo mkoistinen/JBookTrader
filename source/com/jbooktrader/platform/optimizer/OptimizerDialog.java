@@ -287,7 +287,7 @@ public class OptimizerDialog extends JBTDialog {
         stepColumn = paramTableColumnModel.getColumn(3);
 
         paramScrollPane.getViewport().add(paramTable);
-        paramScrollPane.setPreferredSize(new Dimension(0, 90));
+        paramScrollPane.setPreferredSize(new Dimension(0, 95));
 
         strategyParamPanel.add(paramScrollPane);
         SpringUtilities.makeCompactGrid(strategyParamPanel, 1, 1, 0, 0, 12, 0);
