@@ -81,7 +81,7 @@ public class PreferencesDialog extends JBTDialog {
         add(connectionTab, Host, hostText);
         add(connectionTab, Port, portText);
         add(connectionTab, ClientID, clientIDSpin);
-        SpringUtilities.makeCompactGrid(connectionTab, 3, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(connectionTab, 3, 2, 12, 12, 8, 8);
         setWidth(connectionTab, clientIDSpin, 45);
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
@@ -96,7 +96,7 @@ public class PreferencesDialog extends JBTDialog {
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
         add(webAcessTab, WebAccessTableLayout, tableLayoutCombo);
-        SpringUtilities.makeCompactGrid(webAcessTab, 5, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(webAcessTab, 5, 2, 12, 12, 8, 8);
 
         JPanel c2Tab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Collective2", c2Tab);
@@ -131,7 +131,7 @@ public class PreferencesDialog extends JBTDialog {
         } else {
             substanceSkinComboSelector.setEnabled(true);
         }
-        SpringUtilities.makeCompactGrid(lookAndFeelTab, 2, 2, 12, 12, 8, 5);
+        SpringUtilities.makeCompactGrid(lookAndFeelTab, 2, 2, 12, 12, 8, 8);
 
         lookAndFeelCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
