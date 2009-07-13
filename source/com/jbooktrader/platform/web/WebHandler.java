@@ -15,8 +15,8 @@ public class WebHandler implements HttpHandler {
     private static final String WEBROOT = JBookTrader.getAppPath() + "/resources/web";
 
     public void handle(HttpExchange httpExchange) throws IOException {
-        URI uri = httpExchange.getRequestURI();
-        String resource = uri.getPath();
+        URI requestURI = httpExchange.getRequestURI();
+        String resource = requestURI.getPath();
         StringBuilder response = new StringBuilder();
 
         // The index.html page. This is VIRTUAL, it is not on the filesystem.
@@ -43,19 +43,18 @@ public class WebHandler implements HttpHandler {
             response.append(JBookTrader.APP_NAME).append(": ").append(Dispatcher.getMode().getName());
             response.append("</h1>\n");
 
-            Collection<Strategy> strategies = Dispatcher.getTrader().getAssistant().getAllStrategies();
-            List<Strategy> strategyList = new ArrayList<Strategy>(strategies);
-            Collections.sort(strategyList);
+            List<Strategy> strategies = new ArrayList<Strategy>(Dispatcher.getTrader().getAssistant().getAllStrategies());
+            Collections.sort(strategies);
 
             TableLayout tableLayout = null;
             PreferencesHolder prefs = PreferencesHolder.getInstance();
             String tableLayoutPreference = prefs.get(JBTPreferences.WebAccessTableLayout);
             if (tableLayoutPreference.equals("simple")) {
-                tableLayout = new SimpleTableLayout(response, strategyList);
+                tableLayout = new SimpleTableLayout(response, strategies);
             }
 
             if (tableLayoutPreference.equals("grouped")) {
-                tableLayout = new GroupedTableLayout(response, strategyList);
+                tableLayout = new GroupedTableLayout(response, strategies);
             }
 
             if (tableLayout != null) {
@@ -78,7 +77,7 @@ public class WebHandler implements HttpHandler {
             String absoluteResource = resource.startsWith("/reports/") ? (JBookTrader.getAppPath() + resource) : (WEBROOT + resource);
 
             FileHandler fileHandler = new FileHandler();
-            String fileName = fileHandler.getFileName(uri);
+            String fileName = fileHandler.getFileName(requestURI);
             ContentType fileType = ContentType.getContentType(fileName);
             if (!fileHandler.handleFile(httpExchange, absoluteResource, fileType)) {
                 response = new StringBuilder("<h1>404 Not Found</h1>No context found for request");

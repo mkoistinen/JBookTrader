@@ -13,8 +13,8 @@ import java.util.*;
 
 public class GroupedTableLayout extends TableLayout {
 
-    public GroupedTableLayout(StringBuilder response, List<Strategy> strategyList) {
-        super(response, strategyList);
+    public GroupedTableLayout(StringBuilder response, List<Strategy> strategies) {
+        super(response, strategies);
     }
 
     public void render() {
@@ -33,7 +33,7 @@ public class GroupedTableLayout extends TableLayout {
             if (contract.m_currency != null) {
                 symbol += "." + contract.m_currency;
             }
-            
+
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
             String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
 
@@ -70,9 +70,9 @@ public class GroupedTableLayout extends TableLayout {
                     symbolNetProfit += performanceManager.getNetProfit();
 
                     if (strategyRowCount % 2 == 0)
-                    	symbolBlock.append("<tr class=\"strategy\">\n");
+                        symbolBlock.append("<tr class=\"strategy\">\n");
                     else
-                    	symbolBlock.append("<tr class=\"strategy oddRow\">\n");
+                        symbolBlock.append("<tr class=\"strategy oddRow\">\n");
 
                     List<Object> columns = new ArrayList<Object>();
                     columns.add("<a href=\"/reports/" + strategy.getName() + ".htm\" target=\"_new\">" + strategy.getName() + "</a>");
@@ -83,10 +83,10 @@ public class GroupedTableLayout extends TableLayout {
                     for (Object column : columns) {
                         symbolBlock.append("<td>").append(column).append("</td>");
                     }
-                    
+
                     symbolBlock.append("<td class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
                     symbolBlock.append("</tr>\n");
-                    
+
                     strategyRowCount++;
                 }
             }

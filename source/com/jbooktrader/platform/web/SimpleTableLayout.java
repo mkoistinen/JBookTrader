@@ -12,8 +12,8 @@ import java.util.*;
 
 public class SimpleTableLayout extends TableLayout {
 
-    public SimpleTableLayout(StringBuilder response, List<Strategy> strategyList) {
-        super(response, strategyList);
+    public SimpleTableLayout(StringBuilder response, List<Strategy> strategies) {
+        super(response, strategies);
     }
 
     public void render() {
@@ -25,15 +25,15 @@ public class SimpleTableLayout extends TableLayout {
 
         double totalNetProfit = 0.0;
         int totalTrades = 0;
-        
+
         int strategyRowCount = 0;
-        
+
         for (Strategy strategy : strategies) {
-            Contract contract = strategy.getContract();
-            String symbol = contract.m_symbol;
             totalNetProfit += strategy.getPerformanceManager().getNetProfit();
             totalTrades += strategy.getPerformanceManager().getTrades();
-            
+
+            Contract contract = strategy.getContract();
+            String symbol = contract.m_symbol;
             if (contract.m_currency != null) {
                 symbol += "." + contract.m_currency;
             }
@@ -44,10 +44,10 @@ public class SimpleTableLayout extends TableLayout {
             String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
 
             if (strategyRowCount % 2 == 0)
-            	response.append("<tr class=\"strategy\">\n");
+                response.append("<tr class=\"strategy\">\n");
             else
-            	response.append("<tr class=\"strategy oddRow\">\n");
-            	
+                response.append("<tr class=\"strategy oddRow\">\n");
+
             List<Object> columns = new ArrayList<Object>();
             columns.add("<a href=\"/reports/" + strategy.getName() + ".htm\" target=\"_new\">" + strategy.getName() + "</a>");
             columns.add(symbol);
