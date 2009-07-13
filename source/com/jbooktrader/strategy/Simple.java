@@ -35,7 +35,7 @@ public class Simple extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 250, 2500, 1, 1415);
+        addParam(PERIOD, 250, 2500, 1, 1435);
         addParam(ENTRY, 5, 15, 1, 9);
     }
 

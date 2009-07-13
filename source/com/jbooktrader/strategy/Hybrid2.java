@@ -1,5 +1,6 @@
 package com.jbooktrader.strategy;
 
+import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
@@ -8,25 +9,25 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Equalizer extends StrategyES {
+public class Hybrid2 extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd;
+    private final Indicator balanceEMAInd, balanceVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "FastPeriod";
     private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-
-    // Strategy parameters values
     private final int entry;
 
 
-    public Equalizer(StrategyParams optimizationParams) throws JBookTraderException {
+    public Hybrid2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
+        balanceEMAInd = new DepthBalanceEMA(getParam(FAST_PERIOD));
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        addIndicator(balanceEMAInd);
         addIndicator(balanceVelocityInd);
     }
 
@@ -38,9 +39,9 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 50, 1, 19);
-        addParam(SLOW_PERIOD, 100, 12000, 100, 4300);
-        addParam(ENTRY, 10, 30, 1, 22);
+        addParam(FAST_PERIOD, 1, 2000, 1, 1042);
+        addParam(SLOW_PERIOD, 3000, 12000, 1, 6340);
+        addParam(ENTRY, 1, 50, 1, 22);
     }
 
     /**
@@ -49,10 +50,10 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        if (balanceVelocity >= entry) {
+        double balance = balanceEMAInd.getValue() + balanceVelocityInd.getValue();
+        if (balance >= entry) {
             setPosition(1);
-        } else if (balanceVelocity <= -entry) {
+        } else if (balance <= -entry) {
             setPosition(-1);
         }
     }

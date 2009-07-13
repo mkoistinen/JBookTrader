@@ -8,7 +8,7 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Hybrid extends StrategyES {
+public class Hybrid1 extends StrategyES {
 
     // Technical indicators
     private final Indicator priceVelocityInd, balanceVelocityInd;
@@ -20,7 +20,7 @@ public class Hybrid extends StrategyES {
     private final int entry;
 
 
-    public Hybrid(StrategyParams optimizationParams) throws JBookTraderException {
+    public Hybrid1(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -38,9 +38,9 @@ public class Hybrid extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 300, 1000, 1, 550);
-        addParam(SLOW_PERIOD, 100, 12000, 1, 12190);
-        addParam(ENTRY, 1, 15, 1, 3);
+        addParam(FAST_PERIOD, 300, 2000, 1, 293);
+        addParam(SLOW_PERIOD, 2000, 12000, 1, 11220);
+        addParam(ENTRY, 1, 30, 1, 6);
     }
 
     /**
