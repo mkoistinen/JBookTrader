@@ -17,7 +17,7 @@ import java.io.*;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(650, 170);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(650, 175);// minimum frame size
     private final PreferencesHolder prefs;
     private final Strategy strategy;
     private JButton cancelButton, backTestButton, selectFileButton;
@@ -133,7 +133,7 @@ public class BackTestDialog extends JBTDialog {
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
-        selectFileButton.setPreferredSize(new Dimension(24, 24));
+        selectFileButton.setPreferredSize(new Dimension(32, 32));
         fileNameLabel.setLabelFor(fileNameText);
         northPanel.add(fileNameLabel);
         northPanel.add(fileNameText);
