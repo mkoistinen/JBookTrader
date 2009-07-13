@@ -246,6 +246,21 @@ public class MainFrameController {
             }
         });
 
+        mainViewDialog.releaseNotesAction(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                openURL("http://code.google.com/p/jbooktrader/wiki/ReleaseNotes");
+            }
+        });
+
+        mainViewDialog.userManualAction(new ActionListener() {
+            public void actionPerformed(ActionEvent ae) {
+                String fileSep = System.getProperty("file.separator");
+                String documentPath = JBookTrader.getAppPath() + fileSep + "docs" + fileSep + "JBookTrader.UserGuide.pdf";
+                openURL(documentPath);
+            }
+        });
+
+
         mainViewDialog.projectHomeAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 openURL("http://code.google.com/p/jbooktrader/");

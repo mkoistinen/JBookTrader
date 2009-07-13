@@ -20,7 +20,7 @@ import java.net.*;
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private final Toolkit toolkit;
-    private JMenuItem exitMenuItem, aboutMenuItem, discussionMenuItem, projectHomeMenuItem, preferencesMenuItem;
+    private JMenuItem exitMenuItem, aboutMenuItem, userManualMenuItem, discussionMenuItem, releaseNotesMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem;
     private StrategyTableModel strategyTableModel;
     private JTable strategyTable;
@@ -70,8 +70,16 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         }
     }
 
+    public void userManualAction(ActionListener action) {
+        userManualMenuItem.addActionListener(action);
+    }
+
     public void discussionAction(ActionListener action) {
         discussionMenuItem.addActionListener(action);
+    }
+
+    public void releaseNotesAction(ActionListener action) {
+        releaseNotesMenuItem.addActionListener(action);
     }
 
     public void projectHomeAction(ActionListener action) {
@@ -168,19 +176,26 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // configure menu
         JMenu configureMenu = new JMenu("Configure");
         configureMenu.setMnemonic('C');
-        preferencesMenuItem = new JMenuItem("Preferences");
+        preferencesMenuItem = new JMenuItem("Preferences...");
         preferencesMenuItem.setMnemonic('P');
         configureMenu.add(preferencesMenuItem);
 
         // help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic('H');
+        userManualMenuItem = new JMenuItem("User Manual");
+        userManualMenuItem.setMnemonic('U');
+        releaseNotesMenuItem = new JMenuItem("Release Notes");
+        releaseNotesMenuItem.setMnemonic('R');
         discussionMenuItem = new JMenuItem("Discussion Group");
         discussionMenuItem.setMnemonic('D');
         projectHomeMenuItem = new JMenuItem("Project Home");
         projectHomeMenuItem.setMnemonic('P');
         aboutMenuItem = new JMenuItem("About...");
         aboutMenuItem.setMnemonic('A');
+        helpMenu.add(userManualMenuItem);
+        helpMenu.addSeparator();
+        helpMenu.add(releaseNotesMenuItem);
         helpMenu.add(discussionMenuItem);
         helpMenu.add(projectHomeMenuItem);
         helpMenu.addSeparator();
