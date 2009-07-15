@@ -44,8 +44,8 @@ public class TraderAssistant {
 
         PreferencesHolder prefs = PreferencesHolder.getInstance();
         host = prefs.get(Host);
-        port = Integer.valueOf(prefs.get(Port));
-        clientID = Integer.valueOf(prefs.get(ClientID));
+        port = prefs.getInt(Port);
+        clientID = prefs.getInt(ClientID);
     }
 
     public Map<Integer, OpenOrder> getOpenOrders() {
