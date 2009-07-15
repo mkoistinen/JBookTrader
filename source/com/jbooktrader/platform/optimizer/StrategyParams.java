@@ -12,38 +12,18 @@ public class StrategyParams {
     public StrategyParams() {
         params = new ArrayList<StrategyParam>();
     }
-    
-    public boolean equals(Object o) {
-        if (!(o instanceof StrategyParams)) {
-            return false;
-        }
 
-        StrategyParams that = (StrategyParams) o;
-        boolean allSame = true;
+    public String getKey() {
+        StringBuilder key = new StringBuilder();
         for (StrategyParam param : params) {
-            try {
-                if (param.getValue() != that.get(param.getName()).getValue()) {
-                    allSame = false;
-                    break;
-                }
-            } catch (JBookTraderException e) {
-                allSame = false;
-                break;
+            if (key.length() > 0) {
+                key.append("/");
             }
+            key.append(param.getValue());
         }
 
-        return allSame;
+        return key.toString();
     }
-
-    public int hashCode() {
-        int hashCode = 17;
-        for (StrategyParam param : params) {
-            int value = param.getValue();
-            hashCode = 37 * hashCode + value;
-        }
-        return hashCode;
-    }
-
 
     // copy constructor
     public StrategyParams(StrategyParams params) {
@@ -54,17 +34,17 @@ public class StrategyParams {
         }
     }
 
-    public List<StrategyParam> getAll() {
-        return params;
-    }
-
     public void add(String name, int min, int max, int step, int value) {
         StrategyParam param = new StrategyParam(name, min, max, step, value);
         params.add(param);
     }
-    
+
+    public List<StrategyParam> getAll() {
+        return params;
+    }
+
     public void add(StrategyParam strategyParam) {
-    	params.add(strategyParam);
+        params.add(strategyParam);
     }
 
     public int size() {
@@ -74,7 +54,6 @@ public class StrategyParams {
     public StrategyParam get(int index) {
         return params.get(index);
     }
-
 
     public StrategyParam get(String name) throws JBookTraderException {
         for (StrategyParam param : params) {

@@ -10,8 +10,10 @@ import org.jvnet.substance.*;
 import org.jvnet.substance.skin.*;
 
 import javax.swing.*;
+import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 
 public class PreferencesDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
@@ -20,6 +22,7 @@ public class PreferencesDialog extends JBTDialog {
     private JSpinner clientIDSpin, webAccessPortSpin;
     private JPasswordField webAccessPasswordField, c2PasswordField;
     private JComboBox webAccessCombo, tableLayoutCombo, lookAndFeelCombo, substanceSkinComboSelector;
+    private JSlider divideAndConquerCoverageSlider;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -47,13 +50,27 @@ public class PreferencesDialog extends JBTDialog {
         genericAdd(panel, pref, comboBox);
     }
 
-    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
+
+    private void add(JPanel panel, JBTPreferences pref, JSlider slider) {
+        slider.setValue(prefs.getInt(pref));
+        JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
+        fieldNameLabel.setLabelFor(slider);
+        panel.add(fieldNameLabel);
+        panel.add(slider);
+    }
+
+    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp, Dimension dimension) {
         JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
         fieldNameLabel.setLabelFor(comp);
-        comp.setPreferredSize(FIELD_DIMENSION);
-        comp.setMaximumSize(FIELD_DIMENSION);
+        comp.setPreferredSize(dimension);
+        comp.setMaximumSize(dimension);
         panel.add(fieldNameLabel);
         panel.add(comp);
+    }
+
+
+    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
+        genericAdd(panel, pref, comp, FIELD_DIMENSION);
     }
 
     private void init() throws JBookTraderException {
@@ -113,6 +130,28 @@ public class PreferencesDialog extends JBTDialog {
         c2Table.setShowGrid(false);
         scrollPane.getViewport().add(c2Table);
 
+        JPanel optimizerTab = new JPanel(new SpringLayout());
+        tabbedPane1.addTab("Optimizer", optimizerTab);
+        int min = 1;
+        int max = 50;
+        divideAndConquerCoverageSlider = new JSlider(min, max);
+        divideAndConquerCoverageSlider.setMajorTickSpacing(1);
+        divideAndConquerCoverageSlider.setPaintTicks(true);
+        divideAndConquerCoverageSlider.setSnapToTicks(true);
+        Dictionary<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
+        Font labelFont = divideAndConquerCoverageSlider.getFont().deriveFont(Font.ITALIC, 12);
+        JLabel sparserLabel = new JLabel("Sparser");
+        sparserLabel.setFont(labelFont);
+        JLabel denserLabel = new JLabel("Denser");
+        denserLabel.setFont(labelFont);
+        labels.put(min, sparserLabel);
+        labels.put(max, denserLabel);
+        divideAndConquerCoverageSlider.setLabelTable(labels);
+        divideAndConquerCoverageSlider.setPaintLabels(true);
+        add(optimizerTab, DivideAndConquerCoverage, divideAndConquerCoverageSlider);
+        SpringUtilities.makeCompactGrid(optimizerTab, 1, 2, 0, 8, 4, 0);
+
+
         JPanel lookAndFeelTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Look & Feel", lookAndFeelTab);
         lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Native"});
@@ -163,6 +202,8 @@ public class PreferencesDialog extends JBTDialog {
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());
 
+                    prefs.set(DivideAndConquerCoverage, divideAndConquerCoverageSlider.getValue());
+
                     prefs.set(LookAndFeel, (String) lookAndFeelCombo.getSelectedItem());
                     SkinInfo skinInfo = (SkinInfo) substanceSkinComboSelector.getSelectedItem();
                     prefs.set(Skin, skinInfo.getDisplayName());
@@ -184,7 +225,7 @@ public class PreferencesDialog extends JBTDialog {
         });
 
 
-        setPreferredSize(new Dimension(500, 380));
+        setPreferredSize(new Dimension(600, 380));
     }
 
     private void setWidth(JPanel p, Component c, int width) throws JBookTraderException {

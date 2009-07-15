@@ -2,6 +2,7 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.preferences.*;
 
 import java.util.*;
 
@@ -16,31 +17,32 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
     }
 
     public void optimize() throws JBookTraderException {
-        List<StrategyParams> bestParamsList = new ArrayList<StrategyParams>();
+        List<StrategyParams> topParams = new ArrayList<StrategyParams>();
         StrategyParams startingParams = new StrategyParams(strategyParams);
-        bestParamsList.add(startingParams);
+        topParams.add(startingParams);
         int dimensions = strategyParams.size();
-        HashSet<StrategyParams> uniqueParams = new HashSet<StrategyParams>();
+        HashSet<String> uniqueParams = new HashSet<String>();
 
         int maxRange = 0;
         for (StrategyParam param : startingParams.getAll()) {
             maxRange = Math.max(maxRange, param.getMax() - param.getMin());
         }
 
-        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(3d / 2d));
+        int divider = 3;
+        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider));
+
         long completedSteps = 0;
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
         List<Strategy> strategies = new LinkedList<Strategy>();
-        int chunkSize = STRATEGIES_PER_PROCESSOR * availableProcessors;
-        int numberOfCandidates = (int) (chunkSize / Math.pow(2, dimensions));
-
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
+        int chunkSize = 100 * prefs.getInt(JBTPreferences.DivideAndConquerCoverage);
+        int numberOfCandidates = Math.max(1, (int) (chunkSize / Math.pow(divider, dimensions)));
 
         do {
-
             tasks.clear();
-            int maxPartsPerDimension = (bestParamsList.size() == 1) ? (int) Math.pow(chunkSize, 1. / dimensions) : 2;
+            int maxPartsPerDimension = (topParams.size() == 1) ? Math.max(divider, (int) Math.pow(chunkSize, 1. / dimensions)) : divider;
 
-            for (StrategyParams params : bestParamsList) {
+            for (StrategyParams params : topParams) {
                 for (StrategyParam param : params.getAll()) {
                     int step = Math.max(1, (param.getMax() - param.getMin()) / (maxPartsPerDimension - 1));
                     param.setStep(step);
@@ -50,8 +52,9 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
             strategies.clear();
             for (StrategyParams params : tasks) {
-                if (!uniqueParams.contains(params)) {
-                    uniqueParams.add(params);
+                String key = params.getKey();
+                if (!uniqueParams.contains(key)) {
+                    uniqueParams.add(key);
                     Strategy strategy = getStrategyInstance(params);
                     strategies.add(strategy);
                 }
@@ -70,7 +73,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             }
 
 
-            bestParamsList.clear();
+            topParams.clear();
 
             int maxIndex = Math.min(numberOfCandidates, optimizationResults.size());
             for (int index = 0; index < maxIndex; index++) {
@@ -78,12 +81,14 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 for (StrategyParam param : params.getAll()) {
                     String name = param.getName();
                     int value = param.getValue();
-                    int displacement = Math.max(1, (param.getMax() - param.getMin()) / 3);
+                    int displacement = (int) Math.max(1, Math.ceil(param.getStep() / divider));
+
                     StrategyParam originalParam = strategyParams.get(name);
+                    // Don't push beyond the user-specified boundaries
                     param.setMin(Math.max(originalParam.getMin(), value - displacement));
                     param.setMax(Math.min(originalParam.getMax(), value + displacement));
                 }
-                bestParamsList.add(new StrategyParams(params));
+                topParams.add(new StrategyParams(params));
             }
 
         } while (strategies.size() > 0 && !cancelled);
