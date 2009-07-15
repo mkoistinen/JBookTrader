@@ -12,7 +12,7 @@ public class StrategyParams {
     public StrategyParams() {
         params = new ArrayList<StrategyParam>();
     }
-
+    
     public boolean equals(Object o) {
         if (!(o instanceof StrategyParams)) {
             return false;
@@ -61,6 +61,10 @@ public class StrategyParams {
     public void add(String name, int min, int max, int step, int value) {
         StrategyParam param = new StrategyParam(name, min, max, step, value);
         params.add(param);
+    }
+    
+    public void add(StrategyParam strategyParam) {
+    	params.add(strategyParam);
     }
 
     public int size() {

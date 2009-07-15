@@ -3,6 +3,8 @@ package com.jbooktrader.platform.backtest;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.optimizer.StrategyParam;
+import com.jbooktrader.platform.optimizer.StrategyParams;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -12,12 +14,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(650, 175);// minimum frame size
+    private Dimension minSize = new Dimension(650, 175); // minimum frame size
     private final PreferencesHolder prefs;
     private final Strategy strategy;
     private JButton cancelButton, backTestButton, selectFileButton;
@@ -25,9 +31,13 @@ public class BackTestDialog extends JBTDialog {
     private JProgressBar progressBar;
     private BackTestStrategyRunner btsr;
 
+    private List<StrategyParam> strategyParams;
+    private List<JTextField> strategyParamInputs;
+
     public BackTestDialog(JFrame parent, Strategy strategy) {
         super(parent);
         this.strategy = strategy;
+        strategyParams = strategy.getParams().getAll();
         prefs = PreferencesHolder.getInstance();
         init();
         pack();
@@ -78,12 +88,54 @@ public class BackTestDialog extends JBTDialog {
                         String msg = "Historical file " + "\"" + historicalFileName + "\"" + " does not exist.";
                         throw new JBookTraderException(msg);
                     }
-                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategy);
-                    new Thread(btsr).start();
-                } catch (Exception ex) {
-                    MessageDialog.showError(BackTestDialog.this, ex);
-                }
-            }
+                    
+                    StrategyParams newStrategyParams = new StrategyParams();
+                    
+                    // Update strategyParams with input values
+                    for (int i=0; i<strategyParams.size(); i++)
+                    {
+                    	StrategyParam sp = strategyParams.get(i);
+                    	JTextField spi = strategyParamInputs.get(i);
+                    	int value = Integer.parseInt(spi.getText());
+                    	sp.setValue(value);
+                    	newStrategyParams.add(sp);
+                    }
+                    
+                    // Instantiate the strategy with these params:
+                    Class<?> clazz;
+                    Constructor<?> strategyConstructor;
+                    Strategy strategyInstance;
+
+					try {
+						clazz = Class.forName(strategy.getClass().getName());
+					}
+					catch (ClassNotFoundException cnfe) {
+						throw new JBookTraderException("Could not find class " + strategy.getClass().getName());
+					}
+                    Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
+                 
+					try {
+						strategyConstructor = clazz
+						    .getConstructor(parameterTypes);
+					}
+					catch (NoSuchMethodException nsme) {
+						throw new JBookTraderException("Could not find strategy constructor for " + strategy.getClass().getName());
+					}
+					
+					try {
+						strategyInstance = (Strategy) strategyConstructor.newInstance(newStrategyParams);
+					}
+					catch (InvocationTargetException ite) {
+						throw new JBookTraderException("Could not instantiate strategy with parameters " + ite.getCause());
+					}
+                
+                    btsr = new BackTestStrategyRunner(BackTestDialog.this, (Strategy) strategyInstance);
+					new Thread(btsr).start();
+				}
+				catch (Exception ex) {
+					MessageDialog.showError(BackTestDialog.this, ex);
+				}
+			}
         });
 
         cancelButton.addActionListener(new ActionListener() {
@@ -138,7 +190,30 @@ public class BackTestDialog extends JBTDialog {
         northPanel.add(fileNameLabel);
         northPanel.add(fileNameText);
         northPanel.add(selectFileButton);
-        SpringUtilities.makeTopOneLineGrid(northPanel);
+        // SpringUtilities.makeTopOneLineGrid(northPanel);
+        
+        strategyParamInputs = new ArrayList<JTextField>();
+        
+        // Set up the parameters
+        for (StrategyParam strategyParam : strategyParams)
+        {
+        	String label = strategyParam.getName();
+        	int value = strategyParam.getValue();
+        	String minMax = "(" + strategyParam.getMin() + " - " + strategyParam.getMax() + ")";
+        	
+        	JLabel paramLabel = new JLabel(label, JLabel.TRAILING);
+        	JTextField textField = new JTextField();
+        	JLabel minMaxLabel = new JLabel(minMax, JLabel.LEFT);
+        	textField.setText("" + value);
+        	paramLabel.setLabelFor(textField);
+        	strategyParamInputs.add(textField);
+        	northPanel.add(paramLabel);
+        	northPanel.add(textField);
+        	northPanel.add(minMaxLabel);
+        }
+        
+        SpringUtilities.makeCompactGrid(northPanel, strategyParams.size() + 1, 3, 10, 10, 10, 5);
+    	minSize.height += strategyParams.size() * 34; // This is a hack, should find out how tall each is...
 
         JPanel centerPanel = new JPanel(new SpringLayout());
         progressBar = new JProgressBar();
@@ -160,9 +235,10 @@ public class BackTestDialog extends JBTDialog {
         add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(backTestButton);
-        setPreferredSize(MIN_SIZE);
+        setPreferredSize(minSize);
         setMinimumSize(getPreferredSize());
     }
+    
 
     public String getFileName() {
         return fileNameText.getText();
