@@ -47,14 +47,14 @@ public class ClassFinder {
         return classNames;
     }
 
-    public static Strategy getInstance(String name) throws JBookTraderException {
+    public static Strategy getInstance(String name, StrategyParams params) throws JBookTraderException {
         try {
             String className = "com.jbooktrader.strategy." + name;
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
             if (!Modifier.isAbstract(clazz.getModifiers())) {
                 Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
                 Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-                return (Strategy) constructor.newInstance(new StrategyParams());
+                return (Strategy) constructor.newInstance(params);
             } else {
                 return null;
             }
@@ -65,6 +65,11 @@ public class ClassFinder {
         } catch (Exception e) {
             throw new JBookTraderException(e.getCause().getMessage());
         }
+    }
+
+
+    public static Strategy getInstance(String name) throws JBookTraderException {
+        return getInstance(name, new StrategyParams());
     }
 
     public static List<Strategy> getStrategies() {
