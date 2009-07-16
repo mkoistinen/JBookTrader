@@ -10,30 +10,39 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.util.*;
-import java.util.List;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
+    private static final Dimension MIN_SIZE = new Dimension(770, 350);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JProgressBar progressBar;
     private BackTestStrategyRunner btsr;
+    private BackTestParamTableModel backTestParamTableModel;
 
-    private List<StrategyParam> strategyParams;
-    private List<JTextField> strategyParamValues;
+    private StrategyParams strategyParams;
+
+    class ValueColumnRenderer extends DefaultTableCellRenderer {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            component.setBackground(Color.WHITE);
+            return component;
+        }
+    }
+
 
     public BackTestDialog(JFrame parent, Strategy strategy) {
         super(parent);
         strategyName = strategy.getName();
-        strategyParams = strategy.getParams().getAll();
+        strategyParams = strategy.getParams();
         prefs = PreferencesHolder.getInstance();
         init();
         pack();
@@ -85,17 +94,7 @@ public class BackTestDialog extends JBTDialog {
                         throw new JBookTraderException(msg);
                     }
 
-                    StrategyParams newStrategyParams = new StrategyParams();
-
-                    // Create new strategy params with the user-specified values
-                    int size = strategyParams.size();
-                    for (int paramIndex = 0; paramIndex < size; paramIndex++) {
-                        StrategyParam param = strategyParams.get(paramIndex);
-                        int value = Integer.parseInt(strategyParamValues.get(paramIndex).getText());
-                        param.setValue(value);
-                        newStrategyParams.add(param);
-                    }
-
+                    StrategyParams newStrategyParams = backTestParamTableModel.getParams();
                     Strategy strategyInstance = ClassFinder.getInstance(strategyName, newStrategyParams);
                     btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
                     new Thread(btsr).start();
@@ -157,50 +156,50 @@ public class BackTestDialog extends JBTDialog {
         northPanel.add(fileNameLabel);
         northPanel.add(fileNameText);
         northPanel.add(selectFileButton);
-
-        strategyParamValues = new ArrayList<JTextField>();
-
-        // Set up the parameters
-        for (StrategyParam strategyParam : strategyParams) {
-            JLabel paramNameLabel = new JLabel(strategyParam.getName() + ":", JLabel.TRAILING);
-            JTextField paramValueTextField = new JTextField(String.valueOf(strategyParam.getValue()));
-            String minMax = "(" + strategyParam.getMin() + " - " + strategyParam.getMax() + ")";
-            JLabel minMaxLabel = new JLabel(minMax, JLabel.LEFT);
-            paramNameLabel.setLabelFor(paramValueTextField);
-            strategyParamValues.add(paramValueTextField);
-            northPanel.add(paramNameLabel);
-            northPanel.add(paramValueTextField);
-            northPanel.add(minMaxLabel);
-        }
-
-        SpringUtilities.makeCompactGrid(northPanel, strategyParams.size() + 1, 3, 10, 10, 10, 5);
+        SpringUtilities.makeTopOneLineGrid(northPanel);
 
         JPanel centerPanel = new JPanel(new SpringLayout());
+        backTestParamTableModel = new BackTestParamTableModel();
+        backTestParamTableModel.setParams(strategyParams);
+        JTable paramTable = new JTable(backTestParamTableModel);
+
+        TableColumnModel columns = paramTable.getColumnModel();
+        columns.getColumn(1).setCellRenderer(new ValueColumnRenderer());
+
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.getViewport().add(paramTable);
+        centerPanel.add(scrollPane);
+        SpringUtilities.makeOneLineGrid(centerPanel);
+
+        JPanel southPanel = new JPanel(new BorderLayout());
+
+        JPanel progressPanel = new JPanel(new SpringLayout());
         progressBar = new JProgressBar();
         progressBar.setVisible(false);
         progressBar.setStringPainted(true);
-        centerPanel.add(progressBar);
-        SpringUtilities.makeOneLineGrid(centerPanel);
+        progressPanel.add(progressBar);
+        SpringUtilities.makeOneLineGrid(progressPanel);
+        southPanel.add(progressPanel, BorderLayout.NORTH);
 
-        JPanel southPanel = new JPanel();
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
         backTestButton = new JButton("Back Test");
         backTestButton.setMnemonic('B');
         cancelButton = new JButton("Cancel");
         cancelButton.setMnemonic('C');
-        southPanel.add(backTestButton);
-        southPanel.add(cancelButton);
+        buttonsPanel.add(backTestButton);
+        buttonsPanel.add(cancelButton);
+        southPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
         add(northPanel, BorderLayout.NORTH);
         add(centerPanel, BorderLayout.CENTER);
         add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(backTestButton);
-        setMinimumSize(getPreferredSize());
+        setMinimumSize(MIN_SIZE);
+        setPreferredSize(getMinimumSize());
     }
-
 
     public String getFileName() {
         return fileNameText.getText();
     }
-
 }
