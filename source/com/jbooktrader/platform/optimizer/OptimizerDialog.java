@@ -21,7 +21,7 @@ import java.util.List;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class OptimizerDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(770, 500);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(890, 500);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
@@ -319,26 +319,23 @@ public class OptimizerDialog extends JBTDialog {
         }
 
         JLabel minTradesLabel = new JLabel("Minimum trades: ");
-        minTradesText = new JTextField("50");
+        minTradesText = new JTextField();
+
         minTradesText.setText(prefs.get(OptimizerMinTrades));
         minTradesLabel.setLabelFor(minTradesText);
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
 
-        JLabel coverageLabel = new JLabel("Advanced: ");
-        advancedOptionsButton = new JButton("...");
+        advancedOptionsButton = new JButton("Advanced...");
+        optimizationOptionsPanel.add(advancedOptionsButton);
         advancedOptionsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 new AdvancedOptionsDialog((JFrame) OptimizerDialog.this.getParent());
             }
         });
 
-        advancedOptionsButton.setPreferredSize(new Dimension(32, 32));
-        coverageLabel.setLabelFor(advancedOptionsButton);
-        optimizationOptionsPanel.add(coverageLabel);
-        optimizationOptionsPanel.add(advancedOptionsButton);
 
-        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 8, 0, 0, 12, 0);
+        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 7, 0, 0, 12, 0);
 
         northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
         northPanel.add(strategyPanel);
@@ -399,6 +396,7 @@ public class OptimizerDialog extends JBTDialog {
 
         getRootPane().setDefaultButton(optimizeButton);
         setMinimumSize(MIN_SIZE);
+        setPreferredSize(getMinimumSize());
     }
 
     private void initParams() {
