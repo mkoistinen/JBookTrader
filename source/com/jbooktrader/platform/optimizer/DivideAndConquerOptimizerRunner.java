@@ -1,8 +1,8 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
 
