@@ -162,6 +162,7 @@ public class BackTestDialog extends JBTDialog {
         backTestParamTableModel = new BackTestParamTableModel();
         backTestParamTableModel.setParams(strategyParams);
         JTable paramTable = new JTable(backTestParamTableModel);
+        paramTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         TableColumnModel columns = paramTable.getColumnModel();
         columns.getColumn(1).setCellRenderer(new ValueColumnRenderer());

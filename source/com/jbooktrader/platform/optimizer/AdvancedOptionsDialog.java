@@ -11,7 +11,6 @@ import java.awt.event.*;
 import java.util.*;
 
 public class AdvancedOptionsDialog extends JBTDialog {
-    private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
     private JSlider divideAndConquerCoverageSlider;
 
@@ -81,7 +80,9 @@ public class AdvancedOptionsDialog extends JBTDialog {
         });
 
 
+        buttonsPanel.requestFocus();
         getRootPane().setDefaultButton(okButton);
+
         setPreferredSize(new Dimension(600, 380));
     }
 

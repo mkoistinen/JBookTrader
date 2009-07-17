@@ -281,6 +281,7 @@ public class OptimizerDialog extends JBTDialog {
         JScrollPane paramScrollPane = new JScrollPane();
         paramTableModel = new ParamTableModel();
         JTable paramTable = new JTable(paramTableModel);
+        paramTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         paramTable.setShowGrid(false);
 
         paramTableColumnModel = paramTable.getColumnModel();
@@ -350,6 +351,7 @@ public class OptimizerDialog extends JBTDialog {
         SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 0, 12, 0);
 
         resultsTable = new JTable();
+        resultsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         resultsTable.setShowGrid(false);
 
         resultsScrollPane.getViewport().add(resultsTable);
