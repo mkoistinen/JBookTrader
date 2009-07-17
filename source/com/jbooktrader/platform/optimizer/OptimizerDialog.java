@@ -25,7 +25,7 @@ public class OptimizerDialog extends JBTDialog {
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
-    private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
+    private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton, advancedOptionsButton;
     private JTextField fileNameText, minTradesText;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
@@ -325,7 +325,20 @@ public class OptimizerDialog extends JBTDialog {
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
 
-        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 6, 0, 0, 12, 0);
+        JLabel coverageLabel = new JLabel("Advanced: ");
+        advancedOptionsButton = new JButton("...");
+        advancedOptionsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                new AdvancedOptionsDialog((JFrame) OptimizerDialog.this.getParent());
+            }
+        });
+
+        advancedOptionsButton.setPreferredSize(new Dimension(32, 32));
+        coverageLabel.setLabelFor(advancedOptionsButton);
+        optimizationOptionsPanel.add(coverageLabel);
+        optimizationOptionsPanel.add(advancedOptionsButton);
+
+        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 8, 0, 0, 12, 0);
 
         northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
         northPanel.add(strategyPanel);

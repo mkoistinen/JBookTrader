@@ -10,10 +10,8 @@ import org.jvnet.substance.*;
 import org.jvnet.substance.skin.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 public class PreferencesDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
@@ -22,7 +20,6 @@ public class PreferencesDialog extends JBTDialog {
     private JSpinner clientIDSpin, webAccessPortSpin;
     private JPasswordField webAccessPasswordField, c2PasswordField;
     private JComboBox webAccessCombo, tableLayoutCombo, lookAndFeelCombo, substanceSkinComboSelector;
-    private JSlider divideAndConquerCoverageSlider;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -130,28 +127,6 @@ public class PreferencesDialog extends JBTDialog {
         c2Table.setShowGrid(false);
         scrollPane.getViewport().add(c2Table);
 
-        JPanel optimizerTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Optimizer", optimizerTab);
-        int min = 1;
-        int max = 50;
-        divideAndConquerCoverageSlider = new JSlider(min, max);
-        divideAndConquerCoverageSlider.setMajorTickSpacing(1);
-        divideAndConquerCoverageSlider.setPaintTicks(true);
-        divideAndConquerCoverageSlider.setSnapToTicks(true);
-        Dictionary<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
-        Font labelFont = divideAndConquerCoverageSlider.getFont().deriveFont(Font.ITALIC, 12);
-        JLabel sparserLabel = new JLabel("Sparser");
-        sparserLabel.setFont(labelFont);
-        JLabel denserLabel = new JLabel("Denser");
-        denserLabel.setFont(labelFont);
-        labels.put(min, sparserLabel);
-        labels.put(max, denserLabel);
-        divideAndConquerCoverageSlider.setLabelTable(labels);
-        divideAndConquerCoverageSlider.setPaintLabels(true);
-        add(optimizerTab, DivideAndConquerCoverage, divideAndConquerCoverageSlider);
-        SpringUtilities.makeCompactGrid(optimizerTab, 1, 2, 0, 8, 4, 0);
-
-
         JPanel lookAndFeelTab = new JPanel(new SpringLayout());
         tabbedPane1.addTab("Look & Feel", lookAndFeelTab);
         lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Native"});
@@ -201,8 +176,6 @@ public class PreferencesDialog extends JBTDialog {
 
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());
-
-                    prefs.set(DivideAndConquerCoverage, divideAndConquerCoverageSlider.getValue());
 
                     prefs.set(LookAndFeel, (String) lookAndFeelCombo.getSelectedItem());
                     SkinInfo skinInfo = (SkinInfo) substanceSkinComboSelector.getSelectedItem();
