@@ -254,12 +254,9 @@ public class MainFrameController {
 
         mainViewDialog.userManualAction(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                String fileSep = System.getProperty("file.separator");
-                String documentPath = JBookTrader.getAppPath() + fileSep + "docs" + fileSep + "JBookTrader.UserGuide.pdf";
-                openURL(documentPath);
+                openURL("http://docs.google.com/View?id=dfzgvqp4_10gb63b8hg");
             }
         });
-
 
         mainViewDialog.projectHomeAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
