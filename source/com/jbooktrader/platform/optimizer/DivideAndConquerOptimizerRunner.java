@@ -29,7 +29,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         }
 
         int divider = 3;
-        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider));
+        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider / 2.));
 
         long completedSteps = 0;
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
