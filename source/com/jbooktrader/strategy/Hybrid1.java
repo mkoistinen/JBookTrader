@@ -38,9 +38,9 @@ public class Hybrid1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 300, 2000, 1, 293);
-        addParam(SLOW_PERIOD, 2000, 12000, 1, 11220);
-        addParam(ENTRY, 1, 30, 1, 6);
+        addParam(FAST_PERIOD, 5, 50, 1, 32);
+        addParam(SLOW_PERIOD, 3500, 6500, 1, 5167);
+        addParam(ENTRY, 5, 25, 1, 14);
     }
 
     /**

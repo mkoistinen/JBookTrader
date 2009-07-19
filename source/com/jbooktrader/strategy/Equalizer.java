@@ -38,8 +38,8 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 50, 1, 19);
-        addParam(SLOW_PERIOD, 100, 12000, 100, 4300);
+        addParam(FAST_PERIOD, 8, 25, 1, 15);
+        addParam(SLOW_PERIOD, 3000, 8000, 100, 4600);
         addParam(ENTRY, 10, 30, 1, 22);
     }
 
