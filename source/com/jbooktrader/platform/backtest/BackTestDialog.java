@@ -34,6 +34,8 @@ public class BackTestDialog extends JBTDialog {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             component.setBackground(Color.WHITE);
+            component.setForeground(Color.BLACK);
+            setHorizontalAlignment(SwingConstants.RIGHT);
             return component;
         }
     }
@@ -162,6 +164,7 @@ public class BackTestDialog extends JBTDialog {
         backTestParamTableModel = new BackTestParamTableModel();
         backTestParamTableModel.setParams(strategyParams);
         JTable paramTable = new JTable(backTestParamTableModel);
+        paramTable.setShowVerticalLines(false);
         paramTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         TableColumnModel columns = paramTable.getColumnModel();
