@@ -16,6 +16,9 @@ public class LookAndFeelManager {
                     public void run() {
                         try {
                             SubstanceLookAndFeel.setSkin(skinInfo.getClassName());
+                            JFrame.setDefaultLookAndFeelDecorated(true);
+                            JDialog.setDefaultLookAndFeelDecorated(true);
+
                         } catch (Exception e) {
                             MessageDialog.showError(null, e);
                         }
