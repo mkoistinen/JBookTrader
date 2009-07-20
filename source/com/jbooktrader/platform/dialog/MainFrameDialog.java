@@ -233,6 +233,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         strategyTable = new JTable(strategyTableModel);
         strategyTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         strategyTable.setShowGrid(false);
+
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) strategyTable.getDefaultRenderer(String.class);
         renderer.setHorizontalAlignment(JLabel.RIGHT);
 
@@ -248,9 +249,13 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         setIconImage(appIcon);
 
         add(strategyTableScrollPane, BorderLayout.CENTER);
-        JLabel status = new JLabel(" ");
-        status.setForeground(Color.GRAY);
-        add(status, BorderLayout.SOUTH);
+
+        JToolBar statusBar = new JToolBar();
+        statusBar.setFloatable(false);
+        statusBar.setRollover(false);
+        statusBar.add(new JLabel(" "));
+        add(statusBar, BorderLayout.SOUTH);
+
         setMinimumSize(new Dimension(600, 200));
         setTitle(JBookTrader.APP_NAME);
         pack();
