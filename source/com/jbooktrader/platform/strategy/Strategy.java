@@ -220,7 +220,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         String indicatorsState = "";
         for (Indicator indicator : indicatorManager.getIndicators()) {
             if (!indicatorsState.isEmpty()) {
-                indicatorsState += ",";
+                indicatorsState += ", ";
             }
 
             indicatorsState += (int) indicator.getValue();
