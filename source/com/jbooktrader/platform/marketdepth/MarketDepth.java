@@ -1,6 +1,8 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.report.*;
 
 import java.util.*;
 
@@ -12,11 +14,15 @@ public class MarketDepth {
     private boolean isResetting;
     private double lowBalance, highBalance, lastBalance;
     private double midPointPrice;
+    private HashSet<String> errorMessages;
+    private Report eventReport;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
+        errorMessages = new HashSet<String>();
         isResetting = true;
+        eventReport = Dispatcher.getReporter();
     }
 
     public void reset() {
@@ -25,39 +31,96 @@ public class MarketDepth {
         asks.clear();
     }
 
-    public boolean isValid() {
+    synchronized public void checkForValidity() {
+        boolean isValid = true;
+
+        // Number of bid levels must be the same as number of ask levels
         int bidLevels = bids.size();
         int askLevels = asks.size();
-
-        if (bidLevels == 0 || askLevels == 0) {
-            return false;
+        if (bidLevels != askLevels) {
+            isValid = false;
+            String errorMsg = "Number of bid levels (" + bidLevels + ") is not equal to number of ask levels (" + askLevels + ")";
+            if (!errorMessages.contains(errorMsg)) {
+                errorMessages.add(errorMsg);
+                eventReport.report(errorMsg);
+            }
         }
 
-        // The bid price of level N must be smaller or equal to the bid price of level N-1
-        double previousLevelBidPrice = bids.getFirst().getPrice();
-        for (int itemIndex = 1; itemIndex < bidLevels; itemIndex++) {
-            double price = bids.get(itemIndex).getPrice();
-            if (price > previousLevelBidPrice) {
-                return false;
-            } else {
+        if (bidLevels == 0) {
+            isValid = false;
+            String errorMsg = "No bids";
+            if (!errorMessages.contains(errorMsg)) {
+                errorMessages.add(errorMsg);
+                eventReport.report(errorMsg);
+            }
+        }
+
+        if (askLevels == 0) {
+            isValid = false;
+            String errorMsg = "No asks";
+            if (!errorMessages.contains(errorMsg)) {
+                errorMessages.add(errorMsg);
+                eventReport.report(errorMsg);
+            }
+        }
+
+        // The bid price of level N must be smaller than the bid price of level N-1
+        if (!bids.isEmpty()) {
+            double previousLevelBidPrice = bids.getFirst().getPrice();
+            for (int itemIndex = 1; itemIndex < bidLevels; itemIndex++) {
+                double price = bids.get(itemIndex).getPrice();
+                if (price >= previousLevelBidPrice) {
+                    isValid = false;
+                    String errorMsg = "Bid price " + price + " at level " + itemIndex + " is greater or equal to bid price " + previousLevelBidPrice + " at level " + (itemIndex - 1);
+                    if (!errorMessages.contains(errorMsg)) {
+                        errorMessages.add(errorMsg);
+                        eventReport.report(errorMsg);
+                    }
+                }
                 previousLevelBidPrice = price;
             }
         }
 
-        // The ask price of level N must be greater or equal to the ask price of level N-1
-        double previousLevelAskPrice = asks.getFirst().getPrice();
-        for (int itemIndex = 1; itemIndex < askLevels; itemIndex++) {
-            double price = asks.get(itemIndex).getPrice();
-            if (price < previousLevelAskPrice) {
-                return false;
-            } else {
+        // The ask price of level N must be greater than the ask price of level N-1
+        if (!asks.isEmpty()) {
+            double previousLevelAskPrice = asks.getFirst().getPrice();
+            for (int itemIndex = 1; itemIndex < askLevels; itemIndex++) {
+                double price = asks.get(itemIndex).getPrice();
+                if (price <= previousLevelAskPrice) {
+                    isValid = false;
+                    String errorMsg = "Ask price " + price + " at level " + itemIndex + " is smaller or equal to ask price " + previousLevelAskPrice + " at level " + (itemIndex - 1);
+                    if (!errorMessages.contains(errorMsg)) {
+                        errorMessages.add(errorMsg);
+                        eventReport.report(errorMsg);
+                    }
+                }
                 previousLevelAskPrice = price;
             }
         }
 
-        double bestBid = bids.getFirst().getPrice();
-        double bestAsk = asks.getFirst().getPrice();
-        return (bestBid < bestAsk);
+        // Best bid price must be smaller than the best ask price
+        if (!bids.isEmpty() && !asks.isEmpty()) {
+            double bestBid = bids.getFirst().getPrice();
+            double bestAsk = asks.getFirst().getPrice();
+            if (bestBid >= bestAsk) {
+                isValid = false;
+                String errorMsg = "Best bid price " + bestBid + " is greater or equal to best ask price " + bestAsk;
+                if (!errorMessages.contains(errorMsg)) {
+                    errorMessages.add(errorMsg);
+                    eventReport.report(errorMsg);
+                }
+            }
+        }
+
+        if (isValid && !errorMessages.isEmpty()) {
+            errorMessages.clear();
+            String errorMsg = "Errors cleared. Market depth is valid.";
+            eventReport.report(errorMsg);
+        }
+    }
+
+    public boolean isValid() {
+        return !errorMessages.isEmpty();
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
@@ -69,10 +132,10 @@ public class MarketDepth {
     }
 
     public String getMarketDepthAsString() {
-        return getCumulativeSize(bids) + "-" + getCumulativeSize(asks);
+        return isValid() ? (getCumulativeSize(bids) + "-" + getCumulativeSize(asks)) : "invalid";
     }
 
-    public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
+    synchronized public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
         List<MarketDepthItem> items = (side == MarketDepthSide.Bid) ? bids : asks;
         int levels = items.size();
 
@@ -97,7 +160,7 @@ public class MarketDepth {
         }
 
 
-        if (operation == MarketDepthOperation.Update && isValid()) {
+        if (operation == MarketDepthOperation.Update) {
             int cumulativeBid = getCumulativeSize(bids);
             int cumulativeAsk = getCumulativeSize(asks);
             double totalDepth = cumulativeBid + cumulativeAsk;
@@ -107,7 +170,6 @@ public class MarketDepth {
             highBalance = Math.max(lastBalance, highBalance);
             midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
             isResetting = false;
-
         }
     }
 
@@ -116,6 +178,8 @@ public class MarketDepth {
         if (isResetting) {
             return null;
         }
+
+        checkForValidity();
 
         int balance = (int) Math.round((lowBalance + highBalance) / 2d);
         MarketSnapshot marketSnapshot = new MarketSnapshot(time, balance, midPointPrice);
