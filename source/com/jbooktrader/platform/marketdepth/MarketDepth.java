@@ -31,7 +31,15 @@ public class MarketDepth {
         asks.clear();
     }
 
-    synchronized public void checkForValidity() {
+    /**
+     * Market depth is considered valid when all four of the following conditions are true:
+     * <p/>
+     * 1. The number of bid levels equals the number of ask levels and is non-zero
+     * 2. The bid price of level N is smaller than the bid price of level N-1 for all levels
+     * 3. The ask price of level N is greater than the ask price of level N-1 for all levels
+     * 4. The best bid price (at level 0) is smaller than the best ask price (at level 0)
+     */
+    private void checkForValidity() {
         boolean isValid = true;
 
         // Number of bid levels must be the same as number of ask levels
@@ -119,10 +127,6 @@ public class MarketDepth {
         }
     }
 
-    public boolean isValid() {
-        return !errorMessages.isEmpty();
-    }
-
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
         int cumulativeSize = 0;
         for (MarketDepthItem item : items) {
@@ -132,7 +136,7 @@ public class MarketDepth {
     }
 
     public String getMarketDepthAsString() {
-        return isValid() ? (getCumulativeSize(bids) + "-" + getCumulativeSize(asks)) : "invalid";
+        return errorMessages.isEmpty() ? (getCumulativeSize(bids) + "-" + getCumulativeSize(asks)) : "invalid";
     }
 
     synchronized public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
@@ -174,7 +178,7 @@ public class MarketDepth {
     }
 
 
-    public MarketSnapshot getMarketSnapshot(long time) {
+    synchronized public MarketSnapshot getMarketSnapshot(long time) {
         if (isResetting) {
             return null;
         }
