@@ -42,7 +42,7 @@ public class MainFrameController {
     }
 
     private void exit() {
-        String question = "Are you sure you want to exit JBookTrader?";
+        String question = "Are you sure you want to exit " + JBookTrader.APP_NAME + "?";
         int answer = JOptionPane.showConfirmDialog(mainViewDialog, question, JBookTrader.APP_NAME, JOptionPane.YES_NO_OPTION);
         if (answer == JOptionPane.YES_OPTION) {
             prefs.set(MainWindowWidth, mainViewDialog.getSize().width);
