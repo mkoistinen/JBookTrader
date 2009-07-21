@@ -19,7 +19,7 @@ public class MarketBook {
     public MarketBook(String name, TimeZone timeZone) {
         this.name = name;
         this.timeZone = timeZone;
-        marketDepth = new MarketDepth();
+        marketDepth = new MarketDepth(name);
     }
 
     public MarketBook() {
