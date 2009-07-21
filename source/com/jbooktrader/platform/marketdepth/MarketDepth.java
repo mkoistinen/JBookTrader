@@ -2,7 +2,6 @@ package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.report.*;
 
 import java.util.*;
 
@@ -15,11 +14,13 @@ public class MarketDepth {
     private double lowBalance, highBalance, lastBalance;
     private double midPointPrice;
     private MarketDepthValidator validator;
+    private final String name;
 
     public MarketDepth(String name) {
+        this.name = name;
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
-        validator = new MarketDepthValidator(name, bids, asks);
+        validator = new MarketDepthValidator(bids, asks);
         isResetting = true;
     }
 
@@ -43,7 +44,13 @@ public class MarketDepth {
     }
 
     public String getMarketDepthAsString() {
-        return validator.isValid() ? (getCumulativeSize(bids) + "-" + getCumulativeSize(asks)) : "invalid";
+        String md = getCumulativeSize(bids) + "-" + getCumulativeSize(asks);
+        long invalidStateDuration = validator.getInvalidStateDurationInSeconds();
+        if (invalidStateDuration >= 60) {
+            md += ", invalid";
+        }
+
+        return md;
     }
 
     synchronized public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
@@ -74,7 +81,7 @@ public class MarketDepth {
         if (operation == MarketDepthOperation.Update) {
             validator.validate();
             if (validator.isValid()) {
-                int cumulativeBid = getCumulativeSize(bids);  // ekk calc only when valid?
+                int cumulativeBid = getCumulativeSize(bids);
                 int cumulativeAsk = getCumulativeSize(asks);
                 double totalDepth = cumulativeBid + cumulativeAsk;
 
@@ -94,9 +101,13 @@ public class MarketDepth {
             return null;
         }
 
-        long invalidDuration = validator.getInvalidDurationInSeconds();
-        if (invalidDuration > 60) {
-            Dispatcher.getReporter().report("Invalid duration " + invalidDuration);   // ekk which market book?
+        long invalidStateDuration = validator.getInvalidStateDurationInSeconds();
+        if (invalidStateDuration >= 60 && (invalidStateDuration % 60 == 0)) {
+            String msg = "Book " + name + " has been invalid for " + invalidStateDuration + " seconds.<br>";
+            for (String errorMsg: validator.getErrors()) {
+                msg += errorMsg + "<br>";
+            }
+            Dispatcher.getReporter().report(msg);
         }
 
         int balance = (int) Math.round((lowBalance + highBalance) / 2d);

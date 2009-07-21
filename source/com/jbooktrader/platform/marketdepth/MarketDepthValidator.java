@@ -1,34 +1,30 @@
 package com.jbooktrader.platform.marketdepth;
 
-import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.report.*;
-
 import java.util.*;
 
 public class MarketDepthValidator {
     private final LinkedList<MarketDepthItem> bids, asks;
     private List<String> errorMessages;
-    //private Report eventReport;
-    private final String name;
     private long lastValidTime;
 
-    public MarketDepthValidator(String name, LinkedList<MarketDepthItem> bids, LinkedList<MarketDepthItem> asks) {
-        this.name = name;
+    public MarketDepthValidator(LinkedList<MarketDepthItem> bids, LinkedList<MarketDepthItem> asks) {
         this.bids = bids;
         this.asks = asks;
         lastValidTime = System.currentTimeMillis();
         errorMessages = new ArrayList<String>();
-        //eventReport = Dispatcher.getReporter();
     }
 
     public boolean isValid() {
         return errorMessages.isEmpty();
     }
 
-    public long getInvalidDurationInSeconds() {
+    public long getInvalidStateDurationInSeconds() {
         return (System.currentTimeMillis() - lastValidTime) / 1000L;
     }
 
+    public List<String> getErrors() {
+        return errorMessages;
+    }
 
     /**
      * Market depth is considered valid when all four of the following conditions are true:
@@ -40,8 +36,6 @@ public class MarketDepthValidator {
      */
     public void validate() {
         errorMessages.clear();
-        //boolean isValid = true;
-        String book = " Book " + name + ": ";
 
         // Number of bid levels must be the same as number of ask levels
         int bidLevels = bids.size();
@@ -98,19 +92,8 @@ public class MarketDepthValidator {
             }
         }
 
-        //if (isValid) {
-            //errorMessages.clear();
-          //  String errorMsg = "Errors cleared. Market depth is valid.";
-            //eventReport.report(book + errorMsg);
-        //}
-
-        //long timeNow = System.currentTimeMillis();
         if (errorMessages.isEmpty()) {
             lastValidTime = System.currentTimeMillis();
         }
-
-
-
     }
-
 }
