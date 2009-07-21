@@ -27,6 +27,10 @@ public class FileHandler {
 
         Headers responseHeaders = httpExchange.getResponseHeaders();
 
+        responseHeaders.add("Pragma", "public");
+        responseHeaders.add("Expires", "0");
+        responseHeaders.add("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
+        responseHeaders.add("Cache-Control", "public");
         responseHeaders.add("Content-Type", fileType.getContentType() + ";charset=utf-8");
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, file.length());
 

@@ -1,5 +1,3 @@
-addEventListener("load", function() { setTimeout(updateLayout, 0); });
-
 var currentWidth = 0;
 
 function updateLayout()
@@ -14,5 +12,7 @@ function updateLayout()
 		}, 100);
 	}
 }
+
+addEventListener("load", function() { setTimeout(updateLayout, 0); }, false);
 
 setInterval(updateLayout, 400);

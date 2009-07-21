@@ -27,11 +27,13 @@ public class SimpleTableLayout extends TableLayout {
         int totalTrades = 0;
 
         int strategyRowCount = 0;
-
+        String strategyName;
+        
         for (Strategy strategy : strategies) {
             totalNetProfit += strategy.getPerformanceManager().getNetProfit();
             totalTrades += strategy.getPerformanceManager().getTrades();
-
+            strategyName = strategy.getName();
+            
             Contract contract = strategy.getContract();
             String symbol = contract.m_symbol;
             if (contract.m_currency != null) {
@@ -48,19 +50,13 @@ public class SimpleTableLayout extends TableLayout {
             else
                 response.append("<tr class=\"strategy oddRow\">\n");
 
-            List<Object> columns = new ArrayList<Object>();
-            columns.add("<a href=\"/reports/" + strategy.getName() + ".htm\" target=\"_new\">" + strategy.getName() + "</a>");
-            columns.add(symbol);
-            columns.add(price);
-            columns.add(positionManager.getPosition());
-            columns.add(performanceManager.getTrades());
-            columns.add(df0.format(performanceManager.getMaxDrawdown()));
-
-            for (Object column : columns) {
-                response.append("<td>").append(column).append("</td>");
-            }
-
-            response.append("<td class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
+            response.append("<td><a href=\"/reports/" + strategyName + ".htm\" target=\"_new\">" + strategy.getName() + "</a></td>");
+            response.append("<td id=\"" + strategyName + "_symbol\">").append(symbol).append("</td>");
+            response.append("<td id=\"" + strategyName + "_price\">").append(price).append("</td>");
+            response.append("<td id=\"" + strategyName + "_position\">").append(positionManager.getPosition()).append("</td>");
+            response.append("<td id=\"" + strategyName + "_trades\">").append(performanceManager.getTrades()).append("</td>");
+            response.append("<td id=\"" + strategyName + "_maxdd\">").append(df0.format(performanceManager.getMaxDrawdown())).append("</td>");
+            response.append("<td id=\"" + strategyName + "_pnl\" class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
             response.append("</tr>\n");
 
             strategyRowCount++;
@@ -68,11 +64,10 @@ public class SimpleTableLayout extends TableLayout {
 
         response.append("<tr class=\"summary\">");
         response.append("<td colspan=\"4\">All Strategies</td>");
-        response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
-        response.append("<td class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
+        response.append("<td id=\"summary_trades\" colspan=\"1\">").append(totalTrades).append("</td>");
+        response.append("<td id=\"summary_pnl\" class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
         response.append("</tr>\n");
         response.append("</table>");
     }
-
 
 }

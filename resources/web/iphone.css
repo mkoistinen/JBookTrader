@@ -131,19 +131,20 @@ tr.summary td.last {
 }
 
 /* Other */
+.hidden {
+	display: none;
+}
 .version { 
 	font-size: 12px;
 	line-height: 14px;
-	padding-top: 3px;
-	padding-right: 8px;
+	padding: 3px 8px 18px 0px;
 	color: black;
 	float: right;
 }
 .eventReport {
 	font-size: 12px;
 	line-height: 14px;
-	padding-top: 3px;
-	padding-left: 8px;
+	padding: 3px 0px 18px 8px;
 	color: black;
 	float: left;
 }

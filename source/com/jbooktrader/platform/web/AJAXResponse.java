@@ -11,15 +11,13 @@ import com.jbooktrader.platform.util.*;
 import java.text.*;
 import java.util.*;
 
-public class GroupedTableLayout extends TableLayout {
+public class AJAXResponse extends TableLayout {
 
-    public GroupedTableLayout(StringBuilder response, List<Strategy> strategies) {
+    public AJAXResponse(StringBuilder response, List<Strategy> strategies) {
         super(response, strategies);
     }
 
     public void render() {
-        response.append("<table>");
-        response.append("<tr><th>Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th class=\"last\">Net Profit</th></tr>");
 
         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
         DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
@@ -35,7 +33,7 @@ public class GroupedTableLayout extends TableLayout {
             }
 
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
-            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
+            String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "n/a";
 
             if (!symbols.containsKey(symbol)) {
                 symbols.put(symbol, price);
@@ -48,7 +46,6 @@ public class GroupedTableLayout extends TableLayout {
 
         int totalTrades = 0;
         double totalNetProfit = 0;
-        String strategyList = "";
 
         for (String symbol : symbolKeys) {
             StringBuilder symbolBlock = new StringBuilder();
@@ -58,53 +55,44 @@ public class GroupedTableLayout extends TableLayout {
             
             for (Strategy strategy : strategies) {
                 String strategySymbol = strategy.getContract().m_symbol;
+                String strategyName = strategy.getName();
+                
                 if (strategy.getContract().m_secType.equals("CASH")) {
                     strategySymbol += "." + strategy.getContract().m_currency;
                 }
 
                 if (strategySymbol.equals(symbol)) {
-                	String strategyName = strategy.getName();
                     PositionManager positionManager = strategy.getPositionManager();
                     PerformanceManager performanceManager = strategy.getPerformanceManager();
                     totalNetProfit += performanceManager.getNetProfit();
                     totalTrades += performanceManager.getTrades();
                     symbolPosition += positionManager.getPosition();
                     symbolNetProfit += performanceManager.getNetProfit();
-
-                    if (strategyRowCount % 2 == 0)
-                    	symbolBlock.append("<tr class=\"strategy\">\n");
-                    else
-                    	symbolBlock.append("<tr class=\"strategy oddRow\">\n");
                     
-                    symbolBlock.append("<td id=\"" + strategyName + "_name\">").append("<a href=\"/reports/" + strategyName + ".htm\" target=\"_new\">" + strategy.getName() + "</a>").append("</td>");
-                    symbolBlock.append("<td id=\"" + strategyName + "_position\">").append(positionManager.getPosition()).append("</td>");
-                    symbolBlock.append("<td id=\"" + strategyName + "_trades\">").append(performanceManager.getTrades()).append("</td>");
-                    symbolBlock.append("<td id=\"" + strategyName + "_maxdd\">").append(df0.format(performanceManager.getMaxDrawdown())).append("</td>");
-                    symbolBlock.append("<td id=\"" + strategyName + "_pnl\" class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
-                    symbolBlock.append("</tr>\n");
-                    
-                    if (strategyList.equals("")) { strategyList = strategyName; }
-                    else strategyList += "," + strategyName;
+                    symbolBlock.append("[STRATEGY]").append(",");
+                    symbolBlock.append(strategyName).append(",");
+                    symbolBlock.append(symbol).append(",");
+                    symbolBlock.append(symbols.get(symbol)).append(",");
+                    symbolBlock.append(positionManager.getPosition()).append(",");
+                    symbolBlock.append(performanceManager.getTrades()).append(",");
+                    symbolBlock.append(df0.format(performanceManager.getMaxDrawdown())).append(",");
+                    symbolBlock.append(df0.format(performanceManager.getNetProfit())).append("\n");
                     
                     strategyRowCount++;
                 }
             }
 
-            response.append("<tr class=\"symbol\">");
-            response.append("<td>").append(symbol).append(" (<span id=\"" + symbol + "_quote\">").append(symbols.get(symbol)).append("</span>)</td>");
-            response.append("<td id=\"" + symbol + "_position\">").append(symbolPosition).append("</td>");
-            response.append("<td colspan=\"2\">&nbsp;</td>");
-            response.append("<td id=\"" + symbol + "_pnl\" class=\"last\">").append(df0.format(symbolNetProfit)).append("</td></tr>\n");
+            response.append("[SYMBOL]").append(",");
+            response.append(symbol).append(",");
+            response.append(symbols.get(symbol)).append(",");
+            response.append(symbolPosition).append(",");
+            response.append(df0.format(symbolNetProfit)).append("\n");
             response.append(symbolBlock);
+            
+            response.append("[SUMMARY]").append(",");
+            response.append(totalTrades).append(",");
+            response.append(totalNetProfit).append("\n");
         }
-
-
-        response.append("<tr class=\"summary\">");
-        response.append("<td colspan=\"2\">All Strategies</td>");
-        response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
-        response.append("<td class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
-        response.append("</tr>\n");
-        response.append("</table>");
     }
 
 }
