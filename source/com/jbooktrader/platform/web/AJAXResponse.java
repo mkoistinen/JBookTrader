@@ -5,11 +5,15 @@ import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
+import com.jbooktrader.platform.startup.JBookTrader;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import java.text.*;
 import java.util.*;
+
+import java.io.*;
+import java.net.*;
 
 public class AJAXResponse extends TableLayout {
 
@@ -57,6 +61,18 @@ public class AJAXResponse extends TableLayout {
                 String strategySymbol = strategy.getContract().m_symbol;
                 String strategyName = strategy.getName();
                 
+                // Check if the StrategyReport exists
+                boolean fileExists = true;
+                try {
+                	String reportFile = JBookTrader.getAppPath() + WebHandler.REPORT_DIR + strategy.getName() + ".htm";
+                	File file = new File(reportFile);
+                	
+                	if (!file.exists()) fileExists = false;
+                }
+                catch (Exception e) {
+                	fileExists = false;
+                }
+                
                 if (strategy.getContract().m_secType.equals("CASH")) {
                     strategySymbol += "." + strategy.getContract().m_currency;
                 }
@@ -76,7 +92,8 @@ public class AJAXResponse extends TableLayout {
                     symbolBlock.append(positionManager.getPosition()).append(",");
                     symbolBlock.append(performanceManager.getTrades()).append(",");
                     symbolBlock.append(df0.format(performanceManager.getMaxDrawdown())).append(",");
-                    symbolBlock.append(df0.format(performanceManager.getNetProfit())).append("\n");
+                    symbolBlock.append(df0.format(performanceManager.getNetProfit())).append(",");
+                    symbolBlock.append(fileExists ? "link" : "nolink").append("\n");
                     
                     strategyRowCount++;
                 }

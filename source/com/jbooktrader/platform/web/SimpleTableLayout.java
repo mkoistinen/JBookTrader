@@ -50,7 +50,7 @@ public class SimpleTableLayout extends TableLayout {
             else
                 response.append("<tr class=\"strategy oddRow\">\n");
 
-            response.append("<td><a href=\"/reports/" + strategyName + ".htm\" target=\"_new\">" + strategy.getName() + "</a></td>");
+            response.append("<td id=\"" + strategyName + "_name\"><a href=\"/reports/" + strategyName + ".htm\" target=\"_new\">" + strategy.getName() + "</a></td>");
             response.append("<td id=\"" + strategyName + "_symbol\">").append(symbol).append("</td>");
             response.append("<td id=\"" + strategyName + "_price\">").append(price).append("</td>");
             response.append("<td id=\"" + strategyName + "_position\">").append(positionManager.getPosition()).append("</td>");

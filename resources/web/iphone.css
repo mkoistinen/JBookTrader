@@ -156,7 +156,7 @@ body {
 table {
 	table-layout: fixed;	
 }
-a {
+a[href] {
 	display: inline-block;
 	padding-right: 13px;
 	background:transparent url(link.png) center right no-repeat;

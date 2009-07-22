@@ -47,6 +47,12 @@ function handleHttpResponse() {
 						document.getElementById(strategy + "_trades").innerHTML = results[5];
 						document.getElementById(strategy + "_maxdd").innerHTML = results[6];
 						document.getElementById(strategy + "_pnl").innerHTML = results[7];
+						if (results[8] == "link") {
+							document.getElementById(strategy + "_name").firstChild.href = "/reports/" + strategy + ".htm";
+						}
+						else {
+							document.getElementById(strategy + "_name").firstChild.removeAttribute("href");
+						}
 					}
 					catch (e) {
 						// JBT is probably now running additional strategy(ies)...
@@ -105,4 +111,5 @@ var httpObj = getXmlHttpObj();
 var url = "update.html";
 var isWorking = false;
 var strategies = null;
+update();
 var timerId = setInterval(function() { update(); false; }, 5000);

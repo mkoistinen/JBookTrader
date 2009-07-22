@@ -12,7 +12,8 @@ import java.util.*;
 
 public class WebHandler implements HttpHandler {
 
-    private static final String WEBROOT = JBookTrader.getAppPath() + "/resources/web";
+    public static final String WEBROOT = JBookTrader.getAppPath() + "/resources/web";
+    public static final String REPORT_DIR = "/reports/";
 
     public void handle(HttpExchange httpExchange) throws IOException {
         URI requestURI = httpExchange.getRequestURI();
@@ -96,7 +97,7 @@ public class WebHandler implements HttpHandler {
             // We support a VIRTUAL directory '/reports/' which we manually map onto the reports folder in the class path
             // This must explicitly be the beginning of the requested resource.  Otherwise, we fold any requests over to
             // the WEBROOT
-            String absoluteResource = resource.startsWith("/reports/") ? (JBookTrader.getAppPath() + resource) : (WEBROOT + resource);
+            String absoluteResource = resource.startsWith(REPORT_DIR) ? (JBookTrader.getAppPath() + resource) : (WEBROOT + resource);
 
             FileHandler fileHandler = new FileHandler();
             String fileName = fileHandler.getFileName(requestURI);
