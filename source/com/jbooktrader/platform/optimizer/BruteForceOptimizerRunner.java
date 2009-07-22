@@ -15,7 +15,7 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
 
     @Override
     public void optimize() throws JBookTraderException {
-        LinkedList<StrategyParams> tasks = getTasks(strategyParams);
+        ArrayList<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();
         long totalSteps = snapshotCount * taskSize;
         setTotalSteps(totalSteps);
@@ -23,14 +23,16 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
 
         int chunkSize = STRATEGIES_PER_PROCESSOR * availableProcessors;
 
-        List<Strategy> strategies = new LinkedList<Strategy>();
+        List<Strategy> strategies = new ArrayList<Strategy>(chunkSize);
+        int index = 0;
 
-        while (!tasks.isEmpty() && !cancelled) {
+        while (index < taskSize && !cancelled) {
             strategies.clear();
-            while (!tasks.isEmpty() && strategies.size() != chunkSize) {
-                StrategyParams params = tasks.removeFirst();
+            while (index < taskSize && strategies.size() != chunkSize) {
+                StrategyParams params = tasks.get(index);
                 Strategy strategy = getStrategyInstance(params);
                 strategies.add(strategy);
+                index++;
             }
             execute(strategies);
         }

@@ -21,7 +21,6 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
     }
 
     public List<OptimizationResult> call() {
-        List<OptimizationResult> optimizationResults = new ArrayList<OptimizationResult>();
         int size = strategies.size();
         MarketBook marketBook = new MarketBook();
         TradingSchedule tradingSchedule = strategies.get(0).getTradingSchedule();
@@ -59,6 +58,7 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
         }
 
         int minTrades = optimizerRunner.getMinTrades();
+        List<OptimizationResult> optimizationResults = new ArrayList<OptimizationResult>(strategies.size());
         for (Strategy strategy : strategies) {
             strategy.closePosition();
             strategy.getPositionManager().trade();

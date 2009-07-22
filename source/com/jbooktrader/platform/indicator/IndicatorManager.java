@@ -15,7 +15,7 @@ public class IndicatorManager {
     private long previousSnapshotTime;
 
     public IndicatorManager() {
-        indicators = new LinkedList<Indicator>();
+        indicators = new ArrayList<Indicator>();
     }
 
     public void setMarketBook(MarketBook marketBook) {

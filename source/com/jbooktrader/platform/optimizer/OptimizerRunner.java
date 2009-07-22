@@ -17,8 +17,8 @@ import java.util.concurrent.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    protected final int STRATEGIES_PER_PROCESSOR = 125;
-    protected final LinkedList<OptimizationResult> optimizationResults;
+    protected final int STRATEGIES_PER_PROCESSOR = 50;
+    protected final ArrayList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected long snapshotCount;
     protected boolean cancelled;
@@ -49,7 +49,7 @@ public abstract class OptimizerRunner implements Runnable {
         this.optimizerDialog = optimizerDialog;
         this.strategyName = strategy.getName();
         this.strategyParams = params;
-        optimizationResults = new LinkedList<OptimizationResult>();
+        optimizationResults = new ArrayList<OptimizationResult>();
         snapshots = new LinkedList<MarketSnapshot>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
@@ -219,12 +219,12 @@ public abstract class OptimizerRunner implements Runnable {
         completedSteps += iterationsCompleted;
     }
 
-    protected LinkedList<StrategyParams> getTasks(StrategyParams params) {
+    protected ArrayList<StrategyParams> getTasks(StrategyParams params) {
         for (StrategyParam param : params.getAll()) {
             param.setValue(param.getMin());
         }
 
-        LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
+        ArrayList<StrategyParams> tasks = new ArrayList<StrategyParams>();
 
         boolean allTasksAssigned = false;
         while (!allTasksAssigned && !cancelled) {
