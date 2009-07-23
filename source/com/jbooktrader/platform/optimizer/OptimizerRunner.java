@@ -17,7 +17,6 @@ import java.util.concurrent.*;
  * historical market depth.
  */
 public abstract class OptimizerRunner implements Runnable {
-    protected final int STRATEGIES_PER_PROCESSOR = 50;
     protected final ArrayList<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected long snapshotCount;

@@ -11,8 +11,10 @@ import java.awt.event.*;
 import java.util.*;
 
 public class AdvancedOptionsDialog extends JBTDialog {
+    private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
     private JSlider divideAndConquerCoverageSlider;
+    private JTextField bruteForceStrategiesPerProcessorText;
 
     public AdvancedOptionsDialog(JFrame parent) {
         super(parent);
@@ -24,12 +26,28 @@ public class AdvancedOptionsDialog extends JBTDialog {
         setVisible(true);
     }
 
+    private void add(JPanel panel, JBTPreferences pref, JTextField textField) {
+        textField.setText(prefs.get(pref));
+        genericAdd(panel, pref, textField, FIELD_DIMENSION);
+    }
+
+    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp, Dimension dimension) {
+        JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
+        fieldNameLabel.setLabelFor(comp);
+        comp.setPreferredSize(dimension);
+        comp.setMaximumSize(dimension);
+        panel.add(fieldNameLabel);
+        panel.add(comp);
+    }
+
+    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
+        genericAdd(panel, pref, comp, null);
+    }
+
+
     private void add(JPanel panel, JBTPreferences pref, JSlider slider) {
         slider.setValue(prefs.getInt(pref));
-        JLabel label = new JLabel(pref.getName() + ":");
-        label.setLabelFor(slider);
-        panel.add(label);
-        panel.add(slider);
+        genericAdd(panel, pref, slider);
     }
 
     private void init() {
@@ -45,6 +63,11 @@ public class AdvancedOptionsDialog extends JBTDialog {
         buttonsPanel.add(cancelButton);
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
+
+        bruteForceStrategiesPerProcessorText = new JTextField();
+        bruteForceStrategiesPerProcessorText.setHorizontalAlignment(JTextField.RIGHT);
+        add(contentPanel, JBTPreferences.BruteForceStrategiesPerProcessor, bruteForceStrategiesPerProcessorText);
+
 
         int min = 1;
         int max = 50;
@@ -63,12 +86,14 @@ public class AdvancedOptionsDialog extends JBTDialog {
         divideAndConquerCoverageSlider.setLabelTable(labels);
         divideAndConquerCoverageSlider.setPaintLabels(true);
         add(contentPanel, DivideAndConquerCoverage, divideAndConquerCoverageSlider);
-        SpringUtilities.makeCompactGrid(contentPanel, 1, 2, 12, 12, 6, 8);
+
+        SpringUtilities.makeCompactGrid(contentPanel, 2, 2, 12, 12, 6, 8);
 
 
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 prefs.set(DivideAndConquerCoverage, divideAndConquerCoverageSlider.getValue());
+                prefs.set(BruteForceStrategiesPerProcessor, bruteForceStrategiesPerProcessorText.getText());
                 dispose();
             }
         });
@@ -80,10 +105,8 @@ public class AdvancedOptionsDialog extends JBTDialog {
         });
 
 
-        buttonsPanel.requestFocus();
         getRootPane().setDefaultButton(okButton);
-
-        setPreferredSize(new Dimension(600, 380));
+        setPreferredSize(new Dimension(650, 380));
     }
 
 }

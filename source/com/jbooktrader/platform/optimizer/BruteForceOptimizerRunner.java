@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
@@ -21,7 +22,8 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
         setTotalSteps(totalSteps);
         setTotalStrategies(taskSize);
 
-        int chunkSize = STRATEGIES_PER_PROCESSOR * availableProcessors;
+        int strategiesPerProcessor = PreferencesHolder.getInstance().getInt(JBTPreferences.BruteForceStrategiesPerProcessor);
+        int chunkSize = strategiesPerProcessor * availableProcessors;
 
         List<Strategy> strategies = new ArrayList<Strategy>(chunkSize);
         int index = 0;

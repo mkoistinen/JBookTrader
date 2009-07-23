@@ -40,6 +40,7 @@ public enum JBTPreferences {
 
     // Optimizer
     DivideAndConquerCoverage("Divide & Conquer coverage", "10"),
+    BruteForceStrategiesPerProcessor("Brute force strategies per processor", "100"),
 
     // Optimization Map
     OptimizationMapWidth("optimization.map.width", "-1"),
