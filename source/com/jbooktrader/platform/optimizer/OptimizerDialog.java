@@ -11,10 +11,13 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.List;
 
 /**
@@ -35,10 +38,10 @@ public class OptimizerDialog extends JBTDialog {
     private TableColumn stepColumn;
 
     private ParamTableModel paramTableModel;
+    private JTextField combinationField;
     private ResultsTableModel resultsTableModel;
     private Strategy strategy;
     private List<OptimizationResult> optimizationResults;
-
 
     private OptimizerRunner optimizerRunner;
 
@@ -47,10 +50,10 @@ public class OptimizerDialog extends JBTDialog {
         prefs = PreferencesHolder.getInstance();
         this.strategyName = strategyName;
         init();
-        initParams();
         pack();
         assignListeners();
         setLocationRelativeTo(null);
+        initParams();
     }
 
     public void setProgress(final long count, final long iterations, final String text, final String label) {
@@ -85,8 +88,6 @@ public class OptimizerDialog extends JBTDialog {
                 getRootPane().setDefaultButton(cancelButton);
             }
         });
-
-
     }
 
     public void showProgress(final String progressText) {
@@ -149,7 +150,6 @@ public class OptimizerDialog extends JBTDialog {
     }
 
     private void assignListeners() {
-
         optimizeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -245,6 +245,20 @@ public class OptimizerDialog extends JBTDialog {
                 }
             }
         });
+        
+        paramTableModel.addTableModelListener(new TableModelListener() {
+        	public void tableChanged(TableModelEvent e) {
+        		if (e.getType() == TableModelEvent.UPDATE) {
+        			// We ignore events from the combination field itself.
+        			if (e.getSource() != combinationField) {
+        				DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0, true);
+        				
+        				// Get number of combinations and display then in the combinationField
+        				combinationField.setText(df0.format(paramTableModel.getNumCombinations()) + " combinations");
+        			}
+        		}
+        	}
+        });
     }
 
 
@@ -276,7 +290,7 @@ public class OptimizerDialog extends JBTDialog {
 
         SpringUtilities.makeCompactGrid(strategyPanel, 1, 3, 0, 0, 12, 0);
 
-        // strategy parametrs panel and its components
+        // strategy parameters panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
         JScrollPane paramScrollPane = new JScrollPane();
         paramTableModel = new ParamTableModel();
@@ -290,8 +304,19 @@ public class OptimizerDialog extends JBTDialog {
         paramScrollPane.getViewport().add(paramTable);
         paramScrollPane.setPreferredSize(new Dimension(0, 95));
 
+        combinationField = new JTextField("Calculating combinations...");
+        combinationField.setBackground(fileNameLabel.getBackground());
+        combinationField.setBorder(BorderFactory.createEmptyBorder());
+        combinationField.setFont(new Font(Font.DIALOG, Font.ITALIC, 11));
+        combinationField.setEditable(false);
+        combinationField.setHorizontalAlignment(JTextField.RIGHT);
+        combinationField.setFocusable(false);
+        combinationField.setOpaque(false);
+        
         strategyParamPanel.add(paramScrollPane);
-        SpringUtilities.makeCompactGrid(strategyParamPanel, 1, 1, 0, 0, 12, 0);
+        strategyParamPanel.add(combinationField);
+        
+        SpringUtilities.makeCompactGrid(strategyParamPanel, 2, 1, 0, 0, 12, 0);
 
         // optimization options panel and its components
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
@@ -420,7 +445,6 @@ public class OptimizerDialog extends JBTDialog {
         resultsTableModel.setResults(optimizationResults);
     }
 
-
     public String getFileName() {
         return fileNameText.getText();
     }
@@ -428,7 +452,6 @@ public class OptimizerDialog extends JBTDialog {
     public int getMinTrades() {
         return Integer.parseInt(minTradesText.getText());
     }
-
 
     public PerformanceMetric getSortCriteria() {
         String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
