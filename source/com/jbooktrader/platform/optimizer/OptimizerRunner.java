@@ -27,19 +27,22 @@ public abstract class OptimizerRunner implements Runnable {
     private final Constructor<?> strategyConstructor;
     private final ScheduledExecutorService progressExecutor;
     private final NumberFormat nf2, nf0;
+    private final DecimalFormat gnf0 = NumberFormatterFactory.getNumberFormatter(0, true);
     private final String strategyName;
     private final int minTrades;
     private final OptimizerDialog optimizerDialog;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private final List<MarketSnapshot> snapshots;
-    private long completedSteps, totalSteps, totalStrategies;
+    private long completedSteps, totalSteps;
+    private String totalStrategiesString;
     private ExecutorService optimizationExecutor;
 
+    
     class ProgressRunner implements Runnable {
         public void run() {
             if (completedSteps > 0) {
-                showFastProgress(completedSteps, "Optimizing " + totalStrategies + " strategies");
+                showFastProgress(completedSteps, "Optimizing " + totalStrategiesString + " strategies");
             }
         }
     }
@@ -96,7 +99,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     protected void setTotalStrategies(long totalStrategies) {
-        this.totalStrategies = totalStrategies;
+        this.totalStrategiesString = gnf0.format(totalStrategies);
     }
 
     public int getMinTrades() {
