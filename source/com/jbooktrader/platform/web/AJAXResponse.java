@@ -13,7 +13,6 @@ import java.text.*;
 import java.util.*;
 
 import java.io.*;
-import java.net.*;
 
 public class AJAXResponse extends TableLayout {
 
@@ -55,7 +54,6 @@ public class AJAXResponse extends TableLayout {
             StringBuilder symbolBlock = new StringBuilder();
             int symbolPosition = 0;
             double symbolNetProfit = 0.0;
-            int strategyRowCount = 0; // Reset the odd/even counter on each symbol
             
             for (Strategy strategy : strategies) {
                 String strategySymbol = strategy.getContract().m_symbol;
@@ -94,8 +92,6 @@ public class AJAXResponse extends TableLayout {
                     symbolBlock.append(df0.format(performanceManager.getMaxDrawdown())).append(",");
                     symbolBlock.append(df0.format(performanceManager.getNetProfit())).append(",");
                     symbolBlock.append(fileExists ? "link" : "nolink").append("\n");
-                    
-                    strategyRowCount++;
                 }
             }
 
@@ -105,11 +101,11 @@ public class AJAXResponse extends TableLayout {
             response.append(symbolPosition).append(",");
             response.append(df0.format(symbolNetProfit)).append("\n");
             response.append(symbolBlock);
-            
-            response.append("[SUMMARY]").append(",");
-            response.append(totalTrades).append(",");
-            response.append(totalNetProfit).append("\n");
         }
+        
+        response.append("[SUMMARY]").append(",");
+        response.append(totalTrades).append(",");
+        response.append(df0.format(totalNetProfit)).append("\n");
     }
 
 }
