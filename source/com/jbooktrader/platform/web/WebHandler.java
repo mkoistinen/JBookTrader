@@ -19,7 +19,7 @@ public class WebHandler implements HttpHandler {
         URI requestURI = httpExchange.getRequestURI();
         String resource = requestURI.getPath();
         StringBuilder response = new StringBuilder();
-        
+
         String userAgent = httpExchange.getRequestHeaders().getFirst("User-Agent");
 
         boolean isIPhone = userAgent.contains("iPhone");
