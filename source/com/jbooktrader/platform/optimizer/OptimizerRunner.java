@@ -26,8 +26,7 @@ public abstract class OptimizerRunner implements Runnable {
     private static final int MAX_SAVED_RESULTS = 100;// max number of results in the optimization results file
     private final Constructor<?> strategyConstructor;
     private final ScheduledExecutorService progressExecutor;
-    private final NumberFormat nf2, nf0;
-    private final DecimalFormat gnf0 = NumberFormatterFactory.getNumberFormatter(0, true);
+    private final NumberFormat nf2, nf0, gnf0;
     private final String strategyName;
     private final int minTrades;
     private final OptimizerDialog optimizerDialog;
@@ -55,6 +54,7 @@ public abstract class OptimizerRunner implements Runnable {
         snapshots = new LinkedList<MarketSnapshot>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
+        gnf0 = NumberFormatterFactory.getNumberFormatter(0, true);
         availableProcessors = Runtime.getRuntime().availableProcessors();
 
         Class<?> clazz;
