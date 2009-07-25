@@ -4,7 +4,6 @@ import org.jfree.chart.axis.*;
 import org.jfree.chart.event.*;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.renderer.*;
-import org.jfree.data.*;
 import org.jfree.data.xy.*;
 
 import javax.swing.*;
@@ -15,18 +14,19 @@ import java.util.*;
  * Scroll bar for a combined chart where the horizontal axis represents dates
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
-    private static final int STEPS = 100000;
+    private final static long SCALER = 10000;
     private final DateAxis dateAxis;
-    private final Range range;
     private final CombinedDomainXYPlot combinedDomainPlot;
-    private double rangeMin, dateRange, ratio;
 
     public DateScrollBar(CombinedDomainXYPlot combinedDomainPlot) {
+
         super(HORIZONTAL);
         this.combinedDomainPlot = combinedDomainPlot;
 
         dateAxis = (DateAxis) combinedDomainPlot.getDomainAxis();
-        range = combinedDomainPlot.getDataRange(dateAxis);
+        int min = (int) (dateAxis.getLowerBound() / SCALER);
+        int max = (int) (dateAxis.getUpperBound() / SCALER);
+        setValues(max, 0, min, max);
 
         dateAxis.addChangeListener(this);
         addAdjustmentListener(this);
@@ -37,11 +37,16 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
         double lowerBound = dateAxis.getLowerBound();
         double upperBound = dateAxis.getUpperBound();
 
+        if (lowerBound >= upperBound) {
+            return;
+        }
+
         for (Object subPlot : subPlots) {
             XYPlot plot = (XYPlot) subPlot;
             int datasetCount = plot.getDatasetCount();
             double min = Double.MAX_VALUE;
             double max = Double.MIN_VALUE;
+
 
             for (int datasetNumber = 0; datasetNumber < datasetCount; datasetNumber++) {
                 XYDataset dataset = plot.getDataset(datasetNumber);
@@ -79,33 +84,15 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
 
     public void axisChanged(AxisChangeEvent event) {
         rangeUpdate();
-        Timeline timeLine = dateAxis.getTimeline();
-        rangeMin = timeLine.toTimelineValue((long) range.getLowerBound());
-        double rangeMax = timeLine.toTimelineValue((long) range.getUpperBound());
-
-        long dateMin = timeLine.toTimelineValue((long) dateAxis.getLowerBound());
-        long dateMax = timeLine.toTimelineValue((long) dateAxis.getUpperBound());
-
-        dateRange = dateMax - dateMin;
-        ratio = STEPS / (rangeMax - rangeMin);
-
-        int newExtent = (int) (dateRange * ratio);
-        int newValue = (int) ((dateMin - rangeMin) * ratio);
-
-        setValues(newValue, newExtent, 0, STEPS);
+        int value = (int) (dateAxis.getUpperBound() / SCALER);
+        setValue(value);
     }
 
-
     public void adjustmentValueChanged(AdjustmentEvent e) {
-        long start = (long) (getValue() / ratio + rangeMin);
-        long end = (long) (start + dateRange);
-
-        if (end > start) {
-            Timeline timeLine = dateAxis.getTimeline();
-            start = timeLine.toMillisecond(start);
-            end = timeLine.toMillisecond(end);
+        double end = getValue() * SCALER;
+        double start = end - dateAxis.getRange().getLength();
+        if (start < end) {
+            dateAxis.setRange(start, end);
         }
-
-        dateAxis.setRange(start, end);
     }
 }

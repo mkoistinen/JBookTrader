@@ -51,6 +51,9 @@ public class FastXYPlot extends XYPlot {
             foundData = true;
             ValueAxis xAxis = getDomainAxisForDataset(index);
             ValueAxis yAxis = getRangeAxisForDataset(index);
+            if (xAxis.getLowerBound() >= xAxis.getUpperBound()) {
+                return false;
+            }
             XYItemRenderer renderer = getRenderer(index);
             if (renderer == null) {
                 renderer = getRenderer();
