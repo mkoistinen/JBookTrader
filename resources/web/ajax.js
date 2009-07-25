@@ -1,30 +1,30 @@
 function getXmlHttpObj() {
-	try {
-		return new XMLHttpRequest();
-	}
-	catch(e) {}
-	
-	try { 
-		return new ActiveXObject("Msxml2.XMLHTTP.6.0");
-	}
-	catch(e) {}
-	
-	try { 
-		return new ActiveXObject("Msxml2.XMLHTTP.3.0");
-	}
-	catch(e) {}
-	
-	try { 
-		return new ActiveXObject("Msxml2.XMLHTTP");
-	}
-	catch(e) {}
-	
-	try { 
-		return new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	catch(e) {}
+    try {
+        return new XMLHttpRequest();
+    } catch(e) {
+    }
 
-	return false;
+    try {
+        return new ActiveXObject("Msxml2.XMLHTTP.6.0");
+    } catch(e) {
+    }
+
+    try {
+        return new ActiveXObject("Msxml2.XMLHTTP.3.0");
+    } catch(e) {
+    }
+
+    try {
+        return new ActiveXObject("Msxml2.XMLHTTP");
+    } catch(e) {
+    }
+
+    try {
+        return new ActiveXObject("Microsoft.XMLHTTP");
+    } catch(e) {
+    }
+
+    return false;
 }
 
 function handleHttpResponse() {
@@ -111,5 +111,7 @@ var httpObj = getXmlHttpObj();
 var url = "update.html";
 var isWorking = false;
 var strategies = null;
-update();
-var timerId = setInterval(function() { update(); false; }, 5000);
+var timerId = setInterval(function() {
+    update();
+    false;
+}, 5000);

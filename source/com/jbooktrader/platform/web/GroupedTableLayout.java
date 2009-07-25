@@ -55,7 +55,7 @@ public class GroupedTableLayout extends TableLayout {
             int symbolPosition = 0;
             double symbolNetProfit = 0.0;
             int strategyRowCount = 0; // Reset the odd/even counter on each symbol
-            
+
             for (Strategy strategy : strategies) {
                 String strategySymbol = strategy.getContract().m_symbol;
                 if (strategy.getContract().m_secType.equals("CASH")) {
@@ -63,7 +63,7 @@ public class GroupedTableLayout extends TableLayout {
                 }
 
                 if (strategySymbol.equals(symbol)) {
-                	String strategyName = strategy.getName();
+                    String strategyName = strategy.getName();
                     PositionManager positionManager = strategy.getPositionManager();
                     PerformanceManager performanceManager = strategy.getPerformanceManager();
                     totalNetProfit += performanceManager.getNetProfit();
@@ -71,21 +71,25 @@ public class GroupedTableLayout extends TableLayout {
                     symbolPosition += positionManager.getPosition();
                     symbolNetProfit += performanceManager.getNetProfit();
 
-                    if (strategyRowCount % 2 == 0)
-                    	symbolBlock.append("<tr class=\"strategy\">\n");
-                    else
-                    	symbolBlock.append("<tr class=\"strategy oddRow\">\n");
-                    
+                    if (strategyRowCount % 2 == 0) {
+                        symbolBlock.append("<tr class=\"strategy\">\n");
+                    } else {
+                        symbolBlock.append("<tr class=\"strategy oddRow\">\n");
+                    }
+
                     symbolBlock.append("<td id=\"" + strategyName + "_name\">").append("<a href=\"/reports/" + strategyName + ".htm\" target=\"_new\">" + strategy.getName() + "</a>").append("</td>");
                     symbolBlock.append("<td id=\"" + strategyName + "_position\">").append(positionManager.getPosition()).append("</td>");
                     symbolBlock.append("<td id=\"" + strategyName + "_trades\">").append(performanceManager.getTrades()).append("</td>");
                     symbolBlock.append("<td id=\"" + strategyName + "_maxdd\">").append(df0.format(performanceManager.getMaxDrawdown())).append("</td>");
                     symbolBlock.append("<td id=\"" + strategyName + "_pnl\" class=\"last\">").append(df0.format(performanceManager.getNetProfit())).append("</td>");
                     symbolBlock.append("</tr>\n");
-                    
-                    if (strategyList.equals("")) { strategyList = strategyName; }
-                    else strategyList += "," + strategyName;
-                    
+
+                    if (strategyList.equals("")) {
+                        strategyList = strategyName;
+                    } else {
+                        strategyList += "," + strategyName;
+                    }
+
                     strategyRowCount++;
                 }
             }
