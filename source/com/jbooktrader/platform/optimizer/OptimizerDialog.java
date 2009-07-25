@@ -356,7 +356,7 @@ public class OptimizerDialog extends JBTDialog {
         optimizationOptionsPanel.add(advancedOptionsButton);
         advancedOptionsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AdvancedOptionsDialog((JFrame) OptimizerDialog.this.getParent());
+                new AdvancedOptimizationOptionsDialog((JFrame) OptimizerDialog.this.getParent());
             }
         });
 

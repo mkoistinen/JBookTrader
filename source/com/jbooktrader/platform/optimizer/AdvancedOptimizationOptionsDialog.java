@@ -10,13 +10,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class AdvancedOptionsDialog extends JBTDialog {
+public class AdvancedOptimizationOptionsDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
     private JSlider divideAndConquerCoverageSlider;
     private JTextField bruteForceStrategiesPerProcessorText;
 
-    public AdvancedOptionsDialog(JFrame parent) {
+    public AdvancedOptimizationOptionsDialog(JFrame parent) {
         super(parent);
         prefs = PreferencesHolder.getInstance();
         init();
