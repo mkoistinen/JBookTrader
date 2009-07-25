@@ -104,7 +104,7 @@ public class MarketDepth {
         long invalidStateDuration = validator.getInvalidStateDurationInSeconds();
         if (invalidStateDuration >= 60 && (invalidStateDuration % 60 == 0)) {
             String msg = "Book " + name + " has been invalid for " + invalidStateDuration + " seconds.<br>";
-            for (String errorMsg: validator.getErrors()) {
+            for (String errorMsg : validator.getErrors()) {
                 msg += errorMsg + "<br>";
             }
             Dispatcher.getReporter().report(msg);

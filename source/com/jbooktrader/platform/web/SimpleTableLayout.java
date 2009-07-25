@@ -28,12 +28,12 @@ public class SimpleTableLayout extends TableLayout {
 
         int strategyRowCount = 0;
         String strategyName;
-        
+
         for (Strategy strategy : strategies) {
             totalNetProfit += strategy.getPerformanceManager().getNetProfit();
             totalTrades += strategy.getPerformanceManager().getTrades();
             strategyName = strategy.getName();
-            
+
             Contract contract = strategy.getContract();
             String symbol = contract.m_symbol;
             if (contract.m_currency != null) {

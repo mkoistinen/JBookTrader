@@ -21,45 +21,38 @@ public class WebHandler implements HttpHandler {
         StringBuilder response = new StringBuilder();
         
         String userAgent = httpExchange.getRequestHeaders().getFirst("User-Agent");
-        
-        boolean isIPhone = userAgent.contains("iPhone");
 
-        TableLayout tableLayout = null;
+        boolean isIPhone = userAgent.contains("iPhone");
 
         if (resource.equals("/update.html")) {
             List<Strategy> strategies = new ArrayList<Strategy>(Dispatcher.getTrader().getAssistant().getAllStrategies());
             Collections.sort(strategies);
 
-        	tableLayout = new AJAXResponse(response, strategies);
-        	
-            if (tableLayout != null) {
-                tableLayout.render();
-            }
+            TableLayout tableLayout = new AJAXResponse(response, strategies);
+            tableLayout.render();
 
             httpExchange.getResponseHeaders().add("Expires", "-1");
             httpExchange.getResponseHeaders().add("Cache-Control", "no-cache");
             httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
-        }
-        // The index.html page. This is VIRTUAL, it is not on the filesystem.
-        else if (resource.equals("/index.html")) {
+        } else if (resource.equals("/index.html")) {
+            // The index.html page. This is VIRTUAL, it is not on the filesystem.
             // We'll respond to any unknown request with the main page
             response.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n");
             response.append("<html>\n");
             response.append("<head>\n");
             response.append("<title>JBookTrader Web Console</title>\n");
-            
+
             if (isIPhone) {
                 response.append("<link rel=\"apple-touch-icon\" href=\"apple-touch-icon.png\" />\n");
                 response.append("<meta name=\"viewport\" content=\"width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;\" />\n");
                 response.append("<link media=\"screen\" rel=\"stylesheet\" type=\"text/css\" href=\"iphone.css\" />\n");
                 response.append("<script type=\"text/javascript\" src=\"iphone.js\"></script> \n");
-            } 
-            else {
+            } else {
                 response.append("<link media=\"screen\" rel=\"stylesheet\" type=\"text/css\" href=\"stylesheet.css\" />\n");
             }
-            
+
             response.append("<script type=\"text/javascript\" src=\"ajax.js\"></script> \n");
-            
+
             response.append("</head>\n");
             response.append("<body>\n");
             response.append("<h1>\n");
@@ -69,7 +62,7 @@ public class WebHandler implements HttpHandler {
             List<Strategy> strategies = new ArrayList<Strategy>(Dispatcher.getTrader().getAssistant().getAllStrategies());
             Collections.sort(strategies);
 
-            tableLayout = null;
+            TableLayout tableLayout = null;
             PreferencesHolder prefs = PreferencesHolder.getInstance();
             String tableLayoutPreference = prefs.get(JBTPreferences.WebAccessTableLayout);
             if (tableLayoutPreference.equals("simple")) {
