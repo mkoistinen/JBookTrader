@@ -15,6 +15,7 @@ public enum JBTPreferences {
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
+    BackTesterTestingIgnorePeriod("backTester.ignorePeriod", ""),
     BackTesterTestingPeriodStart("backTester.testingPeriodStart", ""),
     BackTesterTestingPeriodEnd("backTester.testingPeriodEnd", ""),
 
@@ -26,6 +27,8 @@ public enum JBTPreferences {
     OptimizerWindowHeight("optimizerwindow.height", "-1"),
     OptimizerWindowX("optimizerwindow.x", "-1"),
     OptimizerWindowY("optimizerwindow.y", "-1"),
+    OptimizerTestingPeriodStart("optimizer.testingPeriodStart", ""),
+    OptimizerTestingPeriodEnd("optimizer.testingPeriodEnd", ""),
 
     // Main window
     MainWindowWidth("mainwindow.width", "-1"),

@@ -14,8 +14,7 @@ public class BackTestStrategyRunner implements Runnable {
     private boolean cancelled;
     private BackTestFileReader backTestFileReader;
 
-    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy, BackTestFileReader backTestFileReader) {
-    	this.backTestFileReader = backTestFileReader;
+    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
         Dispatcher.getTrader().getAssistant().addStrategy(strategy);
@@ -30,7 +29,8 @@ public class BackTestStrategyRunner implements Runnable {
     public void run() {
         try {
             backTestDialog.enableProgress();
-            // backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
+            BackTestFileReader backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
+            backTestFileReader.setFilter(backTestDialog.getDateFilter());
             backTestDialog.showProgress("Scanning historical data file...");
             backTestFileReader.scan();
             if (!cancelled) {

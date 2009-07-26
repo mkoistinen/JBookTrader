@@ -20,20 +20,20 @@ public abstract class MarkSnapshotUtilities {
 
     public static MarketSnapshotFilter getMarketDepthFilter(SimpleDateFormat sdf, String fromText, String toText) {
         MarketSnapshotFilter filter = null;
+        long timeFrom, timeTo;
 
         if (fromText.length() == 0 && toText.length() == 0) {
             return filter;
         }
 
-        long timeFrom, timeTo;
         if (fromText.length() != 0) {
             try {
                 timeFrom = sdf.parse(fromText).getTime();
             } catch (ParseException e) {
-                timeFrom = Long.MIN_VALUE;
+                timeFrom = 0; // Long.MIN_VALUE;
             }
         } else {
-            timeFrom = Long.MIN_VALUE;
+            timeFrom = 0; // Long.MIN_VALUE;
         }
 
         if (toText.length() != 0) {
@@ -57,9 +57,6 @@ public abstract class MarkSnapshotUtilities {
                 }
             }
             
-            public String toString() {
-            	return "MarketSnapshotFilter from: " + timeStart + " to: " + timeEnd;
-            }
         };
 
         return filter;

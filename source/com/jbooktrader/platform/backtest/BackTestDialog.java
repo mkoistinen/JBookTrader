@@ -29,6 +29,7 @@ public class BackTestDialog extends JBTDialog {
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JFormattedTextField fromText, toText;
+    private JCheckBox ignorePeriod;
     private JProgressBar progressBar;
     private BackTestStrategyRunner btsr;
     private BackTestParamTableModel backTestParamTableModel;
@@ -96,6 +97,7 @@ public class BackTestDialog extends JBTDialog {
                     prefs.set(BackTesterFileName, fileNameText.getText());
                     prefs.set(BackTesterTestingPeriodStart, fromText.getText());
                     prefs.set(BackTesterTestingPeriodEnd, toText.getText());
+                    prefs.set(BackTesterTestingIgnorePeriod, (ignorePeriod.isSelected() ? "true" : "false"));
                     String historicalFileName = fileNameText.getText();
                     File file = new File(historicalFileName);
                     if (!file.exists()) {
@@ -106,18 +108,26 @@ public class BackTestDialog extends JBTDialog {
 
                     StrategyParams newStrategyParams = backTestParamTableModel.getParams();
                     
-                    BackTestFileReader backTestReader = new BackTestFileReader(getFileName());
-                    MarketSnapshotFilter filter = MarkSnapshotUtilities.getMarketDepthFilter(sdf, fromText.getText(), toText.getText());
-                    backTestReader.setFilter(filter);
-                    
                     Strategy strategyInstance = ClassFinder.getInstance(strategyName, newStrategyParams);
-                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance, backTestReader);
+                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
                     new Thread(btsr).start();
                 }
                 catch (Exception ex) {
                     MessageDialog.showError(BackTestDialog.this, ex);
                 }
             }
+        });
+
+        ignorePeriod.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		try {
+        			fromText.setEnabled(!ignorePeriod.isSelected());
+        			toText.setEnabled(!ignorePeriod.isSelected());
+        		}
+        		catch (Exception ecb) {
+                    MessageDialog.showError(BackTestDialog.this, ecb);
+        		}
+        	}
         });
 
         cancelButton.addActionListener(new ActionListener() {
@@ -178,10 +188,14 @@ public class BackTestDialog extends JBTDialog {
         // date ranger filter panel
         // From field
         JPanel datePanel = new JPanel(new SpringLayout());
+        ignorePeriod = new JCheckBox("Use all data", prefs.get(BackTesterTestingIgnorePeriod).equals("true"));
+        datePanel.add(ignorePeriod);
+
         JLabel fromLabel = new JLabel("From:", JLabel.TRAILING);
         fromText = new JFormattedTextField(sdf);
         fromText.setText(prefs.get(BackTesterTestingPeriodStart));
         fromText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
+        fromText.setEnabled(!ignorePeriod.isSelected());
         fromLabel.setLabelFor(fromText);
         datePanel.add(fromLabel);
         datePanel.add(fromText);
@@ -190,6 +204,7 @@ public class BackTestDialog extends JBTDialog {
         toText = new JFormattedTextField(sdf);
         toText.setText(prefs.get(BackTesterTestingPeriodEnd));
         toText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
+        toText.setEnabled(!ignorePeriod.isSelected());
         toLabel.setLabelFor(toText);
         datePanel.add(toLabel);
         datePanel.add(toText);
@@ -244,5 +259,15 @@ public class BackTestDialog extends JBTDialog {
 
     public String getFileName() {
         return fileNameText.getText();
+    }
+
+	public MarketSnapshotFilter getDateFilter() {
+		MarketSnapshotFilter filter = null;
+		
+		if (!ignorePeriod.isSelected()) {
+			filter = MarkSnapshotUtilities.getMarketDepthFilter(sdf, fromText.getText(), toText.getText());
+		}
+
+		return filter;
     }
 }

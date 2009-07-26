@@ -2,6 +2,7 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
+import com.jbooktrader.platform.marketbook.MarketSnapshotFilter;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -18,6 +19,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,6 +46,11 @@ public class OptimizerDialog extends JBTDialog {
     private Strategy strategy;
     private List<OptimizationResult> optimizationResults;
 
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+    private JFormattedTextField fromText, toText;
+    private JCheckBox ignorePeriod;
+    
     private OptimizerRunner optimizerRunner;
 
     public OptimizerDialog(JFrame parent, String strategyName) {
@@ -100,7 +108,6 @@ public class OptimizerDialog extends JBTDialog {
         });
     }
 
-
     public void signalCompleted() {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -111,7 +118,6 @@ public class OptimizerDialog extends JBTDialog {
             }
         });
     }
-
 
     private void setOptions() throws JBookTraderException {
         String historicalFileName = fileNameText.getText();
@@ -157,6 +163,9 @@ public class OptimizerDialog extends JBTDialog {
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
+                    prefs.set(OptimizerTestingPeriodStart, fromText.getText());
+                    prefs.set(OptimizerTestingPeriodEnd, toText.getText());
+                    prefs.set(BackTesterTestingIgnorePeriod, (ignorePeriod.isSelected() ? "true" : "false"));
                     setOptions();
                     StrategyParams params = paramTableModel.getParams();
 
@@ -172,6 +181,18 @@ public class OptimizerDialog extends JBTDialog {
                     MessageDialog.showError(OptimizerDialog.this, ex);
                 }
             }
+        });
+        
+        ignorePeriod.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		try {
+        			fromText.setEnabled(!ignorePeriod.isSelected());
+        			toText.setEnabled(!ignorePeriod.isSelected());
+        		}
+        		catch (Exception ecb) {
+                    MessageDialog.showError(OptimizerDialog.this, ecb);
+        		}
+        	}
         });
 
         optimizationMapButton.addActionListener(new ActionListener() {
@@ -191,7 +212,6 @@ public class OptimizerDialog extends JBTDialog {
                 }
             }
         });
-
 
         optimizationMethodCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -274,7 +294,7 @@ public class OptimizerDialog extends JBTDialog {
         JPanel southPanel = new JPanel(new BorderLayout());
 
         // strategy panel and its components
-        JPanel strategyPanel = new JPanel(new SpringLayout());
+        JPanel filenamePanel = new JPanel(new SpringLayout());
 
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
@@ -284,12 +304,38 @@ public class OptimizerDialog extends JBTDialog {
 
         fileNameLabel.setLabelFor(fileNameText);
 
-        strategyPanel.add(fileNameLabel);
-        strategyPanel.add(fileNameText);
-        strategyPanel.add(selectFileButton);
+        filenamePanel.add(fileNameLabel);
+        filenamePanel.add(fileNameText);
+        filenamePanel.add(selectFileButton);
 
-        SpringUtilities.makeCompactGrid(strategyPanel, 1, 3, 0, 0, 12, 0);
+        SpringUtilities.makeCompactGrid(filenamePanel, 1, 3, 0, 0, 12, 0);
 
+        // date ranger filter panel
+        // From field
+        JPanel datePanel = new JPanel(new SpringLayout());
+        ignorePeriod = new JCheckBox("Use all data", prefs.get(BackTesterTestingIgnorePeriod).equals("true"));
+        datePanel.add(ignorePeriod);
+
+        JLabel fromLabel = new JLabel("From:", JLabel.TRAILING);
+        fromText = new JFormattedTextField(sdf);
+        fromText.setText(prefs.get(OptimizerTestingPeriodStart));
+        fromText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
+        fromText.setEnabled(!ignorePeriod.isSelected());
+        fromLabel.setLabelFor(fromText);
+        datePanel.add(fromLabel);
+        datePanel.add(fromText);
+        // To field
+        JLabel toLabel = new JLabel("To:", JLabel.TRAILING);
+        toText = new JFormattedTextField(sdf);
+        toText.setText(prefs.get(OptimizerTestingPeriodEnd));
+        toText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
+        toText.setEnabled(!ignorePeriod.isSelected());
+        toLabel.setLabelFor(toText);
+        datePanel.add(toLabel);
+        datePanel.add(toText);
+        // spring packing
+        SpringUtilities.makeOneLineGrid(datePanel);
+        
         // strategy parameters panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
         JScrollPane paramScrollPane = new JScrollPane();
@@ -364,12 +410,13 @@ public class OptimizerDialog extends JBTDialog {
         SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 7, 0, 0, 12, 0);
 
         northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
-        northPanel.add(strategyPanel);
+        northPanel.add(filenamePanel);
+        northPanel.add(datePanel);
         northPanel.add(strategyParamPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization options")));
         northPanel.add(optimizationOptionsPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization Results")));
-        SpringUtilities.makeCompactGrid(northPanel, 6, 1, 12, 12, 0, 8);
+        SpringUtilities.makeCompactGrid(northPanel, 7, 1, 12, 12, 0, 8);
 
         JScrollPane resultsScrollPane = new JScrollPane();
         centerPanel.add(resultsScrollPane);
@@ -456,5 +503,15 @@ public class OptimizerDialog extends JBTDialog {
     public PerformanceMetric getSortCriteria() {
         String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
         return PerformanceMetric.getColumn(selectedItem);
+    }
+    
+	public MarketSnapshotFilter getDateFilter() {
+		MarketSnapshotFilter filter = null;
+		
+		if (!ignorePeriod.isSelected()) {
+			filter = MarkSnapshotUtilities.getMarketDepthFilter(sdf, fromText.getText(), toText.getText());
+		}
+
+		return filter;
     }
 }

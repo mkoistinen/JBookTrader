@@ -70,7 +70,7 @@ public class BackTestFileReader {
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
                 	marketSnapshot = toMarketDepth(line);
-                	if (filter != null && filter.accept(marketSnapshot)) {
+                	if (filter == null || filter.accept(marketSnapshot)) {
 	                    snapshotCount++;
 	                    if (firstMarketLine == 0) {
 	                        firstMarketLine = lineNumber;
@@ -112,7 +112,7 @@ public class BackTestFileReader {
         		else {
         			marketSnapshot = toMarketDepth(line);
         			lineNumber++;
-        			if (filter != null && filter.accept(marketSnapshot)) {
+        			if (filter == null || filter.accept(marketSnapshot)) {
         				previousTime = marketSnapshot.getTime();
         			}
         			else {
