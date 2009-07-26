@@ -20,6 +20,7 @@ public class BackTestFileReader {
     private volatile boolean cancelled;
     private BufferedReader reader;
     private long snapshotCount, firstMarketLine, lineNumber;
+	private MarketSnapshotFilter filter = null;
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
         this.fileName = fileName;
@@ -33,7 +34,7 @@ public class BackTestFileReader {
     public void cancel() {
         cancelled = true;
     }
-
+    
     public long getSnapshotCount() {
         return snapshotCount;
     }
@@ -52,8 +53,13 @@ public class BackTestFileReader {
         sdf.setTimeZone(tz);
     }
 
+    public void setFilter(MarketSnapshotFilter mssFilter) {
+    	filter = mssFilter;
+    }
+    
     public void scan() throws JBookTraderException {
         String line;
+        MarketSnapshot marketSnapshot = null;
 
         try {
             while ((line = reader.readLine()) != null && !cancelled) {
@@ -63,10 +69,13 @@ public class BackTestFileReader {
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                    snapshotCount++;
-                    if (firstMarketLine == 0) {
-                        firstMarketLine = lineNumber;
-                    }
+                	marketSnapshot = toMarketDepth(line);
+                	if (filter != null && filter.accept(marketSnapshot)) {
+	                    snapshotCount++;
+	                    if (firstMarketLine == 0) {
+	                        firstMarketLine = lineNumber;
+	                    }
+                	}
                 }
 
                 if (isProperty) {
@@ -88,26 +97,37 @@ public class BackTestFileReader {
 
     }
 
-
     public MarketSnapshot next() {
         String line = "";
         MarketSnapshot marketSnapshot = null;
-
+        
         try {
-            line = reader.readLine();
-            if (line != null) {
-                marketSnapshot = toMarketDepth(line);
-                previousTime = marketSnapshot.getTime();
-                lineNumber++;
-            } else {
-                reader.close();
-            }
-        } catch (IOException ioe) {
+        	while (marketSnapshot == null) {
+        		line = reader.readLine();
+        		
+        		if (line == null) {
+                    reader.close();
+                    break;
+        		}
+        		else {
+        			marketSnapshot = toMarketDepth(line);
+        			lineNumber++;
+        			if (filter != null && filter.accept(marketSnapshot)) {
+        				previousTime = marketSnapshot.getTime();
+        			}
+        			else {
+        				marketSnapshot = null;
+        			}
+        		}
+        	} // while
+        } 
+        catch (IOException ioe) {
             throw new RuntimeException("Could not read data file");
-        } catch (JBookTraderException e) {
+        } 
+        catch (JBookTraderException e) {
             String errorMsg = "";
             if (lineNumber > 0) {
-                errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
+            	errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
                 errorMsg += line + LINE_SEP;
             }
             String description = e.getMessage();

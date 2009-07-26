@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.dialog.*;
+import com.jbooktrader.platform.marketbook.MarketSnapshotFilter;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -14,19 +15,24 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final Dimension MIN_SIZE = new Dimension(770, 350);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
+    private JFormattedTextField fromText, toText;
     private JProgressBar progressBar;
     private BackTestStrategyRunner btsr;
     private BackTestParamTableModel backTestParamTableModel;
+    private SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
 
     private StrategyParams strategyParams;
 
@@ -88,6 +94,8 @@ public class BackTestDialog extends JBTDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     prefs.set(BackTesterFileName, fileNameText.getText());
+                    prefs.set(BackTesterTestingPeriodStart, fromText.getText());
+                    prefs.set(BackTesterTestingPeriodEnd, toText.getText());
                     String historicalFileName = fileNameText.getText();
                     File file = new File(historicalFileName);
                     if (!file.exists()) {
@@ -97,8 +105,13 @@ public class BackTestDialog extends JBTDialog {
                     }
 
                     StrategyParams newStrategyParams = backTestParamTableModel.getParams();
+                    
+                    BackTestFileReader backTestReader = new BackTestFileReader(getFileName());
+                    MarketSnapshotFilter filter = MarkSnapshotUtilities.getMarketDepthFilter(sdf, fromText.getText(), toText.getText());
+                    backTestReader.setFilter(filter);
+                    
                     Strategy strategyInstance = ClassFinder.getInstance(strategyName, newStrategyParams);
-                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
+                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance, backTestReader);
                     new Thread(btsr).start();
                 }
                 catch (Exception ex) {
@@ -149,16 +162,42 @@ public class BackTestDialog extends JBTDialog {
         setTitle("Back Test - " + strategyName);
         setLayout(new BorderLayout());
 
-        JPanel northPanel = new JPanel(new SpringLayout());
+        JPanel northPanel = new JPanel(new BorderLayout());
+        
+        JPanel filePanel = new JPanel(new SpringLayout());
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("Browse...");
         fileNameLabel.setLabelFor(fileNameText);
-        northPanel.add(fileNameLabel);
-        northPanel.add(fileNameText);
-        northPanel.add(selectFileButton);
-        SpringUtilities.makeTopOneLineGrid(northPanel);
+        filePanel.add(fileNameLabel);
+        filePanel.add(fileNameText);
+        filePanel.add(selectFileButton);
+        SpringUtilities.makeTopOneLineGrid(filePanel);
+
+        // date ranger filter panel
+        // From field
+        JPanel datePanel = new JPanel(new SpringLayout());
+        JLabel fromLabel = new JLabel("From:", JLabel.TRAILING);
+        fromText = new JFormattedTextField(sdf);
+        fromText.setText(prefs.get(BackTesterTestingPeriodStart));
+        fromText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
+        fromLabel.setLabelFor(fromText);
+        datePanel.add(fromLabel);
+        datePanel.add(fromText);
+        // To field
+        JLabel toLabel = new JLabel("To:", JLabel.TRAILING);
+        toText = new JFormattedTextField(sdf);
+        toText.setText(prefs.get(BackTesterTestingPeriodEnd));
+        toText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
+        toLabel.setLabelFor(toText);
+        datePanel.add(toLabel);
+        datePanel.add(toText);
+        // spring packing
+        SpringUtilities.makeOneLineGrid(datePanel);
+        
+        northPanel.add(filePanel, BorderLayout.NORTH);
+        northPanel.add(datePanel, BorderLayout.SOUTH);
 
         JPanel centerPanel = new JPanel(new SpringLayout());
         backTestParamTableModel = new BackTestParamTableModel();

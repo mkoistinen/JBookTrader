@@ -15,6 +15,8 @@ public enum JBTPreferences {
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
+    BackTesterTestingPeriodStart("backTester.testingPeriodStart", ""),
+    BackTesterTestingPeriodEnd("backTester.testingPeriodEnd", ""),
 
     // Optimizer
     OptimizerMinTrades("optimizer.minTrades", "50"),
