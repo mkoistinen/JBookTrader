@@ -20,7 +20,7 @@ public class BackTestFileReader {
     private volatile boolean cancelled;
     private BufferedReader reader;
     private long snapshotCount, firstMarketLine, lineNumber;
-	private MarketSnapshotFilter filter = null;
+    private MarketSnapshotFilter filter;
 
     public BackTestFileReader(String fileName) throws JBookTraderException {
         this.fileName = fileName;
@@ -34,7 +34,7 @@ public class BackTestFileReader {
     public void cancel() {
         cancelled = true;
     }
-    
+
     public long getSnapshotCount() {
         return snapshotCount;
     }
@@ -54,9 +54,9 @@ public class BackTestFileReader {
     }
 
     public void setFilter(MarketSnapshotFilter mssFilter) {
-    	filter = mssFilter;
+        filter = mssFilter;
     }
-    
+
     public void scan() throws JBookTraderException {
         String line;
         MarketSnapshot marketSnapshot = null;
@@ -69,13 +69,13 @@ public class BackTestFileReader {
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                	marketSnapshot = toMarketDepth(line);
-                	if (filter == null || filter.accept(marketSnapshot)) {
-	                    snapshotCount++;
-	                    if (firstMarketLine == 0) {
-	                        firstMarketLine = lineNumber;
-	                    }
-                	}
+                    marketSnapshot = toMarketDepth(line);
+                    if (filter == null || filter.accept(marketSnapshot)) {
+                        snapshotCount++;
+                        if (firstMarketLine == 0) {
+                            firstMarketLine = lineNumber;
+                        }
+                    }
                 }
 
                 if (isProperty) {
@@ -100,34 +100,32 @@ public class BackTestFileReader {
     public MarketSnapshot next() {
         String line = "";
         MarketSnapshot marketSnapshot = null;
-        
+
         try {
-        	while (marketSnapshot == null) {
-        		line = reader.readLine();
-        		
-        		if (line == null) {
+            while (marketSnapshot == null) {
+                line = reader.readLine();
+
+                if (line == null) {
                     reader.close();
                     break;
-        		}
-        		else {
-        			marketSnapshot = toMarketDepth(line);
-        			lineNumber++;
-        			if (filter == null || filter.accept(marketSnapshot)) {
-        				previousTime = marketSnapshot.getTime();
-        			}
-        			else {
-        				marketSnapshot = null;
-        			}
-        		}
-        	} // while
-        } 
+                } else {
+                    marketSnapshot = toMarketDepth(line);
+                    lineNumber++;
+                    if (filter == null || filter.accept(marketSnapshot)) {
+                        previousTime = marketSnapshot.getTime();
+                    } else {
+                        marketSnapshot = null;
+                    }
+                }
+            } // while
+        }
         catch (IOException ioe) {
             throw new RuntimeException("Could not read data file");
-        } 
+        }
         catch (JBookTraderException e) {
             String errorMsg = "";
             if (lineNumber > 0) {
-            	errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
+                errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
                 errorMsg += line + LINE_SEP;
             }
             String description = e.getMessage();
@@ -166,7 +164,7 @@ public class BackTestFileReader {
         }
 
         if (previousTime != 0) {
-            if (time <= previousTime) {
+            if (time < previousTime) {
                 String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
                 throw new JBookTraderException(msg);
             }
