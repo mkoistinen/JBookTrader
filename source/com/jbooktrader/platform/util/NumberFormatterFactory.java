@@ -5,7 +5,7 @@ import java.text.*;
 public class NumberFormatterFactory {
 
     public static DecimalFormat getNumberFormatter(int maxFractionDigits) {
-    	return getNumberFormatter(maxFractionDigits, false);
+        return getNumberFormatter(maxFractionDigits, false);
     }
 
     public static DecimalFormat getNumberFormatter(int maxFractionDigits, boolean grouping) {

@@ -5,14 +5,13 @@ import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
-import com.jbooktrader.platform.startup.JBookTrader;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
+import java.io.*;
 import java.text.*;
 import java.util.*;
-
-import java.io.*;
 
 public class AJAXResponse extends TableLayout {
 
@@ -54,23 +53,23 @@ public class AJAXResponse extends TableLayout {
             StringBuilder symbolBlock = new StringBuilder();
             int symbolPosition = 0;
             double symbolNetProfit = 0.0;
-            
+
             for (Strategy strategy : strategies) {
                 String strategySymbol = strategy.getContract().m_symbol;
                 String strategyName = strategy.getName();
-                
+
                 // Check if the StrategyReport exists
                 boolean fileExists = true;
                 try {
-                	String reportFile = JBookTrader.getAppPath() + WebHandler.REPORT_DIR + strategy.getName() + ".htm";
-                	File file = new File(reportFile);
-                	
-                	if (!file.exists()) fileExists = false;
+                    String reportFile = JBookTrader.getAppPath() + WebHandler.REPORT_DIR + strategy.getName() + ".htm";
+                    File file = new File(reportFile);
+
+                    if (!file.exists()) fileExists = false;
                 }
                 catch (Exception e) {
-                	fileExists = false;
+                    fileExists = false;
                 }
-                
+
                 if (strategy.getContract().m_secType.equals("CASH")) {
                     strategySymbol += "." + strategy.getContract().m_currency;
                 }
@@ -82,7 +81,7 @@ public class AJAXResponse extends TableLayout {
                     totalTrades += performanceManager.getTrades();
                     symbolPosition += positionManager.getPosition();
                     symbolNetProfit += performanceManager.getNetProfit();
-                    
+
                     symbolBlock.append("[STRATEGY]").append(",");
                     symbolBlock.append(strategyName).append(",");
                     symbolBlock.append(symbol).append(",");
@@ -102,7 +101,7 @@ public class AJAXResponse extends TableLayout {
             response.append(df0.format(symbolNetProfit)).append("\n");
             response.append(symbolBlock);
         }
-        
+
         response.append("[SUMMARY]").append(",");
         response.append(totalTrades).append(",");
         response.append(df0.format(totalNetProfit)).append("\n");

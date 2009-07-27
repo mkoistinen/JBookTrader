@@ -37,7 +37,7 @@ public abstract class OptimizerRunner implements Runnable {
     private String totalStrategiesString;
     private ExecutorService optimizationExecutor;
 
-    
+
     class ProgressRunner implements Runnable {
         public void run() {
             if (completedSteps > 0) {

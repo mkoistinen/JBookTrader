@@ -29,7 +29,7 @@ public class BackTestStrategyRunner implements Runnable {
     public void run() {
         try {
             backTestDialog.enableProgress();
-            BackTestFileReader backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
+            backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
             backTestFileReader.setFilter(backTestDialog.getDateFilter());
             backTestDialog.showProgress("Scanning historical data file...");
             backTestFileReader.scan();
