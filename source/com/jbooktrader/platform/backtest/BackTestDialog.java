@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.backtest;
 
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.marketbook.MarketSnapshotFilter;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -9,31 +9,33 @@ import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
+import com.toedter.calendar.*;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final Dimension MIN_SIZE = new Dimension(770, 350);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(770, 450);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
-    private JFormattedTextField fromText, toText;
-    private JCheckBox ignorePeriod;
+    private JTextFieldDateEditor fromDateEditor, toDateEditor;
+    private JCheckBox useAllDataCheckBox;
+    private JPanel fromDatePanel, toDatePanel;
+    private JLabel fromLabel, toLabel;
     private JProgressBar progressBar;
     private BackTestStrategyRunner btsr;
     private BackTestParamTableModel backTestParamTableModel;
-    private SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+
 
     private StrategyParams strategyParams;
 
@@ -95,9 +97,9 @@ public class BackTestDialog extends JBTDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     prefs.set(BackTesterFileName, fileNameText.getText());
-                    prefs.set(BackTesterTestingPeriodStart, fromText.getText());
-                    prefs.set(BackTesterTestingPeriodEnd, toText.getText());
-                    prefs.set(BackTesterTestingIgnorePeriod, (ignorePeriod.isSelected() ? "true" : "false"));
+                    prefs.set(BackTesterTestingPeriodStart, fromDateEditor.getText());
+                    prefs.set(BackTesterTestingPeriodEnd, toDateEditor.getText());
+                    prefs.set(BackTesterUseAllData, (useAllDataCheckBox.isSelected() ? "true" : "false"));
                     String historicalFileName = fileNameText.getText();
                     File file = new File(historicalFileName);
                     if (!file.exists()) {
@@ -107,7 +109,7 @@ public class BackTestDialog extends JBTDialog {
                     }
 
                     StrategyParams newStrategyParams = backTestParamTableModel.getParams();
-                    
+
                     Strategy strategyInstance = ClassFinder.getInstance(strategyName, newStrategyParams);
                     btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
                     new Thread(btsr).start();
@@ -118,16 +120,19 @@ public class BackTestDialog extends JBTDialog {
             }
         });
 
-        ignorePeriod.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		try {
-        			fromText.setEnabled(!ignorePeriod.isSelected());
-        			toText.setEnabled(!ignorePeriod.isSelected());
-        		}
-        		catch (Exception ecb) {
+        useAllDataCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    boolean useAllData = useAllDataCheckBox.isSelected();
+                    fromLabel.setEnabled(!useAllData);
+                    fromDatePanel.setEnabled(!useAllData);
+                    toLabel.setEnabled(!useAllData);
+                    toDatePanel.setEnabled(!useAllData);
+                }
+                catch (Exception ecb) {
                     MessageDialog.showError(BackTestDialog.this, ecb);
-        		}
-        	}
+                }
+            }
         });
 
         cancelButton.addActionListener(new ActionListener() {
@@ -172,8 +177,8 @@ public class BackTestDialog extends JBTDialog {
         setTitle("Back Test - " + strategyName);
         setLayout(new BorderLayout());
 
-        JPanel northPanel = new JPanel(new BorderLayout());
-        
+        JPanel northPanel = new JPanel(new SpringLayout());
+
         JPanel filePanel = new JPanel(new SpringLayout());
         JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
@@ -183,36 +188,44 @@ public class BackTestDialog extends JBTDialog {
         filePanel.add(fileNameLabel);
         filePanel.add(fileNameText);
         filePanel.add(selectFileButton);
-        SpringUtilities.makeTopOneLineGrid(filePanel);
+        SpringUtilities.makeCompactGrid(filePanel, 1, filePanel.getComponentCount(), 1, 8, 8, 8);
 
-        // date ranger filter panel
-        // From field
-        JPanel datePanel = new JPanel(new SpringLayout());
-        ignorePeriod = new JCheckBox("Use all data", prefs.get(BackTesterTestingIgnorePeriod).equals("true"));
-        datePanel.add(ignorePeriod);
+        // historical data range filter panel
+        JPanel dateRangePanel = new JPanel(new SpringLayout());
+        Border etchedBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
+        TitledBorder dateRangeBorder = BorderFactory.createTitledBorder(etchedBorder, "Historical data range");
+        dateRangePanel.setBorder(dateRangeBorder);
+        String dateFormat = "MMMMM d, yyyy";
+        useAllDataCheckBox = new JCheckBox("Use all data", prefs.get(BackTesterUseAllData).equals("true"));
+        dateRangePanel.add(useAllDataCheckBox);
 
-        JLabel fromLabel = new JLabel("From:", JLabel.TRAILING);
-        fromText = new JFormattedTextField(sdf);
-        fromText.setText(prefs.get(BackTesterTestingPeriodStart));
-        fromText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
-        fromText.setEnabled(!ignorePeriod.isSelected());
-        fromLabel.setLabelFor(fromText);
-        datePanel.add(fromLabel);
-        datePanel.add(fromText);
-        // To field
-        JLabel toLabel = new JLabel("To:", JLabel.TRAILING);
-        toText = new JFormattedTextField(sdf);
-        toText.setText(prefs.get(BackTesterTestingPeriodEnd));
-        toText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
-        toText.setEnabled(!ignorePeriod.isSelected());
-        toLabel.setLabelFor(toText);
-        datePanel.add(toLabel);
-        datePanel.add(toText);
-        // spring packing
-        SpringUtilities.makeOneLineGrid(datePanel);
-        
-        northPanel.add(filePanel, BorderLayout.NORTH);
-        northPanel.add(datePanel, BorderLayout.SOUTH);
+        // From date
+        fromLabel = new JLabel("From:");
+        fromDateEditor = new JTextFieldDateEditor();
+        fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
+        fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
+        fromDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        fromLabel.setLabelFor(fromDatePanel);
+        dateRangePanel.add(fromLabel);
+        fromDatePanel.add(fromDateEditor);
+        dateRangePanel.add(fromDatePanel);
+
+        // To date
+        toLabel = new JLabel("To:");
+        toDateEditor = new JTextFieldDateEditor();
+        toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
+        toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
+        toDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        toLabel.setLabelFor(toDatePanel);
+        dateRangePanel.add(toLabel);
+        toDatePanel.add(toDateEditor);
+        dateRangePanel.add(toDatePanel);
+        SpringUtilities.makeOneLineGrid(dateRangePanel);
+
+
+        northPanel.add(filePanel);
+        northPanel.add(dateRangePanel);
+        SpringUtilities.makeCompactGrid(northPanel, 2, 1, 8, 8, 8, 0);
 
         JPanel centerPanel = new JPanel(new SpringLayout());
         backTestParamTableModel = new BackTestParamTableModel();
@@ -227,7 +240,7 @@ public class BackTestDialog extends JBTDialog {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.getViewport().add(paramTable);
         centerPanel.add(scrollPane);
-        SpringUtilities.makeOneLineGrid(centerPanel);
+        SpringUtilities.makeCompactGrid(centerPanel, 1, centerPanel.getComponentCount(), 10, 8, 10, 10);
 
         JPanel southPanel = new JPanel(new BorderLayout());
 
@@ -261,13 +274,13 @@ public class BackTestDialog extends JBTDialog {
         return fileNameText.getText();
     }
 
-	public MarketSnapshotFilter getDateFilter() {
-		MarketSnapshotFilter filter = null;
-		
-		if (!ignorePeriod.isSelected()) {
-			filter = MarkSnapshotUtilities.getMarketDepthFilter(sdf, fromText.getText(), toText.getText());
-		}
+    public MarketSnapshotFilter getDateFilter() {
+        MarketSnapshotFilter filter = null;
 
-		return filter;
+        if (!useAllDataCheckBox.isSelected()) {
+            filter = MarkSnapshotUtilities.getMarketDepthFilter(fromDateEditor, toDateEditor);
+        }
+
+        return filter;
     }
 }

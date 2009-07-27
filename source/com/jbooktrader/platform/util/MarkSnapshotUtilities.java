@@ -3,88 +3,39 @@
  */
 package com.jbooktrader.platform.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import com.jbooktrader.platform.marketbook.*;
+import com.toedter.calendar.*;
 
-import com.jbooktrader.platform.marketbook.MarketSnapshot;
-import com.jbooktrader.platform.marketbook.MarketSnapshotFilter;
+import java.util.*;
 
 /**
- * @author yueming
  *
  */
 public abstract class MarkSnapshotUtilities {
 
-    public static MarketSnapshotFilter getMarketDepthFilter(SimpleDateFormat sdf, String fromText, String toText) {
+    public static MarketSnapshotFilter getMarketDepthFilter(JTextFieldDateEditor fromDateEditor, JTextFieldDateEditor toDateEditor) {
         MarketSnapshotFilter filter = null;
-        long timeFrom, timeTo;
 
-        if (fromText.length() == 0 && toText.length() == 0) {
-            return filter;
-        }
 
-        if (fromText.length() != 0) {
-            try {
-                timeFrom = sdf.parse(fromText).getTime();
-            } catch (ParseException e) {
-                timeFrom = 0; // Long.MIN_VALUE;
-            }
-        } else {
-            timeFrom = 0; // Long.MIN_VALUE;
-        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fromDateEditor.getDate());
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        final long fromDate = calendar.getTimeInMillis();
+        calendar.setTime(toDateEditor.getDate());
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        final long toDate = calendar.getTimeInMillis();
 
-        if (toText.length() != 0) {
-            try {
-                timeTo = sdf.parse(toText).getTime();
-            } catch (ParseException e) {
-                timeTo = Long.MAX_VALUE;
-            }
-        } else {
-            timeTo = Long.MAX_VALUE;
-        }
 
-        final long timeStart = timeFrom, timeEnd = timeTo;
         filter = new MarketSnapshotFilter() {
-        	
+
             public boolean accept(MarketSnapshot marketSnapshot) {
-                if (marketSnapshot.getTime() >= timeStart && marketSnapshot.getTime() <= timeEnd) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return (marketSnapshot.getTime() >= fromDate && marketSnapshot.getTime() <= toDate);
             }
-            
+
         };
 
         return filter;
     }
 
-
-    public static MarketSnapshotFilter getMarketDepthFilter(final long start, final int days, final TimeZone zone) {
-        MarketSnapshotFilter filter = new MarketSnapshotFilter() {
-            private int prev = 0;
-            private int counter = 0;
-            private Calendar cal = Calendar.getInstance(zone);
-
-            public boolean accept(MarketSnapshot marketSnapshot) {
-                if (marketSnapshot.getTime() >= start && counter < days) {
-                    cal.setTime(new Date(marketSnapshot.getTime()));
-                    if (prev != 0 && prev != cal.get(Calendar.DAY_OF_YEAR)) {
-                        counter++;
-                    }
-                    prev = cal.get(Calendar.DAY_OF_YEAR);
-                    return true;
-                }
-                return false;
-            }
-
-        };
-        return filter;
-    }
 
 }
-
-// $Id: MarkSnapshotUtilities.java 380 2008-10-08 10:10:08Z florent.guiliani $

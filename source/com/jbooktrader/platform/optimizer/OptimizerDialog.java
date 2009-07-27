@@ -2,7 +2,7 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.marketbook.MarketSnapshotFilter;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
@@ -10,17 +10,16 @@ import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
+import com.toedter.calendar.*;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
+import javax.swing.event.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.text.*;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -31,10 +30,14 @@ public class OptimizerDialog extends JBTDialog {
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
-    private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton, advancedOptionsButton;
+    private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
     private JTextField fileNameText, minTradesText;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
+    private JTextFieldDateEditor fromDateEditor, toDateEditor;
+    private JCheckBox useAllDataCheckBox;
+    private JPanel fromDatePanel, toDatePanel;
+    private JLabel fromLabel, toLabel;
     private JProgressBar progressBar;
     private JTable resultsTable;
     private TableColumnModel paramTableColumnModel;
@@ -48,9 +51,7 @@ public class OptimizerDialog extends JBTDialog {
 
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-    private JFormattedTextField fromText, toText;
-    private JCheckBox ignorePeriod;
-    
+
     private OptimizerRunner optimizerRunner;
 
     public OptimizerDialog(JFrame parent, String strategyName) {
@@ -163,9 +164,10 @@ public class OptimizerDialog extends JBTDialog {
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
-                    prefs.set(OptimizerTestingPeriodStart, fromText.getText());
-                    prefs.set(OptimizerTestingPeriodEnd, toText.getText());
-                    prefs.set(BackTesterTestingIgnorePeriod, (ignorePeriod.isSelected() ? "true" : "false"));
+                    prefs.set(OptimizerTestingPeriodStart, fromDateEditor.getText());
+                    prefs.set(OptimizerTestingPeriodEnd, toDateEditor.getText());
+                    prefs.set(OptimizerUseAllData, (useAllDataCheckBox.isSelected() ? "true" : "false"));
+
                     setOptions();
                     StrategyParams params = paramTableModel.getParams();
 
@@ -182,17 +184,20 @@ public class OptimizerDialog extends JBTDialog {
                 }
             }
         });
-        
-        ignorePeriod.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		try {
-        			fromText.setEnabled(!ignorePeriod.isSelected());
-        			toText.setEnabled(!ignorePeriod.isSelected());
-        		}
-        		catch (Exception ecb) {
+
+        useAllDataCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    boolean useAllData = useAllDataCheckBox.isSelected();
+                    fromLabel.setEnabled(!useAllData);
+                    fromDatePanel.setEnabled(!useAllData);
+                    toLabel.setEnabled(!useAllData);
+                    toDatePanel.setEnabled(!useAllData);
+                }
+                catch (Exception ecb) {
                     MessageDialog.showError(OptimizerDialog.this, ecb);
-        		}
-        	}
+                }
+            }
         });
 
         optimizationMapButton.addActionListener(new ActionListener() {
@@ -265,19 +270,19 @@ public class OptimizerDialog extends JBTDialog {
                 }
             }
         });
-        
+
         paramTableModel.addTableModelListener(new TableModelListener() {
-        	public void tableChanged(TableModelEvent e) {
-        		if (e.getType() == TableModelEvent.UPDATE) {
-        			// We ignore events from the combination field itself.
-        			if (e.getSource() != combinationField) {
-        				DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0, true);
-        				
-        				// Get number of combinations and display then in the combinationField
-        				combinationField.setText(df0.format(paramTableModel.getNumCombinations()) + " combinations");
-        			}
-        		}
-        	}
+            public void tableChanged(TableModelEvent e) {
+                if (e.getType() == TableModelEvent.UPDATE) {
+                    // We ignore events from the combination field itself.
+                    if (e.getSource() != combinationField) {
+                        DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0, true);
+
+                        // Get number of combinations and display then in the combinationField
+                        combinationField.setText(df0.format(paramTableModel.getNumCombinations()) + " combinations");
+                    }
+                }
+            }
         });
     }
 
@@ -310,32 +315,36 @@ public class OptimizerDialog extends JBTDialog {
 
         SpringUtilities.makeCompactGrid(filenamePanel, 1, 3, 0, 0, 12, 0);
 
-        // date ranger filter panel
-        // From field
-        JPanel datePanel = new JPanel(new SpringLayout());
-        ignorePeriod = new JCheckBox("Use all data", prefs.get(BackTesterTestingIgnorePeriod).equals("true"));
-        datePanel.add(ignorePeriod);
+        // historical data range filter panel
+        JPanel dateRangePanel = new JPanel(new SpringLayout());
+        String dateFormat = "MMMMM d, yyyy";
+        useAllDataCheckBox = new JCheckBox("Use all data", prefs.get(BackTesterUseAllData).equals("true"));
+        dateRangePanel.add(useAllDataCheckBox);
 
-        JLabel fromLabel = new JLabel("From:", JLabel.TRAILING);
-        fromText = new JFormattedTextField(sdf);
-        fromText.setText(prefs.get(OptimizerTestingPeriodStart));
-        fromText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
-        fromText.setEnabled(!ignorePeriod.isSelected());
-        fromLabel.setLabelFor(fromText);
-        datePanel.add(fromLabel);
-        datePanel.add(fromText);
-        // To field
-        JLabel toLabel = new JLabel("To:", JLabel.TRAILING);
-        toText = new JFormattedTextField(sdf);
-        toText.setText(prefs.get(OptimizerTestingPeriodEnd));
-        toText.setToolTipText("This field is optional. Format is: "+DATE_FORMAT+". For example: " + sdf.format(new Date()));
-        toText.setEnabled(!ignorePeriod.isSelected());
-        toLabel.setLabelFor(toText);
-        datePanel.add(toLabel);
-        datePanel.add(toText);
-        // spring packing
-        SpringUtilities.makeOneLineGrid(datePanel);
-        
+        // From date
+        fromLabel = new JLabel("From:");
+        fromDateEditor = new JTextFieldDateEditor();
+        fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
+        fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
+        fromDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        fromLabel.setLabelFor(fromDatePanel);
+        dateRangePanel.add(fromLabel);
+        fromDatePanel.add(fromDateEditor);
+        dateRangePanel.add(fromDatePanel);
+
+        // To date
+        toLabel = new JLabel("To:");
+        toDateEditor = new JTextFieldDateEditor();
+        toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
+        toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
+        toDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        toLabel.setLabelFor(toDatePanel);
+        dateRangePanel.add(toLabel);
+        toDatePanel.add(toDateEditor);
+        dateRangePanel.add(toDatePanel);
+        SpringUtilities.makeCompactGrid(dateRangePanel, 1, dateRangePanel.getComponentCount(), 0, 0, 12, 10);
+        // end of historical data range filter panel
+
         // strategy parameters panel and its components
         JPanel strategyParamPanel = new JPanel(new SpringLayout());
         JScrollPane paramScrollPane = new JScrollPane();
@@ -358,10 +367,10 @@ public class OptimizerDialog extends JBTDialog {
         combinationField.setHorizontalAlignment(JTextField.RIGHT);
         combinationField.setFocusable(false);
         combinationField.setOpaque(false);
-        
+
         strategyParamPanel.add(paramScrollPane);
         strategyParamPanel.add(combinationField);
-        
+
         SpringUtilities.makeCompactGrid(strategyParamPanel, 2, 1, 0, 0, 12, 0);
 
         // optimization options panel and its components
@@ -398,7 +407,7 @@ public class OptimizerDialog extends JBTDialog {
         optimizationOptionsPanel.add(minTradesLabel);
         optimizationOptionsPanel.add(minTradesText);
 
-        advancedOptionsButton = new JButton("Advanced...");
+        JButton advancedOptionsButton = new JButton("Advanced...");
         optimizationOptionsPanel.add(advancedOptionsButton);
         advancedOptionsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -411,7 +420,7 @@ public class OptimizerDialog extends JBTDialog {
 
         northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
         northPanel.add(filenamePanel);
-        northPanel.add(datePanel);
+        northPanel.add(dateRangePanel);
         northPanel.add(strategyParamPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization options")));
         northPanel.add(optimizationOptionsPanel);
@@ -504,14 +513,12 @@ public class OptimizerDialog extends JBTDialog {
         String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
         return PerformanceMetric.getColumn(selectedItem);
     }
-    
-	public MarketSnapshotFilter getDateFilter() {
-		MarketSnapshotFilter filter = null;
-		
-		if (!ignorePeriod.isSelected()) {
-			filter = MarkSnapshotUtilities.getMarketDepthFilter(sdf, fromText.getText(), toText.getText());
-		}
 
-		return filter;
+    public MarketSnapshotFilter getDateFilter() {
+        MarketSnapshotFilter filter = null;
+        if (!useAllDataCheckBox.isSelected()) {
+            filter = MarkSnapshotUtilities.getMarketDepthFilter(fromDateEditor, toDateEditor);
+        }
+        return filter;
     }
 }
