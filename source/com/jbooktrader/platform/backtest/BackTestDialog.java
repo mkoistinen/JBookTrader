@@ -29,7 +29,7 @@ public class BackTestDialog extends JBTDialog {
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
-    private JCheckBox useAllDataCheckBox;
+    private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
     private JLabel fromLabel, toLabel;
     private JProgressBar progressBar;
@@ -99,7 +99,7 @@ public class BackTestDialog extends JBTDialog {
                     prefs.set(BackTesterFileName, fileNameText.getText());
                     prefs.set(BackTesterTestingPeriodStart, fromDateEditor.getText());
                     prefs.set(BackTesterTestingPeriodEnd, toDateEditor.getText());
-                    prefs.set(BackTesterUseAllData, (useAllDataCheckBox.isSelected() ? "true" : "false"));
+                    prefs.set(BackTesterUseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
                     String historicalFileName = fileNameText.getText();
                     File file = new File(historicalFileName);
                     if (!file.exists()) {
@@ -120,14 +120,14 @@ public class BackTestDialog extends JBTDialog {
             }
         });
 
-        useAllDataCheckBox.addActionListener(new ActionListener() {
+        useDateRangeCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    boolean useAllData = useAllDataCheckBox.isSelected();
-                    fromLabel.setEnabled(!useAllData);
-                    fromDatePanel.setEnabled(!useAllData);
-                    toLabel.setEnabled(!useAllData);
-                    toDatePanel.setEnabled(!useAllData);
+                    boolean useDateRange = useDateRangeCheckBox.isSelected();
+                    fromLabel.setEnabled(useDateRange);
+                    fromDatePanel.setEnabled(useDateRange);
+                    toLabel.setEnabled(useDateRange);
+                    toDatePanel.setEnabled(useDateRange);
                 }
                 catch (Exception ecb) {
                     MessageDialog.showError(BackTestDialog.this, ecb);
@@ -196,15 +196,15 @@ public class BackTestDialog extends JBTDialog {
         TitledBorder dateRangeBorder = BorderFactory.createTitledBorder(etchedBorder, "Historical data range");
         dateRangePanel.setBorder(dateRangeBorder);
         String dateFormat = "MMMMM d, yyyy";
-        useAllDataCheckBox = new JCheckBox("Use all data", prefs.get(BackTesterUseAllData).equals("true"));
-        dateRangePanel.add(useAllDataCheckBox);
+        useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(BackTesterUseDateRange).equals("true"));
+        dateRangePanel.add(useDateRangeCheckBox);
 
         // From date
         fromLabel = new JLabel("From:");
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
         fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
-        fromDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        fromDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         fromLabel.setLabelFor(fromDatePanel);
         dateRangePanel.add(fromLabel);
         fromDatePanel.add(fromDateEditor);
@@ -215,7 +215,7 @@ public class BackTestDialog extends JBTDialog {
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
         toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
-        toDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        toDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
@@ -277,7 +277,7 @@ public class BackTestDialog extends JBTDialog {
     public MarketSnapshotFilter getDateFilter() {
         MarketSnapshotFilter filter = null;
 
-        if (!useAllDataCheckBox.isSelected()) {
+        if (useDateRangeCheckBox.isSelected()) {
             filter = MarkSnapshotUtilities.getMarketDepthFilter(fromDateEditor, toDateEditor);
         }
 

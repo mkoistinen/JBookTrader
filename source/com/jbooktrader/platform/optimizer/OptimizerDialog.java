@@ -35,7 +35,7 @@ public class OptimizerDialog extends JBTDialog {
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JLabel progressLabel;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
-    private JCheckBox useAllDataCheckBox;
+    private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
     private JLabel fromLabel, toLabel;
     private JProgressBar progressBar;
@@ -166,7 +166,7 @@ public class OptimizerDialog extends JBTDialog {
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
                     prefs.set(OptimizerTestingPeriodStart, fromDateEditor.getText());
                     prefs.set(OptimizerTestingPeriodEnd, toDateEditor.getText());
-                    prefs.set(OptimizerUseAllData, (useAllDataCheckBox.isSelected() ? "true" : "false"));
+                    prefs.set(OptimizerUseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
 
                     setOptions();
                     StrategyParams params = paramTableModel.getParams();
@@ -185,14 +185,14 @@ public class OptimizerDialog extends JBTDialog {
             }
         });
 
-        useAllDataCheckBox.addActionListener(new ActionListener() {
+        useDateRangeCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    boolean useAllData = useAllDataCheckBox.isSelected();
-                    fromLabel.setEnabled(!useAllData);
-                    fromDatePanel.setEnabled(!useAllData);
-                    toLabel.setEnabled(!useAllData);
-                    toDatePanel.setEnabled(!useAllData);
+                    boolean useDateRange = useDateRangeCheckBox.isSelected();
+                    fromLabel.setEnabled(useDateRange);
+                    fromDatePanel.setEnabled(useDateRange);
+                    toLabel.setEnabled(useDateRange);
+                    toDatePanel.setEnabled(useDateRange);
                 }
                 catch (Exception ecb) {
                     MessageDialog.showError(OptimizerDialog.this, ecb);
@@ -301,7 +301,7 @@ public class OptimizerDialog extends JBTDialog {
         // strategy panel and its components
         JPanel filenamePanel = new JPanel(new SpringLayout());
 
-        JLabel fileNameLabel = new JLabel("Historical data file:", JLabel.TRAILING);
+        JLabel fileNameLabel = new JLabel("Data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("...");
@@ -318,15 +318,15 @@ public class OptimizerDialog extends JBTDialog {
         // historical data range filter panel
         JPanel dateRangePanel = new JPanel(new SpringLayout());
         String dateFormat = "MMMMM d, yyyy";
-        useAllDataCheckBox = new JCheckBox("Use all data", prefs.get(BackTesterUseAllData).equals("true"));
-        dateRangePanel.add(useAllDataCheckBox);
+        useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(BackTesterUseDateRange).equals("true"));
+        dateRangePanel.add(useDateRangeCheckBox);
 
         // From date
         fromLabel = new JLabel("From:");
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
         fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
-        fromDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        fromDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         fromLabel.setLabelFor(fromDatePanel);
         dateRangePanel.add(fromLabel);
         fromDatePanel.add(fromDateEditor);
@@ -337,7 +337,7 @@ public class OptimizerDialog extends JBTDialog {
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
         toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
-        toDateEditor.setEnabled(!useAllDataCheckBox.isSelected());
+        toDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
@@ -416,16 +416,17 @@ public class OptimizerDialog extends JBTDialog {
         });
 
 
-        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 7, 0, 0, 12, 0);
+        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 7, 0, 0, 12, 8);
 
-        northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
+        northPanel.add(new TitledSeparator(new JLabel("Historical data")));
         northPanel.add(filenamePanel);
         northPanel.add(dateRangePanel);
+        northPanel.add(new TitledSeparator(new JLabel("Strategy parameters")));
         northPanel.add(strategyParamPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization options")));
         northPanel.add(optimizationOptionsPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization Results")));
-        SpringUtilities.makeCompactGrid(northPanel, 7, 1, 12, 12, 0, 8);
+        SpringUtilities.makeCompactGrid(northPanel, 8, 1, 12, 12, 0, 8);
 
         JScrollPane resultsScrollPane = new JScrollPane();
         centerPanel.add(resultsScrollPane);
@@ -516,7 +517,7 @@ public class OptimizerDialog extends JBTDialog {
 
     public MarketSnapshotFilter getDateFilter() {
         MarketSnapshotFilter filter = null;
-        if (!useAllDataCheckBox.isSelected()) {
+        if (useDateRangeCheckBox.isSelected()) {
             filter = MarkSnapshotUtilities.getMarketDepthFilter(fromDateEditor, toDateEditor);
         }
         return filter;
