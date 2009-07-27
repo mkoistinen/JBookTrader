@@ -304,8 +304,7 @@ public class OptimizerDialog extends JBTDialog {
         JLabel fileNameLabel = new JLabel("Data file:", JLabel.TRAILING);
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
-        selectFileButton = new JButton("...");
-        selectFileButton.setPreferredSize(new Dimension(32, 32));
+        selectFileButton = new JButton("Browse...");
 
         fileNameLabel.setLabelFor(fileNameText);
 
@@ -321,12 +320,12 @@ public class OptimizerDialog extends JBTDialog {
         useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(BackTesterUseDateRange).equals("true"));
         dateRangePanel.add(useDateRangeCheckBox);
 
+
         // From date
         fromLabel = new JLabel("From:");
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
         fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
-        fromDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         fromLabel.setLabelFor(fromDatePanel);
         dateRangePanel.add(fromLabel);
         fromDatePanel.add(fromDateEditor);
@@ -337,10 +336,17 @@ public class OptimizerDialog extends JBTDialog {
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
         toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
-        toDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
+
+        boolean useDateRange = useDateRangeCheckBox.isSelected();
+        fromLabel.setEnabled(useDateRange);
+        fromDatePanel.setEnabled(useDateRange);
+        toLabel.setEnabled(useDateRange);
+        toDatePanel.setEnabled(useDateRange);
+        
+
         dateRangePanel.add(toDatePanel);
         SpringUtilities.makeCompactGrid(dateRangePanel, 1, dateRangePanel.getComponentCount(), 0, 0, 12, 10);
         // end of historical data range filter panel

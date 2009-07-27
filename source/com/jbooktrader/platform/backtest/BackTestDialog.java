@@ -204,7 +204,6 @@ public class BackTestDialog extends JBTDialog {
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
         fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
-        fromDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         fromLabel.setLabelFor(fromDatePanel);
         dateRangePanel.add(fromLabel);
         fromDatePanel.add(fromDateEditor);
@@ -215,11 +214,17 @@ public class BackTestDialog extends JBTDialog {
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
         toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
-        toDateEditor.setEnabled(useDateRangeCheckBox.isSelected());
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
         dateRangePanel.add(toDatePanel);
+
+        boolean useDateRange = useDateRangeCheckBox.isSelected();
+        fromLabel.setEnabled(useDateRange);
+        fromDatePanel.setEnabled(useDateRange);
+        toLabel.setEnabled(useDateRange);
+        toDatePanel.setEnabled(useDateRange);
+        
         SpringUtilities.makeOneLineGrid(dateRangePanel);
 
 
