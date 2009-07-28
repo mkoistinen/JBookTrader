@@ -23,6 +23,9 @@ public class BackTestFileWriter {
 
     public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws JBookTraderException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
+        dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
+        dateFormat.setTimeZone(timeZone);
+        
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {
             marketDataDir.mkdir();
@@ -34,12 +37,14 @@ public class BackTestFileWriter {
         }
 
         try {
+            boolean fileExisted = new File(fullFileName).exists();
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
+            if (!fileExisted) {
+                writeHeader();
+            }
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not write to file " + fileName);
         }
-        dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
-        dateFormat.setTimeZone(timeZone);
     }
 
 
