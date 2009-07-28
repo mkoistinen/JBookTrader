@@ -25,7 +25,7 @@ public class BackTestFileWriter {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
-        
+
         File marketDataDir = new File(MARKET_DATA_DIR);
         if (!marketDataDir.exists()) {
             marketDataDir.mkdir();
