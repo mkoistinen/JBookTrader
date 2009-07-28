@@ -45,7 +45,7 @@ public class PerformanceChart {
     private CandlestickRenderer candleRenderer;
     private MultiColoredBarRenderer mcbRenderer;
     private JComboBox chartTypeCombo, timeLineCombo, timeZoneCombo;
-    private JCheckBox tradesVisibilityCheck, pnlVisibilityCheck;
+    private JCheckBox indicatorVisibilityCheck, tradesVisibilityCheck, pnlVisibilityCheck;
 
     public PerformanceChart(JFrame parent, Strategy strategy) {
         indicatorPlots = new ArrayList<FastXYPlot>();
@@ -98,6 +98,25 @@ public class PerformanceChart {
             }
         });
 
+        indicatorVisibilityCheck.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (indicatorVisibilityCheck.isSelected()) {
+                	if (pnlVisibilityCheck.isSelected()) {
+                        combinedPlot.remove(pnlPlot);
+                	}
+                	for (FastXYPlot plot : indicatorPlots) {
+                		combinedPlot.add(plot);
+                	}
+                	if (pnlVisibilityCheck.isSelected()) {
+                        combinedPlot.add(pnlPlot);
+                	}
+                } else {
+                	for (FastXYPlot plot : indicatorPlots) {
+                		combinedPlot.remove(plot);
+                	}
+                }
+            }
+        });
 
         pnlVisibilityCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -108,7 +127,6 @@ public class PerformanceChart {
                 }
             }
         });
-
 
         tradesVisibilityCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -159,10 +177,13 @@ public class PerformanceChart {
         timeZoneCombo = new JComboBox(new String[] {"Exchange", "Local"});
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
-        tradesVisibilityCheck = new JCheckBox("Show trades");
-        tradesVisibilityCheck.setSelected(true);
-        pnlVisibilityCheck = new JCheckBox("Show net profit");
-        pnlVisibilityCheck.setSelected(true);
+        JLabel visibilityLabel = new JLabel("Show:");
+        
+        indicatorVisibilityCheck = new JCheckBox("Indicators", true);
+        
+        tradesVisibilityCheck = new JCheckBox("Trades", true);
+        
+        pnlVisibilityCheck = new JCheckBox("Net Profit", true);
 
         chartOptionsPanel.add(chartTypeLabel);
         chartOptionsPanel.add(chartTypeCombo);
@@ -170,7 +191,9 @@ public class PerformanceChart {
         chartOptionsPanel.add(timeLineCombo);
         chartOptionsPanel.add(timeZoneLabel);
         chartOptionsPanel.add(timeZoneCombo);
+        chartOptionsPanel.add(visibilityLabel);
         chartOptionsPanel.add(tradesVisibilityCheck);
+        chartOptionsPanel.add(indicatorVisibilityCheck);
         chartOptionsPanel.add(pnlVisibilityCheck);
 
         SpringUtilities.makeOneLineGrid(chartOptionsPanel);
