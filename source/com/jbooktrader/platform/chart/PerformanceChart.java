@@ -101,19 +101,19 @@ public class PerformanceChart {
         indicatorVisibilityCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (indicatorVisibilityCheck.isSelected()) {
-                	if (pnlVisibilityCheck.isSelected()) {
+                    if (pnlVisibilityCheck.isSelected()) {
                         combinedPlot.remove(pnlPlot);
-                	}
-                	for (FastXYPlot plot : indicatorPlots) {
-                		combinedPlot.add(plot);
-                	}
-                	if (pnlVisibilityCheck.isSelected()) {
+                    }
+                    for (FastXYPlot plot : indicatorPlots) {
+                        combinedPlot.add(plot);
+                    }
+                    if (pnlVisibilityCheck.isSelected()) {
                         combinedPlot.add(pnlPlot);
-                	}
+                    }
                 } else {
-                	for (FastXYPlot plot : indicatorPlots) {
-                		combinedPlot.remove(plot);
-                	}
+                    for (FastXYPlot plot : indicatorPlots) {
+                        combinedPlot.remove(plot);
+                    }
                 }
             }
         });
@@ -178,11 +178,11 @@ public class PerformanceChart {
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
         JLabel visibilityLabel = new JLabel("Show:");
-        
+
         indicatorVisibilityCheck = new JCheckBox("Indicators", true);
-        
+
         tradesVisibilityCheck = new JCheckBox("Trades", true);
-        
+
         pnlVisibilityCheck = new JCheckBox("Net Profit", true);
 
         chartOptionsPanel.add(chartTypeLabel);
