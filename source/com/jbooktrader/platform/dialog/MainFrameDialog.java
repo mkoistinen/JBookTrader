@@ -42,7 +42,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 break;
             case Error:
                 String msg = (String) value;
-                MessageDialog.showError(this, msg);
+                MessageDialog.showError(msg);
                 break;
             case StrategyUpdate:
                 Strategy strategy = (Strategy) value;

@@ -115,23 +115,18 @@ public class BackTestDialog extends JBTDialog {
                     new Thread(btsr).start();
                 }
                 catch (Exception ex) {
-                    MessageDialog.showError(BackTestDialog.this, ex);
+                    MessageDialog.showError(ex);
                 }
             }
         });
 
         useDateRangeCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    boolean useDateRange = useDateRangeCheckBox.isSelected();
-                    fromLabel.setEnabled(useDateRange);
-                    fromDatePanel.setEnabled(useDateRange);
-                    toLabel.setEnabled(useDateRange);
-                    toDatePanel.setEnabled(useDateRange);
-                }
-                catch (Exception ecb) {
-                    MessageDialog.showError(BackTestDialog.this, ecb);
-                }
+                boolean useDateRange = useDateRangeCheckBox.isSelected();
+                fromLabel.setEnabled(useDateRange);
+                fromDatePanel.setEnabled(useDateRange);
+                toLabel.setEnabled(useDateRange);
+                toDatePanel.setEnabled(useDateRange);
             }
         });
 
@@ -224,7 +219,7 @@ public class BackTestDialog extends JBTDialog {
         fromDatePanel.setEnabled(useDateRange);
         toLabel.setEnabled(useDateRange);
         toDatePanel.setEnabled(useDateRange);
-        
+
         SpringUtilities.makeOneLineGrid(dateRangePanel);
 
 

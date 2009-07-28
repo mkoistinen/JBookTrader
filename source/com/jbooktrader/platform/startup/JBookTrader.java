@@ -27,7 +27,7 @@ public class JBookTrader {
             LookAndFeelManager.setFromPreferences();
         } catch (Throwable t) {
             String msg = t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.";
-            MessageDialog.showMessage(null, msg);
+            MessageDialog.showMessage(msg);
         }
 
         Dispatcher.setReporter();
@@ -36,7 +36,7 @@ public class JBookTrader {
                 try {
                     new MainFrameController();
                 } catch (Exception e) {
-                    MessageDialog.showError(null, e);
+                    MessageDialog.showError(e);
                 }
             }
         });
@@ -53,7 +53,7 @@ public class JBookTrader {
             FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
 
             if (channel.tryLock() == null) {
-                MessageDialog.showMessage(null, APP_NAME + " is already running.");
+                MessageDialog.showMessage(APP_NAME + " is already running.");
                 return;
             }
 
@@ -64,7 +64,7 @@ public class JBookTrader {
             JBookTrader.appPath = args[0];
             new JBookTrader();
         } catch (Throwable t) {
-            MessageDialog.showError(null, t);
+            MessageDialog.showError(t);
         }
     }
 

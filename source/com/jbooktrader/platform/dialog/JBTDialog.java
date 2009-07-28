@@ -1,7 +1,5 @@
 package com.jbooktrader.platform.dialog;
 
-import com.jbooktrader.platform.util.*;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -15,20 +13,14 @@ public class JBTDialog extends JDialog {
 
     public void setVisible(boolean visible) {
         super.setVisible(visible);
-
         // This is to prevent the dialog from being drawn under the Mac menu bar.
-        try {
-            boolean onMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-            if (onMac) {
-                Point point = getLocation();
-                if (point.getY() < MAC_MENUBAR_HEIGHT) {
-                    point.translate(0, (int) (MAC_MENUBAR_HEIGHT - point.getY()));
-                }
-                setLocation(point);
+        boolean onMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+        if (onMac) {
+            Point point = getLocation();
+            if (point.getY() < MAC_MENUBAR_HEIGHT) {
+                point.translate(0, (int) (MAC_MENUBAR_HEIGHT - point.getY()));
             }
-        }
-        catch (Exception e) {
-            MessageDialog.showMessage(null, e.getMessage());
+            setLocation(point);
         }
     }
 }

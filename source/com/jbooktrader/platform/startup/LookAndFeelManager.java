@@ -20,7 +20,7 @@ public class LookAndFeelManager {
                             JDialog.setDefaultLookAndFeelDecorated(true);
 
                         } catch (Exception e) {
-                            MessageDialog.showError(null, e);
+                            MessageDialog.showError(e);
                         }
                     }
                 });
@@ -47,7 +47,7 @@ public class LookAndFeelManager {
                     try {
                         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     } catch (Exception e) {
-                        MessageDialog.showError(null, e);
+                        MessageDialog.showError(e);
                     }
                 }
             });

@@ -180,23 +180,18 @@ public class OptimizerDialog extends JBTDialog {
 
                     new Thread(optimizerRunner).start();
                 } catch (Exception ex) {
-                    MessageDialog.showError(OptimizerDialog.this, ex);
+                    MessageDialog.showError(ex);
                 }
             }
         });
 
         useDateRangeCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    boolean useDateRange = useDateRangeCheckBox.isSelected();
-                    fromLabel.setEnabled(useDateRange);
-                    fromDatePanel.setEnabled(useDateRange);
-                    toLabel.setEnabled(useDateRange);
-                    toDatePanel.setEnabled(useDateRange);
-                }
-                catch (Exception ecb) {
-                    MessageDialog.showError(OptimizerDialog.this, ecb);
-                }
+                boolean useDateRange = useDateRangeCheckBox.isSelected();
+                fromLabel.setEnabled(useDateRange);
+                fromDatePanel.setEnabled(useDateRange);
+                toLabel.setEnabled(useDateRange);
+                toDatePanel.setEnabled(useDateRange);
             }
         });
 
@@ -204,7 +199,7 @@ public class OptimizerDialog extends JBTDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (optimizationResults == null || optimizationResults.isEmpty()) {
-                        MessageDialog.showMessage(OptimizerDialog.this, "No optimization results to map.");
+                        MessageDialog.showMessage("There are no optimization results to map.");
                         return;
                     }
 
@@ -213,7 +208,7 @@ public class OptimizerDialog extends JBTDialog {
                     JDialog chartFrame = optimizationMap.getChartFrame();
                     chartFrame.setVisible(true);
                 } catch (Exception ex) {
-                    MessageDialog.showError(OptimizerDialog.this, ex);
+                    MessageDialog.showError(ex);
                 }
             }
         });
@@ -320,7 +315,6 @@ public class OptimizerDialog extends JBTDialog {
         useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(BackTesterUseDateRange).equals("true"));
         dateRangePanel.add(useDateRangeCheckBox);
 
-
         // From date
         fromLabel = new JLabel("From:");
         fromDateEditor = new JTextFieldDateEditor();
@@ -345,7 +339,7 @@ public class OptimizerDialog extends JBTDialog {
         fromDatePanel.setEnabled(useDateRange);
         toLabel.setEnabled(useDateRange);
         toDatePanel.setEnabled(useDateRange);
-        
+
 
         dateRangePanel.add(toDatePanel);
         SpringUtilities.makeCompactGrid(dateRangePanel, 1, dateRangePanel.getComponentCount(), 0, 0, 12, 10);
@@ -499,7 +493,7 @@ public class OptimizerDialog extends JBTDialog {
             DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) resultsTable.getDefaultRenderer(String.class);
             renderer.setHorizontalAlignment(JLabel.RIGHT);
         } catch (Exception e) {
-            MessageDialog.showError(this, e);
+            MessageDialog.showError(e);
         }
     }
 

@@ -292,10 +292,10 @@ public abstract class OptimizerRunner implements Runnable {
                 saveToFile();
                 long totalTimeInSecs = (end - start) / 1000;
                 showFastProgress(totalSteps, "Optimization");
-                MessageDialog.showMessage(optimizerDialog, "Optimization completed successfully in " + totalTimeInSecs + " seconds.");
+                MessageDialog.showMessage("Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
-            MessageDialog.showError(optimizerDialog, t);
+            MessageDialog.showError(t);
         } finally {
             progressExecutor.shutdownNow();
             optimizationExecutor.shutdownNow();

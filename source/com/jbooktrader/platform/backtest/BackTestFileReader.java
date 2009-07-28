@@ -164,7 +164,7 @@ public class BackTestFileReader {
         }
 
         if (previousTime != 0) {
-            if (time < previousTime) {
+            if (time <= previousTime) {
                 String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
                 throw new JBookTraderException(msg);
             }
