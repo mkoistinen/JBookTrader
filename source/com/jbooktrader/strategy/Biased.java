@@ -8,26 +8,28 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Equalizer extends StrategyES {
+public class Biased extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd;
+    private final Indicator balanceVelocityInd, trendVelocityInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
+    private static final String FAST_PERIOD = "Fast Period";
+    private static final String SLOW_PERIOD = "Slow Period";
+    private static final String TREND_PERIOD = "Trend Period";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
     private final int entry;
 
-
-    public Equalizer(StrategyParams optimizationParams) throws JBookTraderException {
+    public Biased(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
+        addIndicator(trendVelocityInd);
     }
 
     /**
@@ -38,9 +40,10 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 10, 170, 1, 142);
-        addParam(SLOW_PERIOD, 4000, 8000, 100, 5380);
-        addParam(ENTRY, 15, 21, 1, 18);
+        addParam(FAST_PERIOD, 15, 110, 1, 56);
+        addParam(SLOW_PERIOD, 3500, 5500, 500, 4258);
+        addParam(TREND_PERIOD, 500, 1500, 100, 1293);
+        addParam(ENTRY, 16, 23, 1, 18);
     }
 
     /**
@@ -49,10 +52,10 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        if (balanceVelocity >= entry) {
+        double power = balanceVelocityInd.getValue() + trendVelocityInd.getValue();
+        if (power >= entry) {
             setPosition(1);
-        } else if (balanceVelocity <= -entry) {
+        } else if (power <= -entry) {
             setPosition(-1);
         }
     }
