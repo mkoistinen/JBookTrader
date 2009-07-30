@@ -105,8 +105,8 @@ public class GroupedTableLayout extends TableLayout {
 
         response.append("<tr class=\"summary\">");
         response.append("<td colspan=\"2\">All Strategies</td>");
-        response.append("<td colspan=\"1\">").append(totalTrades).append("</td>");
-        response.append("<td class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
+        response.append("<td id=\"summary_trades\" colspan=\"1\">").append(totalTrades).append("</td>");
+        response.append("<td id=\"summary_pnl\" class=\"last\" colspan=\"2\">").append(df0.format(totalNetProfit)).append("</td>");
         response.append("</tr>\n");
         response.append("</table>");
     }

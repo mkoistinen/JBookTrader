@@ -74,13 +74,15 @@ function handleHttpResponse() {
                         document.getElementById(symbol + "_pnl").innerHTML = results[4];
                     }
                     catch (e) {
-                        // Ignore, some layouts just don't use these.
+                        // Ignore, some layouts just don't use these. It could be that JBT is now 
+                        // running some new symbol, but the strategy running it will trigger the
+                        // wholePageRefresh...
                     }
                 }
                 else if (results[0].indexOf("[SUMMARY]") > -1) {
                     try {
-                        document.getElementById(symbol + "_trades").innerHTML = results[1];
-                        document.getElementById(symbol + "_pnl").innerHTML = results[2];
+                        document.getElementById("summary_trades").innerHTML = results[1];
+                        document.getElementById("summary_pnl").innerHTML = results[2];
                     }
                     catch (e) {
                         // How did this happen?

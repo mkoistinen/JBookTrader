@@ -59,16 +59,14 @@ public class AJAXResponse extends TableLayout {
                 String strategyName = strategy.getName();
 
                 // Check if the StrategyReport exists
-                boolean fileExists = true;
+                boolean fileExists = false;
                 try {
                     String reportFile = JBookTrader.getAppPath() + WebHandler.REPORT_DIR + strategy.getName() + ".htm";
                     File file = new File(reportFile);
 
-                    if (!file.exists()) fileExists = false;
+                    if (file.exists()) fileExists = true;
                 }
-                catch (Exception e) {
-                    fileExists = false;
-                }
+                catch (Exception e) { /* we don't care */ }
 
                 if (strategy.getContract().m_secType.equals("CASH")) {
                     strategySymbol += "." + strategy.getContract().m_currency;
