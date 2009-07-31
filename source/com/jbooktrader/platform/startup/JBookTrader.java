@@ -4,8 +4,6 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
-import java.io.*;
-import java.nio.channels.*;
 
 
 /**
@@ -13,8 +11,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "7.02";
-    public static final String RELEASE_DATE = "July 28, 2009";
+    public static final String VERSION = "7.03-dev";
+    public static final String RELEASE_DATE = "TBD";
     private static String appPath;
 
     /**
