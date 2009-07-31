@@ -40,10 +40,10 @@ public class Biased extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 15, 110, 1, 56);
-        addParam(SLOW_PERIOD, 3500, 5500, 500, 4258);
-        addParam(TREND_PERIOD, 500, 1500, 100, 1293);
-        addParam(ENTRY, 16, 23, 1, 18);
+        addParam(FAST_PERIOD, 50, 100, 1, 66);
+        addParam(SLOW_PERIOD, 4100, 5100, 100, 4810);
+        addParam(TREND_PERIOD, 1200, 1700, 100, 1285);
+        addParam(ENTRY, 14, 19, 1, 18);
     }
 
     /**

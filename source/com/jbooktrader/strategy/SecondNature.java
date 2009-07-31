@@ -1,20 +1,14 @@
 package com.jbooktrader.strategy;
 
-import com.ib.client.*;
 import com.jbooktrader.indicator.velocity.*;
-import com.jbooktrader.platform.chart.*;
-import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
-import com.jbooktrader.platform.schedule.*;
-import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
 
 /**
  *
  */
-public class SecondNature extends Strategy {
+public class SecondNature extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendVelocityInd;
@@ -30,16 +24,6 @@ public class SecondNature extends Strategy {
 
     public SecondNature(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
-
-        // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
-        // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("10:00", "14:00", "America/New_York");
-        int multiplier = 50;// contract multiplier
-        double bidAskSpread = 0.25; // prevalent spread between best bid and best ask
-        Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
-        setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread, BarSize.Minute1);
-
 
         balanceEntry = getParam(BALANCE_ENTRY);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
