@@ -19,7 +19,7 @@ public class TrendStrengthVelocity extends Indicator {
     @Override
     public void calculate() {
         double price = marketBook.getSnapshot().getPrice();
-        
+
         if (previousPrice != 0) {
             double change = price - previousPrice;
 
