@@ -2,7 +2,9 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
 
@@ -13,62 +15,85 @@ import java.util.concurrent.*;
  */
 public class OptimizerWorker implements Callable<List<OptimizationResult>> {
     private final OptimizerRunner optimizerRunner;
-    private final List<Strategy> strategies;
+    private final Queue<StrategyParams> tasks;
 
-    public OptimizerWorker(OptimizerRunner optimizerRunner, List<Strategy> strategies) {
+    public OptimizerWorker(OptimizerRunner optimizerRunner, Queue<StrategyParams> tasks) {
         this.optimizerRunner = optimizerRunner;
-        this.strategies = strategies;
+        this.tasks = tasks;
     }
 
-    public List<OptimizationResult> call() {
-        int size = strategies.size();
-        MarketBook marketBook = new MarketBook();
-        TradingSchedule tradingSchedule = strategies.get(0).getTradingSchedule();
 
-        for (Strategy strategy : strategies) {
-            strategy.setMarketBook(marketBook);
-        }
+    public List<OptimizationResult> call() throws JBookTraderException {
+        List<Strategy> strategies = new ArrayList<Strategy>();
+        List<OptimizationResult> optimizationResults = new ArrayList<OptimizationResult>(strategies.size());
+        int strategiesPerProcessor = PreferencesHolder.getInstance().getInt(JBTPreferences.StrategiesPerProcessor);
 
-        List<MarketSnapshot> snapshots = optimizerRunner.getSnapshots();
-        for (MarketSnapshot marketSnapshot : snapshots) {
-            marketBook.setSnapshot(marketSnapshot);
-            long time = marketSnapshot.getTime();
-            boolean inSchedule = tradingSchedule.contains(time);
+        while (!tasks.isEmpty()) {
+            strategies.clear();
+            while (strategies.size() < strategiesPerProcessor && !tasks.isEmpty()) {
+                StrategyParams params = tasks.poll();
+                if (params != null) {
+                    Strategy strategy = optimizerRunner.getStrategyInstance(params);
+                    strategies.add(strategy);
+                }
+            }
 
-            for (Strategy strategy : strategies) {
-                strategy.setTime(time);
-                IndicatorManager indicatorManager = strategy.getIndicatorManager();
-                indicatorManager.updateIndicators();
-                if (inSchedule) {
-                    if (indicatorManager.hasValidIndicators()) {
-                        strategy.onBookChange();
-                    }
-                } else {
-                    strategy.closePosition();// force flat position
+
+            if (strategies.size() != 0) {
+                MarketBook marketBook = new MarketBook();
+                TradingSchedule tradingSchedule = strategies.get(0).getTradingSchedule();
+
+                for (Strategy strategy : strategies) {
+                    strategy.setMarketBook(marketBook);
                 }
 
-                strategy.getPositionManager().trade();
+                List<MarketSnapshot> snapshots = optimizerRunner.getSnapshots();
+                for (MarketSnapshot marketSnapshot : snapshots) {
+                    marketBook.setSnapshot(marketSnapshot);
+                    long time = marketSnapshot.getTime();
+                    boolean inSchedule = tradingSchedule.contains(time);
 
-            }
+                    for (Strategy strategy : strategies) {
+                        strategy.setTime(time);
+                        IndicatorManager indicatorManager = strategy.getIndicatorManager();
+                        indicatorManager.updateIndicators();
+                        if (inSchedule) {
+                            if (indicatorManager.hasValidIndicators()) {
+                                strategy.onBookChange();
+                            }
+                        } else {
+                            strategy.closePosition();// force flat position
+                        }
 
-            optimizerRunner.iterationsCompleted(size);
-            if (optimizerRunner.isCancelled()) {
-                break;
-            }
-        }
+                        strategy.getPositionManager().trade();
 
-        int minTrades = optimizerRunner.getMinTrades();
-        List<OptimizationResult> optimizationResults = new ArrayList<OptimizationResult>(strategies.size());
-        for (Strategy strategy : strategies) {
-            strategy.closePosition();
-            strategy.getPositionManager().trade();
+                    }
+
+                    optimizerRunner.iterationsCompleted(strategies.size());
+                    if (optimizerRunner.isCancelled()) {
+                        return optimizationResults;
+                    }
+                }
 
 
-            PerformanceManager performanceManager = strategy.getPerformanceManager();
-            int trades = performanceManager.getTrades();
-            if (trades >= minTrades) {
-                OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
-                optimizationResults.add(optimizationResult);
+                optimizationResults.clear();
+                int minTrades = optimizerRunner.getMinTrades();
+
+
+                for (Strategy strategy : strategies) {
+                    strategy.closePosition();
+                    strategy.getPositionManager().trade();
+
+
+                    PerformanceManager performanceManager = strategy.getPerformanceManager();
+                    int trades = performanceManager.getTrades();
+                    if (trades >= minTrades) {
+                        OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
+                        optimizationResults.add(optimizationResult);
+                    }
+                }
+
+                optimizerRunner.addResults(optimizationResults);
             }
         }
 

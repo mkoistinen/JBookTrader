@@ -25,7 +25,8 @@ public abstract class OptimizerRunner implements Runnable {
 
     private static final int MAX_SAVED_RESULTS = 100;// max number of results in the optimization results file
     private final Constructor<?> strategyConstructor;
-    private final ScheduledExecutorService progressExecutor;
+    private final ScheduledExecutorService progressExecutor, resultsTableExecutor;
+    private ExecutorService optimizationExecutor;
     private final NumberFormat nf2, nf0, gnf0;
     private final String strategyName;
     private final int minTrades;
@@ -35,7 +36,7 @@ public abstract class OptimizerRunner implements Runnable {
     private final List<MarketSnapshot> snapshots;
     private long completedSteps, totalSteps;
     private String totalStrategiesString;
-    private ExecutorService optimizationExecutor;
+    private long previousResultsSize;
 
 
     class ProgressRunner implements Runnable {
@@ -45,6 +46,17 @@ public abstract class OptimizerRunner implements Runnable {
             }
         }
     }
+
+    class ResultsTableRunner implements Runnable {
+        public void run() {
+            int size = optimizationResults.size();
+            if (size > previousResultsSize) {
+                optimizerDialog.setResults(optimizationResults);
+                previousResultsSize = size;
+            }
+        }
+    }
+
 
     OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         this.optimizerDialog = optimizerDialog;
@@ -74,10 +86,12 @@ public abstract class OptimizerRunner implements Runnable {
         resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
         minTrades = optimizerDialog.getMinTrades();
         progressExecutor = Executors.newSingleThreadScheduledExecutor();
+        resultsTableExecutor = Executors.newSingleThreadScheduledExecutor();
         optimizationExecutor = Executors.newFixedThreadPool(availableProcessors);
     }
 
-    protected Strategy getStrategyInstance(StrategyParams params) throws JBookTraderException {
+
+    public Strategy getStrategyInstance(StrategyParams params) throws JBookTraderException {
         try {
             return (Strategy) strategyConstructor.newInstance(params);
         } catch (InvocationTargetException ite) {
@@ -111,47 +125,28 @@ public abstract class OptimizerRunner implements Runnable {
         return snapshots;
     }
 
-    void execute(List<Strategy> strategies) throws JBookTraderException {
-
-        int size = strategies.size();
-        if (size == 0) {
-            return;
+    public void addResults(List<OptimizationResult> results) {
+        synchronized (optimizationResults) {
+            optimizationResults.addAll(results);
+            Collections.sort(optimizationResults, resultComparator);
         }
+    }
 
-        int workers = availableProcessors;
-        int strategiesPerWorker = size / workers;
-        if (size < workers) {
-            workers = 1;
-            strategiesPerWorker = size;
-        }
-
-        int fromIndex = 0;
-        Set<Future<List<OptimizationResult>>> futureOptimizationResults = new HashSet<Future<List<OptimizationResult>>>();
-
-        for (int worker = 0; worker < workers; worker++) {
-            int toIndex = fromIndex + strategiesPerWorker;
-            if (worker == workers - 1) {
-                toIndex = size;
+    void execute(Queue<StrategyParams> tasks) throws JBookTraderException {
+        if (tasks.size() != 0) {
+            Set<Callable<List<OptimizationResult>>> workers = new HashSet<Callable<List<OptimizationResult>>>();
+            for (int worker = 0; worker < availableProcessors; worker++) {
+                Callable<List<OptimizationResult>> optimizerWorker = new OptimizerWorker(this, tasks);
+                workers.add(optimizerWorker);
             }
 
-            List<Strategy> workerStrategies = strategies.subList(fromIndex, toIndex);
-            Callable<List<OptimizationResult>> optimizerWorker = new OptimizerWorker(this, workerStrategies);
-            Future<List<OptimizationResult>> futureOptimizationResult = optimizationExecutor.submit(optimizerWorker);
-            futureOptimizationResults.add(futureOptimizationResult);
-            fromIndex = toIndex;
-        }
-
-        for (Future<List<OptimizationResult>> futureOptimizationResult : futureOptimizationResults) {
             try {
-                List<OptimizationResult> results = futureOptimizationResult.get();
-                optimizationResults.addAll(results);
-            } catch (Exception e) {
-                throw new JBookTraderException(e);
+                // this blocks until all workers are done
+                List<Future<List<OptimizationResult>>> futureResults = optimizationExecutor.invokeAll(workers);
+            } catch (InterruptedException ie) {
+                throw new JBookTraderException(ie);
             }
         }
-
-        Collections.sort(optimizationResults, resultComparator);
-        optimizerDialog.setResults(optimizationResults);
     }
 
     public void cancel() {
@@ -221,12 +216,12 @@ public abstract class OptimizerRunner implements Runnable {
         completedSteps += iterationsCompleted;
     }
 
-    protected ArrayList<StrategyParams> getTasks(StrategyParams params) {
+    protected Queue<StrategyParams> getTasks(StrategyParams params) {
         for (StrategyParam param : params.getAll()) {
             param.setValue(param.getMin());
         }
 
-        ArrayList<StrategyParams> tasks = new ArrayList<StrategyParams>();
+        Queue<StrategyParams> tasks = new LinkedBlockingQueue<StrategyParams>();
 
         boolean allTasksAssigned = false;
         while (!allTasksAssigned && !cancelled) {
@@ -282,10 +277,15 @@ public abstract class OptimizerRunner implements Runnable {
 
             optimizerDialog.showProgress("Starting optimization ...");
             progressExecutor.scheduleWithFixedDelay(new ProgressRunner(), 0, 1, TimeUnit.SECONDS);
+            resultsTableExecutor.scheduleWithFixedDelay(new ResultsTableRunner(), 0, 30, TimeUnit.SECONDS);
             long start = System.currentTimeMillis();
             optimize();
             long end = System.currentTimeMillis();
             progressExecutor.shutdownNow();
+            resultsTableExecutor.shutdownNow();
+
+
+            optimizerDialog.setResults(optimizationResults);
 
             if (!cancelled) {
                 optimizerDialog.showProgress("Saving optimization results ...");
@@ -298,6 +298,7 @@ public abstract class OptimizerRunner implements Runnable {
             MessageDialog.showError(t);
         } finally {
             progressExecutor.shutdownNow();
+            resultsTableExecutor.shutdownNow();
             optimizationExecutor.shutdownNow();
             optimizerDialog.signalCompleted();
         }

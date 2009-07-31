@@ -14,7 +14,7 @@ public class AdvancedOptimizationOptionsDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;
     private JSlider divideAndConquerCoverageSlider;
-    private JTextField bruteForceStrategiesPerProcessorText;
+    private JTextField strategiesPerProcessorText;
 
     public AdvancedOptimizationOptionsDialog(JFrame parent) {
         super(parent);
@@ -64,9 +64,9 @@ public class AdvancedOptimizationOptionsDialog extends JBTDialog {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 
-        bruteForceStrategiesPerProcessorText = new JTextField();
-        bruteForceStrategiesPerProcessorText.setHorizontalAlignment(JTextField.RIGHT);
-        add(contentPanel, JBTPreferences.BruteForceStrategiesPerProcessor, bruteForceStrategiesPerProcessorText);
+        strategiesPerProcessorText = new JTextField();
+        strategiesPerProcessorText.setHorizontalAlignment(JTextField.RIGHT);
+        add(contentPanel, JBTPreferences.StrategiesPerProcessor, strategiesPerProcessorText);
 
 
         int min = 1;
@@ -93,7 +93,7 @@ public class AdvancedOptimizationOptionsDialog extends JBTDialog {
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 prefs.set(DivideAndConquerCoverage, divideAndConquerCoverageSlider.getValue());
-                prefs.set(BruteForceStrategiesPerProcessor, bruteForceStrategiesPerProcessorText.getText());
+                prefs.set(StrategiesPerProcessor, strategiesPerProcessorText.getText());
                 dispose();
             }
         });

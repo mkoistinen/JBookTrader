@@ -193,46 +193,50 @@ public class OptimizationMap {
 
 
     private XYZDataset createOptimizationDataset() {
-        int size = optimizationResults.size();
-        double[] x = new double[size];
-        double[] y = new double[size];
-        double[] z = new double[size];
+        double[] x, y, z;
 
-        Map<String, Double> values = new HashMap<String, Double>();
+        synchronized (optimizationResults) {
+            int size = optimizationResults.size();
+            x = new double[size];
+            y = new double[size];
+            z = new double[size];
 
-
-        int xParameterIndex = (horizontalCombo == null) ? 0 : horizontalCombo.getSelectedIndex();
-        int yParameterIndex = (verticalCombo == null) ? 1 : verticalCombo.getSelectedIndex();
-
-        int index = 0;
-        min = max = getMetric(optimizationResults.get(index));
-        int selectedsCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
-
-        for (OptimizationResult optimizationResult : optimizationResults) {
-            StrategyParams params = optimizationResult.getParams();
-
-            x[index] = params.get(xParameterIndex).getValue();
-            y[index] = params.get(yParameterIndex).getValue();
-            z[index] = getMetric(optimizationResult);
-
-            String key = x[index] + "," + y[index];
-            Double value = values.get(key);
+            Map<String, Double> values = new HashMap<String, Double>();
 
 
-            if (value != null) {
-                if (selectedsCase == 0) {
-                    z[index] = Math.max(value, z[index]);
-                } else if (selectedsCase == 1) {
-                    z[index] = Math.min(value, z[index]);
+            int xParameterIndex = (horizontalCombo == null) ? 0 : horizontalCombo.getSelectedIndex();
+            int yParameterIndex = (verticalCombo == null) ? 1 : verticalCombo.getSelectedIndex();
+
+            int index = 0;
+            min = max = getMetric(optimizationResults.get(index));
+            int selectedsCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
+
+            for (OptimizationResult optimizationResult : optimizationResults) {
+                StrategyParams params = optimizationResult.getParams();
+
+                x[index] = params.get(xParameterIndex).getValue();
+                y[index] = params.get(yParameterIndex).getValue();
+                z[index] = getMetric(optimizationResult);
+
+                String key = x[index] + "," + y[index];
+                Double value = values.get(key);
+
+
+                if (value != null) {
+                    if (selectedsCase == 0) {
+                        z[index] = Math.max(value, z[index]);
+                    } else if (selectedsCase == 1) {
+                        z[index] = Math.min(value, z[index]);
+                    }
                 }
+
+                values.put(key, z[index]);
+
+
+                min = Math.min(min, z[index]);
+                max = Math.max(max, z[index]);
+                index++;
             }
-
-            values.put(key, z[index]);
-
-
-            min = Math.min(min, z[index]);
-            max = Math.max(max, z[index]);
-            index++;
         }
 
         DefaultXYZDataset dataset = new DefaultXYZDataset();

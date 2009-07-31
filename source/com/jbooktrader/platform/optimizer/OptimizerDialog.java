@@ -31,27 +31,21 @@ public class OptimizerDialog extends JBTDialog {
     private final String strategyName;
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
-    private JTextField fileNameText, minTradesText;
+    private JTextField fileNameText, minTradesText, combinationField;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
-    private JLabel progressLabel;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
     private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
-    private JLabel fromLabel, toLabel;
+    private JLabel progressLabel, fromLabel, toLabel;
     private JProgressBar progressBar;
     private JTable resultsTable;
     private TableColumnModel paramTableColumnModel;
     private TableColumn stepColumn;
 
     private ParamTableModel paramTableModel;
-    private JTextField combinationField;
     private ResultsTableModel resultsTableModel;
     private Strategy strategy;
     private List<OptimizationResult> optimizationResults;
-
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
-
     private OptimizerRunner optimizerRunner;
 
     public OptimizerDialog(JFrame parent, String strategyName) {
@@ -312,7 +306,7 @@ public class OptimizerDialog extends JBTDialog {
         // historical data range filter panel
         JPanel dateRangePanel = new JPanel(new SpringLayout());
         String dateFormat = "MMMMM d, yyyy";
-        useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(BackTesterUseDateRange).equals("true"));
+        useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(OptimizerUseDateRange).equals("true"));
         dateRangePanel.add(useDateRangeCheckBox);
 
         // From date

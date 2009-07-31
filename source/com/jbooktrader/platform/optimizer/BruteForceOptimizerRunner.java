@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
@@ -16,27 +15,10 @@ public class BruteForceOptimizerRunner extends OptimizerRunner {
 
     @Override
     public void optimize() throws JBookTraderException {
-        ArrayList<StrategyParams> tasks = getTasks(strategyParams);
+        Queue<StrategyParams> tasks = getTasks(strategyParams);
         int taskSize = tasks.size();
-        long totalSteps = snapshotCount * taskSize;
-        setTotalSteps(totalSteps);
+        setTotalSteps(snapshotCount * taskSize);
         setTotalStrategies(taskSize);
-
-        int strategiesPerProcessor = PreferencesHolder.getInstance().getInt(JBTPreferences.BruteForceStrategiesPerProcessor);
-        int chunkSize = strategiesPerProcessor * availableProcessors;
-
-        List<Strategy> strategies = new ArrayList<Strategy>(chunkSize);
-        int index = 0;
-
-        while (index < taskSize && !cancelled) {
-            strategies.clear();
-            while (index < taskSize && strategies.size() != chunkSize) {
-                StrategyParams params = tasks.get(index);
-                Strategy strategy = getStrategyInstance(params);
-                strategies.add(strategy);
-                index++;
-            }
-            execute(strategies);
-        }
+        execute(tasks);
     }
 }

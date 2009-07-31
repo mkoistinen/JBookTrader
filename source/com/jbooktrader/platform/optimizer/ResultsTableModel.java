@@ -4,6 +4,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
+import javax.swing.*;
 import java.text.*;
 import java.util.*;
 
@@ -35,32 +36,36 @@ public class ResultsTableModel extends TableDataModel {
         return false;
     }
 
-    public synchronized void setResults(List<OptimizationResult> optimizationResults) {
-        removeAllData();
+    public void setResults(final List<OptimizationResult> optimizationResults) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                removeAllData();
+                synchronized (optimizationResults) {
+                    for (OptimizationResult optimizationResult : optimizationResults) {
+                        Object[] item = new Object[getColumnCount() + 1];
 
-        for (OptimizationResult optimizationResult : optimizationResults) {
-            Object[] item = new Object[getColumnCount() + 1];
+                        StrategyParams params = optimizationResult.getParams();
 
-            StrategyParams params = optimizationResult.getParams();
+                        int index = -1;
+                        for (StrategyParam param : params.getAll()) {
+                            item[++index] = param.getValue();
+                        }
 
-            int index = -1;
-            for (StrategyParam param : params.getAll()) {
-                item[++index] = param.getValue();
+                        DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
+                        DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
+
+                        item[++index] = optimizationResult.getTrades();
+                        item[++index] = df0.format(optimizationResult.getNetProfit());
+                        item[++index] = df0.format(optimizationResult.getMaxDrawdown());
+                        item[++index] = df2.format(optimizationResult.getProfitFactor());
+                        item[++index] = df0.format(optimizationResult.getKellyCriterion());
+                        item[++index] = df2.format(optimizationResult.getPerformanceIndex());
+
+                        addRowFast(item);
+                    }
+                    fireTableDataChanged();
+                }
             }
-
-            DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
-            DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
-
-            item[++index] = optimizationResult.getTrades();
-            item[++index] = df0.format(optimizationResult.getNetProfit());
-            item[++index] = df0.format(optimizationResult.getMaxDrawdown());
-            item[++index] = df2.format(optimizationResult.getProfitFactor());
-            item[++index] = df0.format(optimizationResult.getKellyCriterion());
-            item[++index] = df2.format(optimizationResult.getPerformanceIndex());
-
-            addRowFast(item);
-        }
-
-        fireTableDataChanged();
+        });
     }
 }

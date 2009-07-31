@@ -5,6 +5,7 @@ import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
@@ -33,10 +34,11 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
         long completedSteps = 0;
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
-        List<Strategy> strategies = new LinkedList<Strategy>();
+        Queue<StrategyParams> filteredTasks = new LinkedBlockingQueue<StrategyParams>();
         PreferencesHolder prefs = PreferencesHolder.getInstance();
         int chunkSize = 100 * prefs.getInt(JBTPreferences.DivideAndConquerCoverage);
         int numberOfCandidates = Math.max(1, (int) (chunkSize / Math.pow(divider, dimensions)));
+        int filteredTasksSize;
 
         do {
             tasks.clear();
@@ -50,23 +52,23 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 tasks.addAll(getTasks(params));
             }
 
-            strategies.clear();
+            filteredTasks.clear();
             for (StrategyParams params : tasks) {
                 String key = params.getKey();
                 if (!uniqueParams.contains(key)) {
                     uniqueParams.add(key);
-                    Strategy strategy = getStrategyInstance(params);
-                    strategies.add(strategy);
+                    filteredTasks.add(params);
                 }
             }
 
-            long totalSteps = completedSteps + snapshotCount * iterationsRemaining * strategies.size();
+            long totalSteps = completedSteps + snapshotCount * iterationsRemaining * filteredTasks.size();
             setTotalSteps(totalSteps);
-            setTotalStrategies(strategies.size());
-            execute(strategies);
+            filteredTasksSize = filteredTasks.size();
+            setTotalStrategies(filteredTasksSize);
+            execute(filteredTasks);
 
             iterationsRemaining--;
-            completedSteps += snapshotCount * strategies.size();
+            completedSteps += snapshotCount * filteredTasks.size();
 
             if (optimizationResults.size() == 0 && !cancelled) {
                 throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
@@ -91,6 +93,6 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 topParams.add(new StrategyParams(params));
             }
 
-        } while (strategies.size() > 0 && !cancelled);
+        } while (filteredTasksSize > 0 && !cancelled);
     }
 }
