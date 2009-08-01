@@ -8,26 +8,28 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Hybrid1 extends StrategyES {
+public class Unbiased extends StrategyES {
 
     // Technical indicators
-    private final Indicator priceVelocityInd, balanceVelocityInd;
+    private final Indicator balanceVelocityInd, trendVelocityInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
+    private static final String FAST_PERIOD = "Fast Period";
+    private static final String SLOW_PERIOD = "Slow Period";
+    private static final String TREND_PERIOD = "Trend Period";
     private static final String ENTRY = "Entry";
+
+    // Strategy parameters values
     private final int entry;
 
-
-    public Hybrid1(StrategyParams optimizationParams) throws JBookTraderException {
+    public Unbiased(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        priceVelocityInd = new PriceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(priceVelocityInd);
+        trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
+        addIndicator(trendVelocityInd);
     }
 
     /**
@@ -38,9 +40,10 @@ public class Hybrid1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 5, 50, 1, 32);
-        addParam(SLOW_PERIOD, 3500, 6500, 1, 5167);
-        addParam(ENTRY, 5, 25, 1, 14);
+        addParam(FAST_PERIOD, 15, 155, 1, 66);
+        addParam(SLOW_PERIOD, 4000, 9000, 100, 4237);
+        addParam(TREND_PERIOD, 1000, 5000, 100, 4611);
+        addParam(ENTRY, 12, 26, 1, 19);
     }
 
     /**
@@ -50,10 +53,18 @@ public class Hybrid1 extends StrategyES {
     @Override
     public void onBookChange() {
         double balanceVelocity = balanceVelocityInd.getValue();
-        double priceVelocity = priceVelocityInd.getValue();
-        if (balanceVelocity >= entry && priceVelocity > 0) {
+        double trendVelocity = trendVelocityInd.getValue();
+
+        double power;
+        if (balanceVelocity > 0) {
+            power = balanceVelocity + trendVelocity;
+        } else {
+            power = balanceVelocity - trendVelocity;
+        }
+
+        if (power >= entry) {
             setPosition(1);
-        } else if (balanceVelocity <= -entry && priceVelocity < 0) {
+        } else if (power <= -entry) {
             setPosition(-1);
         }
     }
