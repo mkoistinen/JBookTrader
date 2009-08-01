@@ -8,7 +8,7 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Unbiased extends StrategyES {
+public class Predator extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendVelocityInd;
@@ -22,7 +22,7 @@ public class Unbiased extends StrategyES {
     // Strategy parameters values
     private final int entry;
 
-    public Unbiased(StrategyParams optimizationParams) throws JBookTraderException {
+    public Predator(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -40,10 +40,10 @@ public class Unbiased extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 15, 155, 1, 66);
-        addParam(SLOW_PERIOD, 4000, 9000, 100, 4237);
-        addParam(TREND_PERIOD, 1000, 5000, 100, 4611);
-        addParam(ENTRY, 12, 26, 1, 19);
+        addParam(FAST_PERIOD, 15, 155, 1, 33);
+        addParam(SLOW_PERIOD, 4000, 9000, 100, 7930);
+        addParam(TREND_PERIOD, 1000, 5000, 100, 6332);
+        addParam(ENTRY, 12, 26, 1, 20);
     }
 
     /**
@@ -57,9 +57,9 @@ public class Unbiased extends StrategyES {
 
         double power;
         if (balanceVelocity > 0) {
-            power = balanceVelocity + trendVelocity;
-        } else {
             power = balanceVelocity - trendVelocity;
+        } else {
+            power = balanceVelocity + trendVelocity;
         }
 
         if (power >= entry) {
