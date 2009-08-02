@@ -17,18 +17,16 @@ public class TensionSeeker extends StrategyES {
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
-    private static final String CORRELATION_ENTRY = "Correlation Entry";
-    private static final String BALANCE_VELOCITY_ENTRY = "Balance Velocity Entry";
+    private static final String ENTRY = "Entry";
 
     // Strategy parameters values
-    private final int correlationEntry, balanceEntry;
+    private final int entry;
 
     public TensionSeeker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
-        correlationEntry = getParam(CORRELATION_ENTRY);
-        balanceEntry = getParam(BALANCE_VELOCITY_ENTRY);
-        correlationInd = new DepthPriceCorrelation();
+        entry = getParam(ENTRY);
+        correlationInd = new DepthPriceCorrelation(getTradingSchedule().getTimeZone());
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(correlationInd);
         addIndicator(balanceVelocityInd);
@@ -42,11 +40,9 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        //101-5893-8-19 for 10-14:00
-        addParam(FAST_PERIOD, 25, 165, 1, 65);
-        addParam(SLOW_PERIOD, 3000, 7500, 100, 5631);
-        addParam(CORRELATION_ENTRY, 1, 20, 1, 13);
-        addParam(BALANCE_VELOCITY_ENTRY, 10, 30, 1, 20);
+        addParam(FAST_PERIOD, 5, 200, 1, 37);
+        addParam(SLOW_PERIOD, 2000, 8000, 100, 3140);
+        addParam(ENTRY, 10, 20, 1, 16);
     }
 
     /**
@@ -55,14 +51,16 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balance = balanceVelocityInd.getValue();
+        double balanceVelocity = balanceVelocityInd.getValue();
         double correlation = correlationInd.getValue();
-        // Negative correlation between balance and price indicates high tension,
-        // positive correlation indicates no tension, i.e, "fair prices".
-        if (correlation <= -correlationEntry && balance >= balanceEntry) {
-            setPosition(1);
-        } else if (correlation <= -correlationEntry && balance <= -balanceEntry) {
-            setPosition(-1);
+        // Low correlation between balance and price indicates high tension,
+        // high correlation indicates no tension, i.e, "fair prices".
+        if (correlation < 0) {
+            if (balanceVelocity >= entry) {
+                setPosition(1);
+            } else if (balanceVelocity <= -entry) {
+                setPosition(-1);
+            }
         }
     }
 }
