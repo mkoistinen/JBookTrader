@@ -49,7 +49,7 @@ public class StrategyRunner {
         traderAssistant = Dispatcher.getTrader().getAssistant();
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new SnapshotHandler(), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(new SnapshotHandler(), 0, 1, TimeUnit.SECONDS);
     }
 
     public void addListener(Strategy strategy) {
