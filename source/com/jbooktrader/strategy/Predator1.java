@@ -8,7 +8,7 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Predator extends StrategyES {
+public class Predator1 extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendVelocityInd;
@@ -22,7 +22,7 @@ public class Predator extends StrategyES {
     // Strategy parameters values
     private final int entry;
 
-    public Predator(StrategyParams optimizationParams) throws JBookTraderException {
+    public Predator1(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -42,8 +42,8 @@ public class Predator extends StrategyES {
     public void setParams() {
         addParam(FAST_PERIOD, 15, 155, 1, 33);
         addParam(SLOW_PERIOD, 3000, 10000, 100, 7930);
-        addParam(TREND_PERIOD, 1000, 7000, 100, 6332);
-        addParam(ENTRY, 12, 26, 1, 20);
+        addParam(TREND_PERIOD, 500, 7000, 100, 6332);
+        addParam(ENTRY, 18, 23, 1, 20);
     }
 
     /**
