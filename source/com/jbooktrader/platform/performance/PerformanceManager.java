@@ -51,7 +51,11 @@ public class PerformanceManager {
     }
 
     public double getProfitFactor() {
-        return (grossLoss == 0) ? 0 : grossProfit / grossLoss;
+        double profitFactor = 0;
+        if (grossProfit > 0) {
+            profitFactor = (grossLoss == 0) ? Double.POSITIVE_INFINITY : grossProfit / grossLoss;
+        }
+        return profitFactor;
     }
 
     public double getMaxDrawdown() {
@@ -76,14 +80,18 @@ public class PerformanceManager {
 
     public double getKellyCriterion() {
         int unprofitableTrades = trades - profitableTrades;
-        if (profitableTrades > 0 && unprofitableTrades > 0) {
-            double aveProfit = grossProfit / profitableTrades;
-            double aveLoss = grossLoss / unprofitableTrades;
-            double winLossRatio = aveProfit / aveLoss;
-            double probabilityOfWin = profitableTrades / (double) trades;
-            double kellyCriterion = probabilityOfWin - (1 - probabilityOfWin) / winLossRatio;
-            kellyCriterion *= 100;
-            return kellyCriterion;
+        if (profitableTrades > 0) {
+            if (unprofitableTrades > 0) {
+                double aveProfit = grossProfit / profitableTrades;
+                double aveLoss = grossLoss / unprofitableTrades;
+                double winLossRatio = aveProfit / aveLoss;
+                double probabilityOfWin = profitableTrades / (double) trades;
+                double kellyCriterion = probabilityOfWin - (1 - probabilityOfWin) / winLossRatio;
+                kellyCriterion *= 100;
+                return kellyCriterion;
+            } else {
+                return 100;
+            }
         } else {
             return 0;
         }
@@ -94,7 +102,9 @@ public class PerformanceManager {
         if (trades > 0) {
             double stdev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
             if (stdev != 0) {
-                pi = 10 * getAverageProfitPerTrade() / stdev;
+                pi = Math.sqrt(trades) * getAverageProfitPerTrade() / stdev;
+            } else {
+                pi = Double.POSITIVE_INFINITY;
             }
         }
 
