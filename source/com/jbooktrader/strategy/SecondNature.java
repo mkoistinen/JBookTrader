@@ -40,10 +40,10 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 155, 1, 104);
-        addParam(SLOW_PERIOD, 3000, 9000, 100, 6190);
-        addParam(TREND_PERIOD, 200, 2000, 100, 722);
-        addParam(BALANCE_ENTRY, 13, 23, 1, 19);
+        addParam(FAST_PERIOD, 1, 155, 1, 18);
+        addParam(SLOW_PERIOD, 3000, 9000, 100, 5000);
+        addParam(TREND_PERIOD, 200, 2000, 100, 290);
+        addParam(BALANCE_ENTRY, 13, 23, 1, 22);
     }
 
     /**
