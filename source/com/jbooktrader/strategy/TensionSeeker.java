@@ -1,7 +1,6 @@
 package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.depth.*;
-import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -12,11 +11,11 @@ import com.jbooktrader.platform.optimizer.*;
 public class TensionSeeker extends StrategyES {
 
     // Technical indicators
-    private final Indicator correlationInd, balanceVelocityInd;
+    private final Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
-    private static final String SLOW_PERIOD = "Slow Period";
+    private static final String PERIOD = "Period";
+    private static final String SMOOTHING_PERIOD = "Smoothing Period";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
@@ -26,10 +25,8 @@ public class TensionSeeker extends StrategyES {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        correlationInd = new DepthPriceCorrelation(getTradingSchedule().getTimeZone());
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(correlationInd);
-        addIndicator(balanceVelocityInd);
+        tensionInd = new Tension(getTradingSchedule().getTimeZone(), getParam(PERIOD), getParam(SMOOTHING_PERIOD));
+        addIndicator(tensionInd);
     }
 
     /**
@@ -40,9 +37,9 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 5, 200, 1, 37);
-        addParam(SLOW_PERIOD, 2000, 8000, 100, 3140);
-        addParam(ENTRY, 10, 20, 1, 16);
+        addParam(PERIOD, 2000, 5000, 1, 2510);
+        addParam(SMOOTHING_PERIOD, 5, 300, 100, 110);
+        addParam(ENTRY, 45, 75, 1, 62);
     }
 
     /**
@@ -51,16 +48,19 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        double correlation = correlationInd.getValue();
-        // Low correlation between balance and price indicates high tension,
-        // high correlation indicates no tension, i.e, "fair prices".
-        if (correlation < 0) {
-            if (balanceVelocity >= entry) {
-                setPosition(1);
-            } else if (balanceVelocity <= -entry) {
-                setPosition(-1);
+        double tension = tensionInd.getValue();
+        if (tension <= -entry) {
+            int position = getPositionManager().getPosition();
+            if (position == 0) {
+                double balance = getMarketBook().getSnapshot().getBalance();
+                if (balance < -15) {
+                    setPosition(-1);
+                } else if (balance > 15) {
+                    setPosition(1);
+                }
             }
+        } else if (tension >= entry) {
+            setPosition(0);
         }
     }
 }
