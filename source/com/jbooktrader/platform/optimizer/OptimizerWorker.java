@@ -14,8 +14,10 @@ import java.util.concurrent.*;
 /**
  */
 public class OptimizerWorker implements Callable<List<OptimizationResult>> {
+	private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final OptimizerRunner optimizerRunner;
     private final Queue<StrategyParams> tasks;
+    private long lastInstant;
 
     public OptimizerWorker(OptimizerRunner optimizerRunner, Queue<StrategyParams> tasks) {
         this.optimizerRunner = optimizerRunner;
@@ -58,6 +60,9 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
                         IndicatorManager indicatorManager = strategy.getIndicatorManager();
                         indicatorManager.updateIndicators();
                         if (inSchedule) {
+                        	if (time - lastInstant > GAP_SIZE) strategy.reset();
+                        	lastInstant = time;
+
                             if (indicatorManager.hasValidIndicators()) {
                                 strategy.onBookChange();
                             }

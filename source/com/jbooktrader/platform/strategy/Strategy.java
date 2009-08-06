@@ -20,6 +20,7 @@ import com.jbooktrader.platform.trader.*;
  */
 
 public abstract class Strategy implements Comparable<Strategy> {
+	private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final StrategyParams params;
     private MarketBook marketBook;
     private final Report eventReport;
@@ -36,11 +37,19 @@ public abstract class Strategy implements Comparable<Strategy> {
     private long time;
     private boolean isC2enabled;
     private String c2SystemId;
+    private long lastInstant;
 
     /**
      * Framework calls this method when order book changes.
      */
     abstract public void onBookChange();
+    
+    /**
+     * Called when the last snapshot was more than 1 hour ago
+     */
+    public void reset() {
+    	// Override in implementing strategy as required.
+    }
 
     /**
      * Framework calls this method to set strategy parameter ranges and values.
@@ -143,6 +152,11 @@ public abstract class Strategy implements Comparable<Strategy> {
         performanceChartData.addIndicator(indicator);
     }
 
+    protected void addIndicator(Indicator indicator, boolean show) {
+        indicatorManager.addIndicator(indicator);
+        performanceChartData.addIndicator(indicator);
+    }
+
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread, BarSize barSize) {
         this.contract = contract;
         contract.m_multiplier = String.valueOf(multiplier);
@@ -190,9 +204,14 @@ public abstract class Strategy implements Comparable<Strategy> {
             long instant = marketSnapshot.getTime();
             setTime(instant);
             indicatorManager.updateIndicators();
+            
 
             if (tradingSchedule.contains(instant)) {
-                if (indicatorManager.hasValidIndicators()) {
+
+            	if (instant - lastInstant > GAP_SIZE) reset();
+            	lastInstant = instant;
+
+            	if (indicatorManager.hasValidIndicators()) {
                     onBookChange();
                 }
             } else {
