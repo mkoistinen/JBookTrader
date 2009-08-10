@@ -8,7 +8,7 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class SecondNature extends StrategyES {
+public class Flipper extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendVelocityInd;
@@ -17,15 +17,15 @@ public class SecondNature extends StrategyES {
     private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
     private static final String TREND_PERIOD = "Trend Period";
-    private static final String BALANCE_ENTRY = "Balance Entry";
+    private static final String ENTRY = "Entry";
 
     // Strategy parameters values
-    private final int balanceVelocityEntry;
+    private final int entry;
 
-    public SecondNature(StrategyParams optimizationParams) throws JBookTraderException {
+    public Flipper(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
-        balanceVelocityEntry = getParam(BALANCE_ENTRY);
+        entry = getParam(ENTRY);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
@@ -40,10 +40,10 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 2, 50, 1, 15);
-        addParam(SLOW_PERIOD, 100, 3000, 5, 1017);
-        addParam(TREND_PERIOD, 200, 1200, 5, 381);
-        addParam(BALANCE_ENTRY, 100, 140, 1, 122);
+        addParam(FAST_PERIOD, 10, 14, 1, 12);
+        addParam(SLOW_PERIOD, 1000, 1500, 100, 1256);
+        addParam(TREND_PERIOD, 400, 500, 100, 462);
+        addParam(ENTRY, 13, 17, 1, 15);
     }
 
     /**
@@ -52,14 +52,14 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue() * 10;
+        double balanceVelocity = balanceVelocityInd.getValue();
         double trendVelocity = trendVelocityInd.getValue();
-        if (trendVelocity < 0) {
-            if (balanceVelocity >= balanceVelocityEntry) {
-                setPosition(1);
-            } else if (balanceVelocity <= -balanceVelocityEntry) {
-                setPosition(-1);
-            }
+
+        double power = balanceVelocity > 0 ? (balanceVelocity - trendVelocity) : (balanceVelocity + trendVelocity);
+        if (power >= entry) {
+            setPosition(1);
+        } else if (power <= -entry) {
+            setPosition(-1);
         }
     }
 }

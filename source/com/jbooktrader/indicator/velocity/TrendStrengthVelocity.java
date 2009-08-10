@@ -12,8 +12,8 @@ public class TrendStrengthVelocity extends Indicator {
     private double previousPrice;
 
 
-    public TrendStrengthVelocity(int length) {
-        multiplier = 2.0 / (length + 1.0);
+    public TrendStrengthVelocity(int periodLength) {
+        multiplier = 2.0 / (periodLength + 1.0);
     }
 
     @Override

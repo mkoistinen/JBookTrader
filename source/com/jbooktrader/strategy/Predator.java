@@ -40,10 +40,10 @@ public class Predator extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 25, 200, 1, 160);
-        addParam(SLOW_PERIOD, 4000, 10500, 100, 5100);
-        addParam(TREND_PERIOD, 500, 1500, 100, 890);
-        addParam(ENTRY, 16, 23, 1, 18);
+        addParam(FAST_PERIOD, 2, 25, 1, 6);
+        addParam(SLOW_PERIOD, 1000, 3000, 100, 2630);
+        addParam(TREND_PERIOD, 400, 600, 100, 510);
+        addParam(ENTRY, 12, 24, 1, 19);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Predator extends StrategyES {
         double balanceVelocity = balanceVelocityInd.getValue();
         double trendVelocity = trendVelocityInd.getValue();
 
-        double power = (balanceVelocity > 0) ? (balanceVelocity - trendVelocity) : (balanceVelocity + trendVelocity);
+        double power = balanceVelocity > 0 ? (balanceVelocity - trendVelocity) : (balanceVelocity + trendVelocity);
         if (power >= entry) {
             setPosition(1);
         } else if (power <= -entry) {

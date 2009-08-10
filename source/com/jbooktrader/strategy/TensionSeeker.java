@@ -1,7 +1,6 @@
 package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.depth.*;
-import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 
@@ -11,22 +10,23 @@ import com.jbooktrader.platform.optimizer.*;
 public class TensionSeeker extends StrategyES {
 
     // Technical indicators
-    private final Indicator tensionInd;
+    private final DepthPriceCorrelation correlationInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
-    private static final String SMOOTHING_PERIOD = "Smoothing Period";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, exit;
 
     public TensionSeeker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        tensionInd = new Tension(getTradingSchedule().getTimeZone(), getParam(PERIOD), getParam(SMOOTHING_PERIOD));
-        addIndicator(tensionInd);
+        exit = getParam(EXIT);
+        correlationInd = new DepthPriceCorrelation(getParam(PERIOD));
+        addIndicator(correlationInd);
     }
 
     /**
@@ -37,9 +37,9 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(PERIOD, 2000, 5000, 1, 2510);
-        addParam(SMOOTHING_PERIOD, 5, 300, 100, 110);
-        addParam(ENTRY, 45, 75, 1, 62);
+        addParam(PERIOD, 1800, 3000, 10, 2177);
+        addParam(ENTRY, 55, 95, 1, 82);
+        addParam(EXIT, 0, 20, 1, 7);
     }
 
     /**
@@ -48,19 +48,21 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double tension = tensionInd.getValue();
-        if (tension <= -entry) {
-            int position = getPositionManager().getPosition();
-            if (position == 0) {
-                double balance = getMarketBook().getSnapshot().getBalance();
-                if (balance < -15) {
-                    setPosition(-1);
-                } else if (balance > 15) {
-                    setPosition(1);
-                }
+        double correlationMagnitude = Math.abs(correlationInd.getValue());
+        double priceSlope = correlationInd.getPriceSlope();
+        int currentPosition = getPositionManager().getPosition();
+
+        if (currentPosition == 0) {
+            if (correlationMagnitude >= entry && priceSlope > 0) { //resistance
+                setPosition(-1);
             }
-        } else if (tension >= entry) {
-            setPosition(0);
+            if (correlationMagnitude >= entry && priceSlope < 0) { //support
+                setPosition(1);
+            }
+        } else {
+            if (correlationMagnitude <= exit) {
+                setPosition(0);
+            }
         }
     }
 }
