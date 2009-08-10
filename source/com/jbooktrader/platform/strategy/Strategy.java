@@ -152,11 +152,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         performanceChartData.addIndicator(indicator);
     }
 
-    protected void addIndicator(Indicator indicator, boolean show) {
-        indicatorManager.addIndicator(indicator);
-        performanceChartData.addIndicator(indicator);
-    }
-
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread, BarSize barSize) {
         this.contract = contract;
         contract.m_multiplier = String.valueOf(multiplier);
