@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.model.*;
 
 import java.util.*;
 
@@ -13,14 +12,10 @@ public class MarketDepth {
     private boolean isResetting;
     private double lowBalance, highBalance, lastBalance;
     private double midPointPrice;
-    private MarketDepthValidator validator;
-    private final String name;
 
-    public MarketDepth(String name) {
-        this.name = name;
+    public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
-        validator = new MarketDepthValidator(bids, asks);
         isResetting = true;
     }
 
@@ -32,25 +27,15 @@ public class MarketDepth {
 
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
+        Set<Double> uniquePriceLevels = new HashSet<Double>();
         int cumulativeSize = 0;
+
         for (MarketDepthItem item : items) {
+            uniquePriceLevels.add(item.getPrice());
             cumulativeSize += item.getSize();
         }
-        return cumulativeSize;
-    }
 
-    public boolean isValid() {
-        return validator.isValid();
-    }
-
-    public String getMarketDepthAsString() {
-        String md = getCumulativeSize(bids) + "-" + getCumulativeSize(asks);
-        long invalidStateDuration = validator.getInvalidStateDurationInSeconds();
-        if (invalidStateDuration >= 60) {
-            md += ", invalid";
-        }
-
-        return md;
+        return cumulativeSize / uniquePriceLevels.size();
     }
 
     synchronized public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
@@ -79,16 +64,13 @@ public class MarketDepth {
 
 
         if (operation == MarketDepthOperation.Update) {
-            validator.validate();
-            if (validator.isValid()) {
-                int cumulativeBid = getCumulativeSize(bids);
-                int cumulativeAsk = getCumulativeSize(asks);
-                double totalDepth = cumulativeBid + cumulativeAsk;
+            int cumulativeBid = getCumulativeSize(bids);
+            int cumulativeAsk = getCumulativeSize(asks);
+            double totalDepth = cumulativeBid + cumulativeAsk;
 
-                lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
-                lowBalance = Math.min(lastBalance, lowBalance);
-                highBalance = Math.max(lastBalance, highBalance);
-            }
+            lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
+            lowBalance = Math.min(lastBalance, lowBalance);
+            highBalance = Math.max(lastBalance, highBalance);
 
             midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
             isResetting = false;
@@ -99,15 +81,6 @@ public class MarketDepth {
     synchronized public MarketSnapshot getMarketSnapshot(long time) {
         if (isResetting) {
             return null;
-        }
-
-        long invalidStateDuration = validator.getInvalidStateDurationInSeconds();
-        if (invalidStateDuration >= 60 && (invalidStateDuration % 60 == 0)) {
-            String msg = "Book " + name + " has been invalid for " + invalidStateDuration + " seconds.<br>";
-            for (String errorMsg : validator.getErrors()) {
-                msg += errorMsg + "<br>";
-            }
-            Dispatcher.getReporter().report(msg);
         }
 
         int balance = (int) Math.round((lowBalance + highBalance) / 2d);

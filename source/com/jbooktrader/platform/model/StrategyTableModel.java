@@ -72,7 +72,7 @@ public class StrategyTableModel extends TableDataModel {
         if (!marketBook.isEmpty()) {
             MarketSnapshot lastMarketSnapshot = marketBook.getSnapshot();
             setValueAtFast(df6.format(lastMarketSnapshot.getPrice()), row, Price.ordinal());
-            setValueAtFast(marketBook.getMarketDepth().getMarketDepthAsString(), row, MarketDepth.ordinal());
+            setValueAtFast(lastMarketSnapshot.getBalance(), row, DepthBalance.ordinal());
         }
 
         setValueAtFast(strategy.indicatorsState(), row, Indicators.ordinal());

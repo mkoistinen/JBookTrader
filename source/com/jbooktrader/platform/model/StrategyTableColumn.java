@@ -3,7 +3,7 @@ package com.jbooktrader.platform.model;
 public enum StrategyTableColumn {
     Strategy("Strategy"),
     Symbol("Symbol"),
-    MarketDepth("Market Depth"),
+    DepthBalance("Depth Balance"),
     Indicators("Indicators"),
     Price("Price"),
     Position("Position"),

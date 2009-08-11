@@ -240,7 +240,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // Make some columns wider than the rest, so that the info fits in.
         TableColumnModel columnModel = strategyTable.getColumnModel();
         columnModel.getColumn(Strategy.ordinal()).setPreferredWidth(100);
-        columnModel.getColumn(MarketDepth.ordinal()).setPreferredWidth(120);
+        columnModel.getColumn(DepthBalance.ordinal()).setPreferredWidth(120);
         columnModel.getColumn(ProfitFactor.ordinal()).setPreferredWidth(100);
 
         strategyTableScrollPane.getViewport().add(strategyTable);
