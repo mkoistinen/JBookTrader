@@ -8,10 +8,10 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Flipper extends StrategyES {
+public class Catcher extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, trendVelocityInd;
+    private final Indicator balanceVelocityInd, trendStrengthInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
@@ -22,14 +22,14 @@ public class Flipper extends StrategyES {
     // Strategy parameters values
     private final int entry;
 
-    public Flipper(StrategyParams optimizationParams) throws JBookTraderException {
+    public Catcher(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
+        trendStrengthInd = new TrendStrength(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
-        addIndicator(trendVelocityInd);
+        addIndicator(trendStrengthInd);
     }
 
     /**
@@ -40,10 +40,10 @@ public class Flipper extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 11, 14, 1, 12);
-        addParam(SLOW_PERIOD, 1170, 1310, 100, 1256);
-        addParam(TREND_PERIOD, 440, 485, 100, 462);
-        addParam(ENTRY, 14, 17, 1, 15);
+        addParam(FAST_PERIOD, 2, 50, 1, 13);
+        addParam(SLOW_PERIOD, 200, 5000, 5, 2388);
+        addParam(TREND_PERIOD, 100, 300, 5, 183);
+        addParam(ENTRY, 9, 19, 1, 17);
     }
 
     /**
@@ -53,13 +53,13 @@ public class Flipper extends StrategyES {
     @Override
     public void onBookChange() {
         double balanceVelocity = balanceVelocityInd.getValue();
-        double trendVelocity = trendVelocityInd.getValue();
-
-        double power = balanceVelocity > 0 ? (balanceVelocity - trendVelocity) : (balanceVelocity + trendVelocity);
-        if (power >= entry) {
-            setPosition(1);
-        } else if (power <= -entry) {
-            setPosition(-1);
+        double trendStrength = trendStrengthInd.getValue();
+        if (trendStrength <= entry) {
+            if (balanceVelocity >= entry) {
+                setPosition(1);
+            } else if (balanceVelocity <= -entry) {
+                setPosition(-1);
+            }
         }
     }
 }

@@ -6,29 +6,26 @@ import java.util.*;
 
 
 /**
- * Calculates the slope of the "least squares" regression line
+ * Calculates the slope of the "least squares" regression line through prices in the fixed-length time window
  */
 public class PriceTrend extends Indicator {
     private double sumTime, sumTimeSquared, sumPrice, sumTimePrice;
-    private long time;
-    private final LinkedList<Double> prices, times;
+    private int time;
+    private final LinkedList<Double> prices;
     private final int periodLength;
 
 
     public PriceTrend(int periodLength) {
         this.periodLength = periodLength;
         prices = new LinkedList<Double>();
-        times = new LinkedList<Double>();
     }
 
     @Override
     public void calculate() {
 
-        double price = marketBook.getSnapshot().getPrice();
         time++;
-
+        double price = marketBook.getSnapshot().getPrice();
         prices.add(price);
-        times.add((double) time);
 
         sumTime += time;
         sumTimeSquared += time * time;
@@ -36,7 +33,7 @@ public class PriceTrend extends Indicator {
         sumTimePrice += time * price;
 
         if (prices.size() > periodLength) {
-            double oldTime = times.removeFirst();
+            int oldTime = time - periodLength;
             double oldPrice = prices.removeFirst();
 
             sumTime -= oldTime;
@@ -56,10 +53,8 @@ public class PriceTrend extends Indicator {
 
     @Override
     public void reset() {
-        value = time = 0;
-        sumTime = sumTimeSquared = sumPrice = sumTimePrice = 0;
         prices.clear();
-        times.clear();
+        sumTime = sumTimeSquared = sumPrice = sumTimePrice = value = time = 0;
     }
 }
 
