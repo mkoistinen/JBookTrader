@@ -36,7 +36,7 @@ public class OptimizerDialog extends JBTDialog {
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
     private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
-    private JLabel progressLabel, fromLabel, toLabel;
+    private JLabel progressLabel, toLabel;
     private JProgressBar progressBar;
     private JTable resultsTable;
     private TableColumnModel paramTableColumnModel;
@@ -182,9 +182,7 @@ public class OptimizerDialog extends JBTDialog {
         useDateRangeCheckBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 boolean useDateRange = useDateRangeCheckBox.isSelected();
-                fromLabel.setEnabled(useDateRange);
                 fromDatePanel.setEnabled(useDateRange);
-                toLabel.setEnabled(useDateRange);
                 toDatePanel.setEnabled(useDateRange);
             }
         });
@@ -306,21 +304,18 @@ public class OptimizerDialog extends JBTDialog {
         // historical data range filter panel
         JPanel dateRangePanel = new JPanel(new SpringLayout());
         String dateFormat = "MMMMM d, yyyy";
-        useDateRangeCheckBox = new JCheckBox("Use date range", prefs.get(OptimizerUseDateRange).equals("true"));
+        useDateRangeCheckBox = new JCheckBox("Use date range from:", prefs.get(OptimizerUseDateRange).equals("true"));
         dateRangePanel.add(useDateRangeCheckBox);
 
         // From date
-        fromLabel = new JLabel("From:");
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
         fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
-        fromLabel.setLabelFor(fromDatePanel);
-        dateRangePanel.add(fromLabel);
         fromDatePanel.add(fromDateEditor);
         dateRangePanel.add(fromDatePanel);
 
         // To date
-        toLabel = new JLabel("To:");
+        toLabel = new JLabel("to:");
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
         toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
@@ -329,9 +324,7 @@ public class OptimizerDialog extends JBTDialog {
         toDatePanel.add(toDateEditor);
 
         boolean useDateRange = useDateRangeCheckBox.isSelected();
-        fromLabel.setEnabled(useDateRange);
         fromDatePanel.setEnabled(useDateRange);
-        toLabel.setEnabled(useDateRange);
         toDatePanel.setEnabled(useDateRange);
 
 
