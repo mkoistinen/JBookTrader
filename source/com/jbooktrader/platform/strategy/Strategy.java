@@ -20,7 +20,7 @@ import com.jbooktrader.platform.trader.*;
  */
 
 public abstract class Strategy implements Comparable<Strategy> {
-	private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
+    private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final StrategyParams params;
     private MarketBook marketBook;
     private final Report eventReport;
@@ -43,12 +43,12 @@ public abstract class Strategy implements Comparable<Strategy> {
      * Framework calls this method when order book changes.
      */
     abstract public void onBookChange();
-    
+
     /**
      * Called when the last snapshot was more than 1 hour ago
      */
     public void reset() {
-    	// Override in implementing strategy as required.
+        // Override in implementing strategy as required.
     }
 
     /**
@@ -193,27 +193,32 @@ public abstract class Strategy implements Comparable<Strategy> {
         return c2SystemId;
     }
 
+    public void processInstant(long instant, boolean isInSchedule) {
+        setTime(instant);
+        indicatorManager.updateIndicators();
+
+        if (isInSchedule) {
+            if (instant - lastInstant > GAP_SIZE) {
+                reset();
+            }
+            lastInstant = instant;
+
+            if (indicatorManager.hasValidIndicators()) {
+                onBookChange();
+            }
+        } else {
+            closePosition();// force flat position
+        }
+
+        positionManager.trade();
+    }
+
+
     public void process() {
         if (isActive() && !marketBook.isEmpty()) {
             MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
-            setTime(instant);
-            indicatorManager.updateIndicators();
-            
-
-            if (tradingSchedule.contains(instant)) {
-
-            	if (instant - lastInstant > GAP_SIZE) reset();
-            	lastInstant = instant;
-
-            	if (indicatorManager.hasValidIndicators()) {
-                    onBookChange();
-                }
-            } else {
-                closePosition();// force flat position
-            }
-
-            positionManager.trade();
+            processInstant(instant, tradingSchedule.contains(instant));
             performanceManager.updatePositionValue(marketSnapshot.getPrice(), positionManager.getPosition());
             Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
         }

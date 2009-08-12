@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
@@ -14,10 +13,8 @@ import java.util.concurrent.*;
 /**
  */
 public class OptimizerWorker implements Callable<List<OptimizationResult>> {
-	private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final OptimizerRunner optimizerRunner;
     private final Queue<StrategyParams> tasks;
-    private long lastInstant;
 
     public OptimizerWorker(OptimizerRunner optimizerRunner, Queue<StrategyParams> tasks) {
         this.optimizerRunner = optimizerRunner;
@@ -53,25 +50,10 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
                 for (MarketSnapshot marketSnapshot : snapshots) {
                     marketBook.setSnapshot(marketSnapshot);
                     long time = marketSnapshot.getTime();
-                    boolean inSchedule = tradingSchedule.contains(time);
+                    boolean isInSchedule = tradingSchedule.contains(time);
 
                     for (Strategy strategy : strategies) {
-                        strategy.setTime(time);
-                        IndicatorManager indicatorManager = strategy.getIndicatorManager();
-                        indicatorManager.updateIndicators();
-                        if (inSchedule) {
-                        	if (time - lastInstant > GAP_SIZE) strategy.reset();
-                        	lastInstant = time;
-
-                            if (indicatorManager.hasValidIndicators()) {
-                                strategy.onBookChange();
-                            }
-                        } else {
-                            strategy.closePosition();// force flat position
-                        }
-
-                        strategy.getPositionManager().trade();
-
+                        strategy.processInstant(time, isInSchedule);
                     }
 
                     optimizerRunner.iterationsCompleted(strategies.size());
