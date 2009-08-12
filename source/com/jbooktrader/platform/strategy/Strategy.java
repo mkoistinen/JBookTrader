@@ -235,20 +235,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         return sb.toString();
     }
 
-    public String indicatorsState() {
-        String indicatorsState = "";
-        for (Indicator indicator : indicatorManager.getIndicators()) {
-            if (!indicatorsState.isEmpty()) {
-                indicatorsState += ", ";
-            }
-
-            indicatorsState += (int) indicator.getValue();
-        }
-        return indicatorsState;
-    }
-
     // Implementing Comparable interface
-
     public int compareTo(Strategy other) {
         return getName().compareTo(other.getName());
     }

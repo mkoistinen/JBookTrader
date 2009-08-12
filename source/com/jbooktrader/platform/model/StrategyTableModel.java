@@ -75,7 +75,7 @@ public class StrategyTableModel extends TableDataModel {
             setValueAtFast(lastMarketSnapshot.getBalance(), row, DepthBalance.ordinal());
         }
 
-        setValueAtFast(strategy.indicatorsState(), row, Indicators.ordinal());
+        setValueAtFast(strategy.getIndicatorManager().indicatorsState(), row, Indicators.ordinal());
         setValueAtFast(strategy.getPositionManager().getPosition(), row, Position.ordinal());
 
         PerformanceManager performanceManager = strategy.getPerformanceManager();
