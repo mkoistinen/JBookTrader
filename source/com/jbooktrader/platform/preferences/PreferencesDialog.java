@@ -48,14 +48,6 @@ public class PreferencesDialog extends JBTDialog {
     }
 
 
-    private void add(JPanel panel, JBTPreferences pref, JSlider slider) {
-        slider.setValue(prefs.getInt(pref));
-        JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
-        fieldNameLabel.setLabelFor(slider);
-        panel.add(fieldNameLabel);
-        panel.add(slider);
-    }
-
     private void genericAdd(JPanel panel, JBTPreferences pref, Component comp, Dimension dimension) {
         JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
         fieldNameLabel.setLabelFor(comp);

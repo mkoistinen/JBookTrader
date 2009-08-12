@@ -14,9 +14,6 @@ import java.util.*;
 public abstract class MarkSnapshotUtilities {
 
     public static MarketSnapshotFilter getMarketDepthFilter(JTextFieldDateEditor fromDateEditor, JTextFieldDateEditor toDateEditor) {
-        MarketSnapshotFilter filter = null;
-
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fromDateEditor.getDate());
         calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -26,7 +23,7 @@ public abstract class MarkSnapshotUtilities {
         final long toDate = calendar.getTimeInMillis();
 
 
-        filter = new MarketSnapshotFilter() {
+        MarketSnapshotFilter filter = new MarketSnapshotFilter() {
 
             public boolean accept(MarketSnapshot marketSnapshot) {
                 return (marketSnapshot.getTime() >= fromDate && marketSnapshot.getTime() <= toDate);

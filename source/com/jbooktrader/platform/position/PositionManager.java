@@ -8,23 +8,18 @@ import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
-import com.jbooktrader.platform.util.*;
 
-import java.text.*;
 import java.util.*;
 
 /**
  * Position manager keeps track of current positions and executions.
  */
 public class PositionManager {
-    private static final String LINE_SEP = System.getProperty("line.separator");
-    private final NumberFormat nf2;
     private final LinkedList<Position> positionsHistory;
     private final Strategy strategy;
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
     private final PerformanceManager performanceManager;
-    private final SimpleDateFormat simpleDateFormat;
 
     private int position;
     private double avgFillPrice;
@@ -36,9 +31,6 @@ public class PositionManager {
         eventReport = Dispatcher.getReporter();
         traderAssistant = Dispatcher.getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
-        nf2 = NumberFormatterFactory.getNumberFormatter(2);
-        simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-        simpleDateFormat.setTimeZone(strategy.getTradingSchedule().getTimeZone());
     }
 
     public LinkedList<Position> getPositionsHistory() {

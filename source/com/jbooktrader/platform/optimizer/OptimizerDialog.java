@@ -36,7 +36,7 @@ public class OptimizerDialog extends JBTDialog {
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
     private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
-    private JLabel progressLabel, toLabel;
+    private JLabel progressLabel;
     private JProgressBar progressBar;
     private JTable resultsTable;
     private TableColumnModel paramTableColumnModel;
@@ -315,7 +315,7 @@ public class OptimizerDialog extends JBTDialog {
         dateRangePanel.add(fromDatePanel);
 
         // To date
-        toLabel = new JLabel("to:");
+        JLabel toLabel = new JLabel("to:");
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
         toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));

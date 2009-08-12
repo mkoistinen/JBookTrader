@@ -59,8 +59,6 @@ public class BackTestFileReader {
 
     public void scan() throws JBookTraderException {
         String line;
-        MarketSnapshot marketSnapshot = null;
-
         try {
             while ((line = reader.readLine()) != null && !cancelled) {
                 lineNumber++;
@@ -69,7 +67,7 @@ public class BackTestFileReader {
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                    marketSnapshot = toMarketDepth(line);
+                    MarketSnapshot marketSnapshot = toMarketDepth(line);
                     if (filter == null || filter.accept(marketSnapshot)) {
                         snapshotCount++;
                         if (firstMarketLine == 0) {

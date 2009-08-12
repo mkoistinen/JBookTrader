@@ -92,6 +92,7 @@ public class Trader extends EWrapperAdapter {
         }
     }
 
+    @Override
     public void contractDetails(int id, ContractDetails contractDetails) {
         String lineSep = "<br>";
         StringBuilder details = new StringBuilder("Contract details:").append(lineSep);
