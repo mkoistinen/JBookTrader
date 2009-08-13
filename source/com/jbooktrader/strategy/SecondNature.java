@@ -4,6 +4,7 @@ import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.strategy.base.*;
 
 /**
  *
@@ -40,10 +41,10 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 2, 50, 1, 15);
-        addParam(SLOW_PERIOD, 100, 3000, 5, 1017);
-        addParam(TREND_PERIOD, 200, 1200, 5, 381);
-        addParam(BALANCE_ENTRY, 100, 140, 1, 122);
+        addParam(FAST_PERIOD, 3, 25, 1, 14);
+        addParam(SLOW_PERIOD, 600, 1800, 5, 1125);
+        addParam(TREND_PERIOD, 300, 600, 5, 385);
+        addParam(BALANCE_ENTRY, 110, 140, 1, 126);
     }
 
     /**

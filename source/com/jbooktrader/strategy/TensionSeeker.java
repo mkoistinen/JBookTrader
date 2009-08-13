@@ -3,6 +3,7 @@ package com.jbooktrader.strategy;
 import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.strategy.base.*;
 
 /**
  *

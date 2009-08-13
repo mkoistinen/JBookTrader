@@ -4,6 +4,7 @@ import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.strategy.base.*;
 
 /**
  *
@@ -38,9 +39,9 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 200, 1, 8);
-        addParam(SLOW_PERIOD, 2000, 7000, 100, 4220);
-        addParam(ENTRY, 12, 25, 1, 17);
+        addParam(FAST_PERIOD, 1, 200, 1, 10);
+        addParam(SLOW_PERIOD, 2000, 7000, 100, 2115);
+        addParam(ENTRY, 12, 25, 1, 18);
     }
 
     /**

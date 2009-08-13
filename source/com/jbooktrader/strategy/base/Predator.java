@@ -1,4 +1,4 @@
-package com.jbooktrader.strategy;
+package com.jbooktrader.strategy.base;
 
 import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
@@ -8,21 +8,21 @@ import com.jbooktrader.platform.optimizer.*;
 /**
  *
  */
-public class Flipper extends StrategyES {
+public abstract class Predator extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendVelocityInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
-    private static final String SLOW_PERIOD = "Slow Period";
-    private static final String TREND_PERIOD = "Trend Period";
-    private static final String ENTRY = "Entry";
+    protected static final String FAST_PERIOD = "Fast Period";
+    protected static final String SLOW_PERIOD = "Slow Period";
+    protected static final String TREND_PERIOD = "Trend Period";
+    protected static final String ENTRY = "Entry";
 
     // Strategy parameters values
     private final int entry;
 
-    public Flipper(StrategyParams optimizationParams) throws JBookTraderException {
+    public Predator(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -30,20 +30,6 @@ public class Flipper extends StrategyES {
         trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
         addIndicator(trendVelocityInd);
-    }
-
-    /**
-     * Adds parameters to strategy. Each parameter must have 5 values:
-     * name: identifier
-     * min, max, step: range for optimizer
-     * value: used in backtesting and trading
-     */
-    @Override
-    public void setParams() {
-        addParam(FAST_PERIOD, 11, 14, 1, 12);
-        addParam(SLOW_PERIOD, 1170, 1310, 100, 1256);
-        addParam(TREND_PERIOD, 440, 485, 100, 462);
-        addParam(ENTRY, 14, 17, 1, 15);
     }
 
     /**
