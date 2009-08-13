@@ -45,16 +45,16 @@ public abstract class Strategy implements Comparable<Strategy> {
     abstract public void onBookChange();
 
     /**
-     * Called when the last snapshot was more than 1 hour ago
-     */
-    public void reset() {
-        // Override in implementing strategy as required.
-    }
-
-    /**
      * Framework calls this method to set strategy parameter ranges and values.
      */
     abstract protected void setParams();
+
+    /**
+     * Framework calls this method when the last snapshot was more than 1 hour ago
+     */
+    protected void reset() {
+        // Override in implementing strategy as required.
+    }
 
 
     protected Strategy(StrategyParams params) {
