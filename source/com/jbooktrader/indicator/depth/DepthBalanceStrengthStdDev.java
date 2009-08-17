@@ -36,17 +36,17 @@ public class DepthBalanceStrengthStdDev extends Indicator {
 		
 		history.addLast(strength);
 		sum += strength;
-		sum_sqr += strength*strength;
+		sum_sqr += strength * strength;
 		
 		if (history.size() > period) {
 			strength = history.removeFirst();
 			sum -= strength;
-			sum_sqr -= strength*strength;
+			sum_sqr -= strength * strength;
 		}
 		
 		if (history.size() > 0) {
 			mean = sum/history.size();
-			value = Math.sqrt((sum_sqr - sum*mean)/(history.size()));
+			value = Math.sqrt((sum_sqr - sum * mean)/history.size());
 		}
 	}
 	
