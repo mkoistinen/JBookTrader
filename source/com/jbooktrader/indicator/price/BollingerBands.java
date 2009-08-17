@@ -23,7 +23,7 @@ public class BollingerBands extends Indicator {
 	private final double multiple;
 
 	private LinkedList<Double> history = new LinkedList<Double>();
-	private double price, sum, mean, sum_sqr;
+	private double price, sum, mean, sum_sqr, sigma;
 	
 	public BollingerBands(int period) {
 		this(period, 1.0);
@@ -37,7 +37,7 @@ public class BollingerBands extends Indicator {
 	
 	@Override
 	public void reset() {
-		value = sum = sum_sqr = mean = 0.0;
+		value = sum = sum_sqr = mean = sigma = 0.0;
 		history.clear();
 	}
 
@@ -47,17 +47,17 @@ public class BollingerBands extends Indicator {
 		
 		history.addLast(price);
 		sum += price;
-		sum_sqr += price*price;
+		sum_sqr += price * price;
 		
 		if (history.size() > period) {
 			price = history.removeFirst();
 			sum -= price;
-			sum_sqr -= price*price;
+			sum_sqr -= price * price;
 		}
 		
 		if (history.size() > 0) {
 			mean = sum/history.size();
-			value = Math.sqrt((sum_sqr - sum*mean)/(history.size()));
+			value = sigma = Math.sqrt( (sum_sqr - sum * mean) / history.size() );
 		}
 	}
 
@@ -74,14 +74,14 @@ public class BollingerBands extends Indicator {
 	 * @return The upper band of the Bollinger Bands specified by the period and multiple.
 	 */
 	public double getUpperBand() {
-		return mean + value * multiple;
+		return mean + sigma * multiple;
 	}
 
 	/**
 	 * @return The lower band of the Bollinger Bands specified by the period and multiple.
 	 */
 	public double getLowerBand() {
-		return mean - value * multiple;
+		return mean - sigma * multiple;
 	}
 
 }
