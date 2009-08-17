@@ -43,7 +43,7 @@ public class SecondNature extends StrategyES {
     public void setParams() {
         addParam(FAST_PERIOD, 3, 25, 1, 14);
         addParam(SLOW_PERIOD, 600, 1800, 5, 1125);
-        addParam(TREND_PERIOD, 300, 600, 5, 385);
+        addParam(TREND_PERIOD, 300, 600, 5, 384);
         addParam(BALANCE_ENTRY, 110, 140, 1, 126);
     }
 
