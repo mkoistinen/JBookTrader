@@ -9,10 +9,10 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class SecondNature extends StrategyES {
+public class PeaceSeeker extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, trendStrengthVelocityInd;
+    private final Indicator balanceVelocityInd, volatilityVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
@@ -23,14 +23,14 @@ public class SecondNature extends StrategyES {
     // Strategy parameters values
     private final int entry;
 
-    public SecondNature(StrategyParams optimizationParams) throws JBookTraderException {
+    public PeaceSeeker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        trendStrengthVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
+        volatilityVelocityInd = new PriceVolatilityVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
-        addIndicator(trendStrengthVelocityInd);
+        addIndicator(volatilityVelocityInd);
     }
 
     /**
@@ -41,10 +41,10 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 3, 25, 1, 14);
-        addParam(SLOW_PERIOD, 600, 1800, 5, 1125);
-        addParam(TREND_PERIOD, 300, 600, 5, 384);
-        addParam(ENTRY, 110, 140, 1, 126);
+        addParam(FAST_PERIOD, 5, 30, 1, 11);
+        addParam(SLOW_PERIOD, 900, 4500, 5, 3171);
+        addParam(TREND_PERIOD, 150, 450, 5, 188);
+        addParam(ENTRY, 11, 18, 1, 17);
     }
 
     /**
@@ -53,9 +53,9 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue() * 10;
-        double trendStrengthVelocity = trendStrengthVelocityInd.getValue();
-        if (trendStrengthVelocity < 0) {
+        double balanceVelocity = balanceVelocityInd.getValue();
+        double volatilityVelocity = volatilityVelocityInd.getValue();
+        if (volatilityVelocity <= 0) {
             if (balanceVelocity >= entry) {
                 setPosition(1);
             } else if (balanceVelocity <= -entry) {
