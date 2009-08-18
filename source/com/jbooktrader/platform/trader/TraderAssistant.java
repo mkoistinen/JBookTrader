@@ -21,7 +21,7 @@ public class TraderAssistant {
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
     private final Map<String, Integer> tickers;
-    private final HashSet<Integer> subscribedTickers;
+    private final Set<Integer> subscribedTickers;
     private final Map<Integer, MarketBook> marketBooks;
     private final Report eventReport;
     private final Trader trader;
@@ -30,7 +30,7 @@ public class TraderAssistant {
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isConnected;
-    private double bidAskSpread;
+
 
     public TraderAssistant(Trader trader) {
         this.trader = trader;
@@ -212,10 +212,6 @@ public class TraderAssistant {
         this.accountCode = accountCode;
     }
 
-    public void setBidAskSpread(double bidAskSpread) {
-        this.bidAskSpread = bidAskSpread;
-    }
-
     private synchronized void placeOrder(Contract contract, Order order, Strategy strategy) {
         try {
             orderID++;
@@ -233,6 +229,7 @@ public class TraderAssistant {
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
                 double price = strategy.getMarketBook().getSnapshot().getPrice();
+                double bidAskSpread = strategy.getBidAskSpread();
                 execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? (price + bidAskSpread / 2) : (price - bidAskSpread / 2);
                 execution.m_orderId = orderID;
                 trader.execDetails(0, contract, execution);

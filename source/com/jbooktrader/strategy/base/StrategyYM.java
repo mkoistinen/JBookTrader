@@ -13,18 +13,14 @@ import com.jbooktrader.platform.util.*;
  *
  */
 public abstract class StrategyYM extends Strategy {
-
-	protected static final double BIDASKSPREAD = 1.00; // prevalent spread between best bid and best ask
-
-	/*
-	 * MARGIN REQUIREMENTS for YM: ECBOT as of 13-July-2009
-	 * 
-	 * Initial Intra-day: $3,250
-	 * Intra-day Maintenance: $2,600
-	 * Initial Overnight: $6,500
-	 * Overnight Maintenance: $5,200
-	 */
-	
+    /*
+      * MARGIN REQUIREMENTS for YM: ECBOT as of 13-July-2009
+      *
+      * Initial Intra-day: $3,250
+      * Intra-day Maintenance: $2,600
+      * Initial Overnight: $6,500
+      * Overnight Maintenance: $5,200
+      */
     protected StrategyYM(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
@@ -32,8 +28,9 @@ public abstract class StrategyYM extends Strategy {
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:55", "America/New_York");
         int multiplier = 5;// contract multiplier
+        double bidAskSpread = 1; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
-        setStrategy(contract, tradingSchedule, multiplier, commission, BIDASKSPREAD, BarSize.Minute1);
+        setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread, BarSize.Minute1);
     }
 
 }

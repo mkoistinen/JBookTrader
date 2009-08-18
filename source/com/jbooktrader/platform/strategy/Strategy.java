@@ -35,6 +35,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     private boolean isActive;
     private int position;
     private long time;
+    private double bidAskSpread;
     private boolean isC2enabled;
     private String c2SystemId;
     private long lastInstant;
@@ -86,6 +87,14 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     protected void setPosition(int position) {
         this.position = position;
+    }
+
+    public double getBidAskSpread() {
+        return bidAskSpread;
+    }
+
+    public void setBidAskSpread(double bidAskSpread) {
+        this.bidAskSpread = bidAskSpread;
     }
 
     public void closePosition() {
@@ -162,9 +171,8 @@ public abstract class Strategy implements Comparable<Strategy> {
         strategyReportManager = new StrategyReportManager(this);
         TraderAssistant traderAssistant = Dispatcher.getTrader().getAssistant();
         marketBook = traderAssistant.createMarketBook(this);
-        traderAssistant.setBidAskSpread(bidAskSpread);
+        setBidAskSpread(bidAskSpread);
         indicatorManager = new IndicatorManager();
-
     }
 
     public MarketBook getMarketBook() {
