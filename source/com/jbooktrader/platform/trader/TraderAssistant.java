@@ -30,6 +30,7 @@ public class TraderAssistant {
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isConnected;
+    private boolean isOrderExecutionPending;
 
 
     public TraderAssistant(Trader trader) {
@@ -212,8 +213,17 @@ public class TraderAssistant {
         this.accountCode = accountCode;
     }
 
+    public void resetOrderExecutionPending() {
+        isOrderExecutionPending = false;
+    }
+
     private synchronized void placeOrder(Contract contract, Order order, Strategy strategy) {
         try {
+            if (isOrderExecutionPending) {
+                return;
+            }
+
+            isOrderExecutionPending = true;
             orderID++;
             Dispatcher.Mode mode = Dispatcher.getMode();
             if (mode == Trade || mode == ForwardTest) {

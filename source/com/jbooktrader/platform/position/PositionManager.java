@@ -20,10 +20,8 @@ public class PositionManager {
     private final Report eventReport;
     private final TraderAssistant traderAssistant;
     private final PerformanceManager performanceManager;
-
     private int position;
     private double avgFillPrice;
-    private volatile boolean orderExecutionPending;
 
     public PositionManager(Strategy strategy) {
         this.strategy = strategy;
@@ -70,7 +68,6 @@ public class PositionManager {
 
 
         performanceManager.updateOnTrade(quantity, avgFillPrice, position);
-        orderExecutionPending = false;
 
         Dispatcher.Mode mode = Dispatcher.getMode();
         if (mode == BackTest) {
@@ -91,29 +88,21 @@ public class PositionManager {
         }
     }
 
-    public void resetOrderExecutionPending() {
-        orderExecutionPending = false;
-    }
-
     public void trade() {
-        if (!orderExecutionPending) {
-            int newPosition = strategy.getPosition();
-            int quantity = newPosition - position;
-            if (quantity != 0) {
-                orderExecutionPending = true;
-
-                if (strategy.isC2enabled()) {
-                    Dispatcher.Mode mode = Dispatcher.getMode();
-                    if (mode == Trade || mode == ForwardTest) {
-                        Collective2Gateway c2g = new Collective2Gateway(strategy.getC2SystemId());
-                        c2g.send(position, newPosition);
-                    }
+        int newPosition = strategy.getPosition();
+        int quantity = newPosition - position;
+        if (quantity != 0) {
+            if (strategy.isC2enabled()) {
+                Dispatcher.Mode mode = Dispatcher.getMode();
+                if (mode == Trade || mode == ForwardTest) {
+                    Collective2Gateway c2g = new Collective2Gateway(strategy.getC2SystemId());
+                    c2g.send(position, newPosition);
                 }
-
-                String action = (quantity > 0) ? "BUY" : "SELL";
-                Contract contract = strategy.getContract();
-                traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);
             }
+
+            String action = (quantity > 0) ? "BUY" : "SELL";
+            Contract contract = strategy.getContract();
+            traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);
         }
     }
 }
