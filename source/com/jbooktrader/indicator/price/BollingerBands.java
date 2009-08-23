@@ -84,5 +84,9 @@ public class BollingerBands extends Indicator {
     public double getLowerBand() {
         return mean - sigma * multiple;
     }
+        
+    public double getWidth() {
+    	return sigma * multiple * 2;
+    }
 
 }
