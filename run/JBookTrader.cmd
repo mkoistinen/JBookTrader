@@ -11,6 +11,7 @@ set cp=%cp%;%appHome%/lib/junit-4.5.jar
 set cp=%cp%;%appHome%/lib/jcalendar-1.3.3.jar
 set cp=%cp%;%appHome%/lib/substance-5.2.jar
 set cp=%cp%;%appHome%/lib/substance-extras-5.1.jar
+set cp=%cp%;%appHome%/lib/commons-net-2.0.jar
 
 set javaOptions=-XX:+AggressiveHeap
 set mainClass=com.jbooktrader.platform.startup.JBookTrader

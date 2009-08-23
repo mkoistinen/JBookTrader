@@ -3,6 +3,7 @@ package com.jbooktrader.platform.strategy;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.trader.*;
+import com.jbooktrader.platform.util.*;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -10,16 +11,21 @@ import java.util.concurrent.*;
 public class StrategyRunner {
     private final Collection<Strategy> strategies;
     private final TraderAssistant traderAssistant;
+    private final NTPClock ntpClock;
     private Collection<MarketBook> marketBooks;
     private static StrategyRunner instance;
 
     class SnapshotHandler implements Runnable {
         public void run() {
             try {
+                long ntpTime = ntpClock.getTime();
+                long delay = 1000 - ntpTime % 1000;
+                Thread.sleep(delay);
+
                 if (marketBooks != null) {
                     for (MarketBook marketBook : marketBooks) {
-                        long time = System.currentTimeMillis();
-                        MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(time);
+                        long snapshotTime = ntpTime + delay;
+                        MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(snapshotTime);
                         if (marketSnapshot != null) {
                             marketBook.setSnapshot(marketSnapshot);
                             marketBook.saveSnapshot(marketSnapshot);
@@ -46,10 +52,11 @@ public class StrategyRunner {
     }
 
     private StrategyRunner() {
+        ntpClock = new NTPClock();
         traderAssistant = Dispatcher.getTrader().getAssistant();
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleAtFixedRate(new SnapshotHandler(), 0, 1, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(new SnapshotHandler(), 0, 500, TimeUnit.MILLISECONDS);
     }
 
     public void addListener(Strategy strategy) {
