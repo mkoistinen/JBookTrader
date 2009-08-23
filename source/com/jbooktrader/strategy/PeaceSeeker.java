@@ -41,10 +41,10 @@ public class PeaceSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 5, 30, 1, 11);
-        addParam(SLOW_PERIOD, 900, 4500, 5, 3168);
-        addParam(TREND_PERIOD, 150, 450, 5, 188);
-        addParam(ENTRY, 11, 18, 1, 17);
+        addParam(FAST_PERIOD, 8, 17, 1, 12);
+        addParam(SLOW_PERIOD, 2500, 4000, 5, 2972);
+        addParam(TREND_PERIOD, 140, 300, 5, 224);
+        addParam(ENTRY, 157, 177, 1, 171);
     }
 
     /**
@@ -53,7 +53,7 @@ public class PeaceSeeker extends StrategyES {
      */
     @Override
     public void onBookChange() {
-        double balanceVelocity = balanceVelocityInd.getValue();
+        double balanceVelocity = balanceVelocityInd.getValue() * 10;
         double volatilityVelocity = volatilityVelocityInd.getValue();
         if (volatilityVelocity <= 0) {
             if (balanceVelocity >= entry) {
