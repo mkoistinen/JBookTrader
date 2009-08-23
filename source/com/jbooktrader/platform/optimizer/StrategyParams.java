@@ -55,12 +55,12 @@ public class StrategyParams {
         return params.get(index);
     }
 
-    public StrategyParam get(String name) throws JBookTraderException {
+    public StrategyParam get(String name) throws RuntimeException {
         for (StrategyParam param : params) {
             if (param.getName().equals(name)) {
                 return param;
             }
         }
-        throw new JBookTraderException("Parameter " + name + " is not defined.");
+        throw new RuntimeException("Parameter " + name + " is not defined.");
     }
 }
