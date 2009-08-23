@@ -21,10 +21,10 @@ public class StrategyRunner {
                 long ntpTime = ntpClock.getTime();
                 long delay = 1000 - ntpTime % 1000;
                 Thread.sleep(delay);
+                long snapshotTime = ntpTime + delay;
 
                 if (marketBooks != null) {
                     for (MarketBook marketBook : marketBooks) {
-                        long snapshotTime = ntpTime + delay;
                         MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(snapshotTime);
                         if (marketSnapshot != null) {
                             marketBook.setSnapshot(marketSnapshot);

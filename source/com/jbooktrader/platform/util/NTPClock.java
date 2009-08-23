@@ -29,14 +29,16 @@ public class NTPClock {
 
     public long getTime() {
         TimeInfo timeInfo = null;
+
         while (timeInfo == null) {
             try {
                 timeInfo = ntp.getTime(host);
             } catch (Exception e) {
-                // ignore
+                // ignore and retry
             }
         }
 
-        return timeInfo.getReturnTime();
+        timeInfo.computeDetails();
+        return System.currentTimeMillis() + timeInfo.getOffset();
     }
 }
