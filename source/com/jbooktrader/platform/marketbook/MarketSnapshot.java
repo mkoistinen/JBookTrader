@@ -5,17 +5,17 @@ package com.jbooktrader.platform.marketbook;
  */
 public class MarketSnapshot {
     private final long time;
-    private final int balance;
+    private final double balance;
     private final double price;
 
 
-    public MarketSnapshot(long time, int balance, double price) {
+    public MarketSnapshot(long time, double balance, double price) {
         this.time = time;
         this.balance = balance;
         this.price = price;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 

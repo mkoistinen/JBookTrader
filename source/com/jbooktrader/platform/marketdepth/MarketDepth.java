@@ -1,7 +1,9 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
+import com.jbooktrader.platform.util.*;
 
+import java.text.*;
 import java.util.*;
 
 /**
@@ -9,20 +11,23 @@ import java.util.*;
  */
 public class MarketDepth {
     private final LinkedList<MarketDepthItem> bids, asks;
-    private boolean isResetting;
-    private double lowBalance, highBalance, lastBalance;
+    private final LinkedList<Double> balances;
+    private double averageBalance;
     private double midPointPrice;
+    private final DecimalFormat df2;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
         asks = new LinkedList<MarketDepthItem>();
-        isResetting = true;
+        balances = new LinkedList<Double>();
+        df2 = NumberFormatterFactory.getNumberFormatter(2);
     }
 
+
     public void reset() {
-        isResetting = true;
         bids.clear();
         asks.clear();
+        balances.clear();
     }
 
 
@@ -37,6 +42,7 @@ public class MarketDepth {
 
         return cumulativeSize / uniquePriceLevels.size();
     }
+
 
     synchronized public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
         List<MarketDepthItem> items = (side == MarketDepthSide.Bid) ? bids : asks;
@@ -64,32 +70,36 @@ public class MarketDepth {
 
 
         if (operation == MarketDepthOperation.Update) {
-            int cumulativeBid = getCumulativeSize(bids);
-            int cumulativeAsk = getCumulativeSize(asks);
-            double totalDepth = cumulativeBid + cumulativeAsk;
+            if (!bids.isEmpty() && !asks.isEmpty()) {
+                int cumulativeBid = getCumulativeSize(bids);
+                int cumulativeAsk = getCumulativeSize(asks);
+                double totalDepth = cumulativeBid + cumulativeAsk;
 
-            lastBalance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
-            lowBalance = Math.min(lastBalance, lowBalance);
-            highBalance = Math.max(lastBalance, highBalance);
-
-            midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
-            isResetting = false;
+                double balance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
+                balances.add(balance);
+                midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
+            }
         }
     }
 
 
     synchronized public MarketSnapshot getMarketSnapshot(long time) {
-        if (isResetting) {
+        if (midPointPrice == 0) {
+            // This is normal. It happens at the very start when market depth is initializing.
             return null;
         }
 
-        int balance = (int) Math.round((lowBalance + highBalance) / 2d);
-        MarketSnapshot marketSnapshot = new MarketSnapshot(time, balance, midPointPrice);
-        // reset values for the next market snapshot
-        highBalance = lowBalance = lastBalance;
+        if (!balances.isEmpty()) {
+            double multiplier = 2. / (balances.size() + 1.);
+            for (double balance : balances) {
+                averageBalance += (balance - averageBalance) * multiplier;
+            }
+        }
+
+        double oneSecondBalance = Double.valueOf(df2.format(averageBalance));
+        MarketSnapshot marketSnapshot = new MarketSnapshot(time, oneSecondBalance, midPointPrice);
+        balances.clear();
 
         return marketSnapshot;
     }
-
-
 }
