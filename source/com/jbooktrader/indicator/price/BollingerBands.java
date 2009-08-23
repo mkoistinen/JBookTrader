@@ -83,6 +83,6 @@ public class BollingerBands extends Indicator {
      */
     public double getLowerBand() {
         return mean - sigma * multiple;
-	}
+    }
 
 }
