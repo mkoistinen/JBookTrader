@@ -9,44 +9,49 @@ import com.jbooktrader.platform.report.*;
 import java.io.*;
 import java.net.*;
 
-public class Collective2Gateway {
+public class C2Manager {
+    private final C2TableModel c2TableModel;
     private static final String COLLECTIVE2_URL = "http://www.collective2.com/cgi-perl/signal.mpl";
-    private final String systemId;
     private final String password;
     private static final Report report = Dispatcher.getReporter();
 
-    public Collective2Gateway(String systemId) {
-        this.systemId = systemId;
+    public C2Manager() {
+        c2TableModel = new C2TableModel();
         password = PreferencesHolder.getInstance().get(Collective2Password);
     }
 
 
-    public void send(int currentPosition, int newPosition) {
-        Collective2Sender c2Sender = Collective2Sender.getInstance();
-        C2Action c2Action = null;
-        int quantity;
+    public void sendSignal(String strategyName, int currentPosition, int newPosition) {
+        C2Value c2Value = c2TableModel.getStrategy(strategyName);
 
-        if (currentPosition * newPosition < 0) {
-            // reverse
-            quantity = Math.abs(newPosition);
-        } else {
-            quantity = Math.abs(newPosition - currentPosition);
-            if (newPosition > currentPosition) {
-                c2Action = (currentPosition < 0) ? BuyToClose : BuyToOpen;
+        if (c2Value.getIsEnabled()) {
+            String c2SystemId = c2Value.getId();
+            C2Sender c2Sender = C2Sender.getInstance();
+            C2Action c2Action = null;
+            int quantity;
+
+            if (currentPosition * newPosition < 0) {
+                // reverse
+                quantity = Math.abs(newPosition);
             } else {
-                c2Action = (currentPosition > 0) ? SellToClose : SellToOpen;
+                quantity = Math.abs(newPosition - currentPosition);
+                if (newPosition > currentPosition) {
+                    c2Action = (currentPosition < 0) ? BuyToClose : BuyToOpen;
+                } else {
+                    c2Action = (currentPosition > 0) ? SellToClose : SellToOpen;
+                }
             }
-        }
 
-        try {
-            URL url = createURL(c2Action, quantity);
-            c2Sender.submit(url);
-        } catch (Exception e) {
-            report.report(e);
+            try {
+                URL url = createURL(c2SystemId, c2Action, quantity);
+                c2Sender.submit(url);
+            } catch (Exception e) {
+                report.report(e);
+            }
         }
     }
 
-    private URL createURL(C2Action c2Action, int quantity) throws MalformedURLException, IllegalArgumentException, Collective2Exception {
+    private URL createURL(String systemId, C2Action c2Action, int quantity) throws MalformedURLException, IllegalArgumentException, C2Exception {
         StringBuffer params;
         try {
             params = new StringBuffer(COLLECTIVE2_URL);
@@ -65,7 +70,7 @@ public class Collective2Gateway {
             params.append("&instrument=future");
             params.append("&symbol=").append(URLEncoder.encode("@ESU9", "US-ASCII"));
         } catch (UnsupportedEncodingException e) {
-            throw new Collective2Exception(e);
+            throw new C2Exception(e);
         }
 
         return new URL(params.toString());

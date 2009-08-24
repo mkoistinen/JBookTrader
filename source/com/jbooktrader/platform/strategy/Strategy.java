@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
@@ -36,8 +35,6 @@ public abstract class Strategy implements Comparable<Strategy> {
     private int position;
     private long time;
     private double bidAskSpread;
-    private boolean isC2enabled;
-    private String c2SystemId;
     private long lastInstant;
 
     /**
@@ -51,10 +48,10 @@ public abstract class Strategy implements Comparable<Strategy> {
     abstract protected void setParams();
 
     /**
-     * Framework calls this method when the last snapshot was more than 1 hour ago
+     * Framework calls this method when the last snapshot was more than 1 hour ago.
+     * Override in implementing strategy as required.
      */
     protected void reset() {
-        // Override in implementing strategy as required.
     }
 
 
@@ -107,14 +104,6 @@ public abstract class Strategy implements Comparable<Strategy> {
             }
         }
     }
-
-    public void setCollective2() {
-        C2TableModel c2TableModel = new C2TableModel();
-        C2Value c2Value = c2TableModel.getStrategy(name);
-        isC2enabled = c2Value.getIsEnabled();
-        c2SystemId = c2Value.getId();
-    }
-
 
     public StrategyParams getParams() {
         return params;
@@ -192,15 +181,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         return name;
     }
 
-
-    public boolean isC2enabled() {
-        return isC2enabled;
-    }
-
-    public String getC2SystemId() {
-        return c2SystemId;
-    }
-
     public void processInstant(long instant, boolean isInSchedule) {
         setTime(instant);
         indicatorManager.updateIndicators();
@@ -243,7 +223,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         return sb.toString();
     }
 
-    // Implementing Comparable interface
+
     public int compareTo(Strategy other) {
         return getName().compareTo(other.getName());
     }

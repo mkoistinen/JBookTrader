@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.position;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.performance.*;
@@ -92,12 +91,9 @@ public class PositionManager {
         int newPosition = strategy.getPosition();
         int quantity = newPosition - position;
         if (quantity != 0) {
-            if (strategy.isC2enabled()) {
-                Dispatcher.Mode mode = Dispatcher.getMode();
-                if (mode == Trade || mode == ForwardTest) {
-                    Collective2Gateway c2g = new Collective2Gateway(strategy.getC2SystemId());
-                    c2g.send(position, newPosition);
-                }
+            Dispatcher.Mode mode = Dispatcher.getMode();
+            if (mode == Trade || mode == ForwardTest) {
+                Dispatcher.getC2Manager().sendSignal(strategy.getName(), position, newPosition);
             }
 
             String action = (quantity > 0) ? "BUY" : "SELL";

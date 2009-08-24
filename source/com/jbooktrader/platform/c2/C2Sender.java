@@ -9,20 +9,20 @@ import java.util.*;
 import java.util.concurrent.*;
 
 
-public class Collective2Sender extends Thread {
+public class C2Sender extends Thread {
     private static final Report report = Dispatcher.getReporter();
     private static boolean shutdown;
     private final Queue<URL> urls;
-    private static Collective2Sender instance;
+    private static C2Sender instance;
 
-    private Collective2Sender() {
+    private C2Sender() {
         urls = new ConcurrentLinkedQueue<URL>();
         start();
     }
 
-    public synchronized static Collective2Sender getInstance() {
+    public synchronized static C2Sender getInstance() {
         if (instance == null) {
-            instance = new Collective2Sender();
+            instance = new C2Sender();
         }
         return instance;
     }

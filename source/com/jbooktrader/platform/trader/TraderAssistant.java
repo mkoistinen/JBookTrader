@@ -193,7 +193,6 @@ public class TraderAssistant {
         if (mode == ForwardTest || mode == Trade) {
             String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
             eventReport.report(msg);
-            strategy.setCollective2();
             requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);
             strategy.setIsActive(true);

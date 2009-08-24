@@ -3,7 +3,6 @@ package com.jbooktrader.platform.c2;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
-import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 import java.util.*;
@@ -27,18 +26,17 @@ public class C2TableModel extends TableDataModel {
             c2Strategies.put(name, c2Value);
         }
 
-        List<Strategy> strategies = ClassFinder.getStrategies();
-        for (Strategy strategy : strategies) {
-            String strategyName = strategy.getName();
+        List<String> strategies = ClassFinder.getClasses();
+        for (String name : strategies) {
             String systemId = "";
             boolean isSelected = false;
-            C2Value c2Value = c2Strategies.get(strategyName);
+            C2Value c2Value = c2Strategies.get(name);
             if (c2Value != null) {
                 systemId = c2Value.getId();
                 isSelected = c2Value.getIsEnabled();
             }
 
-            Object[] row = {strategy.getName(), systemId, isSelected};
+            Object[] row = {name, systemId, isSelected};
             addRow(row);
         }
     }
