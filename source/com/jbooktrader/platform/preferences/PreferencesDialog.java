@@ -14,9 +14,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class PreferencesDialog extends JBTDialog {
-    private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
+    private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 25);
     private final PreferencesHolder prefs;
-    private JTextField hostText, portText, webAccessUser;
+    private JTextField hostText, portText, webAccessUser, ntpTimeServer;
     private JSpinner clientIDSpin, webAccessPortSpin;
     private JPasswordField webAccessPasswordField, c2PasswordField;
     private JComboBox webAccessCombo, tableLayoutCombo, lookAndFeelCombo, substanceSkinComboSelector;
@@ -76,11 +76,11 @@ public class PreferencesDialog extends JBTDialog {
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 
-        JTabbedPane tabbedPane1 = new JTabbedPane();
-        contentPanel.add(tabbedPane1, BorderLayout.CENTER);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        contentPanel.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel connectionTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("TWS Connection", connectionTab);
+        tabbedPane.addTab("TWS Connection", connectionTab);
         hostText = new JTextField();
         portText = new JTextField();
         clientIDSpin = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
@@ -91,7 +91,7 @@ public class PreferencesDialog extends JBTDialog {
         setWidth(connectionTab, clientIDSpin, 45);
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Web Access", webAcessTab);
+        tabbedPane.addTab("Web Access", webAcessTab);
         webAccessCombo = new JComboBox(new String[] {"disabled", "enabled"});
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
@@ -105,7 +105,7 @@ public class PreferencesDialog extends JBTDialog {
         SpringUtilities.makeCompactGrid(webAcessTab, 5, 2, 12, 12, 8, 8);
 
         JPanel c2Tab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Collective2", c2Tab);
+        tabbedPane.addTab("Collective2", c2Tab);
         JPanel passwordPanel = new JPanel(new SpringLayout());
         c2PasswordField = new JPasswordField();
         add(passwordPanel, Collective2Password, c2PasswordField);
@@ -119,8 +119,14 @@ public class PreferencesDialog extends JBTDialog {
         c2Table.setShowGrid(false);
         scrollPane.getViewport().add(c2Table);
 
+        JPanel timeServerTab = new JPanel(new SpringLayout());
+        tabbedPane.addTab("Time Server", timeServerTab);
+        ntpTimeServer = new JTextField();
+        add(timeServerTab, NTPTimeServer, ntpTimeServer);
+        SpringUtilities.makeCompactGrid(timeServerTab, 1, 2, 12, 12, 8, 8);
+
         JPanel lookAndFeelTab = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Look & Feel", lookAndFeelTab);
+        tabbedPane.addTab("Look & Feel", lookAndFeelTab);
         lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Native"});
         add(lookAndFeelTab, LookAndFeel, lookAndFeelCombo);
         substanceSkinComboSelector = new SubstanceSkinComboSelector();
@@ -168,6 +174,8 @@ public class PreferencesDialog extends JBTDialog {
 
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());
+
+                    prefs.set(NTPTimeServer, ntpTimeServer.getText());
 
                     prefs.set(LookAndFeel, (String) lookAndFeelCombo.getSelectedItem());
                     SkinInfo skinInfo = (SkinInfo) substanceSkinComboSelector.getSelectedItem();

@@ -13,6 +13,8 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
+import java.text.*;
+import java.util.*;
 
 /**
  * Main application window. All the system logic is intentionally left out if this class,
@@ -20,11 +22,14 @@ import java.net.*;
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private final Toolkit toolkit;
+    private JLabel timeLabel;
     private JMenuItem exitMenuItem, aboutMenuItem, userManualMenuItem, discussionMenuItem, releaseNotesMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem;
     private StrategyTableModel strategyTableModel;
     private JTable strategyTable;
     private JPopupMenu popupMenu;
+    private Calendar ntpTime;
+    private SimpleDateFormat sdf;
 
     public MainFrameDialog() throws JBookTraderException {
         toolkit = Toolkit.getDefaultToolkit();
@@ -42,6 +47,11 @@ public class MainFrameDialog extends JFrame implements ModelListener {
             case Error:
                 String msg = (String) value;
                 MessageDialog.showError(msg);
+                break;
+            case TimeUpdate:
+                long time = (Long) value;
+                ntpTime.setTimeInMillis(time);
+                timeLabel.setText(sdf.format(ntpTime.getTime()));
                 break;
             case StrategyUpdate:
                 Strategy strategy = (Strategy) value;
@@ -165,6 +175,9 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
 
+        ntpTime = Calendar.getInstance();
+        sdf = new SimpleDateFormat("HH:mm:ss");
+
         // session menu
         JMenu sessionMenu = new JMenu("Session");
         sessionMenu.setMnemonic('S');
@@ -250,9 +263,11 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         add(strategyTableScrollPane, BorderLayout.CENTER);
 
         JToolBar statusBar = new JToolBar();
+        statusBar.setLayout(new BorderLayout());
         statusBar.setFloatable(false);
-        statusBar.setRollover(false);
-        statusBar.add(new JLabel(" "));
+        timeLabel = new JLabel(" ");
+
+        statusBar.add(timeLabel, BorderLayout.EAST);
         add(statusBar, BorderLayout.SOUTH);
 
         setMinimumSize(new Dimension(600, 200));

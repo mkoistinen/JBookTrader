@@ -22,6 +22,7 @@ public class StrategyRunner {
                 long delay = 1000 - ntpTime % 1000;
                 Thread.sleep(delay);
                 long snapshotTime = ntpTime + delay;
+                Dispatcher.fireModelChanged(ModelListener.Event.TimeUpdate, snapshotTime);
 
                 if (marketBooks != null) {
                     for (MarketBook marketBook : marketBooks) {

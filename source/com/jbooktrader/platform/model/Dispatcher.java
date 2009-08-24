@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.model;
 
 
+import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.web.*;
@@ -33,6 +34,7 @@ public class Dispatcher {
     private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
     private static Report eventReport;
     private static Trader trader;
+    private static C2Manager c2Manager;
     private static Mode mode;
     private static int activeStrategies;
 
@@ -66,6 +68,14 @@ public class Dispatcher {
         }
         return trader;
     }
+
+    synchronized public static C2Manager getC2Manager() {
+        if (c2Manager == null) {
+            c2Manager = new C2Manager();
+        }
+        return c2Manager;
+    }
+
 
     public static Report getReporter() {
         return eventReport;

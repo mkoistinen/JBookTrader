@@ -1,23 +1,21 @@
 package com.jbooktrader.platform.util;
 
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.preferences.*;
 import org.apache.commons.net.ntp.*;
 
 import java.net.*;
 import java.util.concurrent.*;
 
-/*
--------- Server Pools --------
-Worldwide: 	 pool.ntp.org
-Asia: 	asia.pool.ntp.org
-Europe: 	europe.pool.ntp.org
-North America: 	north-america.pool.ntp.org
-Oceania: 	oceania.pool.ntp.org
-South America: 	south-america.pool.ntp.org
-*/
+/**
+ * NTPClock uses Apache's NTPUPDClient which implements the Network Time Protocol (RFC-1305) specification:
+ * http://www.faqs.org/ftp/rfc/rfc1305.pdf
+ * <p/>
+ * NTPClock does not synchronize the computer's clock, but merely uses NTP time to timestamp incoming market data.
+ */
 public class NTPClock {
-    private static final String HOST_NAME = "ntp2.usno.navy.mil";
-    private final NTPUDPClient ntp;
+    private static final String ERROR_MSG = "Problem while requesting time from server";
+    private final NTPUDPClient ntpClient;
     private final InetAddress host;
     private long offset;
 
@@ -29,7 +27,7 @@ public class NTPClock {
 
     private void getAttributes() {
         try {
-            TimeInfo timeInfo = ntp.getTime(host);
+            TimeInfo timeInfo = ntpClient.getTime(host);
             timeInfo.computeDetails();
             NtpV3Packet message = timeInfo.getMessage();
 
@@ -44,26 +42,27 @@ public class NTPClock {
             Dispatcher.getReporter().report(msg);
 
         } catch (Exception e) {
-            Dispatcher.getReporter().report("Problem while requesting time from server " + HOST_NAME + ": " + e.getMessage());
+            Dispatcher.getReporter().report(ERROR_MSG + "host " + ": " + e.getMessage());
         }
     }
 
 
     private void getOffset() {
         try {
-            TimeInfo timeInfo = ntp.getTime(host);
+            TimeInfo timeInfo = ntpClient.getTime(host);
             timeInfo.computeDetails();
             offset = timeInfo.getOffset();
         } catch (Exception e) {
-            Dispatcher.getReporter().report("Problem while requesting time from server " + HOST_NAME + ": " + e.getMessage());
+            Dispatcher.getReporter().report(ERROR_MSG + "host " + ": " + e.getMessage());
         }
     }
 
     public NTPClock() {
-        ntp = new NTPUDPClient();
-        ntp.setDefaultTimeout(5000);
+        ntpClient = new NTPUDPClient();
+        ntpClient.setDefaultTimeout(5000);
         try {
-            host = InetAddress.getByName(HOST_NAME);
+            String hostName = PreferencesHolder.getInstance().get(JBTPreferences.NTPTimeServer);
+            host = InetAddress.getByName(hostName);
         } catch (UnknownHostException uhe) {
             Dispatcher.getReporter().report(uhe);
             throw new RuntimeException(uhe);

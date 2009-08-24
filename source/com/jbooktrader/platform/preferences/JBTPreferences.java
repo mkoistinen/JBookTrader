@@ -58,6 +58,9 @@ public enum JBTPreferences {
     Collective2Password("C2 Password", ""),
     Collective2Strategies("C2 Strategies", ""),
 
+    // Time Server
+    NTPTimeServer("NTP time server", "ntp2.usno.navy.mil"),
+
     // Look & Feel
     LookAndFeel("Look & Feel", "Substance"),
     Skin("Skin", "Mist Aqua");
