@@ -1,14 +1,15 @@
-package com.jbooktrader.strategy.base;
+package com.jbooktrader.strategy;
 
 import com.jbooktrader.indicator.velocity.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.strategy.base.*;
 
 /**
  *
  */
-public abstract class Predator extends StrategyES {
+public class Predator extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendVelocityInd;
@@ -30,6 +31,20 @@ public abstract class Predator extends StrategyES {
         trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
         addIndicator(trendVelocityInd);
+    }
+
+    /**
+     * Adds parameters to strategy. Each parameter must have 5 values:
+     * name: identifier
+     * min, max, step: range for optimizer
+     * value: used in backtesting and trading
+     */
+    @Override
+    public void setParams() {
+        addParam(FAST_PERIOD, 3, 15, 1, 7);
+        addParam(SLOW_PERIOD, 1700, 3500, 100, 2630);
+        addParam(TREND_PERIOD, 400, 750, 100, 600);
+        addParam(ENTRY, 16, 21, 1, 19);
     }
 
     /**
