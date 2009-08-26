@@ -148,6 +148,18 @@ public class Trader extends EWrapperAdapter {
                 traderAssistant.setIsConnected(true);
             }
 
+            // Error 322 occurs from time to time when the first order is submitted. The cause is unknown,
+            // it's assumed to be a bug in the IB API. When this error is generated, the order is rejected
+            // with a message such as this: Error processing request:-'ub' : cause - jextend.ub.f(ub.java:1193)
+            // To get around this problem, we simply request executions for open orders. If the order execution
+            // is not found, another order would be submitted.
+            if (errorCode == 322) {
+                if (!traderAssistant.getOpenOrders().isEmpty()) {
+                    eventReport.report("Checking for executions after error 322.");
+                    traderAssistant.requestExecutions();
+                }
+            }
+
             if (errorCode == 317) {// Market depth data has been reset
                 traderAssistant.getMarketBook(id).getMarketDepth().reset();
                 eventReport.report("Market data for book " + id + " has been reset.");
