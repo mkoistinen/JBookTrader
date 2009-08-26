@@ -13,7 +13,7 @@ import com.jbooktrader.platform.util.*;
  *
  */
 public abstract class StrategyES extends Strategy {
-    /*
+     /*
       * MARGIN REQUIREMENTS for ES: GLOBEX as of 13-July-2009
       * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
       *

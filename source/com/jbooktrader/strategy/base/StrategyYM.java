@@ -13,7 +13,7 @@ import com.jbooktrader.platform.util.*;
  *
  */
 public abstract class StrategyYM extends Strategy {
-    /*
+     /*
       * MARGIN REQUIREMENTS for YM: ECBOT as of 13-July-2009
       *
       * Initial Intra-day: $3,250
@@ -21,7 +21,7 @@ public abstract class StrategyYM extends Strategy {
       * Initial Overnight: $6,500
       * Overnight Maintenance: $5,200
       */
-	
+
     protected StrategyYM(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
