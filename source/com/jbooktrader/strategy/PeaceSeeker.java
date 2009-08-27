@@ -41,10 +41,10 @@ public class PeaceSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 8, 17, 1, 11);
-        addParam(SLOW_PERIOD, 2500, 4000, 5, 3050);
-        addParam(TREND_PERIOD, 140, 300, 5, 188);
-        addParam(ENTRY, 157, 185, 1, 172);
+        addParam(FAST_PERIOD, 1, 30, 1, 6);
+        addParam(SLOW_PERIOD, 1000, 5000, 100, 3900);
+        addParam(TREND_PERIOD, 100, 900, 10, 264);
+        addParam(ENTRY, 160, 220, 1, 179);
     }
 
     /**
