@@ -14,7 +14,7 @@ import java.util.concurrent.*;
  * NTPClock does not synchronize the computer's clock, but merely uses NTP time to timestamp incoming market data.
  */
 public class NTPClock {
-    private static final String ERROR_MSG = "Problem while requesting time from server";
+    private static final String ERROR_MSG = "Problem while requesting time from server ";
     private final NTPUDPClient ntpClient;
     private final InetAddress host;
     private long offset;
@@ -41,8 +41,9 @@ public class NTPClock {
 
             Dispatcher.getReporter().report(msg);
 
+
         } catch (Exception e) {
-            Dispatcher.getReporter().report(ERROR_MSG + "host " + ": " + e.getMessage());
+            Dispatcher.getReporter().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
     }
 
@@ -53,7 +54,7 @@ public class NTPClock {
             timeInfo.computeDetails();
             offset = timeInfo.getOffset();
         } catch (Exception e) {
-            Dispatcher.getReporter().report(ERROR_MSG + "host " + ": " + e.getMessage());
+            Dispatcher.getReporter().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
     }
 
