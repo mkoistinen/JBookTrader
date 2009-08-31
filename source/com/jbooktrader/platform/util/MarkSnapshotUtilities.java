@@ -23,16 +23,11 @@ public abstract class MarkSnapshotUtilities {
         final long toDate = calendar.getTimeInMillis();
 
 
-        MarketSnapshotFilter filter = new MarketSnapshotFilter() {
-
+        return new MarketSnapshotFilter() {
             public boolean accept(MarketSnapshot marketSnapshot) {
-                return (marketSnapshot.getTime() >= fromDate && marketSnapshot.getTime() <= toDate);
+                long snapshotTime = marketSnapshot.getTime();
+                return (snapshotTime >= fromDate && snapshotTime <= toDate);
             }
-
         };
-
-        return filter;
     }
-
-
 }
