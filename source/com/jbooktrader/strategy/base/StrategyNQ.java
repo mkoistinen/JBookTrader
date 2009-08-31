@@ -13,15 +13,15 @@ import com.jbooktrader.platform.util.*;
  *
  */
 public abstract class StrategyNQ extends Strategy {
-     /*
-      * MARGIN REQUIREMENTS for NQ: GLOBEX as of 13-July-2009
-      * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
-      *
-      * Initial Intra-day: $1,750
-      * Intra-day Maintenance: $1,400
-      * Initial Overnight: $3,500
-      * Overnight Maintenance: $2,800
-      */
+    /*
+    * MARGIN REQUIREMENTS for NQ: GLOBEX as of 13-July-2009
+    * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
+    *
+    * Initial Intra-day: $1,750
+    * Intra-day Maintenance: $1,400
+    * Initial Overnight: $3,500
+    * Overnight Maintenance: $2,800
+    */
 
     protected StrategyNQ(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);

@@ -13,15 +13,15 @@ import com.jbooktrader.platform.util.*;
  *
  */
 public abstract class StrategyES extends Strategy {
-     /*
-      * MARGIN REQUIREMENTS for ES: GLOBEX as of 13-July-2009
-      * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
-      *
-      * Initial Intra-day: $2,813
-      * Intra-day Maintenance: $2,250
-      * Initial Overnight: $5,625
-      * Overnight Maintenance: $4,500
-      */
+    /*
+    * MARGIN REQUIREMENTS for ES: GLOBEX as of 13-July-2009
+    * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
+    *
+    * Initial Intra-day: $2,813
+    * Intra-day Maintenance: $2,250
+    * Initial Overnight: $5,625
+    * Overnight Maintenance: $4,500
+    */
 
     protected StrategyES(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);

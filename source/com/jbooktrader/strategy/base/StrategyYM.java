@@ -13,15 +13,15 @@ import com.jbooktrader.platform.util.*;
  *
  */
 public abstract class StrategyYM extends Strategy {
-     /*
-      * MARGIN REQUIREMENTS for YM: ECBOT as of 13-July-2009
-      * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
-      *
-      * Initial Intra-day: $3,250
-      * Intra-day Maintenance: $2,600
-      * Initial Overnight: $6,500
-      * Overnight Maintenance: $5,200
-      */
+    /*
+    * MARGIN REQUIREMENTS for YM: ECBOT as of 13-July-2009
+    * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
+    *
+    * Initial Intra-day: $3,250
+    * Intra-day Maintenance: $2,600
+    * Initial Overnight: $6,500
+    * Overnight Maintenance: $5,200
+    */
 
     protected StrategyYM(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
