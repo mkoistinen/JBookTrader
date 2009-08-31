@@ -12,7 +12,7 @@ import com.jbooktrader.strategy.base.*;
 public class Defensive extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, trendVelocityInd;
+    private final Indicator balanceVelocityInd, trendStrengthVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
@@ -29,9 +29,9 @@ public class Defensive extends StrategyES {
 
         entry = getParam(ENTRY);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        trendVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
+        trendStrengthVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
         addIndicator(balanceVelocityInd);
-        addIndicator(trendVelocityInd);
+        addIndicator(trendStrengthVelocityInd);
     }
 
     /**
@@ -42,10 +42,10 @@ public class Defensive extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 30, 1, 8);
-        addParam(SLOW_PERIOD, 2000, 5000, 100, 4350);
-        addParam(TREND_PERIOD, 600, 900, 10, 717);
-        addParam(ENTRY, 150, 190, 1, 171);
+        addParam(FAST_PERIOD, 1, 30, 1, 10);
+        addParam(SLOW_PERIOD, 1000, 5000, 100, 3485);
+        addParam(TREND_PERIOD, 200, 900, 10, 716);
+        addParam(ENTRY, 150, 220, 1, 166);
     }
 
     /**
@@ -55,21 +55,23 @@ public class Defensive extends StrategyES {
     @Override
     public void onBookChange() {
         double balanceVelocity = balanceVelocityInd.getValue() * 10;
-        double trendVelocity = trendVelocityInd.getValue();
-        if (trendVelocity < 0) {
+        double trendStrengthVelocity = trendStrengthVelocityInd.getValue();
+
+        int currentPosition = getPositionManager().getPosition();
+        if (currentPosition > 0 && balanceVelocity <= -entry) {
+            setPosition(0);
+        }
+        if (currentPosition < 0 && balanceVelocity >= entry) {
+            setPosition(0);
+        }
+
+        if (trendStrengthVelocity < 0) {
             if (balanceVelocity >= entry) {
                 setPosition(1);
             } else if (balanceVelocity <= -entry) {
                 setPosition(-1);
             }
-        } else {
-            int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && balanceVelocity <= -entry) {
-                setPosition(0);
-            }
-            if (currentPosition < 0 && balanceVelocity >= entry) {
-                setPosition(0);
-            }
         }
+
     }
 }
