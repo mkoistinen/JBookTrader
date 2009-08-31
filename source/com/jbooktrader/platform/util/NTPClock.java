@@ -19,6 +19,14 @@ public class NTPClock {
     private final NTPUDPClient ntpClient;
     private final InetAddress host;
     private AtomicLong offset;
+    private static NTPClock instance;
+
+    synchronized public static NTPClock getInstance() {
+        if (instance == null) {
+            instance = new NTPClock();
+        }
+        return instance;
+    }
 
     private class NTPClockPoller implements Runnable {
         public void run() {
@@ -26,7 +34,7 @@ public class NTPClock {
         }
     }
 
-    private void getAttributes() {
+    public void reportAttributes() {
         try {
             TimeInfo timeInfo = ntpClient.getTime(host);
             timeInfo.computeDetails();
@@ -59,7 +67,8 @@ public class NTPClock {
         }
     }
 
-    public NTPClock() {
+    // private constructor for non-instantiability
+    private NTPClock() {
         ntpClient = new NTPUDPClient();
         ntpClient.setDefaultTimeout(5000);
         offset = new AtomicLong();
@@ -71,7 +80,6 @@ public class NTPClock {
             throw new RuntimeException(uhe);
         }
 
-        getAttributes();
         getOffset();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleWithFixedDelay(new NTPClockPoller(), 0, 1, TimeUnit.MINUTES);

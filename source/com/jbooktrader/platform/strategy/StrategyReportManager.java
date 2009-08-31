@@ -17,7 +17,7 @@ public class StrategyReportManager {
     private final List<String> strategyReportHeaders;
     private final Strategy strategy;
     private final DecimalFormat df2, df5;
-    private final SimpleDateFormat sdf;
+    private final SimpleDateFormat dateFormat, timeFormat;
     private final List<Object> strategyReportColumns;
     private final PositionManager positionManager;
     private final PerformanceManager performanceManager;
@@ -30,13 +30,17 @@ public class StrategyReportManager {
 
         df2 = NumberFormatterFactory.getNumberFormatter(2);
         df5 = NumberFormatterFactory.getNumberFormatter(5);
-        sdf = new SimpleDateFormat("HH:mm:ss MM/dd/yy z");
-        sdf.setTimeZone(strategy.getTradingSchedule().getTimeZone());
+        TimeZone timeZone = strategy.getTradingSchedule().getTimeZone();
+        dateFormat = new SimpleDateFormat("MM/dd/yy");
+        dateFormat.setTimeZone(timeZone);
+        timeFormat = new SimpleDateFormat("HH:mm:ss.SSS z");
+        timeFormat.setTimeZone(timeZone);
 
 
         strategyReportColumns = new ArrayList<Object>();
         strategyReportHeaders = new ArrayList<String>();
-        strategyReportHeaders.add("Time & Date");
+        strategyReportHeaders.add("Date");
+        strategyReportHeaders.add("Time");
         strategyReportHeaders.add("Trade #");
         strategyReportHeaders.add("Price");
         strategyReportHeaders.add("Position");
@@ -44,7 +48,6 @@ public class StrategyReportManager {
         strategyReportHeaders.add("Commission");
         strategyReportHeaders.add("Trade Net Profit");
         strategyReportHeaders.add("Total Net Profit");
-
     }
 
     public void report() {
@@ -69,7 +72,13 @@ public class StrategyReportManager {
         strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");
         strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
 
-        strategyReport.report(strategyReportColumns, sdf.format(strategy.getTime()));
+        Dispatcher.Mode mode = Dispatcher.getMode();
+        boolean useNTPTime = (mode == Dispatcher.Mode.ForwardTest || mode == Dispatcher.Mode.Trade);
+
+        long now = useNTPTime ? NTPClock.getInstance().getTime() : strategy.getTime();
+        String date = dateFormat.format(now);
+        String time = timeFormat.format(now);
+        strategyReport.report(strategyReportColumns, date, time);
     }
 
 }
