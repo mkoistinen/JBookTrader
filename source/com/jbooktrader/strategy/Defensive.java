@@ -42,10 +42,10 @@ public class Defensive extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 30, 1, 10);
-        addParam(SLOW_PERIOD, 1000, 5000, 100, 3485);
-        addParam(TREND_PERIOD, 200, 900, 10, 716);
-        addParam(ENTRY, 150, 220, 1, 166);
+        addParam(FAST_PERIOD, 1, 30, 1, 11);
+        addParam(SLOW_PERIOD, 500, 5000, 100, 3485);
+        addParam(TREND_PERIOD, 100, 900, 10, 611);
+        addParam(ENTRY, 80, 220, 1, 165);
     }
 
     /**
