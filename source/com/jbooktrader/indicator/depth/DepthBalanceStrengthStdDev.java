@@ -18,7 +18,7 @@ public class DepthBalanceStrengthStdDev extends Indicator {
     private final int period;
 
     private LinkedList<Double> history = new LinkedList<Double>();
-    private double strength, sum, mean, sum_sqr;
+    private double sum, mean, sum_sqr;
 
     public DepthBalanceStrengthStdDev(int period) {
         this.period = period;
@@ -33,7 +33,7 @@ public class DepthBalanceStrengthStdDev extends Indicator {
 
     @Override
     public void calculate() {
-        strength = Math.abs(marketBook.getSnapshot().getBalance());
+        double strength = Math.abs(marketBook.getSnapshot().getBalance());
 
         history.addLast(strength);
         sum += strength;

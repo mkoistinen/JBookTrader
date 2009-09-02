@@ -505,7 +505,7 @@ public class OptimizerDialog extends JBTDialog {
     public MarketSnapshotFilter getDateFilter() {
         MarketSnapshotFilter filter = null;
         if (useDateRangeCheckBox.isSelected()) {
-            filter = MarkSnapshotUtilities.getMarketDepthFilter(fromDateEditor, toDateEditor);
+            filter = MarketSnapshotUtils.getMarketDepthFilter(fromDateEditor, toDateEditor);
         }
         return filter;
     }

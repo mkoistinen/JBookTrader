@@ -11,7 +11,7 @@ import java.util.*;
 /**
  *
  */
-public abstract class MarkSnapshotUtilities {
+public abstract class MarketSnapshotUtils {
 
     public static MarketSnapshotFilter getMarketDepthFilter(JTextFieldDateEditor fromDateEditor, JTextFieldDateEditor toDateEditor) {
         Calendar calendar = Calendar.getInstance();

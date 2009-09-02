@@ -115,12 +115,10 @@ public class BackTestFileReader {
                         marketSnapshot = null;
                     }
                 }
-            } // while
-        }
-        catch (IOException ioe) {
+            }
+        } catch (IOException ioe) {
             throw new RuntimeException("Could not read data file");
-        }
-        catch (JBookTraderException e) {
+        } catch (JBookTraderException e) {
             String errorMsg = "";
             if (lineNumber > 0) {
                 errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;

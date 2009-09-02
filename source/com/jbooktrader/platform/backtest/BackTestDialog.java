@@ -278,7 +278,7 @@ public class BackTestDialog extends JBTDialog {
         MarketSnapshotFilter filter = null;
 
         if (useDateRangeCheckBox.isSelected()) {
-            filter = MarkSnapshotUtilities.getMarketDepthFilter(fromDateEditor, toDateEditor);
+            filter = MarketSnapshotUtils.getMarketDepthFilter(fromDateEditor, toDateEditor);
         }
 
         return filter;

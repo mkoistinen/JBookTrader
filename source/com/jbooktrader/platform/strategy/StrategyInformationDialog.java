@@ -10,7 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.*;
 
-public final class StrategyInformationDialog extends JBTDialog {
+public class StrategyInformationDialog extends JBTDialog {
     private final Strategy strategy;
 
     public StrategyInformationDialog(JFrame parent, Strategy strategy) {

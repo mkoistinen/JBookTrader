@@ -24,7 +24,7 @@ public class BollingerBands extends Indicator {
     private final double multiple;
 
     private LinkedList<Double> history = new LinkedList<Double>();
-    private double price, sum, mean, sum_sqr, sigma;
+    private double sum, mean, sum_sqr, sigma;
 
     public BollingerBands(int period) {
         this(period, 1.0);
@@ -44,7 +44,7 @@ public class BollingerBands extends Indicator {
 
     @Override
     public void calculate() {
-        price = marketBook.getSnapshot().getPrice();
+        double price = marketBook.getSnapshot().getPrice();
 
         history.addLast(price);
         sum += price;

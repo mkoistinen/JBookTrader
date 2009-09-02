@@ -6,8 +6,6 @@ public class PriceEMA extends Indicator {
 
     private final double alpha;
 
-    private double price;
-
     public PriceEMA(int period) {
         this.alpha = 2.0 / (period + 1.0);
         reset();
@@ -20,7 +18,7 @@ public class PriceEMA extends Indicator {
 
     @Override
     public void calculate() {
-        price = marketBook.getSnapshot().getPrice();
+        double price = marketBook.getSnapshot().getPrice();
         value += alpha * (price - value);
     }
 

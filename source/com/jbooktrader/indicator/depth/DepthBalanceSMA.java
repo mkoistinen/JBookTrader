@@ -9,7 +9,7 @@ public class DepthBalanceSMA extends Indicator {
     private final int period;
 
     private LinkedList<Double> history = new LinkedList<Double>();
-    private double balance, sum;
+    private double sum;
 
     public DepthBalanceSMA(int period) {
         this.period = period;
@@ -26,7 +26,7 @@ public class DepthBalanceSMA extends Indicator {
     @Override
     public void calculate() {
 
-        balance = marketBook.getSnapshot().getBalance();
+        double balance = marketBook.getSnapshot().getBalance();
         history.addLast(balance);
         sum += balance;
 
