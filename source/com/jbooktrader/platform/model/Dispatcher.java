@@ -32,14 +32,14 @@ public class Dispatcher {
 
 
     private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
-    private static Report eventReport;
+    private static EventReport eventReport;
     private static Trader trader;
     private static C2Manager c2Manager;
     private static Mode mode;
     private static int activeStrategies;
 
     public static void setReporter() throws JBookTraderException {
-        eventReport = new Report("EventReport");
+        eventReport = new EventReport("EventReport");
     }
 
     public static void addListener(ModelListener listener) {
@@ -77,7 +77,7 @@ public class Dispatcher {
     }
 
 
-    public static Report getReporter() {
+    public static EventReport getEventReport() {
         return eventReport;
     }
 
@@ -99,9 +99,9 @@ public class Dispatcher {
         // Disable all reporting when JBT runs in optimization mode. The optimizer runs
         // thousands of strategies, and the amount of data to report would be enormous.
         if (mode == Mode.Optimization) {
-            Report.disable();
+            EventReport.disable();
         } else {
-            Report.enable();
+            EventReport.enable();
         }
 
         if (mode == Mode.Trade || mode == Mode.ForwardTest) {

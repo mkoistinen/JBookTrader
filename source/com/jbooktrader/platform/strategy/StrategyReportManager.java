@@ -18,10 +18,10 @@ public class StrategyReportManager {
     private final Strategy strategy;
     private final DecimalFormat df2, df5;
     private final SimpleDateFormat dateFormat, timeFormat;
-    private final List<Object> strategyReportColumns;
+    private final List<String> strategyReportColumns;
     private final PositionManager positionManager;
     private final PerformanceManager performanceManager;
-    private Report strategyReport;
+    private StrategyReport strategyReport;
 
     public StrategyReportManager(Strategy strategy) {
         this.strategy = strategy;
@@ -37,7 +37,7 @@ public class StrategyReportManager {
         timeFormat.setTimeZone(timeZone);
 
 
-        strategyReportColumns = new ArrayList<Object>();
+        strategyReportColumns = new ArrayList<String>();
         strategyReportHeaders = new ArrayList<String>();
         strategyReportHeaders.add("Date");
         strategyReportHeaders.add("Time");
@@ -53,7 +53,7 @@ public class StrategyReportManager {
     public void report() {
         if (strategyReport == null) {
             try {
-                strategyReport = new Report(strategy.getName());
+                strategyReport = new StrategyReport(strategy.getName());
             } catch (JBookTraderException e) {
                 throw new RuntimeException(e);
             }
@@ -64,9 +64,9 @@ public class StrategyReportManager {
         boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
 
         strategyReportColumns.clear();
-        strategyReportColumns.add(isCompletedTrade ? performanceManager.getTrades() : "--");
+        strategyReportColumns.add(isCompletedTrade ? String.valueOf(performanceManager.getTrades()) : "--");
         strategyReportColumns.add(df5.format(marketSnapshot.getPrice()));
-        strategyReportColumns.add(positionManager.getPosition());
+        strategyReportColumns.add(String.valueOf(positionManager.getPosition()));
         strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
         strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
         strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");

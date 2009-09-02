@@ -13,14 +13,14 @@ import java.util.*;
  * This class acts as a "wrapper" in the IB's API terminology.
  */
 public class Trader extends EWrapperAdapter {
-    private final Report eventReport;
+    private final EventReport eventReport;
     private final TraderAssistant traderAssistant;
     private String previousErrorMessage;
 
     public Trader() {
         traderAssistant = new TraderAssistant(this);
         previousErrorMessage = "";
-        eventReport = Dispatcher.getReporter();
+        eventReport = Dispatcher.getEventReport();
     }
 
     public TraderAssistant getAssistant() {

@@ -16,7 +16,7 @@ import java.util.*;
 public class PositionManager {
     private final LinkedList<Position> positionsHistory;
     private final Strategy strategy;
-    private final Report eventReport;
+    private final EventReport eventReport;
     private final TraderAssistant traderAssistant;
     private final PerformanceManager performanceManager;
     private int position;
@@ -25,7 +25,7 @@ public class PositionManager {
     public PositionManager(Strategy strategy) {
         this.strategy = strategy;
         positionsHistory = new LinkedList<Position>();
-        eventReport = Dispatcher.getReporter();
+        eventReport = Dispatcher.getEventReport();
         traderAssistant = Dispatcher.getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
     }

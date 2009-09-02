@@ -23,9 +23,9 @@ public class MonitoringServer {
                     context.setAuthenticator(new WebAuthenticator());
                     server.setExecutor(Executors.newSingleThreadExecutor());
                     server.start();
-                    Dispatcher.getReporter().report("Monitoring server started");
+                    Dispatcher.getEventReport().report("Monitoring server started");
                 } catch (Exception e) {
-                    Dispatcher.getReporter().report(e);
+                    Dispatcher.getEventReport().report(e);
                     MessageDialog.showError("Could not start monitoring server: " + e);
                 }
             }

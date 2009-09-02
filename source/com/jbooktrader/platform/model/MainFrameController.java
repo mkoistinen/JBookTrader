@@ -65,7 +65,7 @@ public class MainFrameController {
         try {
             Browser.openURL(url);
         } catch (Throwable t) {
-            Dispatcher.getReporter().report(t);
+            Dispatcher.getEventReport().report(t);
             MessageDialog.showError(t);
         }
     }

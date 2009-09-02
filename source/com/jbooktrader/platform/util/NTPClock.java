@@ -48,11 +48,11 @@ public class NTPClock {
             msg += ", dispersion (ms):" + message.getRootDispersionInMillisDouble();
             msg += "]";
 
-            Dispatcher.getReporter().report(msg);
+            Dispatcher.getEventReport().report(msg);
 
 
         } catch (Exception e) {
-            Dispatcher.getReporter().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
+            Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
     }
 
@@ -63,7 +63,7 @@ public class NTPClock {
             timeInfo.computeDetails();
             offset.set(timeInfo.getOffset());
         } catch (Exception e) {
-            Dispatcher.getReporter().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
+            Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
     }
 
@@ -76,7 +76,7 @@ public class NTPClock {
             String hostName = PreferencesHolder.getInstance().get(JBTPreferences.NTPTimeServer);
             host = InetAddress.getByName(hostName);
         } catch (UnknownHostException uhe) {
-            Dispatcher.getReporter().report(uhe);
+            Dispatcher.getEventReport().report(uhe);
             throw new RuntimeException(uhe);
         }
 

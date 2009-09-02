@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 
 
 public class C2Sender extends Thread {
-    private static final Report report = Dispatcher.getReporter();
+    private static final EventReport report = Dispatcher.getEventReport();
     private static boolean shutdown;
     private final Queue<URL> urls;
     private static C2Sender instance;

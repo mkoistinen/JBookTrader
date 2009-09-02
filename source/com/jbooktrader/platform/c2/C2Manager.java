@@ -13,7 +13,7 @@ public class C2Manager {
     private final C2TableModel c2TableModel;
     private static final String COLLECTIVE2_URL = "http://www.collective2.com/cgi-perl/signal.mpl";
     private final String password;
-    private static final Report report = Dispatcher.getReporter();
+    private static final EventReport report = Dispatcher.getEventReport();
 
     public C2Manager() {
         c2TableModel = new C2TableModel();

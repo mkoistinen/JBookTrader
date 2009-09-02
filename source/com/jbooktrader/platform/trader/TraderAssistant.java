@@ -23,7 +23,7 @@ public class TraderAssistant {
     private final Map<String, Integer> tickers;
     private final Set<Integer> subscribedTickers;
     private final Map<Integer, MarketBook> marketBooks;
-    private final Report eventReport;
+    private final EventReport eventReport;
     private final Trader trader;
 
     private EClientSocket socket;
@@ -36,7 +36,7 @@ public class TraderAssistant {
     public TraderAssistant(Trader trader) {
         this.trader = trader;
 
-        eventReport = Dispatcher.getReporter();
+        eventReport = Dispatcher.getEventReport();
         strategies = new HashMap<Integer, Strategy>();
         openOrders = new HashMap<Integer, OpenOrder>();
         tickers = new HashMap<String, Integer>();

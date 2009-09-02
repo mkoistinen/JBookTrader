@@ -22,7 +22,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final StrategyParams params;
     private MarketBook marketBook;
-    private final Report eventReport;
+    private final EventReport eventReport;
     private final String name;
     private Contract contract;
     private TradingSchedule tradingSchedule;
@@ -62,7 +62,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         }
 
         name = getClass().getSimpleName();
-        eventReport = Dispatcher.getReporter();
+        eventReport = Dispatcher.getEventReport();
     }
 
     public void setMarketBook(MarketBook marketBook) {

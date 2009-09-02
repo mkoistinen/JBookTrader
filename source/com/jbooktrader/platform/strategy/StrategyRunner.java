@@ -41,7 +41,7 @@ public class StrategyRunner {
                     Dispatcher.fireModelChanged(ModelListener.Event.TimeUpdate, snapshotTime);
                 }
             } catch (Throwable t) {
-                Dispatcher.getReporter().report(t);
+                Dispatcher.getEventReport().report(t);
             }
         }
     }

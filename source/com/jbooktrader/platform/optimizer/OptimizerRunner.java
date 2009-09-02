@@ -22,7 +22,6 @@ public abstract class OptimizerRunner implements Runnable {
     protected long snapshotCount;
     protected boolean cancelled;
     protected final int availableProcessors;
-
     private static final int MAX_SAVED_RESULTS = 100;// max number of results in the optimization results file
     private final Constructor<?> strategyConstructor;
     private final ScheduledExecutorService progressExecutor, resultsTableExecutor;
@@ -163,16 +162,15 @@ public abstract class OptimizerRunner implements Runnable {
             return;
         }
 
-        Report.enable();
         String fileName = strategyName + "Optimizer";
-        Report optimizerReport = new Report(fileName);
+        OptimizationReport optimizationReport = new OptimizationReport(fileName);
 
-        optimizerReport.reportDescription("Strategy parameters:");
+        optimizationReport.reportDescription("Strategy parameters:");
         for (StrategyParam param : strategyParams.getAll()) {
-            optimizerReport.reportDescription(param.toString());
+            optimizationReport.reportDescription(param.toString());
         }
-        optimizerReport.reportDescription("Minimum trades for strategy inclusion: " + optimizerDialog.getMinTrades());
-        optimizerReport.reportDescription("Back data file: " + optimizerDialog.getFileName());
+        optimizationReport.reportDescription("Minimum trades for strategy inclusion: " + optimizerDialog.getMinTrades());
+        optimizationReport.reportDescription("Back data file: " + optimizerDialog.getFileName());
 
         List<String> otpimizerReportHeaders = new ArrayList<String>();
         StrategyParams params = optimizationResults.iterator().next().getParams();
@@ -183,28 +181,28 @@ public abstract class OptimizerRunner implements Runnable {
         for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
             otpimizerReportHeaders.add(performanceMetric.getName());
         }
-        optimizerReport.report(otpimizerReportHeaders);
+        optimizationReport.report(otpimizerReportHeaders);
 
         int maxIndex = Math.min(MAX_SAVED_RESULTS, optimizationResults.size());
         for (int index = 0; index < maxIndex; index++) {
             OptimizationResult optimizationResult = optimizationResults.get(index);
             params = optimizationResult.getParams();
 
-            List<Object> columns = new ArrayList<Object>();
+            List<String> columns = new ArrayList<String>();
             for (StrategyParam param : params.getAll()) {
-                columns.add(param.getValue());
+                columns.add(nf0.format(param.getValue()));
             }
 
-            columns.add(optimizationResult.getTrades());
+            columns.add(nf0.format(optimizationResult.getTrades()));
             columns.add(nf0.format(optimizationResult.getNetProfit()));
             columns.add(nf0.format(optimizationResult.getMaxDrawdown()));
             columns.add(nf2.format(optimizationResult.getProfitFactor()));
             columns.add(nf0.format(optimizationResult.getKellyCriterion()));
             columns.add(nf2.format(optimizationResult.getPerformanceIndex()));
 
-            optimizerReport.report(columns);
+            optimizationReport.report(columns);
         }
-        Report.disable();
+
     }
 
     private void showFastProgress(long counter, String text) {
