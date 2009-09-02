@@ -3,9 +3,16 @@ package com.jbooktrader.platform.report;
 import com.jbooktrader.platform.model.*;
 
 
-public final class OptimizationReport extends StrategyReport {
+public class OptimizationReport extends StrategyReport {
 
-    public OptimizationReport(String fileName) throws JBookTraderException {
-        super(fileName);
+    public OptimizationReport(String reportName) throws JBookTraderException {
+        super(reportName);
     }
+
+    public void reportDescription(String message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(message).append(FIELD_BREAK);
+        write(sb);
+    }
+    
 }

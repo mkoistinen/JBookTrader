@@ -3,28 +3,35 @@ package com.jbooktrader.platform.report;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.*;
 import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
 import java.text.*;
 import java.util.*;
 
 
-public final class EventReport extends Report {
-    private static boolean isDisabled;
+public class EventReport extends Report {
+    private boolean isEnabled;
     protected final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
     protected final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS z");
 
+    public EventReport(String reportName) throws JBookTraderException {
+        super(reportName);
 
-    public EventReport(String fileName) throws JBookTraderException {
-        super(fileName);
+        isEnabled = true;
+        StringBuilder startupMessage = new StringBuilder();
+        startupMessage.append("<b>");
+        startupMessage.append("New Report Started.").append(" JBT Version: ").append(JBookTrader.VERSION);
+        startupMessage.append("</b>");
+        report(startupMessage);
     }
 
-    public static void disable() {
-        isDisabled = true;
+    public void disable() {
+        isEnabled = false;
     }
 
-    public static void enable() {
-        isDisabled = false;
+    public void enable() {
+        isEnabled = true;
     }
 
     private void report(StringBuilder message) {
@@ -38,23 +45,18 @@ public final class EventReport extends Report {
         write(s);
     }
 
-
     public void report(String message) {
-        if (!isDisabled) {
+        if (isEnabled) {
             report(new StringBuilder(message));
         }
     }
-
 
     public void report(Throwable t) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         t.printStackTrace(pw);
         pw.close();
-        boolean saved = isDisabled;
-        isDisabled = false;//always report exceptions
-        report(sw.toString());
-        isDisabled = saved;
+        report(new StringBuilder(sw.toString()));
     }
 
     private Date getDate() {
@@ -65,6 +67,4 @@ public final class EventReport extends Report {
             return new Date();
         }
     }
-
-
 }

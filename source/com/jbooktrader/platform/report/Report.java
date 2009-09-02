@@ -13,36 +13,29 @@ public abstract class Report {
     protected final static String ROW_END = "</tr>";
     protected final static String FIELD_BREAK = "<br>";
 
+    private static final String REPORT_DIR;
     private final PrintWriter writer;
 
-    public Report(String fileName) throws JBookTraderException {
+    static {
         String fileSeparator = System.getProperty("file.separator");
-        String reportDirPath = JBookTrader.getAppPath() + fileSeparator + "reports" + fileSeparator;
-        File reportDir = new File(reportDirPath);
+        REPORT_DIR = JBookTrader.getAppPath() + fileSeparator + "reports" + fileSeparator;
+        File reportDir = new File(REPORT_DIR);
         if (!reportDir.exists()) {
             reportDir.mkdir();
         }
+    }
 
-        String fullFileName = reportDirPath + fileName + ".htm";
+    public Report(String reportName) throws JBookTraderException {
+        String fullFileName = REPORT_DIR + reportName + ".htm";
         try {
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
         } catch (IOException ioe) {
             throw new JBookTraderException(ioe);
         }
+
         StringBuilder sb = new StringBuilder();
-        //String dateAndTime = dateFormat.format(getDate()) + " " + timeFormat.format(getDate());
-        //sb.append("<b>").append("New Report Started: ").append(dateAndTime).append("</b>");
-        reportDescription(sb.toString());
-        sb = new StringBuilder();
-        sb.append("<b>").append("JBT Version: ").append(JBookTrader.VERSION).append("</b>");
+        sb.append("</table><br>"); // close the previously created table, if any
         sb.append("<table border=1 width=100%>");
-        reportDescription(sb.toString());
-    }
-
-
-    public void reportDescription(String message) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(message).append(FIELD_BREAK);
         write(sb);
     }
 

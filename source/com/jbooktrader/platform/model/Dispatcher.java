@@ -93,15 +93,19 @@ public class Dispatcher {
     }
 
     public static void setMode(Mode mode) throws JBookTraderException {
+
+        if (Dispatcher.mode != mode) {
+            eventReport.report("Running mode changed to: " + mode.getName());
+        }
+
         Dispatcher.mode = mode;
-        eventReport.report("Running mode: " + mode.getName());
 
         // Disable all reporting when JBT runs in optimization mode. The optimizer runs
         // thousands of strategies, and the amount of data to report would be enormous.
         if (mode == Mode.Optimization) {
-            EventReport.disable();
+            eventReport.disable();
         } else {
-            EventReport.enable();
+            eventReport.enable();
         }
 
         if (mode == Mode.Trade || mode == Mode.ForwardTest) {

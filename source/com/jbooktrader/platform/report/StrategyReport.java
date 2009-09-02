@@ -7,14 +7,8 @@ import java.util.*;
 
 public class StrategyReport extends Report {
 
-    public StrategyReport(String fileName) throws JBookTraderException {
-        super(fileName);
-    }
-
-    public void reportDescription(String message) {
-        StringBuilder s = new StringBuilder();
-        s.append(message).append(FIELD_BREAK);
-        write(s);
+    public StrategyReport(String reportName) throws JBookTraderException {
+        super(reportName);
     }
 
     public void report(List<String> columns) {
@@ -24,6 +18,7 @@ public class StrategyReport extends Report {
             sb.append(FIELD_START).append(column).append(FIELD_END);
         }
         sb.append(ROW_END);
+
         write(sb);
     }
 
