@@ -30,14 +30,24 @@ public class Dispatcher {
         }
     }
 
-
     private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
     private static EventReport eventReport;
     private static Trader trader;
     private static C2Manager c2Manager;
     private static Mode mode;
     private static int activeStrategies;
+    
+    // We wish to keep track of all 'open' reports.
+    private static List<Report> reports = new ArrayList<Report>();
 
+    public static void registerReport(Report report) {
+    	reports.add(report);
+    }
+    
+    public static void deregisterReport(Report report) {
+    	reports.remove(report);
+    }
+    
     public static void setReporter() throws JBookTraderException {
         eventReport = new EventReport("EventReport");
     }
@@ -89,6 +99,11 @@ public class Dispatcher {
         if (trader != null) {
             trader.getAssistant().disconnect();
         }
+        // Close all the reports and their files.
+        ArrayList<Report> reportsCopy = new ArrayList<Report>(reports);
+        for (Report report: reportsCopy) {
+        	report.close();
+        }
         System.exit(0);
     }
 
@@ -129,4 +144,5 @@ public class Dispatcher {
             fireModelChanged(ModelListener.Event.StrategiesEnd, null);
         }
     }
+    
 }

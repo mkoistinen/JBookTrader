@@ -8,7 +8,7 @@ import java.util.*;
 public class StrategyReport extends Report {
 
     public StrategyReport(String reportName) throws JBookTraderException {
-        super(reportName);
+        super(reportName, "Strategy Report");
     }
 
     public void report(List<String> columns) {

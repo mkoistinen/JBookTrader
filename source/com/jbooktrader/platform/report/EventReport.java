@@ -16,7 +16,7 @@ public class EventReport extends Report {
     protected final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS z");
 
     public EventReport(String reportName) throws JBookTraderException {
-        super(reportName);
+        super(reportName, "Event Report");
 
         isEnabled = true;
         StringBuilder startupMessage = new StringBuilder();
