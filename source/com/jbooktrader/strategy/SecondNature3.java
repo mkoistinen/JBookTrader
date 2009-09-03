@@ -9,7 +9,7 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class SecondNature2 extends StrategyES {
+public class SecondNature3 extends StrategyES {
 
     // Technical indicators
     private final Indicator balanceVelocityInd, trendStrengthVelocityInd;
@@ -23,7 +23,7 @@ public class SecondNature2 extends StrategyES {
     // Strategy parameters values
     private final int entry;
 
-    public SecondNature2(StrategyParams optimizationParams) throws JBookTraderException {
+    public SecondNature3(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -41,10 +41,10 @@ public class SecondNature2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 25, 1, 12);
-        addParam(SLOW_PERIOD, 2000, 4500, 100, 3030);
-        addParam(TREND_PERIOD, 100, 650, 10, 429);
-        addParam(ENTRY, 120, 200, 1, 165);
+        addParam(FAST_PERIOD, 1, 25, 1, 8);
+        addParam(SLOW_PERIOD, 2000, 4500, 100, 3454);
+        addParam(TREND_PERIOD, 100, 650, 10, 296);
+        addParam(ENTRY, 120, 200, 1, 187);
     }
 
     /**
