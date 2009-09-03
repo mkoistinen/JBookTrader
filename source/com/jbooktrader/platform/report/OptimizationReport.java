@@ -14,5 +14,5 @@ public class OptimizationReport extends StrategyReport {
         sb.append(message).append(FIELD_BREAK);
         write(sb);
     }
-    
+
 }

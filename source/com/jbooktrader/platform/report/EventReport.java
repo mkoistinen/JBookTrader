@@ -2,8 +2,8 @@ package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.*;
-import com.jbooktrader.platform.util.*;
 import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.util.*;
 
 import java.io.*;
 import java.text.*;

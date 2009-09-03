@@ -32,7 +32,7 @@ public class StrategyReport extends Report {
             sb.append(FIELD_START).append(column).append(FIELD_END);
         }
         sb.append(ROW_END);
-        
+
         write(sb);
     }
 }
