@@ -109,7 +109,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         return params;
     }
 
-    protected int getParam(String name) throws JBookTraderException {
+    protected int getParam(String name) {
         return params.get(name).getValue();
     }
 
