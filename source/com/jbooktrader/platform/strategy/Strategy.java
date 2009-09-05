@@ -38,9 +38,9 @@ public abstract class Strategy implements Comparable<Strategy> {
     private long lastInstant;
 
     /**
-     * Framework calls this method when order book changes.
+     * Framework calls this method when a new snapshot of the limit order book is taken.
      */
-    public abstract void onBookChange();
+    public abstract void onBookSnapshot();
 
     /**
      * Framework calls this method to set strategy parameter ranges and values.
@@ -192,7 +192,7 @@ public abstract class Strategy implements Comparable<Strategy> {
             lastInstant = instant;
 
             if (indicatorManager.hasValidIndicators()) {
-                onBookChange();
+                onBookSnapshot();
             }
         } else {
             closePosition();// force flat position

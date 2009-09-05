@@ -45,11 +45,12 @@ public class Equalizer extends StrategyES {
     }
 
     /**
-     * This method is invoked by the framework when an order book changes and the technical
-     * indicators are recalculated. This is where the strategy itself should be defined.
+     * Framework invokes this method when a new snapshot of the the order book is taken
+     * and the technical indicators are recalculated. This is where the strategy itself
+     * (i.e., its entry and exit criteria) should be defined.
      */
     @Override
-    public void onBookChange() {
+    public void onBookSnapshot() {
         double balanceVelocity = balanceVelocityInd.getValue();
         if (balanceVelocity >= entry) {
             setPosition(1);

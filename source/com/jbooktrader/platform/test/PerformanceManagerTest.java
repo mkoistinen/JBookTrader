@@ -30,7 +30,7 @@ public class PerformanceManagerTest {
         }
 
         @Override
-        public void onBookChange() {
+        public void onBookSnapshot() {
         }
 
         @Override
