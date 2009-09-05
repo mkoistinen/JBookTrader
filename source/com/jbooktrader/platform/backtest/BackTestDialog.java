@@ -37,14 +37,15 @@ public class BackTestDialog extends JBTDialog {
     private BackTestParamTableModel backTestParamTableModel;
 
 
-    private StrategyParams strategyParams;
+    private final StrategyParams strategyParams;
 
     class ValueColumnRenderer extends DefaultTableCellRenderer {
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             component.setBackground(Color.WHITE);
             component.setForeground(Color.BLACK);
-            setHorizontalAlignment(SwingConstants.RIGHT);
+            setHorizontalAlignment(RIGHT);
             return component;
         }
     }
@@ -278,7 +279,7 @@ public class BackTestDialog extends JBTDialog {
         MarketSnapshotFilter filter = null;
 
         if (useDateRangeCheckBox.isSelected()) {
-            filter = MarketSnapshotUtils.getMarketDepthFilter(fromDateEditor, toDateEditor);
+            filter = new MarketSnapshotFilter(fromDateEditor, toDateEditor);
         }
 
         return filter;

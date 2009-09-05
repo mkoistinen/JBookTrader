@@ -7,8 +7,8 @@ import java.util.*;
  * "Remaining time" estimator for long-running computational processes.
  */
 public class ComputationalTimeEstimator {
-    private final static long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
-    private final static long MIN_ITERATIONS = 15000000;
+    private static final long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
+    private static final long MIN_ITERATIONS = 15000000;
     private final long startTime;
     private final SimpleDateFormat sdf;
     private long totalIterations;

@@ -6,7 +6,7 @@ public class DepthBalanceStrengthEMA extends Indicator {
     private final double multiplier;
 
     public DepthBalanceStrengthEMA(int period) {
-        this.multiplier = 2.0 / (period + 1);
+        multiplier = 2.0 / (period + 1);
         reset();
     }
 

@@ -17,6 +17,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         super(optimizerDialog, strategy, params);
     }
 
+    @Override
     public void optimize() throws JBookTraderException {
         List<StrategyParams> topParams = new ArrayList<StrategyParams>();
         StrategyParams startingParams = new StrategyParams(strategyParams);
@@ -30,7 +31,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         }
 
         int divider = 3;
-        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider / 2.));
+        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider / 2.0));
 
         long completedSteps = 0;
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
@@ -42,7 +43,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
         do {
             tasks.clear();
-            int maxPartsPerDimension = (topParams.size() == 1) ? Math.max(divider, (int) Math.pow(chunkSize, 1. / dimensions)) : divider;
+            int maxPartsPerDimension = (topParams.size() == 1) ? Math.max(divider, (int) Math.pow(chunkSize, 1.0 / dimensions)) : divider;
 
             for (StrategyParams params : topParams) {
                 for (StrategyParam param : params.getAll()) {
@@ -70,7 +71,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             iterationsRemaining--;
             completedSteps += snapshotCount * filteredTasks.size();
 
-            if (optimizationResults.size() == 0 && !cancelled) {
+            if (optimizationResults.isEmpty() && !cancelled) {
                 throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
             }
 

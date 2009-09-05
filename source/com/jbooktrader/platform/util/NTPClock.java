@@ -18,10 +18,10 @@ public class NTPClock {
     private static final String ERROR_MSG = "Problem while requesting time from server ";
     private final NTPUDPClient ntpClient;
     private final InetAddress host;
-    private AtomicLong offset;
+    private final AtomicLong offset;
     private static NTPClock instance;
 
-    synchronized public static NTPClock getInstance() {
+    public static synchronized NTPClock getInstance() {
         if (instance == null) {
             instance = new NTPClock();
         }
@@ -49,8 +49,6 @@ public class NTPClock {
             msg += "]";
 
             Dispatcher.getEventReport().report(msg);
-
-
         } catch (Exception e) {
             Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }

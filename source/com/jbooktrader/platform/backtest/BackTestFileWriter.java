@@ -18,7 +18,7 @@ public class BackTestFileWriter {
     private static final String LINE_SEP = System.getProperty("line.separator");
     private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";
     private final DecimalFormat decimalFormat;
-    private SimpleDateFormat dateFormat;
+    private final SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
     public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws JBookTraderException {

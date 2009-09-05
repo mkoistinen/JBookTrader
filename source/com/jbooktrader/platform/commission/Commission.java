@@ -19,6 +19,7 @@ public class Commission {
         this.maximumPercent = maximumPercent;
     }
 
+    @Override
     public String toString() {
         return (rate + " per share/contract, " + minimum + " minimum per trade");
     }

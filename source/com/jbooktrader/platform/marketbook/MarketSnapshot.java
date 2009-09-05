@@ -27,9 +27,10 @@ public class MarketSnapshot {
         return price;
     }
 
+    @Override
     public String toString() {
         StringBuilder marketDepth = new StringBuilder();
-        marketDepth.append("time: ").append(getTime());
+        marketDepth.append("time: ").append(time);
         marketDepth.append(" balance: ").append(balance);
         marketDepth.append(" price: ").append(price);
 

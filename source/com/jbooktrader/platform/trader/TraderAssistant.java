@@ -16,8 +16,6 @@ import java.util.*;
 
 
 public class TraderAssistant {
-    private final String host;
-    private final int port, clientID;
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
     private final Map<String, Integer> tickers;
@@ -43,10 +41,6 @@ public class TraderAssistant {
         marketBooks = new HashMap<Integer, MarketBook>();
         subscribedTickers = new HashSet<Integer>();
 
-        PreferencesHolder prefs = PreferencesHolder.getInstance();
-        host = prefs.get(Host);
-        port = prefs.getInt(Port);
-        clientID = prefs.getInt(ClientID);
     }
 
     public Map<Integer, OpenOrder> getOpenOrders() {
@@ -88,6 +82,11 @@ public class TraderAssistant {
             eventReport.report("Connecting to TWS");
 
             socket = new EClientSocket(trader);
+            PreferencesHolder prefs = PreferencesHolder.getInstance();
+            String host = prefs.get(Host);
+            int port = prefs.getInt(Port);
+            int clientID = prefs.getInt(ClientID);
+
             socket.eConnect(host, port, clientID);
             if (!socket.isConnected()) {
                 throw new JBookTraderException("Could not connect to TWS. See report for details.");

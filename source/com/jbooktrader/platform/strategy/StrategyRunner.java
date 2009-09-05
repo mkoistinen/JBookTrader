@@ -46,7 +46,7 @@ public class StrategyRunner {
         }
     }
 
-    synchronized public static StrategyRunner getInstance() {
+    public static synchronized StrategyRunner getInstance() {
         if (instance == null) {
             instance = new StrategyRunner();
         }

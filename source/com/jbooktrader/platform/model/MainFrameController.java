@@ -73,6 +73,7 @@ public class MainFrameController {
     private void assignListeners() {
 
         strategyTable.addMouseListener(new MouseAdapter() {
+            @Override
             public void mousePressed(MouseEvent e) {
                 int modifiers = e.getModifiers();
                 boolean actionRequested = (modifiers & InputEvent.BUTTON2_MASK) != 0;
@@ -210,13 +211,13 @@ public class MainFrameController {
                         throw new JBookTraderException(msg);
                     }
 
-                    if (!strategy.getPerformanceChartData().isEmpty()) {
+                    if (strategy.getPerformanceChartData().isEmpty()) {
+                        String msg = "There is no data to chart. Please run a back test first.";
+                        MessageDialog.showMessage(msg);
+                    } else {
                         PerformanceChart spChart = new PerformanceChart(mainViewDialog, strategy);
                         JFrame chartFrame = spChart.getChart();
                         chartFrame.setVisible(true);
-                    } else {
-                        String msg = "There is no data to chart. Please run a back test first.";
-                        MessageDialog.showMessage(msg);
                     }
                 } catch (Throwable t) {
                     MessageDialog.showError(t);

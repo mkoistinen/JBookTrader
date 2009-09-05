@@ -26,7 +26,7 @@ public class MessageDialog {
         });
     }
 
-    public static void showError(final Throwable t) {
+    public static void showError(Throwable t) {
         Dispatcher.getEventReport().report(t);
         showError(t.getMessage());
     }

@@ -13,9 +13,9 @@ public enum ContentType {
     ICO("ico", "image/x-ico"),
     UNKNOWN("unknown", "application/octent-stream");
 
-    private String extension, contentType;
+    private final String extension, contentType;
 
-    private ContentType(String extension, String contentType) {
+    ContentType(String extension, String contentType) {
         this.extension = extension;
         this.contentType = contentType;
     }
@@ -42,7 +42,7 @@ public enum ContentType {
             String ext = resource.substring(dotIndex + 1).toLowerCase();
 
             for (ContentType type : values()) {
-                if (ext.equals(type.extension)) {
+                if (ext.equals(type.getExtension())) {
                     contentType = type;
                     break;
                 }
@@ -52,7 +52,7 @@ public enum ContentType {
         return contentType;
     }
 
-
+    @Override
     public String toString() {
         return "Type: " + extension + ", ContentType: " + contentType;
     }

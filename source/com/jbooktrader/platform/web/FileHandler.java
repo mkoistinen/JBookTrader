@@ -11,7 +11,9 @@ import java.net.*;
 public class FileHandler {
     public boolean handleFile(HttpExchange httpExchange, String resource, ContentType fileType) throws IOException {
 
-        if (resource == null) return false;
+        if (resource == null) {
+            return false;
+        }
 
         File file = new File(resource);
 
@@ -39,7 +41,7 @@ public class FileHandler {
             FileInputStream fileStream = new FileInputStream(resource);
             BufferedInputStream bis = new BufferedInputStream(fileStream);
 
-            byte buffer[] = new byte[8192];
+            byte[] buffer = new byte[8192];
             int bytesRead;
             while ((bytesRead = bis.read(buffer)) != -1) {
                 responseBody.write(buffer, 0, bytesRead);
@@ -68,10 +70,14 @@ public class FileHandler {
         int end = url.length();
 
         int tmp = url.indexOf("?", start);
-        if (tmp > start && tmp < end) end = tmp;
+        if (tmp > start && tmp < end) {
+            end = tmp;
+        }
 
         tmp = url.indexOf("#", start);
-        if (tmp > start && tmp < end) end = tmp;
+        if (tmp > start && tmp < end) {
+            end = tmp;
+        }
 
         if (start > -1 && start < url.length() - 1) {
             return url.substring(start, end);

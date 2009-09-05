@@ -37,10 +37,10 @@ public class BackTester {
         while ((marketSnapshot = backTestFileReader.next()) != null) {
             marketDepthCounter++;
             marketBook.setSnapshot(marketSnapshot);
-            performanceChartData.updatePrice(marketSnapshot);
+            performanceChartData.update(marketSnapshot);
             long instant = marketSnapshot.getTime();
             strategy.processInstant(instant, tradingSchedule.contains(instant));
-            performanceChartData.updateIndicators(indicatorManager.getIndicators(), instant);
+            performanceChartData.update(indicatorManager.getIndicators(), instant);
 
             if (marketDepthCounter % 10000 == 0) {
                 backTestDialog.setProgress(marketDepthCounter, size);

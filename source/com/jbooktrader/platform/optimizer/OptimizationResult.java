@@ -12,12 +12,12 @@ public class OptimizationResult {
 
     public OptimizationResult(StrategyParams params, PerformanceManager performanceManager) {
         this.params = params;
-        this.netProfit = performanceManager.getNetProfit();
-        this.maxDrawdown = performanceManager.getMaxDrawdown();
-        this.trades = performanceManager.getTrades();
-        this.profitFactor = performanceManager.getProfitFactor();
-        this.kellyCriterion = performanceManager.getKellyCriterion();
-        this.performanceIndex = performanceManager.getPerformanceIndex();
+        netProfit = performanceManager.getNetProfit();
+        maxDrawdown = performanceManager.getMaxDrawdown();
+        trades = performanceManager.getTrades();
+        profitFactor = performanceManager.getProfitFactor();
+        kellyCriterion = performanceManager.getKellyCriterion();
+        performanceIndex = performanceManager.getPerformanceIndex();
     }
 
     public StrategyParams getParams() {

@@ -27,7 +27,7 @@ public class DepthBalanceStrengthSMA extends Indicator {
             sum -= balances.removeFirst();
         }
 
-        if (balances.size() > 0) {
+        if (!balances.isEmpty()) {
             value = sum / balances.size();
         }
     }

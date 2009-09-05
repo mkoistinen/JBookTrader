@@ -20,14 +20,14 @@ public class C2Sender extends Thread {
         start();
     }
 
-    public synchronized static C2Sender getInstance() {
+    public static synchronized C2Sender getInstance() {
         if (instance == null) {
             instance = new C2Sender();
         }
         return instance;
     }
 
-    public synchronized static void shutdown() {
+    public static synchronized void shutdown() {
         shutdown = true;
     }
 
@@ -50,6 +50,7 @@ public class C2Sender extends Thread {
     }
 
 
+    @Override
     public void run() {
         while (!shutdown) {
             synchronized (urls) {

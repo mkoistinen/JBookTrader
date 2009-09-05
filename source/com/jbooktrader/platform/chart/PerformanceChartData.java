@@ -34,24 +34,23 @@ public class PerformanceChartData {
     }
 
     public boolean isEmpty() {
-        return prices.size() == 0;
+        return prices.isEmpty();
     }
 
 
     public void addIndicator(Indicator indicator) {
         indicators.put(indicator.getName(), new ArrayList<OHLCDataItem>());
-
-    }
-
-    public void updateNetProfit(TimedValue profitAndLoss) {
-        netProfit.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
     }
 
     public TimeSeries getProfitAndLossSeries() {
         return netProfit;
     }
 
-    public void updateIndicators(List<Indicator> indicatorsToUpdate, long time) {
+    public void update(TimedValue profitAndLoss) {
+        netProfit.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
+    }
+
+    public void update(List<Indicator> indicatorsToUpdate, long time) {
         long frequency = barSize.getSize();
         for (Indicator indicator : indicatorsToUpdate) {
 
@@ -80,11 +79,9 @@ public class PerformanceChartData {
             indicatorBar.setLow(Math.min(value, indicatorBar.getLow()));
             indicatorBar.setHigh(Math.max(value, indicatorBar.getHigh()));
         }
-
     }
 
-
-    public void updatePrice(MarketSnapshot marketSnapshot) {
+    public void update(MarketSnapshot marketSnapshot) {
         long frequency = barSize.getSize();
         long time = marketSnapshot.getTime();
         double price = marketSnapshot.getPrice();

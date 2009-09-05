@@ -13,7 +13,7 @@ public class DepthBalanceRSI extends Indicator {
     private double previousBalance;
 
     public DepthBalanceRSI(int periodLength) {
-        multiplier = 2. / (periodLength + 1.);
+        multiplier = 2.0 / (periodLength + 1.0);
     }
 
     @Override

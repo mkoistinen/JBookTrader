@@ -66,7 +66,7 @@ public class AdvancedOptimizationOptionsDialog extends JBTDialog {
 
         strategiesPerProcessorText = new JTextField();
         strategiesPerProcessorText.setHorizontalAlignment(JTextField.RIGHT);
-        add(contentPanel, JBTPreferences.StrategiesPerProcessor, strategiesPerProcessorText);
+        add(contentPanel, StrategiesPerProcessor, strategiesPerProcessorText);
 
 
         int min = 25;

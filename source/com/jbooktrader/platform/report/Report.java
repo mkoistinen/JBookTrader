@@ -6,11 +6,11 @@ import com.jbooktrader.platform.startup.*;
 import java.io.*;
 
 public abstract class Report {
-    protected final static String FIELD_START = "<td>";
-    protected final static String FIELD_END = "</td>";
-    protected final static String ROW_START = "<tr>";
-    protected final static String ROW_END = "</tr>";
-    protected final static String FIELD_BREAK = "<br>";
+    protected static final String FIELD_START = "<td>";
+    protected static final String FIELD_END = "</td>";
+    protected static final String ROW_START = "<tr>";
+    protected static final String ROW_END = "</tr>";
+    protected static final String FIELD_BREAK = "<br>";
 
     private static final String REPORT_DIR;
     private final PrintWriter writer;

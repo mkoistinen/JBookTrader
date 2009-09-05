@@ -14,6 +14,7 @@ public class WebAuthenticator extends BasicAuthenticator {
         authPair = prefs.get(WebAccessUser) + "/" + prefs.get(WebAccessPassword);
     }
 
+    @Override
     public boolean checkCredentials(String userName, String password) {
         return authPair.equals(userName + "/" + password);
     }

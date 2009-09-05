@@ -10,8 +10,8 @@ public class PriceVelocity extends Indicator {
     private double fast, slow;
 
     public PriceVelocity(int fastPeriod, int slowPeriod) {
-        fastMultiplier = 2. / (fastPeriod + 1.);
-        slowMultiplier = 2. / (slowPeriod + 1.);
+        fastMultiplier = 2.0 / (fastPeriod + 1.0);
+        slowMultiplier = 2.0 / (slowPeriod + 1.0);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class PriceSMA extends Indicator {
             sum -= prices.removeFirst();
         }
 
-        if (prices.size() > 0) {
+        if (!prices.isEmpty()) {
             value = sum / prices.size();
         }
     }

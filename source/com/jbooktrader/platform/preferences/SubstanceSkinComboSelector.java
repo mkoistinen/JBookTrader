@@ -16,7 +16,7 @@ public class SubstanceSkinComboSelector extends JComboBox {
         super(new ArrayList<SkinInfo>(SubstanceLookAndFeel.getAllSkins().values()).toArray());
 
         // set custom renderer to show the skin display name
-        this.setRenderer(new SubstanceDefaultComboBoxRenderer(this) {
+        setRenderer(new SubstanceDefaultComboBoxRenderer(this) {
             @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 return super.getListCellRendererComponent(list, ((SkinInfo) value).getDisplayName(), index, isSelected, cellHasFocus);
@@ -24,14 +24,14 @@ public class SubstanceSkinComboSelector extends JComboBox {
         });
 
         // add an action listener to change skin based on user selection
-        this.addActionListener(new ActionListener() {
+        addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         if (isEnabled()) {
-                            String skinName = ((SkinInfo) SubstanceSkinComboSelector.this.getSelectedItem()).getDisplayName();
+                            String skinName = ((SkinInfo) getSelectedItem()).getDisplayName();
                             LookAndFeelManager.setSubstanceSkin(skinName);
                         }
                     }

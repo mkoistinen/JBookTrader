@@ -44,7 +44,7 @@ public class MarketDepth {
     }
 
 
-    synchronized public void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
+    public synchronized void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
         List<MarketDepthItem> items = (side == MarketDepthSide.Bid) ? bids : asks;
         int levels = items.size();
 
@@ -75,7 +75,7 @@ public class MarketDepth {
                 int cumulativeAsk = getCumulativeSize(asks);
                 double totalDepth = cumulativeBid + cumulativeAsk;
 
-                double balance = 100d * (cumulativeBid - cumulativeAsk) / totalDepth;
+                double balance = 100.0d * (cumulativeBid - cumulativeAsk) / totalDepth;
                 balances.add(balance);
                 midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
             }
@@ -83,14 +83,14 @@ public class MarketDepth {
     }
 
 
-    synchronized public MarketSnapshot getMarketSnapshot(long time) {
+    public synchronized MarketSnapshot getMarketSnapshot(long time) {
         if (midPointPrice == 0) {
             // This is normal. It happens at the very start when market depth is initializing.
             return null;
         }
 
         if (!balances.isEmpty()) {
-            double multiplier = 2. / (balances.size() + 1.);
+            double multiplier = 2.0 / (balances.size() + 1.0);
             for (double balance : balances) {
                 averageBalance += (balance - averageBalance) * multiplier;
             }

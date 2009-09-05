@@ -11,6 +11,7 @@ public class JBTDialog extends JDialog {
         super(owner);
     }
 
+    @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);
         // This is to prevent the dialog from being drawn under the Mac menu bar.

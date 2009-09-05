@@ -57,10 +57,10 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
 
-    OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
+    protected OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         this.optimizerDialog = optimizerDialog;
-        this.strategyName = strategy.getName();
-        this.strategyParams = params;
+        strategyName = strategy.getName();
+        strategyParams = params;
         optimizationResults = new ArrayList<OptimizationResult>();
         snapshots = new LinkedList<MarketSnapshot>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
@@ -112,7 +112,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     protected void setTotalStrategies(long totalStrategies) {
-        this.totalStrategiesString = gnf0.format(totalStrategies);
+        totalStrategiesString = gnf0.format(totalStrategies);
     }
 
     public int getMinTrades() {
@@ -132,7 +132,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     void execute(Queue<StrategyParams> tasks) throws JBookTraderException {
-        if (tasks.size() != 0) {
+        if (!tasks.isEmpty()) {
             Set<Callable<List<OptimizationResult>>> workers = new HashSet<Callable<List<OptimizationResult>>>();
             for (int worker = 0; worker < availableProcessors; worker++) {
                 Callable<List<OptimizationResult>> optimizerWorker = new OptimizerWorker(this, tasks);
@@ -141,7 +141,7 @@ public abstract class OptimizerRunner implements Runnable {
 
             try {
                 // this blocks until all workers are done
-                List<Future<List<OptimizationResult>>> futureResults = optimizationExecutor.invokeAll(workers);
+                optimizationExecutor.invokeAll(workers);
             } catch (InterruptedException ie) {
                 throw new JBookTraderException(ie);
             }
@@ -158,7 +158,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     private void saveToFile() throws JBookTraderException {
-        if (optimizationResults.size() == 0) {
+        if (optimizationResults.isEmpty()) {
             return;
         }
 

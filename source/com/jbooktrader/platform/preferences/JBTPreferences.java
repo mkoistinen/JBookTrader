@@ -68,7 +68,7 @@ public enum JBTPreferences {
 
     private final String name, defaultValue;
 
-    private JBTPreferences(String name, String defaultValue) {
+    JBTPreferences(String name, String defaultValue) {
         this.name = name;
         this.defaultValue = defaultValue;
     }

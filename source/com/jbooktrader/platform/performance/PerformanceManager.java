@@ -43,7 +43,7 @@ public class PerformanceManager {
     }
 
     public double getPercentProfitableTrades() {
-        return (trades == 0) ? 0 : (100d * profitableTrades / trades);
+        return (trades == 0) ? 0 : (100.0d * profitableTrades / trades);
     }
 
     public double getAverageProfitPerTrade() {
@@ -155,7 +155,7 @@ public class PerformanceManager {
 
 
         if (Dispatcher.getMode() == BackTest) {
-            performanceChartData.updateNetProfit(new TimedValue(strategy.getTime(), netProfit));
+            performanceChartData.update(new TimedValue(strategy.getTime(), netProfit));
         }
 
         previousPosition = position;

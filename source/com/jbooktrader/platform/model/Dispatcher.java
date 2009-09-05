@@ -21,7 +21,7 @@ public class Dispatcher {
 
         private final String name;
 
-        private Mode(String name) {
+        Mode(String name) {
             this.name = name;
         }
 
@@ -72,14 +72,14 @@ public class Dispatcher {
         }
     }
 
-    synchronized public static Trader getTrader() {
+    public static synchronized Trader getTrader() {
         if (trader == null) {
             trader = new Trader();
         }
         return trader;
     }
 
-    synchronized public static C2Manager getC2Manager() {
+    public static synchronized C2Manager getC2Manager() {
         if (c2Manager == null) {
             c2Manager = new C2Manager();
         }
@@ -144,5 +144,4 @@ public class Dispatcher {
             fireModelChanged(ModelListener.Event.StrategiesEnd, null);
         }
     }
-    
 }

@@ -174,8 +174,8 @@ public class CMEDataConverter {
                     String askPriceS = line.substring(groupStart + 118, groupStart + 136);
                     boolean isValid = !(bidPriceS.equals(INVALID_PRICE)) && !(askPriceS.equals(INVALID_PRICE));
                     if (isValid) {
-                        double bidPrice = Integer.valueOf(bidPriceS) / 100d;
-                        double askPrice = Integer.valueOf(askPriceS) / 100d;
+                        double bidPrice = Integer.valueOf(bidPriceS) / 100.0d;
+                        double askPrice = Integer.valueOf(askPriceS) / 100.0d;
                         int bidSize = Integer.parseInt(line.substring(groupStart + 82, groupStart + 94));
                         int askSize = Integer.parseInt(line.substring(groupStart + 140, groupStart + 152));
                         marketDepth.update(level, MarketDepthOperation.Update, MarketDepthSide.Bid, bidPrice, bidSize);

@@ -61,7 +61,7 @@ public class JBookTrader {
                 String msg = "Exactly one argument must be passed. Usage: JBookTrader <JBookTraderDirectory>";
                 throw new JBookTraderException(msg);
             }
-            JBookTrader.appPath = args[0];
+            appPath = args[0];
             new JBookTrader();
         } catch (Throwable t) {
             MessageDialog.showError(t);
@@ -69,7 +69,7 @@ public class JBookTrader {
     }
 
     public static String getAppPath() {
-        return JBookTrader.appPath;
+        return appPath;
     }
 
 }

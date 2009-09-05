@@ -8,7 +8,7 @@ public class DepthBalanceSMA extends Indicator {
 
     private final int period;
 
-    private LinkedList<Double> history = new LinkedList<Double>();
+    private final LinkedList<Double> history = new LinkedList<Double>();
     private double sum;
 
     public DepthBalanceSMA(int period) {
@@ -34,7 +34,7 @@ public class DepthBalanceSMA extends Indicator {
             sum -= history.removeFirst();
         }
 
-        if (history.size() > 0) {
+        if (!history.isEmpty()) {
             value = sum / history.size();
         }
     }

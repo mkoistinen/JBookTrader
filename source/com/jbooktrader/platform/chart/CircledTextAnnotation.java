@@ -32,7 +32,7 @@ public class CircledTextAnnotation extends XYTextAnnotation {
             bkColor = Color.RED;
         }
 
-        setBkColor(bkColor);
+        color = bkColor;
         setFont(ANNOTATION_FONT);
         setPaint(Color.BLACK);
         setTextAnchor(TextAnchor.CENTER);

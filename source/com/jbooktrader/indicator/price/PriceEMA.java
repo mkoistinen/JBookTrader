@@ -7,7 +7,7 @@ public class PriceEMA extends Indicator {
     private final double alpha;
 
     public PriceEMA(int period) {
-        this.alpha = 2.0 / (period + 1.0);
+        alpha = 2.0 / (period + 1.0);
         reset();
     }
 

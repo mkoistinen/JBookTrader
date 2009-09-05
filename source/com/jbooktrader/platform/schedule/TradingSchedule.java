@@ -138,6 +138,7 @@ public class TradingSchedule {
         return hours * 60 + minutes;
     }
 
+    @Override
     public String toString() {
         return text;
     }

@@ -3,7 +3,7 @@ package com.jbooktrader.platform.optimizer;
 import java.util.*;
 
 /**
- * Comparator for strategy optimization optimizationResults.
+ * Comparator for strategy optimization results.
  */
 public class ResultComparator implements Comparator<OptimizationResult> {
     private final PerformanceMetric performanceMetric;

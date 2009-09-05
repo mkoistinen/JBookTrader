@@ -17,7 +17,7 @@ public class AboutDialog extends JBTDialog {
 
     /* inner class to define the "about" model */
     private class AboutTableModel extends TableDataModel {
-        public AboutTableModel() {
+        private AboutTableModel() {
             String[] aboutSchema = {"Property", "Value"};
             setSchema(aboutSchema);
         }

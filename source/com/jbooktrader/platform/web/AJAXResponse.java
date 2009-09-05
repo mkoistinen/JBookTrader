@@ -19,6 +19,7 @@ public class AJAXResponse extends TableLayout {
         super(response, strategies);
     }
 
+    @Override
     public void render() {
 
         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
@@ -64,7 +65,9 @@ public class AJAXResponse extends TableLayout {
                     String reportFile = JBookTrader.getAppPath() + WebHandler.REPORT_DIR + strategy.getName() + ".htm";
                     File file = new File(reportFile);
 
-                    if (file.exists()) fileExists = true;
+                    if (file.exists()) {
+                        fileExists = true;
+                    }
                 }
                 catch (Exception e) { /* we don't care */ }
 

@@ -17,7 +17,7 @@ public class PriceVolatilityVelocity extends Indicator {
 
     public PriceVolatilityVelocity(int periodLength) {
         this.periodLength = periodLength;
-        multiplier = 2. / (periodLength + 1.);
+        multiplier = 2.0 / (periodLength + 1.0);
         prices = new LinkedList<Double>();
     }
 

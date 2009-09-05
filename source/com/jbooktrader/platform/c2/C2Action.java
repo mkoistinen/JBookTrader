@@ -8,7 +8,7 @@ public enum C2Action {
 
     private final String code;
 
-    private C2Action(String code) {
+    C2Action(String code) {
         this.code = code;
     }
 

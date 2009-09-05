@@ -19,7 +19,7 @@ public class DepthPriceCorrelation extends Indicator {
         this.periodLength = periodLength;
         prices = new LinkedList<Double>();
         balances = new LinkedList<Double>();
-        multiplier = 2. / (30 + 1.);
+        multiplier = 2.0 / (30 + 1.0);
     }
 
     @Override

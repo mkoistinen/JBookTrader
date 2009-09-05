@@ -13,13 +13,15 @@ public class PriceRSI extends Indicator {
     private double previousPrice;
 
     public PriceRSI(int periodLength) {
-        multiplier = 2. / (periodLength + 1.);
+        multiplier = 2.0 / (periodLength + 1.0);
     }
 
     @Override
     public void calculate() {
         double price = marketBook.getSnapshot().getPrice();
-        if (previousPrice != 0) {
+        if (previousPrice == 0) {
+            value = 50;
+        } else {
             double change = price - previousPrice;
             double up = (change > 0) ? change : 0;
             double down = (change < 0) ? -change : 0;
@@ -27,8 +29,6 @@ public class PriceRSI extends Indicator {
             emaDown += (down - emaDown) * multiplier;
             double sum = emaUp + emaDown;
             value = (sum == 0) ? 50 : (100 * emaUp / sum);
-        } else {
-            value = 50;
         }
         previousPrice = price;
     }

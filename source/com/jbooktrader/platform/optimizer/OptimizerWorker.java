@@ -38,7 +38,7 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
             }
 
 
-            if (strategies.size() != 0) {
+            if (!strategies.isEmpty()) {
                 MarketBook marketBook = new MarketBook();
                 TradingSchedule tradingSchedule = strategies.get(0).getTradingSchedule();
 

@@ -12,7 +12,7 @@ import java.util.*;
  * The data file is used for backtesting and optimization of trading strategies.
  */
 public class BackTestFileReader {
-    public final static int COLUMNS = 4;
+    public static final int COLUMNS = 4;
     private static final String LINE_SEP = System.getProperty("line.separator");
     private final String fileName;
     private long previousTime;

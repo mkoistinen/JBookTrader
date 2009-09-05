@@ -18,9 +18,9 @@ public enum PerformanceMetric {
         return name;
     }
 
-    static public PerformanceMetric getColumn(String name) {
+    public static PerformanceMetric getColumn(String name) {
         for (PerformanceMetric performanceMetric : values()) {
-            if (performanceMetric.getName().equals(name)) {
+            if (performanceMetric.name.equals(name)) {
                 return performanceMetric;
             }
         }

@@ -16,12 +16,12 @@ public enum BarSize {
     private final String name;
     private final int barSize;
 
-    private BarSize(String name, int barSize) {
+    BarSize(String name, int barSize) {
         this.name = name;
         this.barSize = barSize;
     }
 
-    protected String getName() {
+    public String getName() {
         return name;
     }
 

@@ -17,6 +17,7 @@ public class GroupedTableLayout extends TableLayout {
         super(response, strategies);
     }
 
+    @Override
     public void render() {
         response.append("<table>");
         response.append("<tr><th>Strategy</th><th>Position</th><th>Trades</th><th>Max DD</th><th class=\"last\">Net Profit</th></tr>");

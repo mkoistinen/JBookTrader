@@ -10,7 +10,7 @@ public enum MarketDepthSide {
     private static final Map<Integer, MarketDepthSide> sides = new HashMap<Integer, MarketDepthSide>();
 
 
-    private MarketDepthSide(int value) {
+    MarketDepthSide(int value) {
         this.value = value;
     }
 

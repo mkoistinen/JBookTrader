@@ -9,7 +9,7 @@ public class DepthBalanceEMA extends Indicator {
     private final double multiplier;
 
     public DepthBalanceEMA(int length) {
-        multiplier = 2. / (length + 1.);
+        multiplier = 2.0 / (length + 1.0);
     }
 
     @Override

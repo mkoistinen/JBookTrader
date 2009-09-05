@@ -51,12 +51,12 @@ public class ClassFinder {
         try {
             String className = "com.jbooktrader.strategy." + name;
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
-            if (!Modifier.isAbstract(clazz.getModifiers())) {
+            if (Modifier.isAbstract(clazz.getModifiers())) {
+                return null;
+            } else {
                 Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
                 Constructor<?> constructor = clazz.getConstructor(parameterTypes);
                 return (Strategy) constructor.newInstance(params);
-            } else {
-                return null;
             }
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");

@@ -310,7 +310,7 @@ public class OptimizerDialog extends JBTDialog {
         // From date
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
-        fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
+        fromDateEditor.setText(prefs.get(OptimizerTestingPeriodStart));
         fromDatePanel.add(fromDateEditor);
         dateRangePanel.add(fromDatePanel);
 
@@ -318,7 +318,7 @@ public class OptimizerDialog extends JBTDialog {
         JLabel toLabel = new JLabel("to:");
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
-        toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
+        toDateEditor.setText(prefs.get(OptimizerTestingPeriodEnd));
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
@@ -398,7 +398,7 @@ public class OptimizerDialog extends JBTDialog {
         optimizationOptionsPanel.add(advancedOptionsButton);
         advancedOptionsButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new AdvancedOptimizationOptionsDialog((JFrame) OptimizerDialog.this.getParent());
+                new AdvancedOptimizationOptionsDialog((JFrame) getParent());
             }
         });
 
@@ -505,7 +505,7 @@ public class OptimizerDialog extends JBTDialog {
     public MarketSnapshotFilter getDateFilter() {
         MarketSnapshotFilter filter = null;
         if (useDateRangeCheckBox.isSelected()) {
-            filter = MarketSnapshotUtils.getMarketDepthFilter(fromDateEditor, toDateEditor);
+            filter = new MarketSnapshotFilter(fromDateEditor, toDateEditor);
         }
         return filter;
     }

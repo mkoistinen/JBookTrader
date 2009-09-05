@@ -40,12 +40,12 @@ public abstract class Strategy implements Comparable<Strategy> {
     /**
      * Framework calls this method when order book changes.
      */
-    abstract public void onBookChange();
+    public abstract void onBookChange();
 
     /**
      * Framework calls this method to set strategy parameter ranges and values.
      */
-    abstract protected void setParams();
+    protected abstract void setParams();
 
     /**
      * Framework calls this method when the last snapshot was more than 1 hour ago.
@@ -100,7 +100,7 @@ public abstract class Strategy implements Comparable<Strategy> {
             Dispatcher.Mode mode = Dispatcher.getMode();
             if (mode == ForwardTest || mode == Trade) {
                 String msg = "End of trading interval. Closing current position.";
-                eventReport.report(getName() + ": " + msg);
+                eventReport.report(name + ": " + msg);
             }
         }
     }
@@ -160,7 +160,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         strategyReportManager = new StrategyReportManager(this);
         TraderAssistant traderAssistant = Dispatcher.getTrader().getAssistant();
         marketBook = traderAssistant.createMarketBook(this);
-        setBidAskSpread(bidAskSpread);
+        this.bidAskSpread = bidAskSpread;
         indicatorManager = new IndicatorManager();
     }
 
@@ -203,7 +203,7 @@ public abstract class Strategy implements Comparable<Strategy> {
 
 
     public void process() {
-        if (isActive() && !marketBook.isEmpty()) {
+        if (isActive && !marketBook.isEmpty()) {
             MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
             processInstant(instant, tradingSchedule.contains(instant));
@@ -225,7 +225,7 @@ public abstract class Strategy implements Comparable<Strategy> {
 
 
     public int compareTo(Strategy other) {
-        return getName().compareTo(other.getName());
+        return name.compareTo(other.name);
     }
 
 }

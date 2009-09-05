@@ -38,7 +38,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         setVisible(true);
     }
 
-    public void modelChanged(ModelListener.Event event, Object value) {
+    public void modelChanged(Event event, Object value) {
         switch (event) {
             case ModeChanged:
                 String subTitle = Dispatcher.getMode().getName();

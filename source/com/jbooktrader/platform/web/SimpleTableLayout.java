@@ -16,6 +16,7 @@ public class SimpleTableLayout extends TableLayout {
         super(response, strategies);
     }
 
+    @Override
     public void render() {
         response.append("<table>");
         response.append("<tr><th>Strategy</th><th>Symbol</th><th>Price</th><th>Position</th><th>Trades</th><th>Max DD</th><th class=\"last\">Net Profit</th></tr>");
@@ -45,10 +46,12 @@ public class SimpleTableLayout extends TableLayout {
             MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
             String price = (marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "<span class=\"na\">n/a</span>";
 
-            if (strategyRowCount % 2 == 0)
+            if (strategyRowCount % 2 == 0) {
                 response.append("<tr class=\"strategy\">\n");
-            else
+            }
+            else {
                 response.append("<tr class=\"strategy oddRow\">\n");
+            }
 
             response.append("<td id=\"" + strategyName + "_name\"><a href=\"/reports/" + strategyName + ".htm\" target=\"_new\">" + strategy.getName() + "</a></td>");
             response.append("<td id=\"" + strategyName + "_symbol\">").append(symbol).append("</td>");

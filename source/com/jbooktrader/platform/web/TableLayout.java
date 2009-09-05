@@ -8,7 +8,7 @@ public abstract class TableLayout {
     protected final StringBuilder response;
     protected final List<Strategy> strategies;
 
-    public TableLayout(StringBuilder response, List<Strategy> strategies) {
+    protected TableLayout(StringBuilder response, List<Strategy> strategies) {
         this.response = response;
         this.strategies = strategies;
     }

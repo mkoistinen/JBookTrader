@@ -17,7 +17,7 @@ public class DepthBalanceStrengthStdDev extends Indicator {
 
     private final int period;
 
-    private LinkedList<Double> history = new LinkedList<Double>();
+    private final LinkedList<Double> history = new LinkedList<Double>();
     private double sum, mean, sum_sqr;
 
     public DepthBalanceStrengthStdDev(int period) {
@@ -45,7 +45,7 @@ public class DepthBalanceStrengthStdDev extends Indicator {
             sum_sqr -= strength * strength;
         }
 
-        if (history.size() > 0) {
+        if (!history.isEmpty()) {
             mean = sum / history.size();
             value = Math.sqrt((sum_sqr - sum * mean) / history.size());
         }
