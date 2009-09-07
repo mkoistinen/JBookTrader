@@ -8,14 +8,14 @@ import java.util.*;
 public class StrategyReport extends Report {
 
     public StrategyReport(String reportName) throws JBookTraderException {
-        super(reportName, "Strategy Report");
+        super(reportName);
     }
 
-    public void report(List<String> columns) {
+    public void reportHeaders(List<String> headers) {
         StringBuilder sb = new StringBuilder();
         sb.append(ROW_START);
-        for (String column : columns) {
-            sb.append(FIELD_START).append(column).append(FIELD_END);
+        for (String column : headers) {
+            sb.append(HEADER_START).append(column).append(HEADER_END);
         }
         sb.append(ROW_END);
 

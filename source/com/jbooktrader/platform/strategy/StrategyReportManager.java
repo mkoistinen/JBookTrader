@@ -57,7 +57,7 @@ public class StrategyReportManager {
             } catch (JBookTraderException e) {
                 throw new RuntimeException(e);
             }
-            strategyReport.report(strategyReportHeaders);
+            strategyReport.reportHeaders(strategyReportHeaders);
         }
 
         MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();

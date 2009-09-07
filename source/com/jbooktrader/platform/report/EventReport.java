@@ -16,13 +16,20 @@ public class EventReport extends Report {
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS z");
 
     public EventReport(String reportName) throws JBookTraderException {
-        super(reportName, "Event Report");
+        super(reportName);
 
         isEnabled = true;
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(ROW_START);
+        sb.append("<TH WIDTH=\"80\">").append("Date").append(HEADER_END);
+        sb.append("<TH WIDTH=\"130\">").append("Time").append(HEADER_END);
+        sb.append(HEADER_START).append("Message").append(HEADER_END);
+        sb.append(ROW_END);
+        write(sb);
+
         StringBuilder startupMessage = new StringBuilder();
-        startupMessage.append("<b>");
         startupMessage.append("New Report Started.").append(" JBT Version: ").append(JBookTrader.VERSION);
-        startupMessage.append("</b>");
         report(startupMessage);
     }
 
