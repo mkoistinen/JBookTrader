@@ -101,11 +101,7 @@ public class PerformanceManager {
         double pi = 0;
         if (trades > 0) {
             double stdev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
-            if (stdev != 0) {
-                pi = Math.sqrt(trades) * getAverageProfitPerTrade() / stdev;
-            } else {
-                pi = Double.POSITIVE_INFINITY;
-            }
+            pi = (stdev == 0) ? Double.POSITIVE_INFINITY : Math.sqrt(trades) * getAverageProfitPerTrade() / stdev;
         }
 
         return pi;

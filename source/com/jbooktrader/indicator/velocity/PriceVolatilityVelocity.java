@@ -12,7 +12,9 @@ public class PriceVolatilityVelocity extends Indicator {
     private double sumPrice, sumPriceSquared;
     private final LinkedList<Double> prices;
     private final int periodLength;
-    private double smoothed, fast, slow, multiplier;
+    private final double multiplier;
+    private double smoothed, fast, slow;
+
 
 
     public PriceVolatilityVelocity(int periodLength) {
