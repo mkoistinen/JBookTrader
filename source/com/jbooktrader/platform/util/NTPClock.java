@@ -59,7 +59,10 @@ public class NTPClock {
         try {
             TimeInfo timeInfo = ntpClient.getTime(host);
             timeInfo.computeDetails();
-            offset.set(timeInfo.getOffset());
+            long thisOffset = timeInfo.getOffset();
+            if (thisOffset != 0) {
+                offset.set(timeInfo.getOffset());
+            }
         } catch (Exception e) {
             Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
@@ -68,7 +71,7 @@ public class NTPClock {
     // private constructor for non-instantiability
     private NTPClock() {
         ntpClient = new NTPUDPClient();
-        ntpClient.setDefaultTimeout(5000);
+        ntpClient.setDefaultTimeout(10000);
         offset = new AtomicLong();
         try {
             String hostName = PreferencesHolder.getInstance().get(JBTPreferences.NTPTimeServer);
