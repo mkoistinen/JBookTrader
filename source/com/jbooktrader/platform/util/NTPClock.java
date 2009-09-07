@@ -59,9 +59,9 @@ public class NTPClock {
         try {
             TimeInfo timeInfo = ntpClient.getTime(host);
             timeInfo.computeDetails();
-            long thisOffset = timeInfo.getOffset();
-            if (thisOffset != 0) {
-                offset.set(timeInfo.getOffset());
+            long currentOffset = timeInfo.getOffset();
+            if (currentOffset != 0) {
+                offset.set(currentOffset);
             }
         } catch (Exception e) {
             Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
