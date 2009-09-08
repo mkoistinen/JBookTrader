@@ -43,6 +43,7 @@ public enum JBTPreferences {
     PerformanceChartX("performance.chart.x", "-1"),
     PerformanceChartY("performance.chart.y", "-1"),
     PerformanceChartState("performance.chart.state", "-1"),
+    PerformanceChartBarSize("performance.chart.barSize", "1 minute"),
 
     // Optimizer
     DivideAndConquerCoverage("Divide & Conquer coverage", "10"),

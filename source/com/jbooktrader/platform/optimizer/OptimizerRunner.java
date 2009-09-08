@@ -11,6 +11,7 @@ import java.lang.reflect.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
@@ -33,15 +34,16 @@ public abstract class OptimizerRunner implements Runnable {
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private final List<MarketSnapshot> snapshots;
-    private long completedSteps, totalSteps;
+    private AtomicLong completedSteps;
+    private long totalSteps;
     private String totalStrategiesString;
     private long previousResultsSize;
 
 
     class ProgressRunner implements Runnable {
         public void run() {
-            if (completedSteps > 0) {
-                showFastProgress(completedSteps, "Optimizing " + totalStrategiesString + " strategies");
+            if (completedSteps.get() > 0) {
+                showFastProgress(completedSteps.get(), "Optimizing " + totalStrategiesString + " strategies");
             }
         }
     }
@@ -67,6 +69,7 @@ public abstract class OptimizerRunner implements Runnable {
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
         gnf0 = NumberFormatterFactory.getNumberFormatter(0, true);
         availableProcessors = Runtime.getRuntime().availableProcessors();
+        completedSteps = new AtomicLong();
 
         Class<?> clazz;
         try {
@@ -181,7 +184,7 @@ public abstract class OptimizerRunner implements Runnable {
         for (PerformanceMetric performanceMetric : PerformanceMetric.values()) {
             otpimizerReportHeaders.add(performanceMetric.getName());
         }
-        optimizationReport.report(otpimizerReportHeaders);
+        optimizationReport.reportHeaders(otpimizerReportHeaders);
 
         int maxIndex = Math.min(MAX_SAVED_RESULTS, optimizationResults.size());
         for (int index = 0; index < maxIndex; index++) {
@@ -210,8 +213,8 @@ public abstract class OptimizerRunner implements Runnable {
         optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
     }
 
-    public synchronized void iterationsCompleted(long iterationsCompleted) {
-        completedSteps += iterationsCompleted;
+    public void iterationsCompleted(long iterationsCompleted) {
+        completedSteps.getAndAdd(iterationsCompleted);
     }
 
     protected Queue<StrategyParams> getTasks(StrategyParams params) {

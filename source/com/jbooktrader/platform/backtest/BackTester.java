@@ -28,7 +28,7 @@ public class BackTester {
         PositionManager positionManager = strategy.getPositionManager();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
-        PerformanceChartData performanceChartData = strategy.getPerformanceChartData();
+        PerformanceChartData performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
 
         long marketDepthCounter = 0;
         long size = backTestFileReader.getSnapshotCount();

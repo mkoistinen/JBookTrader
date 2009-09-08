@@ -31,7 +31,11 @@ public class PerformanceManager {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
-        performanceChartData = strategy.getPerformanceChartData();
+        performanceChartData = new PerformanceChartData();
+    }
+
+    public PerformanceChartData getPerformanceChartData() {
+        return performanceChartData;
     }
 
     public int getTrades() {

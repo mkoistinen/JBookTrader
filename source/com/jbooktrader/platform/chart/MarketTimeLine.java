@@ -21,7 +21,7 @@ public class MarketTimeLine {
 
     public SegmentedTimeline getNormalHours() {
         SegmentedTimeline timeline = new SegmentedTimeline(SEGMENT_SIZE, 1, 0);
-        List<OHLCDataItem> items = strategy.getPerformanceChartData().getPrices();
+        List<OHLCDataItem> items = strategy.getPerformanceManager().getPerformanceChartData().getPrices();
 
         long previousTime = items.get(0).getDate().getTime();
 

@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.test;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
@@ -24,7 +23,7 @@ public class PerformanceManagerTest {
             TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
             int multiplier = 50;// contract multiplier
             Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
-            setStrategy(contract, tradingSchedule, multiplier, commission, 0.25, BarSize.Minute1);
+            setStrategy(contract, tradingSchedule, multiplier, commission, 0.25);
 
             setMarketBook(new MarketBook());
         }

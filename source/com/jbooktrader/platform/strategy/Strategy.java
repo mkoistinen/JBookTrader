@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.strategy;
 
 import com.ib.client.*;
-import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
@@ -30,7 +29,6 @@ public abstract class Strategy implements Comparable<Strategy> {
     private PerformanceManager performanceManager;
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
-    private PerformanceChartData performanceChartData;
     private boolean isActive;
     private int position;
     private long time;
@@ -147,14 +145,13 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     protected void addIndicator(Indicator indicator) {
         indicatorManager.addIndicator(indicator);
-        performanceChartData.addIndicator(indicator);
+        performanceManager.getPerformanceChartData().addIndicator(indicator);
     }
 
-    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread, BarSize barSize) {
+    protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread) {
         this.contract = contract;
         contract.m_multiplier = String.valueOf(multiplier);
         this.tradingSchedule = tradingSchedule;
-        performanceChartData = new PerformanceChartData(barSize);
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
         strategyReportManager = new StrategyReportManager(this);
@@ -168,11 +165,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         return marketBook;
     }
 
-
-    public PerformanceChartData getPerformanceChartData() {
-        return performanceChartData;
-    }
-
     public Contract getContract() {
         return contract;
     }
@@ -182,7 +174,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     }
 
     public void processInstant(long instant, boolean isInSchedule) {
-        setTime(instant);
+        time = instant;
         indicatorManager.updateIndicators();
 
         if (isInSchedule) {

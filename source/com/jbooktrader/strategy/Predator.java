@@ -48,9 +48,9 @@ public class Predator extends StrategyES {
     }
 
     /**
-     * Framework invokes this method when a new snapshot of the the order book is taken
+     * Framework invokes this method when a new snapshot of the limit order book is taken
      * and the technical indicators are recalculated. This is where the strategy itself
-     * (i.e., its entry and exit criteria) should be defined.
+     * (i.e., its entry and exit conditions) should be defined.
      */
     @Override
     public void onBookSnapshot() {

@@ -211,7 +211,7 @@ public class MainFrameController {
                         throw new JBookTraderException(msg);
                     }
 
-                    if (strategy.getPerformanceChartData().isEmpty()) {
+                    if (strategy.getPerformanceManager().getPerformanceChartData().isEmpty()) {
                         String msg = "There is no data to chart. Please run a back test first.";
                         MessageDialog.showMessage(msg);
                     } else {

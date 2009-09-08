@@ -49,7 +49,7 @@ public class PerformanceChart {
 
     public PerformanceChart(JFrame parent, Strategy strategy) {
         indicatorPlots = new ArrayList<FastXYPlot>();
-        performanceChartData = strategy.getPerformanceChartData();
+        performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
         prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
         createChartFrame(parent);

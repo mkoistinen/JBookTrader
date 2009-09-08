@@ -5,8 +5,8 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 /**
- * Runs a trading strategy in the optimizer mode using a data file containing
- * historical market depth.
+ * Runs a trading strategy in the backtesting mode using a file containing
+ * historical market data.
  */
 public class BackTestStrategyRunner implements Runnable {
     private final BackTestDialog backTestDialog;
@@ -29,6 +29,7 @@ public class BackTestStrategyRunner implements Runnable {
     public void run() {
         try {
             backTestDialog.enableProgress();
+            strategy.getPerformanceManager().getPerformanceChartData().setBarSize(backTestDialog.getBarSize());
             backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
             backTestFileReader.setFilter(backTestDialog.getDateFilter());
             backTestDialog.showProgress("Scanning historical data file...");

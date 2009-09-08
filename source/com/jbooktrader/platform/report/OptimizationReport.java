@@ -5,7 +5,7 @@ import com.jbooktrader.platform.model.*;
 import java.util.*;
 
 
-public class OptimizationReport extends Report {
+public class OptimizationReport extends StrategyReport {
 
     public OptimizationReport(String reportName) throws JBookTraderException {
         super(reportName);

@@ -69,10 +69,9 @@ public class CMEDataConverter {
 
         String outFilename = "unzipped.cme";
         try {
-            OutputStream unzippedStream;
             ZipInputStream zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(cmeFileName)));
             zipInputStream.getNextEntry();
-            unzippedStream = new BufferedOutputStream(new FileOutputStream(outFilename, false));
+            OutputStream unzippedStream = new BufferedOutputStream(new FileOutputStream(outFilename, false));
 
             byte[] buffer = new byte[1024 * 1024];
             int length;

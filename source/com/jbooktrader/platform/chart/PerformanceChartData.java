@@ -14,18 +14,21 @@ import java.util.*;
  */
 public class PerformanceChartData {
     private final TimeSeries netProfit;
-    private final BarSize barSize;
+    private BarSize barSize;
     private final List<OHLCDataItem> prices;
     private Bar priceBar;
     private final Map<String, Bar> indicatorBars;
     private final Map<String, List<OHLCDataItem>> indicators;
 
-    public PerformanceChartData(BarSize barSize) {
-        this.barSize = barSize;
+    public PerformanceChartData() {
         netProfit = new TimeSeries("Net Profit");
         prices = new ArrayList<OHLCDataItem>();
         indicatorBars = new HashMap<String, Bar>();
         indicators = new HashMap<String, List<OHLCDataItem>>();
+    }
+
+    public void setBarSize(BarSize barSize) {
+        this.barSize = barSize;
     }
 
 

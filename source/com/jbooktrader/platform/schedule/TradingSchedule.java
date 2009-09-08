@@ -92,13 +92,6 @@ public class TradingSchedule {
         return containsTime;
     }
 
-    public boolean approximatelyContains(long time) {
-        instant.setTimeInMillis(time);
-        int minutes = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
-        return minutes >= (start - 5) && minutes < (end + 5);
-    }
-
-
     private int getMinutes(String time) throws JBookTraderException {
         StringTokenizer st = new StringTokenizer(time, ":");
         int tokens = st.countTokens();
