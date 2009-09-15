@@ -219,7 +219,7 @@ public class BackTestDialog extends JBTDialog {
 
         JPanel barSizePanel = new JPanel(new SpringLayout());
         barSizeCombo = new JComboBox();
-        for (BarSize barSize: BarSize.values()) {
+        for (BarSize barSize : BarSize.values()) {
             barSizeCombo.addItem(barSize.getName());
         }
         barSizeCombo.setSelectedItem(prefs.get(PerformanceChartBarSize));
@@ -229,7 +229,6 @@ public class BackTestDialog extends JBTDialog {
         barSizePanel.add(barSizeLabel);
         barSizePanel.add(barSizeCombo);
         SpringUtilities.makeOneLineGrid(barSizePanel);
-
 
 
         northPanel.add(filePanel);
@@ -250,7 +249,7 @@ public class BackTestDialog extends JBTDialog {
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.getViewport().add(paramTable);
         centerPanel.add(scrollPane);
-        SpringUtilities.makeCompactGrid(centerPanel, 1, centerPanel.getComponentCount(), 10, 8, 10, 10);
+        SpringUtilities.makeOneLineGrid(centerPanel);
 
         JPanel southPanel = new JPanel(new BorderLayout());
 

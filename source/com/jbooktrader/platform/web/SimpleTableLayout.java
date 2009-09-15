@@ -48,8 +48,7 @@ public class SimpleTableLayout extends TableLayout {
 
             if (strategyRowCount % 2 == 0) {
                 response.append("<tr class=\"strategy\">\n");
-            }
-            else {
+            } else {
                 response.append("<tr class=\"strategy oddRow\">\n");
             }
 

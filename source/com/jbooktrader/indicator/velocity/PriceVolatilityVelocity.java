@@ -1,43 +1,28 @@
 package com.jbooktrader.indicator.velocity;
 
 import com.jbooktrader.platform.indicator.*;
-
-import java.util.*;
+import com.jbooktrader.platform.util.*;
 
 
 /**
  * Calculates the velocity of the rolling volatility of prices
  */
 public class PriceVolatilityVelocity extends Indicator {
-    private double sumPrice, sumPriceSquared;
-    private final LinkedList<Double> prices;
-    private final int periodLength;
+    private final MovingWindow prices;
     private final double multiplier;
     private double smoothed, fast, slow;
 
-
-
     public PriceVolatilityVelocity(int periodLength) {
-        this.periodLength = periodLength;
         multiplier = 2.0 / (periodLength + 1.0);
-        prices = new LinkedList<Double>();
+        prices = new MovingWindow(periodLength);
     }
 
     @Override
     public void calculate() {
         double price = marketBook.getSnapshot().getPrice();
         prices.add(price);
-        sumPrice += price;
-        sumPriceSquared += price * price;
-
-        if (prices.size() > periodLength) {
-            double oldPrice = prices.removeFirst();
-
-            sumPrice -= oldPrice;
-            sumPriceSquared -= oldPrice * oldPrice;
-            double stdev = Math.sqrt((sumPriceSquared - (sumPrice * sumPrice) / periodLength) / periodLength);
-            //double stdev = sumPriceSquared - (sumPrice * sumPrice) / periodLength; //ekk
-
+        if (prices.isFull()) {
+            double stdev = prices.getStdev();
             smoothed += multiplier * (stdev - smoothed);
             fast += multiplier * (smoothed - fast);
             slow += multiplier * (fast - slow);
@@ -49,7 +34,7 @@ public class PriceVolatilityVelocity extends Indicator {
     @Override
     public void reset() {
         prices.clear();
-        smoothed = fast = slow = sumPrice = sumPriceSquared = value = 0;
+        smoothed = fast = slow = value = 0;
     }
 }
 

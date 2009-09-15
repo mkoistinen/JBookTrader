@@ -41,10 +41,10 @@ public class Predator extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 25, 1, 7);
-        addParam(SLOW_PERIOD, 2000, 4000, 100, 2750);
-        addParam(TREND_PERIOD, 400, 800, 10, 467);
-        addParam(ENTRY, 16, 22, 1, 18);
+        addParam(FAST_PERIOD, 1, 50, 1, 7);
+        addParam(SLOW_PERIOD, 1000, 6000, 100, 2750);
+        addParam(TREND_PERIOD, 100, 900, 10, 467);
+        addParam(ENTRY, 10, 22, 1, 18);
     }
 
     /**

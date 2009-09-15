@@ -20,7 +20,6 @@ public class BalanceVelocity extends Indicator {
     @Override
     public void setMarketBook(MarketBook marketBook) {
         super.setMarketBook(marketBook);
-
         depthBalance = new DepthBalance();
         depthBalance.setMarketBook(marketBook);
     }
@@ -37,7 +36,6 @@ public class BalanceVelocity extends Indicator {
 
     @Override
     public void reset() {
-        fast = slow = 0;
-        value = 0;
+        fast = slow = value = 0;
     }
 }

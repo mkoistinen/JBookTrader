@@ -190,7 +190,7 @@ public class TraderAssistant {
         strategies.put(nextStrategyID, strategy);
         Dispatcher.Mode mode = Dispatcher.getMode();
         if (mode == ForwardTest || mode == Trade) {
-            String msg = strategy.getName() + ": strategy started. " + strategy.getTradingSchedule();
+            String msg = strategy.getName() + ": strategy started. Trading schedule: " + strategy.getTradingSchedule();
             eventReport.report(msg);
             requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);

@@ -14,23 +14,22 @@ import java.util.*;
  */
 public class PerformanceChartData {
     private final TimeSeries netProfit;
-    private BarSize barSize;
+    private final BarSize barSize;
     private final List<OHLCDataItem> prices;
     private Bar priceBar;
     private final Map<String, Bar> indicatorBars;
     private final Map<String, List<OHLCDataItem>> indicators;
 
-    public PerformanceChartData() {
+    public PerformanceChartData(BarSize barSize, List<Indicator> indicators) {
+        this.barSize = barSize;
         netProfit = new TimeSeries("Net Profit");
         prices = new ArrayList<OHLCDataItem>();
         indicatorBars = new HashMap<String, Bar>();
-        indicators = new HashMap<String, List<OHLCDataItem>>();
+        this.indicators = new HashMap<String, List<OHLCDataItem>>();
+        for (Indicator indicator : indicators) {
+            this.indicators.put(indicator.getName(), new ArrayList<OHLCDataItem>());
+        }
     }
-
-    public void setBarSize(BarSize barSize) {
-        this.barSize = barSize;
-    }
-
 
     public List<OHLCDataItem> getPrices() {
         return prices;
@@ -38,11 +37,6 @@ public class PerformanceChartData {
 
     public boolean isEmpty() {
         return prices.isEmpty();
-    }
-
-
-    public void addIndicator(Indicator indicator) {
-        indicators.put(indicator.getName(), new ArrayList<OHLCDataItem>());
     }
 
     public TimeSeries getProfitAndLossSeries() {

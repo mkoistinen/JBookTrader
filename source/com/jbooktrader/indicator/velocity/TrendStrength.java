@@ -11,7 +11,6 @@ public class TrendStrength extends Indicator {
     private double smoothedTrend;
     private double previousPrice;
 
-
     public TrendStrength(int periodLength) {
         multiplier = 2.0 / (periodLength + 1.0);
     }

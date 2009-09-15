@@ -1,8 +1,7 @@
 package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
-
-import java.util.*;
+import com.jbooktrader.platform.util.*;
 
 /**
  * This indicator computes the standard deviation of the last <period> prices.
@@ -20,45 +19,33 @@ import java.util.*;
  */
 public class BollingerBands extends Indicator {
 
-    private final int period;
     private final double multiple;
-
-    private final LinkedList<Double> history = new LinkedList<Double>();
-    private double sum, mean, sum_sqr, sigma;
+    private final MovingWindow prices;
+    private double mean, sigma;
 
     public BollingerBands(int period) {
         this(period, 1.0);
     }
 
     public BollingerBands(int period, double multiple) {
-        this.period = period;
         this.multiple = multiple;
-        reset();
+        prices = new MovingWindow(period);
     }
 
     @Override
     public void reset() {
-        value = sum = sum_sqr = mean = sigma = 0.0;
-        history.clear();
+        value = 0.0;
+        prices.clear();
     }
 
     @Override
     public void calculate() {
         double price = marketBook.getSnapshot().getPrice();
+        prices.add(price);
 
-        history.addLast(price);
-        sum += price;
-        sum_sqr += price * price;
-
-        if (history.size() > period) {
-            double oldPrice = history.removeFirst();
-            sum -= oldPrice;
-            sum_sqr -= oldPrice * oldPrice;
-        }
-
-        if (!history.isEmpty()) {
-            mean = sum / history.size();
-            value = sigma = Math.sqrt((sum_sqr - sum * mean) / history.size());
+        if (prices.isFull()) {
+            mean = prices.getMean();
+            value = sigma = prices.getStdev();
         }
     }
 

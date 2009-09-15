@@ -8,7 +8,6 @@ public class PriceEMA extends Indicator {
 
     public PriceEMA(int period) {
         alpha = 2.0 / (period + 1.0);
-        reset();
     }
 
     @Override

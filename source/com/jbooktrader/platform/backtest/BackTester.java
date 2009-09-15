@@ -32,7 +32,6 @@ public class BackTester {
 
         long marketDepthCounter = 0;
         long size = backTestFileReader.getSnapshotCount();
-
         MarketSnapshot marketSnapshot;
         while ((marketSnapshot = backTestFileReader.next()) != null) {
             marketDepthCounter++;

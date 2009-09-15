@@ -2,10 +2,13 @@ package com.jbooktrader.platform.performance;
 
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
+import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
+
+import java.util.*;
 
 /**
  * Performance manager evaluates trading strategy performance based on statistics
@@ -15,8 +18,8 @@ public class PerformanceManager {
     private final int multiplier;
     private final Commission commission;
     private final Strategy strategy;
-    private final PerformanceChartData performanceChartData;
 
+    private PerformanceChartData performanceChartData;
     private int trades, profitableTrades, previousPosition;
     private double tradeCommission, totalCommission;
     private double positionValue;
@@ -31,7 +34,10 @@ public class PerformanceManager {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
-        performanceChartData = new PerformanceChartData();
+    }
+
+    public void createPerformanceChartData(BarSize barSize, List<Indicator> indicators) {
+        performanceChartData = new PerformanceChartData(barSize, indicators);
     }
 
     public PerformanceChartData getPerformanceChartData() {

@@ -202,23 +202,27 @@ public class MainFrameController {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     int selectedRow = strategyTable.getSelectedRow();
                     if (selectedRow < 0) {
-                        throw new JBookTraderException("No strategy is selected.");
+                        MessageDialog.showMessage("No strategy is selected.");
+                        return;
                     }
 
                     Strategy strategy = strategyTableModel.getStrategyForRow(selectedRow);
                     if (strategy == null) {
                         String msg = "Please run this strategy first.";
-                        throw new JBookTraderException(msg);
+                        MessageDialog.showMessage(msg);
+                        return;
                     }
 
-                    if (strategy.getPerformanceManager().getPerformanceChartData().isEmpty()) {
+                    PerformanceChartData pcd = strategy.getPerformanceManager().getPerformanceChartData();
+                    if (pcd == null || pcd.isEmpty()) {
                         String msg = "There is no data to chart. Please run a back test first.";
                         MessageDialog.showMessage(msg);
-                    } else {
-                        PerformanceChart spChart = new PerformanceChart(mainViewDialog, strategy);
-                        JFrame chartFrame = spChart.getChart();
-                        chartFrame.setVisible(true);
+                        return;
                     }
+
+                    PerformanceChart spChart = new PerformanceChart(mainViewDialog, strategy);
+                    JFrame chartFrame = spChart.getChart();
+                    chartFrame.setVisible(true);
                 } catch (Throwable t) {
                     MessageDialog.showError(t);
                 } finally {
