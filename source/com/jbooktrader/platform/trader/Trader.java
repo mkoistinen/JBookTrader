@@ -97,11 +97,18 @@ public class Trader extends EWrapperAdapter {
     public void contractDetails(int id, ContractDetails contractDetails) {
         String lineSep = "<br>";
         StringBuilder details = new StringBuilder("Contract details:").append(lineSep);
-        details.append("Trading class: ").append(contractDetails.m_tradingClass).append(lineSep);
-        details.append("Valid exchanges: ").append(contractDetails.m_validExchanges).append(lineSep);
-        details.append("Long name: ").append(contractDetails.m_longName).append(lineSep);
-        details.append("Market name: ").append(contractDetails.m_marketName).append(lineSep);
-        details.append("Min tick: ").append(contractDetails.m_minTick).append(lineSep);
+        details.append("trading class: ").append(contractDetails.m_tradingClass).append(lineSep);
+        details.append("valid exchanges: ").append(contractDetails.m_validExchanges).append(lineSep);
+        details.append("long name: ").append(contractDetails.m_longName).append(lineSep);
+        details.append("market name: ").append(contractDetails.m_marketName).append(lineSep);
+        details.append("min tick: ").append(contractDetails.m_minTick).append(lineSep);
+        details.append("contractMonth: ").append(contractDetails.m_contractMonth).append(lineSep);
+        details.append("industry: ").append(contractDetails.m_industry).append(lineSep);
+        details.append("category: ").append(contractDetails.m_category).append(lineSep);
+        details.append("subcategory: ").append(contractDetails.m_subcategory).append(lineSep);
+        details.append("timeZoneId: ").append(contractDetails.m_timeZoneId).append(lineSep);
+        details.append("tradingHours: ").append(contractDetails.m_tradingHours).append(lineSep);
+        details.append("liquidHours: ").append(contractDetails.m_liquidHours).append(lineSep);
         eventReport.report(details.toString());
     }
 

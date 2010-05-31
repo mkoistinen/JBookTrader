@@ -42,10 +42,10 @@ public class Defender1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 4, 18, 1, 9);
-        addParam(SLOW_PERIOD, 2500, 4500, 100, 3380);
-        addParam(TREND_PERIOD, 250, 800, 10, 585);
-        addParam(ENTRY, 120, 200, 1, 170);
+        addParam(FAST_PERIOD, 5, 50, 1, 26);
+        addParam(SLOW_PERIOD, 100, 1500, 100, 600);
+        addParam(TREND_PERIOD, 50, 600, 10, 400);
+        addParam(ENTRY, 9, 18, 1, 12);
     }
 
     /**
@@ -55,7 +55,7 @@ public class Defender1 extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double balanceVelocity = balanceVelocityInd.getValue() * 10;
+        double balanceVelocity = balanceVelocityInd.getValue();
         double trendStrengthVelocity = trendStrengthVelocityInd.getValue();
 
         int currentPosition = getPositionManager().getPosition();

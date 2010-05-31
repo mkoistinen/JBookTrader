@@ -41,10 +41,10 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 8, 17, 1, 11);
-        addParam(SLOW_PERIOD, 2500, 4000, 100, 2076);
-        addParam(TREND_PERIOD, 250, 600, 10, 536);
-        addParam(ENTRY, 158, 170, 1, 164);
+        addParam(FAST_PERIOD, 1, 50, 1, 5);
+        addParam(SLOW_PERIOD, 200, 4000, 100, 2800);
+        addParam(TREND_PERIOD, 50, 600, 10, 500);
+        addParam(ENTRY, 5, 25, 1, 17);
     }
 
     /**
@@ -54,7 +54,7 @@ public class SecondNature extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double balanceVelocity = balanceVelocityInd.getValue() * 10;
+        double balanceVelocity = balanceVelocityInd.getValue();
         double trendStrengthVelocity = trendStrengthVelocityInd.getValue();
         if (trendStrengthVelocity < 0) {
             if (balanceVelocity >= entry) {
