@@ -65,6 +65,12 @@ public class BackTestDialog extends JBTDialog {
         setVisible(true);
     }
 
+    public void dispose() {
+        btsr = null;
+        super.dispose();
+    }
+
+
     public void setProgress(final long count, final long iterations) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

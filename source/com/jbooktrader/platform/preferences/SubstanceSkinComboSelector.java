@@ -1,9 +1,9 @@
 package com.jbooktrader.platform.preferences;
 
 import com.jbooktrader.platform.startup.*;
-import org.jvnet.substance.*;
-import org.jvnet.substance.api.renderers.*;
-import org.jvnet.substance.skin.*;
+import org.pushingpixels.substance.api.*;
+import org.pushingpixels.substance.api.renderers.*;
+import org.pushingpixels.substance.api.skin.*;
 
 import javax.swing.*;
 import java.awt.*;

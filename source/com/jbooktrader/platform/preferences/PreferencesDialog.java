@@ -6,8 +6,8 @@ import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
-import org.jvnet.substance.*;
-import org.jvnet.substance.skin.*;
+import org.pushingpixels.substance.api.*;
+import org.pushingpixels.substance.api.skin.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,7 +127,7 @@ public class PreferencesDialog extends JBTDialog {
 
         JPanel lookAndFeelTab = new JPanel(new SpringLayout());
         tabbedPane.addTab("Look & Feel", lookAndFeelTab);
-        lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Native"});
+        lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Nimbus", "Liquid", "Seaglass", "Native"});
         add(lookAndFeelTab, LookAndFeel, lookAndFeelCombo);
         substanceSkinComboSelector = new SubstanceSkinComboSelector();
         String skinName = prefs.get(Skin);
@@ -138,18 +138,19 @@ public class PreferencesDialog extends JBTDialog {
             }
         }
         genericAdd(lookAndFeelTab, Skin, substanceSkinComboSelector);
-        if (lookAndFeelCombo.getSelectedItem().equals("Native")) {
-            substanceSkinComboSelector.setEnabled(false);
-        } else {
+        if (lookAndFeelCombo.getSelectedItem().equals("Substance")) {
             substanceSkinComboSelector.setEnabled(true);
+        } else {
+            substanceSkinComboSelector.setEnabled(false);
         }
         SpringUtilities.makeCompactGrid(lookAndFeelTab, 2, 2, 12, 12, 8, 8);
 
         lookAndFeelCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (lookAndFeelCombo.getSelectedItem().equals("Native")) {
+                String selectedLaf = (String) lookAndFeelCombo.getSelectedItem();
+                if (!selectedLaf.equals("Substance")) {
                     substanceSkinComboSelector.setEnabled(false);
-                    MessageDialog.showMessage("Look and Feel will change to native after " + JBookTrader.APP_NAME + " restarts.");
+                    MessageDialog.showMessage("Look and Feel will change to " + selectedLaf + " after " + JBookTrader.APP_NAME + " is restarted.");
                 } else {
                     substanceSkinComboSelector.setEnabled(true);
                     String skinName = ((SkinInfo) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
