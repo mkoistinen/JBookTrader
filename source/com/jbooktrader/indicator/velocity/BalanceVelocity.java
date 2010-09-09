@@ -5,7 +5,7 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 
 /**
- * Velocity of balance
+ * Velocity of balance in the market limit order book
  */
 public class BalanceVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;

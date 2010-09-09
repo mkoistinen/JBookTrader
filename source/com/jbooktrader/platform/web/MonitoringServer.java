@@ -3,6 +3,8 @@ package com.jbooktrader.platform.web;
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 import com.sun.net.httpserver.*;
 
@@ -16,6 +18,7 @@ public class MonitoringServer {
         if (server == null) {
             PreferencesHolder prefs = PreferencesHolder.getInstance();
             if (prefs.get(WebAccess).equalsIgnoreCase("enabled")) {
+                EventReport eventReport = Dispatcher.getInstance().getEventReport();
                 try {
                     int port = Integer.parseInt(prefs.get(WebAccessPort));
                     server = HttpServer.create(new InetSocketAddress(port), 0);
@@ -23,9 +26,9 @@ public class MonitoringServer {
                     context.setAuthenticator(new WebAuthenticator());
                     server.setExecutor(Executors.newSingleThreadExecutor());
                     server.start();
-                    Dispatcher.getEventReport().report("Monitoring server started");
+                    eventReport.report(JBookTrader.APP_NAME, "Monitoring server started");
                 } catch (Exception e) {
-                    Dispatcher.getEventReport().report(e);
+                    eventReport.report(e);
                     MessageDialog.showError("Could not start monitoring server: " + e);
                 }
             }

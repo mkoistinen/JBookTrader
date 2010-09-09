@@ -9,28 +9,29 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class PeaceSeeker extends StrategyES {
+public class Predator2 extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, volatilityVelocityInd;
+    private final Indicator balanceVelocityInd, priceTrendVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
-    private static final String TREND_PERIOD = "Trend Period";
+    private static final String MAGNIFIER = "Magnifier";
     private static final String ENTRY = "Entry";
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, magnifier;
 
-    public PeaceSeeker(StrategyParams optimizationParams) throws JBookTraderException {
+    public Predator2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
+        magnifier = getParam(MAGNIFIER);
         balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        volatilityVelocityInd = new PriceVolatilityVelocity(getParam(TREND_PERIOD));
+        priceTrendVelocityInd = new PriceTrendVelocity(getParam(SLOW_PERIOD));
         addIndicator(balanceVelocityInd);
-        addIndicator(volatilityVelocityInd);
+        addIndicator(priceTrendVelocityInd);
     }
 
     /**
@@ -41,10 +42,11 @@ public class PeaceSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 5, 100, 1, 25);
-        addParam(SLOW_PERIOD, 1000, 5000, 100, 3360);
-        addParam(TREND_PERIOD, 120, 600, 10, 266);
-        addParam(ENTRY, 1, 20, 1, 15);
+        addParam(FAST_PERIOD, 5, 250, 1, 131);
+        addParam(SLOW_PERIOD, 6000, 13000, 100, 7400);
+        addParam(MAGNIFIER, 1, 13, 1, 5);
+        addParam(ENTRY, 17, 30, 1, 20);
+
     }
 
     /**
@@ -55,13 +57,13 @@ public class PeaceSeeker extends StrategyES {
     @Override
     public void onBookSnapshot() {
         double balanceVelocity = balanceVelocityInd.getValue();
-        double volatilityVelocity = volatilityVelocityInd.getValue();
-        if (volatilityVelocity <= 0) {
-            if (balanceVelocity >= entry) {
-                setPosition(1);
-            } else if (balanceVelocity <= -entry) {
-                setPosition(-1);
-            }
+        double priceTrendVelocity = priceTrendVelocityInd.getValue();
+
+        double power = balanceVelocity - magnifier * priceTrendVelocity;
+        if (power >= entry) {
+            setPosition(1);
+        } else if (power <= -entry) {
+            setPosition(-1);
         }
     }
 }

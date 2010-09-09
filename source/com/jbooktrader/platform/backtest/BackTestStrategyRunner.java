@@ -15,19 +15,21 @@ import java.util.*;
 public class BackTestStrategyRunner implements Runnable {
     private final BackTestDialog backTestDialog;
     private final Strategy strategy;
-    private boolean cancelled;
     private BackTestFileReader backTestFileReader;
+    private BackTester backTester;
 
     public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
-        Dispatcher.getTrader().getAssistant().addStrategy(strategy);
+        Dispatcher.getInstance().getTrader().getAssistant().addStrategy(strategy);
     }
 
     public void cancel() {
         backTestFileReader.cancel();
+        if (backTester != null) {
+            backTester.cancel();
+        }
         backTestDialog.showProgress("Stopping back test...");
-        cancelled = true;
     }
 
     public void run() {
@@ -40,11 +42,10 @@ public class BackTestStrategyRunner implements Runnable {
             backTestFileReader.setFilter(backTestDialog.getDateFilter());
             backTestDialog.showProgress("Scanning historical data file...");
             backTestFileReader.scan();
-            if (!cancelled) {
-                backTestDialog.showProgress("Running back test...");
-                BackTester backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
-                backTester.execute();
-            }
+
+            backTestDialog.showProgress("Running back test...");
+            backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
+            backTester.execute();
         } catch (Throwable t) {
             MessageDialog.showError(t);
         } finally {

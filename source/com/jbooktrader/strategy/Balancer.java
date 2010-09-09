@@ -9,26 +9,29 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Equalizer extends StrategyES {
+public class Balancer extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd;
+    private final Indicator tensionInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "FastPeriod";
     private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
+
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, exit;
 
 
-    public Equalizer(StrategyParams optimizationParams) throws JBookTraderException {
+    public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(balanceVelocityInd);
+        exit = getParam(EXIT);
+        tensionInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        addIndicator(tensionInd);
     }
 
     /**
@@ -39,9 +42,10 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 35, 1, 28);
-        addParam(SLOW_PERIOD, 100, 4000, 100, 3230);
-        addParam(ENTRY, 10, 30, 1, 15);
+        addParam(FAST_PERIOD, 650, 1600, 10, 1338);
+        addParam(SLOW_PERIOD, 8000, 13500, 100, 8964);
+        addParam(ENTRY, 9, 15, 1, 10);
+        addParam(EXIT, -3, 1, 1, -1);
     }
 
     /**
@@ -51,11 +55,19 @@ public class Equalizer extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        if (balanceVelocity >= entry) {
+        double tension = tensionInd.getValue();
+        if (tension >= entry) {
             setPosition(1);
-        } else if (balanceVelocity <= -entry) {
+        } else if (tension <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && tension <= -exit) {
+                setPosition(0);
+            }
+            if (currentPosition < 0 && tension >= exit) {
+                setPosition(0);
+            }
         }
     }
 }

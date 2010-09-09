@@ -6,8 +6,6 @@ import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
-import org.pushingpixels.substance.api.*;
-import org.pushingpixels.substance.api.skin.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +17,7 @@ public class PreferencesDialog extends JBTDialog {
     private JTextField hostText, portText, webAccessUser, ntpTimeServer;
     private JSpinner clientIDSpin, webAccessPortSpin;
     private JPasswordField webAccessPasswordField, c2PasswordField;
-    private JComboBox webAccessCombo, tableLayoutCombo, lookAndFeelCombo, substanceSkinComboSelector;
+    private JComboBox webAccessCombo;
     private C2TableModel c2TableModel;
 
     public PreferencesDialog(JFrame parent) throws JBookTraderException {
@@ -96,13 +94,11 @@ public class PreferencesDialog extends JBTDialog {
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();
-        tableLayoutCombo = new JComboBox(new String[] {"simple", "grouped"});
         add(webAcessTab, WebAccess, webAccessCombo);
         add(webAcessTab, WebAccessPort, webAccessPortSpin);
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
-        add(webAcessTab, WebAccessTableLayout, tableLayoutCombo);
-        SpringUtilities.makeCompactGrid(webAcessTab, 5, 2, 12, 12, 8, 8);
+        SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 8);
 
         JPanel c2Tab = new JPanel(new SpringLayout());
         tabbedPane.addTab("Collective2", c2Tab);
@@ -125,41 +121,6 @@ public class PreferencesDialog extends JBTDialog {
         add(timeServerTab, NTPTimeServer, ntpTimeServer);
         SpringUtilities.makeCompactGrid(timeServerTab, 1, 2, 12, 12, 8, 8);
 
-        JPanel lookAndFeelTab = new JPanel(new SpringLayout());
-        tabbedPane.addTab("Look & Feel", lookAndFeelTab);
-        lookAndFeelCombo = new JComboBox(new String[] {"Substance", "Nimbus", "Liquid", "Seaglass", "Native"});
-        add(lookAndFeelTab, LookAndFeel, lookAndFeelCombo);
-        substanceSkinComboSelector = new SubstanceSkinComboSelector();
-        String skinName = prefs.get(Skin);
-        for (SkinInfo skinInfo : SubstanceLookAndFeel.getAllSkins().values()) {
-            if (skinInfo.getDisplayName().equals(skinName)) {
-                substanceSkinComboSelector.setSelectedItem(skinInfo);
-                break;
-            }
-        }
-        genericAdd(lookAndFeelTab, Skin, substanceSkinComboSelector);
-        if (lookAndFeelCombo.getSelectedItem().equals("Substance")) {
-            substanceSkinComboSelector.setEnabled(true);
-        } else {
-            substanceSkinComboSelector.setEnabled(false);
-        }
-        SpringUtilities.makeCompactGrid(lookAndFeelTab, 2, 2, 12, 12, 8, 8);
-
-        lookAndFeelCombo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String selectedLaf = (String) lookAndFeelCombo.getSelectedItem();
-                if (!selectedLaf.equals("Substance")) {
-                    substanceSkinComboSelector.setEnabled(false);
-                    MessageDialog.showMessage("Look and Feel will change to " + selectedLaf + " after " + JBookTrader.APP_NAME + " is restarted.");
-                } else {
-                    substanceSkinComboSelector.setEnabled(true);
-                    String skinName = ((SkinInfo) substanceSkinComboSelector.getSelectedItem()).getDisplayName();
-                    LookAndFeelManager.setSubstanceSkin(skinName);
-                }
-            }
-        });
-
-
         okButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -171,16 +132,11 @@ public class PreferencesDialog extends JBTDialog {
                     prefs.set(WebAccessPort, webAccessPortSpin.getValue().toString());
                     prefs.set(WebAccessUser, webAccessUser.getText());
                     prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
-                    prefs.set(WebAccessTableLayout, (String) tableLayoutCombo.getSelectedItem());
 
                     prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
                     prefs.set(Collective2Strategies, c2TableModel.getStrategies());
 
                     prefs.set(NTPTimeServer, ntpTimeServer.getText());
-
-                    prefs.set(LookAndFeel, (String) lookAndFeelCombo.getSelectedItem());
-                    SkinInfo skinInfo = (SkinInfo) substanceSkinComboSelector.getSelectedItem();
-                    prefs.set(Skin, skinInfo.getDisplayName());
 
                     String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
                     MessageDialog.showMessage(msg);
@@ -203,9 +159,8 @@ public class PreferencesDialog extends JBTDialog {
     }
 
     private void setWidth(JPanel p, Component c, int width) throws JBookTraderException {
-        SpringLayout layout;
         try {
-            layout = (SpringLayout) p.getLayout();
+            SpringLayout layout = (SpringLayout) p.getLayout();
             SpringLayout.Constraints spinLayoutConstraint = layout.getConstraints(c);
             spinLayoutConstraint.setWidth(Spring.constant(width));
         } catch (ClassCastException exc) {

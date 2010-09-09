@@ -1,5 +1,9 @@
 package com.jbooktrader.platform.util;
 
+/**
+ * For reference, see "Rapid calculation methods" section in this document:
+ * http://en.wikipedia.org/wiki/Standard_deviation
+ */
 public class MovingWindow {
     private final double[] buffer;
     private double sum, sumSquared;
@@ -30,20 +34,14 @@ public class MovingWindow {
         return isFull;
     }
 
-    public double getSum() {
-        return sum;
-    }
-
     public double getMean() {
         return sum / buffer.length;
     }
 
-    public double getSumSquared() {
-        return sumSquared;
-    }
-
     public double getStdev() {
-        return Math.sqrt((sumSquared - (sum * sum) / buffer.length) / buffer.length);
+        double num = buffer.length * sumSquared - (sum * sum);
+        double denom = buffer.length * (buffer.length - 1);
+        return Math.sqrt(num / denom);
     }
 
     public void clear() {

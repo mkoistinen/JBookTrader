@@ -3,7 +3,6 @@ package com.jbooktrader.platform.model;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
@@ -23,10 +22,12 @@ public class MainFrameController {
     private final JTable strategyTable;
     private final StrategyTableModel strategyTableModel;
     private final PreferencesHolder prefs = PreferencesHolder.getInstance();
+    private final Dispatcher dispatcher;
 
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
-        Dispatcher.addListener(mainViewDialog);
+        dispatcher = Dispatcher.getInstance();
+        dispatcher.addListener(mainViewDialog);
         int width = prefs.getInt(MainWindowWidth);
         int height = prefs.getInt(MainWindowHeight);
         int x = prefs.getInt(MainWindowX);
@@ -49,7 +50,7 @@ public class MainFrameController {
             prefs.set(MainWindowHeight, mainViewDialog.getSize().height);
             prefs.set(MainWindowX, mainViewDialog.getX());
             prefs.set(MainWindowY, mainViewDialog.getY());
-            Dispatcher.exit();
+            dispatcher.exit();
         }
     }
 
@@ -65,7 +66,7 @@ public class MainFrameController {
         try {
             Browser.openURL(url);
         } catch (Throwable t) {
-            Dispatcher.getEventReport().report(t);
+            dispatcher.getEventReport().report(t);
             MessageDialog.showError(t);
         }
     }
@@ -117,9 +118,9 @@ public class MainFrameController {
             public void actionPerformed(ActionEvent e) {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    Dispatcher.getTrader().getAssistant().removeAllStrategies();
+                    dispatcher.getTrader().getAssistant().removeAllStrategies();
                     Strategy strategy = createSelectedRowStrategy();
-                    Dispatcher.setMode(BackTest);
+                    dispatcher.setMode(Mode.BackTest);
                     new BackTestDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
                     MessageDialog.showError(t);
@@ -139,10 +140,9 @@ public class MainFrameController {
                         throw new JBookTraderException("No strategy is selected.");
                     }
                     String name = strategyTableModel.getStrategyNameForRow(selectedRow);
-                    Dispatcher.setMode(Optimization);
+                    dispatcher.setMode(Mode.Optimization);
                     optimizerDialog = new OptimizerDialog(mainViewDialog, name);
 
-                    PreferencesHolder prefs = PreferencesHolder.getInstance();
                     int width = prefs.getInt(OptimizerWindowWidth);
                     int height = prefs.getInt(OptimizerWindowHeight);
                     int x = prefs.getInt(OptimizerWindowX);
@@ -171,8 +171,8 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = createSelectedRowStrategy();
-                    Dispatcher.setMode(ForwardTest);
-                    Dispatcher.getTrader().getAssistant().addStrategy(strategy);
+                    dispatcher.setMode(Mode.ForwardTest);
+                    dispatcher.getTrader().getAssistant().addStrategy(strategy);
                 } catch (Throwable t) {
                     MessageDialog.showError(t);
                 } finally {
@@ -186,8 +186,8 @@ public class MainFrameController {
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Strategy strategy = createSelectedRowStrategy();
-                    Dispatcher.setMode(Trade);
-                    Dispatcher.getTrader().getAssistant().addStrategy(strategy);
+                    dispatcher.setMode(Mode.Trade);
+                    dispatcher.getTrader().getAssistant().addStrategy(strategy);
                 } catch (Throwable t) {
                     MessageDialog.showError(t);
                 } finally {

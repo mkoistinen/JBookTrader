@@ -3,8 +3,10 @@ package com.jbooktrader.platform.trader;
 import com.ib.client.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
@@ -20,7 +22,7 @@ public class Trader extends EWrapperAdapter {
     public Trader() {
         traderAssistant = new TraderAssistant(this);
         previousErrorMessage = "";
-        eventReport = Dispatcher.getEventReport();
+        eventReport = Dispatcher.getInstance().getEventReport();
     }
 
     public TraderAssistant getAssistant() {
@@ -45,7 +47,7 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void updateNewsBulletin(int msgId, int msgType, String message, String origExchange) {
         String newsBulletin = "Msg ID: " + msgId + " Msg Type: " + msgType + " Msg: " + message + " Exchange: " + origExchange;
-        eventReport.report(newsBulletin);
+        eventReport.report("IB API", newsBulletin);
     }
 
 
@@ -81,7 +83,7 @@ public class Trader extends EWrapperAdapter {
 
             for (OpenOrder openOrder : openOrders.values()) {
                 String orderMsg = "Order " + openOrder.getId() + ": " + msg;
-                eventReport.report(orderMsg);
+                eventReport.report(openOrder.getStrategy().getName(), orderMsg);
             }
 
             openOrders.clear();
@@ -97,29 +99,26 @@ public class Trader extends EWrapperAdapter {
     public void contractDetails(int id, ContractDetails contractDetails) {
         String lineSep = "<br>";
         StringBuilder details = new StringBuilder("Contract details:").append(lineSep);
-        details.append("trading class: ").append(contractDetails.m_tradingClass).append(lineSep);
-        details.append("valid exchanges: ").append(contractDetails.m_validExchanges).append(lineSep);
-        details.append("long name: ").append(contractDetails.m_longName).append(lineSep);
-        details.append("market name: ").append(contractDetails.m_marketName).append(lineSep);
-        details.append("min tick: ").append(contractDetails.m_minTick).append(lineSep);
-        details.append("contractMonth: ").append(contractDetails.m_contractMonth).append(lineSep);
-        details.append("industry: ").append(contractDetails.m_industry).append(lineSep);
-        details.append("category: ").append(contractDetails.m_category).append(lineSep);
-        details.append("subcategory: ").append(contractDetails.m_subcategory).append(lineSep);
-        details.append("timeZoneId: ").append(contractDetails.m_timeZoneId).append(lineSep);
-        details.append("tradingHours: ").append(contractDetails.m_tradingHours).append(lineSep);
-        details.append("liquidHours: ").append(contractDetails.m_liquidHours).append(lineSep);
-        eventReport.report(details.toString());
+        details.append("Trading class: ").append(contractDetails.m_tradingClass).append(lineSep);
+        details.append("Exchanges: ").append(contractDetails.m_validExchanges).append(lineSep);
+        details.append("Long name: ").append(contractDetails.m_longName).append(lineSep);
+        details.append("Market name: ").append(contractDetails.m_marketName).append(lineSep);
+        details.append("Minimum tick: ").append(contractDetails.m_minTick).append(lineSep);
+        details.append("Contract month: ").append(contractDetails.m_contractMonth).append(lineSep);
+        details.append("Time zone id: ").append(contractDetails.m_timeZoneId).append(lineSep);
+        details.append("Trading hours: ").append(contractDetails.m_tradingHours).append(lineSep);
+        details.append("Liquid hours: ").append(contractDetails.m_liquidHours).append(lineSep);
+        eventReport.report("IB API", details.toString());
     }
 
     @Override
     public void error(Exception e) {
-        eventReport.report(e.toString());
+        eventReport.report("IB API", e.toString());
     }
 
     @Override
     public void error(String error) {
-        eventReport.report(error);
+        eventReport.report("IB API", error);
     }
 
     @Override
@@ -136,20 +135,19 @@ public class Trader extends EWrapperAdapter {
             }
 
             previousErrorMessage = msg;
-            eventReport.report(msg);
+            eventReport.report("IB API", msg);
 
             if (errorCode == 1100) {// Connectivity between IB and TWS has been lost.
                 traderAssistant.setIsConnected(false);
             }
 
             // Errors 1101 and 1102 are sent when connectivity is restored. However, sometimes TWS fails
-            // to send them, and in those situations we would be waiting forever. To avoid this, we also
-            // listen for error code 2104 which indicates that market data is restored, which we can
-            // interpret as restored connection.
+            // to send these error codes. To compensate, we also listen for error code 2104 which indicates
+            // that market data is restored, which we can interpret as restored connection.
             boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102 || errorCode == 2104);
             if (isConnectivityRestored) {
                 if (!traderAssistant.getOpenOrders().isEmpty()) {
-                    eventReport.report("Checking for executions while TWS was disconnected from the IB server.");
+                    eventReport.report(JBookTrader.APP_NAME, "Checking for executions while TWS was disconnected from the IB server.");
                     traderAssistant.requestExecutions();
                 }
                 traderAssistant.setIsConnected(true);
@@ -162,21 +160,21 @@ public class Trader extends EWrapperAdapter {
             // is not found, another order would be submitted.
             if (errorCode == 322) {
                 if (!traderAssistant.getOpenOrders().isEmpty()) {
-                    eventReport.report("Checking for executions after error 322.");
+                    eventReport.report(JBookTrader.APP_NAME, "Checking for executions after error 322.");
                     traderAssistant.requestExecutions();
                 }
             }
 
             if (errorCode == 317) {// Market depth data has been reset
                 traderAssistant.getMarketBook(id).getMarketDepth().reset();
-                eventReport.report("Market data for book " + id + " has been reset.");
+                eventReport.report(JBookTrader.APP_NAME, "Market data for book " + id + " has been reset.");
             }
 
             // 200: bad contract
             // 309: market depth requested for more than 3 symbols
             boolean isInvalidRequest = (errorCode == 200 || errorCode == 309);
             if (isInvalidRequest) {
-                Dispatcher.fireModelChanged(ModelListener.Event.Error, "IB reported: " + errorMsg);
+                Dispatcher.getInstance().fireModelChanged(Event.Error, "IB reported: " + errorMsg);
             }
 
 

@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.depth;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Depth balance in the latest market snapshot
+ * Depth balance of the limit order book in the latest market snapshot
  */
 public class DepthBalance extends Indicator {
 

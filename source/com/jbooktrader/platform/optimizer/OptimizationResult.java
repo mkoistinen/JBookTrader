@@ -24,27 +24,21 @@ public class OptimizationResult {
         return params;
     }
 
-    public double getNetProfit() {
-        return netProfit;
-    }
-
-    public double getMaxDrawdown() {
-        return maxDrawdown;
-    }
-
-    public int getTrades() {
-        return trades;
-    }
-
-    public double getProfitFactor() {
-        return profitFactor;
-    }
-
-    public double getKellyCriterion() {
-        return kellyCriterion;
-    }
-
-    public double getPerformanceIndex() {
-        return performanceIndex;
+    public double get(PerformanceMetric pm) {
+        switch (pm) {
+            case Trades:
+                return trades;
+            case PF:
+                return profitFactor;
+            case PI:
+                return performanceIndex;
+            case Kelly:
+                return kellyCriterion;
+            case MaxDD:
+                return maxDrawdown;
+            case NetProfit:
+                return netProfit;
+        }
+        throw new RuntimeException("Performance metric " + pm + " is not recognized.");
     }
 }

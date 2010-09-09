@@ -3,6 +3,7 @@ package com.jbooktrader.platform.optimizer;
 import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
+import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -15,7 +16,7 @@ import java.util.concurrent.atomic.*;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
- * historical market depth.
+ * historical market snapshots.
  */
 public abstract class OptimizerRunner implements Runnable {
     protected final ArrayList<OptimizationResult> optimizationResults;
@@ -43,7 +44,7 @@ public abstract class OptimizerRunner implements Runnable {
     class ProgressRunner implements Runnable {
         public void run() {
             if (completedSteps.get() > 0) {
-                showFastProgress(completedSteps.get(), "Optimizing " + totalStrategiesString + " strategies");
+                showProgress(completedSteps.get(), "Optimizing " + totalStrategiesString + " strategies");
             }
         }
     }
@@ -77,10 +78,9 @@ public abstract class OptimizerRunner implements Runnable {
         } catch (ClassNotFoundException cnfe) {
             throw new JBookTraderException("Could not find class " + strategy.getClass().getName());
         }
-        Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
 
         try {
-            strategyConstructor = clazz.getConstructor(parameterTypes);
+            strategyConstructor = clazz.getConstructor(new Class[] {StrategyParams.class});
         } catch (NoSuchMethodException nsme) {
             throw new JBookTraderException("Could not find strategy constructor for " + strategy.getClass().getName());
         }
@@ -196,19 +196,19 @@ public abstract class OptimizerRunner implements Runnable {
                 columns.add(nf0.format(param.getValue()));
             }
 
-            columns.add(nf0.format(optimizationResult.getTrades()));
-            columns.add(nf0.format(optimizationResult.getNetProfit()));
-            columns.add(nf0.format(optimizationResult.getMaxDrawdown()));
-            columns.add(nf2.format(optimizationResult.getProfitFactor()));
-            columns.add(nf0.format(optimizationResult.getKellyCriterion()));
-            columns.add(nf2.format(optimizationResult.getPerformanceIndex()));
+            columns.add(nf0.format(optimizationResult.get(Trades)));
+            columns.add(nf2.format(optimizationResult.get(PF)));
+            columns.add(nf2.format(optimizationResult.get(PI)));
+            columns.add(nf0.format(optimizationResult.get(Kelly)));
+            columns.add(nf0.format(optimizationResult.get(MaxDD)));
+            columns.add(nf0.format(optimizationResult.get(NetProfit)));
 
             optimizationReport.report(columns);
         }
 
     }
 
-    private void showFastProgress(long counter, String text) {
+    private void showProgress(long counter, String text) {
         String remainingTime = (counter == totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
         optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
     }
@@ -239,11 +239,10 @@ public abstract class OptimizerRunner implements Runnable {
                     if (paramNumber == 0) {
                         allTasksAssigned = true;
                         break;
-                    } else {
-                        int prevParamNumber = paramNumber - 1;
-                        StrategyParam prevParam = params.get(prevParamNumber);
-                        prevParam.setValue(prevParam.getValue() + prevParam.getStep());
                     }
+                    int prevParamNumber = paramNumber - 1;
+                    StrategyParam prevParam = params.get(prevParamNumber);
+                    prevParam.setValue(prevParam.getValue() + prevParam.getStep());
                 }
             }
         }
@@ -292,7 +291,7 @@ public abstract class OptimizerRunner implements Runnable {
                 optimizerDialog.showProgress("Saving optimization results ...");
                 saveToFile();
                 long totalTimeInSecs = (end - start) / 1000;
-                showFastProgress(totalSteps, "Optimization");
+                showProgress(totalSteps, "Optimization");
                 MessageDialog.showMessage("Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {

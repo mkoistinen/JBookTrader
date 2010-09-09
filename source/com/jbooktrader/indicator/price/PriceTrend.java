@@ -1,17 +1,17 @@
-package com.jbooktrader.indicator.velocity;
+package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
 
 /**
  * Measures the strength of a trend.
  */
-public class TrendStrength extends Indicator {
+public class PriceTrend extends Indicator {
     private final double multiplier;
     private double upEma, downEma;
     private double smoothedTrend;
     private double previousPrice;
 
-    public TrendStrength(int periodLength) {
+    public PriceTrend(int periodLength) {
         multiplier = 2.0 / (periodLength + 1.0);
     }
 
@@ -28,7 +28,7 @@ public class TrendStrength extends Indicator {
             upEma += multiplier * (up - upEma);
             downEma += multiplier * (down - downEma);
             double sum = upEma + downEma;
-            double trend = (sum == 0) ? 0 : Math.abs(upEma - downEma) / sum;
+            double trend = (sum == 0) ? 0 : (upEma - downEma) / sum;
 
             smoothedTrend += multiplier * (trend - smoothedTrend);
             value = 100 * smoothedTrend;

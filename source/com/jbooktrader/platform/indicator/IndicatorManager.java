@@ -25,18 +25,6 @@ public class IndicatorManager {
         }
     }
 
-    public String indicatorsState() {
-        String indicatorsState = "";
-        for (Indicator indicator : indicators) {
-            if (!indicatorsState.isEmpty()) {
-                indicatorsState += ", ";
-            }
-
-            indicatorsState += (int) indicator.getValue();
-        }
-        return indicatorsState;
-    }
-
     public boolean hasValidIndicators() {
         return hasValidIndicators;
     }

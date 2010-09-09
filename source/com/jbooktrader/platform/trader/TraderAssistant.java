@@ -3,7 +3,6 @@ package com.jbooktrader.platform.trader;
 import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.position.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
@@ -23,6 +22,7 @@ public class TraderAssistant {
     private final Map<Integer, MarketBook> marketBooks;
     private final EventReport eventReport;
     private final Trader trader;
+    private final Dispatcher dispatcher;
 
     private EClientSocket socket;
     private int nextStrategyID, tickerId, orderID, serverVersion;
@@ -33,8 +33,8 @@ public class TraderAssistant {
 
     public TraderAssistant(Trader trader) {
         this.trader = trader;
-
-        eventReport = Dispatcher.getEventReport();
+        dispatcher = Dispatcher.getInstance();
+        eventReport = dispatcher.getEventReport();
         strategies = new HashMap<Integer, Strategy>();
         openOrders = new HashMap<Integer, OpenOrder>();
         tickers = new HashMap<String, Integer>();
@@ -66,20 +66,18 @@ public class TraderAssistant {
 
 
     public Strategy getStrategy(String name) {
-        Strategy strategy = null;
         for (Map.Entry<Integer, Strategy> mapEntry : strategies.entrySet()) {
-            Strategy thisStrategy = mapEntry.getValue();
-            if (thisStrategy.getName().equals(name)) {
-                strategy = thisStrategy;
-                break;
+            Strategy strategy = mapEntry.getValue();
+            if (strategy.getName().equals(name)) {
+                return strategy;
             }
         }
-        return strategy;
+        return null;
     }
 
     public void connect() throws JBookTraderException {
         if (socket == null || !socket.isConnected()) {
-            eventReport.report("Connecting to TWS");
+            eventReport.report(JBookTrader.APP_NAME, "Connecting to TWS");
 
             socket = new EClientSocket(trader);
             PreferencesHolder prefs = PreferencesHolder.getInstance();
@@ -99,7 +97,7 @@ public class TraderAssistant {
             isConnected = true;
 
 
-            eventReport.report("Connected to TWS");
+            eventReport.report(JBookTrader.APP_NAME, "Connected to TWS");
             checkAccountType();
         }
     }
@@ -124,7 +122,7 @@ public class TraderAssistant {
         try {
             for (OpenOrder openOrder : openOrders.values()) {
                 openOrder.reset();
-                eventReport.report("Requesting executions for open order " + openOrder.getId());
+                eventReport.report(openOrder.getStrategy().getName(), "Requesting executions for open order " + openOrder.getId());
                 socket.reqExecutions(openOrder.getId(), new ExecutionFilter());
             }
         } catch (Throwable t) {
@@ -177,10 +175,10 @@ public class TraderAssistant {
             subscribedTickers.add(ticker);
             socket.reqContractDetails(strategy.getContract().m_conId, strategy.getContract());
             String msg = "Requested contract details for instrument " + instrument;
-            eventReport.report(msg);
+            eventReport.report(strategy.getName(), msg);
             socket.reqMktDepth(ticker, contract, 10);
             msg = "Requested market depth for instrument " + instrument;
-            eventReport.report(msg);
+            eventReport.report(strategy.getName(), msg);
         }
     }
 
@@ -188,14 +186,14 @@ public class TraderAssistant {
         strategy.getIndicatorManager().setMarketBook(strategy.getMarketBook());
         nextStrategyID++;
         strategies.put(nextStrategyID, strategy);
-        Dispatcher.Mode mode = Dispatcher.getMode();
-        if (mode == ForwardTest || mode == Trade) {
-            String msg = strategy.getName() + ": strategy started. Trading schedule: " + strategy.getTradingSchedule();
-            eventReport.report(msg);
+        Mode mode = dispatcher.getMode();
+        if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+            String msg = "Strategy started. Trading schedule: " + strategy.getTradingSchedule();
+            eventReport.report(strategy.getName(), msg);
             requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);
             strategy.setIsActive(true);
-            Dispatcher.strategyStarted();
+            dispatcher.strategyStarted();
         }
     }
 
@@ -223,22 +221,25 @@ public class TraderAssistant {
 
             isOrderExecutionPending = true;
             orderID++;
-            Dispatcher.Mode mode = Dispatcher.getMode();
-            if (mode == Trade || mode == ForwardTest) {
-                String msg = strategy.getName() + ": Placing order " + orderID;
-                eventReport.report(msg);
+            Mode mode = dispatcher.getMode();
+            if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+                String msg = "Placing order " + orderID;
+                eventReport.report(strategy.getName(), msg);
             }
 
             openOrders.put(orderID, new OpenOrder(orderID, order, strategy));
 
-            if (mode == Trade) {
+            double midPrice = strategy.getMarketBook().getSnapshot().getPrice();
+            double bidAskSpread = strategy.getBidAskSpread();
+            double expectedFillPrice = order.m_action.equalsIgnoreCase("BUY") ? (midPrice + bidAskSpread / 2) : (midPrice - bidAskSpread / 2);
+            strategy.getPositionManager().setExpectedFillPrice(expectedFillPrice);
+
+            if (mode == Mode.Trade) {
                 socket.placeOrder(orderID, contract, order);
             } else {
                 Execution execution = new Execution();
                 execution.m_shares = order.m_totalQuantity;
-                double price = strategy.getMarketBook().getSnapshot().getPrice();
-                double bidAskSpread = strategy.getBidAskSpread();
-                execution.m_price = order.m_action.equalsIgnoreCase("BUY") ? (price + bidAskSpread / 2) : (price - bidAskSpread / 2);
+                execution.m_price = expectedFillPrice;
                 execution.m_orderId = orderID;
                 trader.execDetails(0, contract, execution);
             }
@@ -263,8 +264,8 @@ public class TraderAssistant {
     }
 
     public boolean isConnected() {
-        Dispatcher.Mode mode = Dispatcher.getMode();
-        return mode == BackTest || mode == Optimization || isConnected;
+        Mode mode = Dispatcher.getInstance().getMode();
+        return mode == Mode.BackTest || mode == Mode.Optimization || isConnected;
     }
 
     public void setIsConnected(boolean isConnected) {
@@ -285,7 +286,7 @@ public class TraderAssistant {
         }
 
         socket.reqAccountUpdates(false, "");
-        boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getMode() == Trade;
+        boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getInstance().getMode() == Mode.Trade;
         if (isRealTrading) {
             String lineSep = System.getProperty("line.separator");
             String warning = "Connected to a real (not simulated) IB account. ";

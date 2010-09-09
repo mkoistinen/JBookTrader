@@ -50,11 +50,11 @@ public class StrategyInformationDialog extends JBTDialog {
         JPanel contentPanel = new JPanel(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
 
-        JTabbedPane tabbedPane1 = new JTabbedPane();
-        contentPanel.add(tabbedPane1, BorderLayout.CENTER);
+        JTabbedPane tabbedPane = new JTabbedPane();
+        contentPanel.add(tabbedPane, BorderLayout.CENTER);
 
         JPanel performancePanel = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Performance", performancePanel);
+        tabbedPane.addTab("Performance", performancePanel);
 
         NumberFormat nf2 = NumberFormatterFactory.getNumberFormatter(2);
 
@@ -72,7 +72,7 @@ public class StrategyInformationDialog extends JBTDialog {
 
 
         JPanel securityPanel = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Instrument", securityPanel);
+        tabbedPane.addTab("Instrument", securityPanel);
         add(securityPanel, "Symbol", strategy.getContract().m_symbol);
         add(securityPanel, "Security Type", strategy.getContract().m_secType);
         add(securityPanel, "Exchange", strategy.getContract().m_exchange);
@@ -81,7 +81,7 @@ public class StrategyInformationDialog extends JBTDialog {
         makeCompactGrid(securityPanel);
 
         JPanel parametersPanel = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Parameters", parametersPanel);
+        tabbedPane.addTab("Parameters", parametersPanel);
         StrategyParams params = strategy.getParams();
         add(parametersPanel, "Schedule", strategy.getTradingSchedule().toString());
         for (StrategyParam param : params.getAll()) {
@@ -91,7 +91,7 @@ public class StrategyInformationDialog extends JBTDialog {
 
 
         JPanel indicatorsPanel = new JPanel(new SpringLayout());
-        tabbedPane1.addTab("Indicators", indicatorsPanel);
+        tabbedPane.addTab("Indicators", indicatorsPanel);
         for (Indicator indicator : strategy.getIndicatorManager().getIndicators()) {
             add(indicatorsPanel, indicator.getName(), indicator.getValue());
         }

@@ -2,7 +2,6 @@ package com.jbooktrader.platform.position;
 
 import com.ib.client.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
@@ -20,13 +19,13 @@ public class PositionManager {
     private final TraderAssistant traderAssistant;
     private final PerformanceManager performanceManager;
     private int position;
-    private double avgFillPrice;
+    private double avgFillPrice, expectedFillPrice;
 
     public PositionManager(Strategy strategy) {
         this.strategy = strategy;
         positionsHistory = new LinkedList<Position>();
-        eventReport = Dispatcher.getEventReport();
-        traderAssistant = Dispatcher.getTrader().getAssistant();
+        eventReport = Dispatcher.getInstance().getEventReport();
+        traderAssistant = Dispatcher.getInstance().getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
     }
 
@@ -45,6 +44,14 @@ public class PositionManager {
 
     public double getAvgFillPrice() {
         return avgFillPrice;
+    }
+
+    public void setExpectedFillPrice(double expectedFillPrice) {
+        this.expectedFillPrice = expectedFillPrice;
+    }
+
+    public double getExpectedFillPrice() {
+        return expectedFillPrice;
     }
 
     public synchronized void update(OpenOrder openOrder) {
@@ -68,22 +75,21 @@ public class PositionManager {
 
         performanceManager.updateOnTrade(quantity, avgFillPrice, position);
 
-        Dispatcher.Mode mode = Dispatcher.getMode();
-        if (mode == BackTest) {
+        Mode mode = Dispatcher.getInstance().getMode();
+        if (mode == Mode.BackTest) {
             positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
         }
 
-        if (mode != Optimization) {
+        if (mode != Mode.Optimization) {
             strategy.getStrategyReportManager().report();
         }
 
-        if (mode == ForwardTest || mode == Trade) {
+        if (mode == Mode.ForwardTest || mode == Mode.Trade) {
             StringBuilder msg = new StringBuilder();
-            msg.append(strategy.getName()).append(": ");
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");
             msg.append("Avg Fill Price: ").append(avgFillPrice).append(". ");
             msg.append("Position: ").append(getPosition());
-            eventReport.report(msg.toString());
+            eventReport.report(strategy.getName(), msg.toString());
         }
     }
 
@@ -91,9 +97,9 @@ public class PositionManager {
         int newPosition = strategy.getPosition();
         int quantity = newPosition - position;
         if (quantity != 0) {
-            Dispatcher.Mode mode = Dispatcher.getMode();
-            if (mode == Trade || mode == ForwardTest) {
-                Dispatcher.getC2Manager().sendSignal(strategy.getName(), position, newPosition);
+            Mode mode = Dispatcher.getInstance().getMode();
+            if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+                Dispatcher.getInstance().getC2Manager().sendSignal(strategy.getName(), position, newPosition);
             }
 
             String action = (quantity > 0) ? "BUY" : "SELL";

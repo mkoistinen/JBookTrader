@@ -5,7 +5,7 @@ import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
+import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
@@ -22,6 +22,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     private final StrategyParams params;
     private MarketBook marketBook;
     private final EventReport eventReport;
+    private final Dispatcher dispatcher;
     private final String name;
     private Contract contract;
     private TradingSchedule tradingSchedule;
@@ -60,7 +61,8 @@ public abstract class Strategy implements Comparable<Strategy> {
         }
 
         name = getClass().getSimpleName();
-        eventReport = Dispatcher.getEventReport();
+        dispatcher = Dispatcher.getInstance();
+        eventReport = dispatcher.getEventReport();
     }
 
     public void setMarketBook(MarketBook marketBook) {
@@ -95,10 +97,10 @@ public abstract class Strategy implements Comparable<Strategy> {
     public void closePosition() {
         position = 0;
         if (positionManager.getPosition() != 0) {
-            Dispatcher.Mode mode = Dispatcher.getMode();
-            if (mode == ForwardTest || mode == Trade) {
+            Mode mode = dispatcher.getMode();
+            if (mode == Mode.ForwardTest || mode == Mode.Trade) {
                 String msg = "End of trading interval. Closing current position.";
-                eventReport.report(name + ": " + msg);
+                eventReport.report(name, msg);
             }
         }
     }
@@ -154,7 +156,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
         strategyReportManager = new StrategyReportManager(this);
-        TraderAssistant traderAssistant = Dispatcher.getTrader().getAssistant();
+        TraderAssistant traderAssistant = dispatcher.getTrader().getAssistant();
         marketBook = traderAssistant.createMarketBook(this);
         this.bidAskSpread = bidAskSpread;
         indicatorManager = new IndicatorManager();
@@ -199,7 +201,7 @@ public abstract class Strategy implements Comparable<Strategy> {
             long instant = marketSnapshot.getTime();
             processInstant(instant, tradingSchedule.contains(instant));
             performanceManager.updatePositionValue(marketSnapshot.getPrice(), positionManager.getPosition());
-            Dispatcher.fireModelChanged(ModelListener.Event.StrategyUpdate, this);
+            dispatcher.fireModelChanged(Event.StrategyUpdate, this);
         }
     }
 

@@ -42,7 +42,7 @@ public class C2TableModel extends TableDataModel {
     }
 
     @Override
-    public Class getColumnClass(int column) {
+    public Class<?> getColumnClass(int column) {
         return (column == 2) ? Boolean.class : getValueAt(0, column).getClass();
     }
 

@@ -1,9 +1,7 @@
 package com.jbooktrader.platform.report;
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.*;
 import com.jbooktrader.platform.startup.*;
-import com.jbooktrader.platform.util.*;
 
 import java.io.*;
 import java.text.*;
@@ -15,8 +13,8 @@ public class EventReport extends Report {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS z");
 
-    public EventReport(String reportName) throws JBookTraderException {
-        super(reportName);
+    public EventReport() throws JBookTraderException {
+        super("EventReport");
 
         isEnabled = true;
 
@@ -24,13 +22,14 @@ public class EventReport extends Report {
         sb.append(ROW_START);
         sb.append("<TH WIDTH=\"80\">").append("Date").append(HEADER_END);
         sb.append("<TH WIDTH=\"130\">").append("Time").append(HEADER_END);
+        sb.append("<TH WIDTH=\"130\">").append("Reporter").append(HEADER_END);
         sb.append(HEADER_START).append("Message").append(HEADER_END);
         sb.append(ROW_END);
         write(sb);
 
         StringBuilder startupMessage = new StringBuilder();
-        startupMessage.append("New Report Started.").append(" JBT Version: ").append(JBookTrader.VERSION);
-        report(startupMessage);
+        startupMessage.append("New Report Started. ").append(JBookTrader.APP_NAME).append(" version ").append(JBookTrader.VERSION);
+        report(JBookTrader.APP_NAME, startupMessage);
     }
 
     public void disable() {
@@ -41,20 +40,21 @@ public class EventReport extends Report {
         isEnabled = true;
     }
 
-    private void report(StringBuilder message) {
+    private void report(String reporter, StringBuilder message) {
         Date date = getDate();
         StringBuilder s = new StringBuilder();
         s.append(ROW_START);
         s.append(FIELD_START).append(dateFormat.format(date)).append(FIELD_END);
         s.append(FIELD_START).append(timeFormat.format(date)).append(FIELD_END);
+        s.append(FIELD_START).append(reporter).append(FIELD_END);
         s.append(FIELD_START).append(message).append(FIELD_END);
         s.append(ROW_END);
         write(s);
     }
 
-    public void report(String message) {
+    public void report(String reporter, String message) {
         if (isEnabled) {
-            report(new StringBuilder(message));
+            report(reporter, new StringBuilder(message));
         }
     }
 
@@ -63,15 +63,14 @@ public class EventReport extends Report {
         PrintWriter pw = new PrintWriter(sw);
         t.printStackTrace(pw);
         pw.close();
-        report(new StringBuilder(sw.toString()));
+        report(JBookTrader.APP_NAME, new StringBuilder(sw.toString()));
     }
 
     private Date getDate() {
-        Mode mode = Dispatcher.getMode();
+        Mode mode = Dispatcher.getInstance().getMode();
         if (mode == Mode.ForwardTest || mode == Mode.Trade) {
-            return new Date(NTPClock.getInstance().getTime());
-        } else {
-            return new Date();
+            return new Date(Dispatcher.getInstance().getNTPClock().getTime());
         }
+        return new Date();
     }
 }

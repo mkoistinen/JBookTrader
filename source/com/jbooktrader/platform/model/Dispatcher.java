@@ -2,103 +2,117 @@ package com.jbooktrader.platform.model;
 
 
 import com.jbooktrader.platform.c2.*;
+import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.trader.*;
+import com.jbooktrader.platform.util.*;
 import com.jbooktrader.platform.web.*;
 
+import java.net.*;
 import java.util.*;
 
 /**
  * Acts as the dispatcher of the services.
  */
 public class Dispatcher {
+    private static Dispatcher instance;
+    private final List<ModelListener> listeners;
+    private EventReport eventReport;
+    private C2Manager c2Manager;
+    private Trader trader;
+    private NTPClock ntpClock;
+    private Mode mode;
+    private int activeStrategies;
 
-    public enum Mode {
-        Trade("Trading"),
-        BackTest("Back Testing"),
-        ForwardTest("Forward Testing"),
-        Optimization("Optimizing");
-
-        private final String name;
-
-        Mode(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
+    private Dispatcher() {
+        listeners = new ArrayList<ModelListener>();
     }
 
-
-    private static final List<ModelListener> listeners = new ArrayList<ModelListener>();
-    private static EventReport eventReport;
-    private static Trader trader;
-    private static C2Manager c2Manager;
-    private static Mode mode;
-    private static int activeStrategies;
-
-    public static void setReporter() throws JBookTraderException {
-        eventReport = new EventReport("EventReport");
+    public static synchronized Dispatcher getInstance() {
+        if (instance == null) {
+            instance = new Dispatcher();
+        }
+        return instance;
     }
 
-    public static void addListener(ModelListener listener) {
+    public void setReporter() throws JBookTraderException {
+        eventReport = new EventReport();
+    }
+
+    public void addListener(ModelListener listener) {
         listeners.add(listener);
     }
 
-    public static void removeListener(ModelListener listener) {
+    public void removeListener(ModelListener listener) {
         listeners.remove(listener);
     }
 
-    public static void fireModelChanged(ModelListener.Event event, Object value) {
-        if (mode != Mode.Optimization) {
-            for (ModelListener listener : listeners) {
-                try {
-                    listener.modelChanged(event, value);
-                } catch (Exception e) {
-                    eventReport.report(e);
-                }
+    public void fireModelChanged(Event event, Object value) {
+        for (ModelListener listener : listeners) {
+            try {
+                listener.modelChanged(event, value);
+            } catch (Exception e) {
+                eventReport.report(e);
             }
         }
     }
 
-    public static synchronized Trader getTrader() {
+    public void fireModelChanged(Event event) {
+        fireModelChanged(event, null);
+    }
+
+
+    public synchronized Trader getTrader() {
         if (trader == null) {
             trader = new Trader();
         }
         return trader;
     }
 
-    public static synchronized C2Manager getC2Manager() {
+    public NTPClock getNTPClock() {
+        return ntpClock;
+    }
+
+    public synchronized C2Manager getC2Manager() {
         if (c2Manager == null) {
             c2Manager = new C2Manager();
         }
         return c2Manager;
     }
 
-
-    public static EventReport getEventReport() {
+    public EventReport getEventReport() {
         return eventReport;
     }
 
-    public static Mode getMode() {
+    public Mode getMode() {
         return mode;
     }
 
-    public static void exit() {
+    public void exit() {
         if (trader != null) {
             trader.getAssistant().disconnect();
         }
         System.exit(0);
     }
 
-    public static void setMode(Mode mode) throws JBookTraderException {
+    public void setMode(Mode mode) throws JBookTraderException {
 
-        if (Dispatcher.mode != mode) {
-            eventReport.report("Running mode changed to: " + mode.getName());
+        if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+            try {
+                ntpClock = new NTPClock();
+            } catch (UnknownHostException uhe) {
+                throw new JBookTraderException(uhe);
+            } catch (SocketException se) {
+                throw new JBookTraderException(se);
+            }
         }
 
-        Dispatcher.mode = mode;
+        if (this.mode != mode) {
+            eventReport.report(JBookTrader.APP_NAME, "Running mode changed to: " + mode.getName());
+        }
+
+        this.mode = mode;
 
         // Disable all reporting when JBT runs in optimization mode. The optimizer runs
         // thousands of strategies, and the amount of data to report would be enormous.
@@ -115,18 +129,18 @@ public class Dispatcher {
             trader.getAssistant().disconnect();
         }
 
-        fireModelChanged(ModelListener.Event.ModeChanged, null);
+        fireModelChanged(Event.ModeChanged);
     }
 
-    public static synchronized void strategyStarted() {
+    public synchronized void strategyStarted() {
         activeStrategies++;
-        fireModelChanged(ModelListener.Event.StrategiesStart, null);
+        fireModelChanged(Event.StrategiesStart);
     }
 
-    public static synchronized void strategyCompleted() {
+    public synchronized void strategyCompleted() {
         activeStrategies--;
         if (activeStrategies == 0) {
-            fireModelChanged(ModelListener.Event.StrategiesEnd, null);
+            fireModelChanged(Event.StrategiesEnd);
         }
     }
 }

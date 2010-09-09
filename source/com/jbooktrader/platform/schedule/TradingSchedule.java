@@ -17,8 +17,8 @@ import java.util.*;
  * -- start trading at 9:35 EST
  * -- close open positions at 15:45 EST
  * <p/>
- * A particular period of time within the time window between The "startTime" and "endTime"
- * can be set as exclusionary.
+ * A particular period of time within the time window between the "startTime" and "endTime"
+ * can be excluded.
  * Example: A strategy defines the following trading interval, along with the exclusion period:
  * tradingSchedule = new TradingSchedule("9:35", "15:45", "America/New_York");
  * tradingSchedule.setExclusion("12:00", "13:00");

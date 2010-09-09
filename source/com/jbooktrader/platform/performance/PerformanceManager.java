@@ -4,7 +4,6 @@ import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
@@ -28,6 +27,7 @@ public class PerformanceManager {
     private double peakNetProfit, maxDrawdown;
     private boolean isCompletedTrade;
     private double sumTradeProfit, sumTradeProfitSquared;
+    private long timeInMarketStart, timeInMarket;
 
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
@@ -99,12 +99,10 @@ public class PerformanceManager {
                 double kellyCriterion = probabilityOfWin - (1 - probabilityOfWin) / winLossRatio;
                 kellyCriterion *= 100;
                 return kellyCriterion;
-            } else {
-                return 100;
             }
-        } else {
-            return 0;
+            return 100;
         }
+        return 0;
     }
 
     public double getPerformanceIndex() {
@@ -122,6 +120,15 @@ public class PerformanceManager {
     }
 
     public void updateOnTrade(int quantity, double avgFillPrice, int position) {
+        if (position != 0) {
+            if (timeInMarketStart == 0) {
+                timeInMarketStart = strategy.getTime();
+            }
+        } else {
+            timeInMarket += (strategy.getTime() - timeInMarketStart);
+            timeInMarketStart = 0;
+        }
+
         double tradeAmount = avgFillPrice * Math.abs(quantity) * multiplier;
         if (quantity > 0) {
             totalBought += tradeAmount;
@@ -160,7 +167,7 @@ public class PerformanceManager {
         }
 
 
-        if (Dispatcher.getMode() == BackTest) {
+        if (Dispatcher.getInstance().getMode() == Mode.BackTest) {
             performanceChartData.update(new TimedValue(strategy.getTime(), netProfit));
         }
 

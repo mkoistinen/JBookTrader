@@ -33,7 +33,7 @@ public class MarketBook {
     public void saveSnapshot(MarketSnapshot marketSnapshot) {
         if (backTestFileWriter == null) {
             try {
-                backTestFileWriter = new BackTestFileWriter(name, timeZone, true);
+                backTestFileWriter = new BackTestFileWriter(name, timeZone);
             } catch (JBookTraderException e) {
                 throw new RuntimeException(e);
             }

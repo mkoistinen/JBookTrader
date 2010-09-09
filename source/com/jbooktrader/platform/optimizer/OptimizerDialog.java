@@ -31,12 +31,12 @@ public class OptimizerDialog extends JBTDialog {
     private final String strategyName;
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
-    private JTextField fileNameText, minTradesText, combinationField;
+    private JTextField fileNameText, minTradesText;
     private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
     private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
-    private JLabel progressLabel;
+    private JLabel progressLabel, combinationLabel;
     private JProgressBar progressBar;
     private JTable resultsTable;
     private TableColumnModel paramTableColumnModel;
@@ -59,59 +59,38 @@ public class OptimizerDialog extends JBTDialog {
         initParams();
     }
 
-    public void setProgress(final long count, final long iterations, final String text, final String label) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressLabel.setText(label);
-                int percent = (int) (100 * (count / (double) iterations));
-                progressBar.setValue(percent);
-                progressBar.setString(text + ": " + percent + "% completed");
-            }
-        });
+    public void setProgress(long count, long iterations, String text, String label) {
+        progressLabel.setText(label);
+        int percent = (int) (100 * (count / (double) iterations));
+        progressBar.setValue(percent);
+        progressBar.setString(text + ": " + percent + "% completed");
     }
 
-    public void setProgress(final long count, final long iterations, final String text) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                int percent = (int) (100 * (count / (double) iterations));
-                progressBar.setValue(percent);
-                progressBar.setString(text + percent + "%");
-            }
-        });
+    public void setProgress(long count, long iterations, String text) {
+        int percent = (int) (100 * (count / (double) iterations));
+        progressBar.setValue(percent);
+        progressBar.setString(text + percent + "%");
     }
 
     public void enableProgress() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressLabel.setText("");
-                progressBar.setValue(0);
-                progressPanel.setVisible(true);
-                optimizeButton.setEnabled(false);
-                cancelButton.setEnabled(true);
-                getRootPane().setDefaultButton(cancelButton);
-            }
-        });
+        progressLabel.setText("");
+        progressBar.setValue(0);
+        progressPanel.setVisible(true);
+        optimizeButton.setEnabled(false);
+        cancelButton.setEnabled(true);
+        getRootPane().setDefaultButton(cancelButton);
     }
 
-    public void showProgress(final String progressText) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setValue(0);
-                progressBar.setString(progressText);
-
-            }
-        });
+    public void showProgress(String progressText) {
+        progressBar.setValue(0);
+        progressBar.setString(progressText);
     }
 
     public void signalCompleted() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressPanel.setVisible(false);
-                optimizeButton.setEnabled(true);
-                cancelButton.setEnabled(false);
-                getRootPane().setDefaultButton(optimizationMapButton);
-            }
-        });
+        progressPanel.setVisible(false);
+        optimizeButton.setEnabled(true);
+        cancelButton.setEnabled(false);
+        getRootPane().setDefaultButton(optimizationMapButton);
     }
 
     private void setOptions() throws JBookTraderException {
@@ -260,13 +239,14 @@ public class OptimizerDialog extends JBTDialog {
 
         paramTableModel.addTableModelListener(new TableModelListener() {
             public void tableChanged(TableModelEvent e) {
+
                 if (e.getType() == TableModelEvent.UPDATE) {
                     // We ignore events from the combination field itself.
-                    if (e.getSource() != combinationField) {
+                    if (e.getSource() != combinationLabel) {
                         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0, true);
 
                         // Get number of combinations and display then in the combinationField
-                        combinationField.setText(df0.format(paramTableModel.getNumCombinations()) + " combinations");
+                        combinationLabel.setText(df0.format(paramTableModel.getNumCombinations()) + " combinations");
                     }
                 }
             }
@@ -288,7 +268,7 @@ public class OptimizerDialog extends JBTDialog {
         // strategy panel and its components
         JPanel filenamePanel = new JPanel(new SpringLayout());
 
-        JLabel fileNameLabel = new JLabel("Data file:", JLabel.TRAILING);
+        JLabel fileNameLabel = new JLabel("Data file:", SwingConstants.TRAILING);
         fileNameText = new JTextField();
         fileNameText.setText(prefs.get(BackTesterFileName));
         selectFileButton = new JButton("Browse...");
@@ -346,17 +326,13 @@ public class OptimizerDialog extends JBTDialog {
         paramScrollPane.getViewport().add(paramTable);
         paramScrollPane.setPreferredSize(new Dimension(0, 95));
 
-        combinationField = new JTextField("Calculating combinations...");
-        combinationField.setBackground(fileNameLabel.getBackground());
-        combinationField.setBorder(BorderFactory.createEmptyBorder());
-        combinationField.setFont(new Font(Font.DIALOG, Font.ITALIC, 11));
-        combinationField.setEditable(false);
-        combinationField.setHorizontalAlignment(JTextField.RIGHT);
-        combinationField.setFocusable(false);
-        combinationField.setOpaque(false);
+        combinationLabel = new JLabel("Calculating combinations...");
+
+        combinationLabel.setFont(new Font(combinationLabel.getFont().getFamily(), Font.ITALIC, 10));
+        combinationLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 
         strategyParamPanel.add(paramScrollPane);
-        strategyParamPanel.add(combinationField);
+        strategyParamPanel.add(combinationLabel);
 
         SpringUtilities.makeCompactGrid(strategyParamPanel, 2, 1, 0, 0, 12, 0);
 
@@ -376,6 +352,7 @@ public class OptimizerDialog extends JBTDialog {
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
         String[] sortFactors = new String[] {PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName()};
+
         selectionCriteriaCombo = new JComboBox(sortFactors);
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -438,11 +415,9 @@ public class OptimizerDialog extends JBTDialog {
 
 
         cancelButton = new JButton("Cancel");
-        cancelButton.setMnemonic('C');
         cancelButton.setEnabled(false);
 
         closeButton = new JButton("Close");
-        closeButton.setMnemonic('S');
 
         FlowLayout flowLayout = new FlowLayout(FlowLayout.CENTER, 5, 12);
         JPanel buttonsPanel = new JPanel(flowLayout);
@@ -478,7 +453,7 @@ public class OptimizerDialog extends JBTDialog {
             resultsTableModel = new ResultsTableModel(strategy);
             resultsTable.setModel(resultsTableModel);
             DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) resultsTable.getDefaultRenderer(String.class);
-            renderer.setHorizontalAlignment(JLabel.RIGHT);
+            renderer.setHorizontalAlignment(SwingConstants.RIGHT);
         } catch (Exception e) {
             MessageDialog.showError(e);
         }

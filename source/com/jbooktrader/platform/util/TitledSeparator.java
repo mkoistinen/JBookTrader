@@ -9,12 +9,11 @@ public class TitledSeparator extends JPanel {
         component.setFont(component.getFont().deriveFont(Font.BOLD));
         setLayout(new GridBagLayout());
         add(component);
-        GridBagConstraints constrants = new GridBagConstraints();
-        constrants.anchor = GridBagConstraints.WEST;
-        constrants.fill = GridBagConstraints.HORIZONTAL;
-        constrants.weightx = 1;
-        constrants.insets = new Insets(0, 0, 0, 2);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1;
+        constraints.insets = new Insets(0, 6, 0, 12);
 
-        add(new JSeparator(), constrants);
+        add(new JSeparator(), constraints);
     }
 }

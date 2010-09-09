@@ -48,42 +48,42 @@ public class AboutDialog extends JBTDialog {
         tabbedPane1.addTab("About", aboutPanel);
         tabbedPane1.addTab("API Info", apiPanel);
 
-        JLabel productLabel = new JLabel("Product:", JLabel.TRAILING);
+        JLabel productLabel = new JLabel("Product:", SwingConstants.TRAILING);
         JLabel productValueLabel = new JLabel(JBookTrader.APP_NAME);
         productValueLabel.setForeground(Color.BLACK);
         productLabel.setLabelFor(productValueLabel);
         aboutPanel.add(productLabel);
         aboutPanel.add(productValueLabel);
 
-        JLabel versionLabel = new JLabel("Version:", JLabel.TRAILING);
+        JLabel versionLabel = new JLabel("Version:", SwingConstants.TRAILING);
         JLabel versionValueLabel = new JLabel(JBookTrader.VERSION);
         versionValueLabel.setForeground(Color.BLACK);
         versionLabel.setLabelFor(versionValueLabel);
         aboutPanel.add(versionLabel);
         aboutPanel.add(versionValueLabel);
 
-        JLabel releaseDateLabel = new JLabel("Released:", JLabel.TRAILING);
+        JLabel releaseDateLabel = new JLabel("Released:", SwingConstants.TRAILING);
         JLabel releaseDateValueLabel = new JLabel(JBookTrader.RELEASE_DATE);
         releaseDateValueLabel.setForeground(Color.BLACK);
         releaseDateLabel.setLabelFor(releaseDateValueLabel);
         aboutPanel.add(releaseDateLabel);
         aboutPanel.add(releaseDateValueLabel);
 
-        JLabel authorLabel = new JLabel("Author:", JLabel.TRAILING);
+        JLabel authorLabel = new JLabel("Author:", SwingConstants.TRAILING);
         JLabel authorValueLabel = new JLabel("Eugene Kononov");
         authorValueLabel.setForeground(Color.BLACK);
         authorLabel.setLabelFor(authorValueLabel);
         aboutPanel.add(authorLabel);
         aboutPanel.add(authorValueLabel);
 
-        JLabel emailLabel = new JLabel("Email:", JLabel.TRAILING);
+        JLabel emailLabel = new JLabel("Email:", SwingConstants.TRAILING);
         JLabel emailValueLabel = new JLabel("eugene.kononov@gmail.com");
         emailValueLabel.setForeground(Color.BLACK);
         emailLabel.setLabelFor(productValueLabel);
         aboutPanel.add(emailLabel);
         aboutPanel.add(emailValueLabel);
 
-        JLabel licenseLabel = new JLabel("License:", JLabel.TRAILING);
+        JLabel licenseLabel = new JLabel("License:", SwingConstants.TRAILING);
         JLabel licenseValueLabel = new JLabel("BSD (Free, open source)");
         licenseValueLabel.setForeground(Color.BLACK);
         licenseLabel.setLabelFor(licenseValueLabel);
@@ -92,9 +92,9 @@ public class AboutDialog extends JBTDialog {
 
         SpringUtilities.makeCompactGrid(aboutPanel, 6, 2, 12, 12, 5, 5);
 
-        JLabel serverVersionLabel = new JLabel("Server Version:", JLabel.TRAILING);
+        JLabel serverVersionLabel = new JLabel("Server Version:", SwingConstants.TRAILING);
         String serverVersion = "Disconnected from server";
-        Trader trader = Dispatcher.getTrader();
+        Trader trader = Dispatcher.getInstance().getTrader();
         if (trader != null) {
             int version = trader.getAssistant().getServerVersion();
             if (version != 0) {
@@ -107,7 +107,7 @@ public class AboutDialog extends JBTDialog {
         apiPanel.add(serverVersionLabel);
         apiPanel.add(serverVersionValueLabel);
 
-        JLabel clientVersionLabel = new JLabel("Client Version:", JLabel.TRAILING);
+        JLabel clientVersionLabel = new JLabel("Client Version:", SwingConstants.TRAILING);
         JLabel clientVersionValueLabel = new JLabel("" + EClientSocket.CLIENT_VERSION);
         clientVersionValueLabel.setForeground(Color.BLACK);
         clientVersionLabel.setLabelFor(clientVersionValueLabel);

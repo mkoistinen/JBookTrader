@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.strategy;
 
-import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
@@ -42,12 +41,12 @@ public class StrategyReportManager {
         strategyReportHeaders.add("Date");
         strategyReportHeaders.add("Time");
         strategyReportHeaders.add("Trade #");
-        strategyReportHeaders.add("Price");
         strategyReportHeaders.add("Position");
-        strategyReportHeaders.add("Avg Fill Price");
+        strategyReportHeaders.add("Average Fill");
+        strategyReportHeaders.add("Expected Fill");
         strategyReportHeaders.add("Commission");
-        strategyReportHeaders.add("Trade Net Profit");
-        strategyReportHeaders.add("Total Net Profit");
+        strategyReportHeaders.add("Trade Profit");
+        strategyReportHeaders.add("Total Profit");
     }
 
     public void report() {
@@ -60,22 +59,27 @@ public class StrategyReportManager {
             strategyReport.reportHeaders(strategyReportHeaders);
         }
 
-        MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
         boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
 
         strategyReportColumns.clear();
         strategyReportColumns.add(isCompletedTrade ? String.valueOf(performanceManager.getTrades()) : "--");
-        strategyReportColumns.add(df5.format(marketSnapshot.getPrice()));
         strategyReportColumns.add(String.valueOf(positionManager.getPosition()));
-        strategyReportColumns.add(df5.format(positionManager.getAvgFillPrice()));
+        double averageFillPrice = positionManager.getAvgFillPrice();
+        double expectedFillPrice = positionManager.getExpectedFillPrice();
+        String decoratedExpectedFillPrice = df5.format(expectedFillPrice);
+        if (averageFillPrice != expectedFillPrice) {
+            decoratedExpectedFillPrice = "<b>" + decoratedExpectedFillPrice + "</b>";
+        }
+        strategyReportColumns.add(df5.format(averageFillPrice));
+        strategyReportColumns.add(decoratedExpectedFillPrice);
         strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
         strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");
         strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
 
-        Dispatcher.Mode mode = Dispatcher.getMode();
-        boolean useNTPTime = (mode == Dispatcher.Mode.ForwardTest || mode == Dispatcher.Mode.Trade);
+        Mode mode = Dispatcher.getInstance().getMode();
+        boolean useNTPTime = (mode == Mode.ForwardTest || mode == Mode.Trade);
 
-        long now = useNTPTime ? NTPClock.getInstance().getTime() : strategy.getTime();
+        long now = useNTPTime ? Dispatcher.getInstance().getNTPClock().getTime() : strategy.getTime();
         String date = dateFormat.format(now);
         String time = timeFormat.format(now);
         strategyReport.report(strategyReportColumns, date, time);

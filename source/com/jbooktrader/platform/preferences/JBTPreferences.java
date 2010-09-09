@@ -11,7 +11,6 @@ public enum JBTPreferences {
     WebAccessPort("Web Access Port", "1234"),
     WebAccessUser("Web Access User", "admin"),
     WebAccessPassword("Web Access Password", "admin"),
-    WebAccessTableLayout("Table Layout", "simple"),
 
     // Back tester
     BackTesterFileName("backTester.dataFileName", ""),
@@ -60,12 +59,7 @@ public enum JBTPreferences {
     Collective2Strategies("C2 Strategies", ""),
 
     // Time Server
-    NTPTimeServer("NTP time server", "ntp2.usno.navy.mil"),
-
-    // Look & Feel
-    LookAndFeel("Look & Feel", "Substance"),
-    Skin("Skin", "Mist Aqua");
-
+    NTPTimeServer("NTP time server", "ntp2.usno.navy.mil");
 
     private final String name, defaultValue;
 

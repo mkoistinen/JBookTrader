@@ -3,14 +3,15 @@ package com.jbooktrader.platform.model;
 public enum StrategyTableColumn {
     Strategy("Strategy"),
     Symbol("Symbol"),
-    DepthBalance("Depth Balance"),
-    Indicators("Indicators"),
+    DepthBalance("Book Balance"),
     Price("Price"),
     Position("Position"),
     Trades("Trades"),
-    NetProfit("Net Profit"),
     ProfitFactor("Profit Factor"),
-    MaxDD("Max DD");
+    PI("PI"),
+    Kelly("Kelly"),
+    MaxDD("Max DD"),
+    NetProfit("Net Profit");
 
     private final String columnName;
 

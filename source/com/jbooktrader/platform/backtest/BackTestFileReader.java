@@ -58,8 +58,8 @@ public class BackTestFileReader {
     }
 
     public void scan() throws JBookTraderException {
-        String line;
         try {
+            String line;
             while ((line = reader.readLine()) != null && !cancelled) {
                 lineNumber++;
                 boolean isComment = line.startsWith("#");
@@ -67,20 +67,20 @@ public class BackTestFileReader {
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                    MarketSnapshot marketSnapshot = toMarketDepth(line);
-                    if (filter == null || filter.accept(marketSnapshot)) {
-                        snapshotCount++;
-                        if (firstMarketLine == 0) {
-                            firstMarketLine = lineNumber;
-                        }
+                    snapshotCount++;
+                    if (firstMarketLine == 0) {
+                        firstMarketLine = lineNumber;
                     }
-                }
-
-                if (isProperty) {
+                } else if (isProperty) {
                     if (line.startsWith("timeZone")) {
                         setTimeZone(line);
                     }
                 }
+            }
+
+            if (sdf == null) {
+                String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
+                throw new JBookTraderException(msg);
             }
 
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
@@ -88,7 +88,6 @@ public class BackTestFileReader {
                 reader.readLine();
             }
             lineNumber = firstMarketLine;
-
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not read data file");
         }
@@ -106,14 +105,13 @@ public class BackTestFileReader {
                 if (line == null) {
                     reader.close();
                     break;
+                }
+                marketSnapshot = toMarketDepth(line);
+                lineNumber++;
+                if (filter == null || filter.accept(marketSnapshot)) {
+                    previousTime = marketSnapshot.getTime();
                 } else {
-                    marketSnapshot = toMarketDepth(line);
-                    lineNumber++;
-                    if (filter == null || filter.accept(marketSnapshot)) {
-                        previousTime = marketSnapshot.getTime();
-                    } else {
-                        marketSnapshot = null;
-                    }
+                    marketSnapshot = null;
                 }
             }
         } catch (IOException ioe) {
@@ -137,11 +135,6 @@ public class BackTestFileReader {
 
 
     private MarketSnapshot toMarketDepth(String line) throws JBookTraderException {
-        if (sdf == null) {
-            String msg = "Property " + "\"timeZone\"" + " is not defined in the data file." + LINE_SEP;
-            throw new JBookTraderException(msg);
-        }
-
         StringTokenizer st = new StringTokenizer(line, ",");
 
         int tokenCount = st.countTokens();

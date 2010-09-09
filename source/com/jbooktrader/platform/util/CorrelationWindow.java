@@ -2,7 +2,7 @@ package com.jbooktrader.platform.util;
 
 public class CorrelationWindow {
     private class Pair {
-        public double value1, value2;
+        public final double value1, value2;
 
         public Pair(double value1, double value2) {
             this.value1 = value1;

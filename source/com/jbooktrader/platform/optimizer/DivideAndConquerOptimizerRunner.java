@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
- * historical market depth.
+ * historical market snapshots.
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
@@ -31,7 +31,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         }
 
         int divider = 3;
-        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider / 2.0));
+        int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider));
 
         long completedSteps = 0;
         LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
@@ -68,8 +68,8 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             setTotalStrategies(filteredTasksSize);
             execute(filteredTasks);
 
-            iterationsRemaining--;
-            completedSteps += snapshotCount * filteredTasks.size();
+            iterationsRemaining = Math.max(1, --iterationsRemaining);
+            completedSteps += snapshotCount * filteredTasksSize;
 
             if (optimizationResults.isEmpty() && !cancelled) {
                 throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
@@ -84,7 +84,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 for (StrategyParam param : params.getAll()) {
                     String name = param.getName();
                     int value = param.getValue();
-                    int displacement = (int) Math.ceil(param.getStep() / (double) divider);
+                    int displacement = (int) Math.round(param.getStep() / (double) divider);
                     StrategyParam originalParam = strategyParams.get(name);
                     // Don't push beyond the user-specified boundaries
                     param.setMin(Math.max(originalParam.getMin(), value - displacement));

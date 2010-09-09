@@ -61,13 +61,14 @@ public class OptimizationMap {
 
         Border etchedBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
         TitledBorder border = BorderFactory.createTitledBorder(etchedBorder, "Optimization Map Options");
+        border.setTitlePosition(TitledBorder.TOP);
         chartOptionsPanel.setBorder(border);
 
-        JLabel horizontalLabel = new JLabel("Horizontal:", JLabel.TRAILING);
+        JLabel horizontalLabel = new JLabel("Horizontal:", SwingConstants.TRAILING);
         horizontalCombo = new JComboBox();
         horizontalLabel.setLabelFor(horizontalCombo);
 
-        JLabel verticalLabel = new JLabel("Vertical:", JLabel.TRAILING);
+        JLabel verticalLabel = new JLabel("Vertical:", SwingConstants.TRAILING);
         verticalCombo = new JComboBox();
         verticalLabel.setLabelFor(verticalCombo);
 
@@ -80,13 +81,13 @@ public class OptimizationMap {
         horizontalCombo.setSelectedIndex(0);
         verticalCombo.setSelectedIndex(1);
 
-        JLabel caseLabel = new JLabel("Case:", JLabel.TRAILING);
+        JLabel caseLabel = new JLabel("Case:", SwingConstants.TRAILING);
         caseCombo = new JComboBox(new String[] {"Best", "Worst"});
         caseCombo.setSelectedIndex(0);
         caseLabel.setLabelFor(caseCombo);
 
 
-        JLabel colorMapLabel = new JLabel("Color map:", JLabel.TRAILING);
+        JLabel colorMapLabel = new JLabel("Color map:", SwingConstants.TRAILING);
         colorMapCombo = new JComboBox(new String[] {"Heat", "Gray"});
         colorMapLabel.setLabelFor(colorMapCombo);
 
@@ -105,6 +106,7 @@ public class OptimizationMap {
 
         chartPanel = new ChartPanel(chart);
         TitledBorder chartBorder = BorderFactory.createTitledBorder(etchedBorder, "Optimization Map");
+        chartBorder.setTitlePosition(TitledBorder.TOP);
         chartPanel.setBorder(chartBorder);
 
         centerPanel.add(chartPanel);
@@ -123,7 +125,7 @@ public class OptimizationMap {
                 prefs.set(OptimizationMapHeight, chartFrame.getHeight());
                 prefs.set(OptimizationMapX, chartFrame.getX());
                 prefs.set(OptimizationMapY, chartFrame.getY());
-                chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                chartFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             }
         });
 
@@ -173,22 +175,7 @@ public class OptimizationMap {
 
 
     private double getMetric(OptimizationResult optimizationResult) {
-        double metric = 0;
-        switch (sortPerformanceMetric) {
-            case NetProfit:
-                metric = optimizationResult.getNetProfit();
-                break;
-            case PF:
-                metric = optimizationResult.getProfitFactor();
-                break;
-            case Kelly:
-                metric = optimizationResult.getKellyCriterion();
-                break;
-            case PI:
-                metric = optimizationResult.getPerformanceIndex();
-                break;
-        }
-        return metric;
+        return optimizationResult.get(sortPerformanceMetric);
     }
 
 

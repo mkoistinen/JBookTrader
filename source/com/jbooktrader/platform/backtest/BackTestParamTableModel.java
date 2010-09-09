@@ -7,11 +7,12 @@ import com.jbooktrader.platform.optimizer.*;
  * Strategy parameters table model for the back test dialog.
  */
 public class BackTestParamTableModel extends TableDataModel {
-    private static final String[] SCHEMA = {"Parameter", "Value", "Min", "Max"};
+    private static final String[] SCHEMA = {"Parameter", "Value"};
 
     public BackTestParamTableModel() {
         setSchema(SCHEMA);
     }
+
 
     @Override
     public Class<?> getColumnClass(int column) {
@@ -26,13 +27,10 @@ public class BackTestParamTableModel extends TableDataModel {
 
     public void setParams(StrategyParams strategyParams) {
         removeAllData();
-
         for (StrategyParam param : strategyParams.getAll()) {
             Object[] row = new Object[getColumnCount() + 1];
             row[0] = param.getName();
             row[1] = param.getValue();
-            row[2] = param.getMin();
-            row[3] = param.getMax();
             addRow(row);
         }
     }

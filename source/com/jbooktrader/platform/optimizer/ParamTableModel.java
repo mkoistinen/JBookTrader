@@ -55,10 +55,9 @@ public class ParamTableModel extends TableDataModel {
 
     public long getNumCombinations() {
         long product = 1;
-        Object[] row;
 
         for (int rowIndex = 0; rowIndex < getRowCount(); rowIndex++) {
-            row = getRow(rowIndex);
+            Object[] row = getRow(rowIndex);
             product *= (((Integer) row[2] - (Integer) row[1]) / (Integer) row[3]) + 1;
         }
 

@@ -8,7 +8,6 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
-import javax.swing.*;
 import java.text.*;
 import java.util.*;
 
@@ -16,6 +15,7 @@ import java.util.*;
  */
 public class StrategyTableModel extends TableDataModel {
     private final TraderAssistant traderAssistant;
+    private final DecimalFormat df0, df2, df6;
 
     public StrategyTableModel() {
         StrategyTableColumn[] columns = StrategyTableColumn.values();
@@ -24,7 +24,10 @@ public class StrategyTableModel extends TableDataModel {
             allColumns.add(column.getColumnName());
         }
         setSchema(allColumns.toArray(new String[columns.length]));
-        traderAssistant = Dispatcher.getTrader().getAssistant();
+        traderAssistant = Dispatcher.getInstance().getTrader().getAssistant();
+        df0 = NumberFormatterFactory.getNumberFormatter(0);
+        df2 = NumberFormatterFactory.getNumberFormatter(2);
+        df6 = NumberFormatterFactory.getNumberFormatter(6);
     }
 
     public String getStrategyNameForRow(int row) {
@@ -44,7 +47,7 @@ public class StrategyTableModel extends TableDataModel {
         String strategyName = getStrategyNameForRow(row);
         strategy = ClassFinder.getInstance(strategyName);
         update(strategy);
-        fireTableRowsUpdated(row, row);
+
         return strategy;
     }
 
@@ -62,33 +65,27 @@ public class StrategyTableModel extends TableDataModel {
     }
 
     public void update(Strategy strategy) {
-        DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
-        DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
-        DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
-
-        final int row = getRowForStrategy(strategy);
+        int rowIndex = getRowForStrategy(strategy);
+        Map<StrategyTableColumn, Object> row = new HashMap<StrategyTableColumn, Object>();
 
         MarketBook marketBook = strategy.getMarketBook();
         if (!marketBook.isEmpty()) {
             MarketSnapshot lastMarketSnapshot = marketBook.getSnapshot();
-            setValueAtFast(df6.format(lastMarketSnapshot.getPrice()), row, Price.ordinal());
-            setValueAtFast(lastMarketSnapshot.getBalance(), row, DepthBalance.ordinal());
+            row.put(Price, df6.format(lastMarketSnapshot.getPrice()));
+            row.put(DepthBalance, df0.format(lastMarketSnapshot.getBalance()));
         }
 
-        setValueAtFast(strategy.getIndicatorManager().indicatorsState(), row, Indicators.ordinal());
-        setValueAtFast(strategy.getPositionManager().getPosition(), row, Position.ordinal());
+        row.put(Position, strategy.getPositionManager().getPosition());
 
-        PerformanceManager performanceManager = strategy.getPerformanceManager();
-        setValueAtFast(performanceManager.getTrades(), row, Trades.ordinal());
-        setValueAtFast(df0.format(performanceManager.getMaxDrawdown()), row, MaxDD.ordinal());
-        setValueAtFast(df0.format(performanceManager.getNetProfit()), row, NetProfit.ordinal());
-        setValueAtFast(df2.format(performanceManager.getProfitFactor()), row, ProfitFactor.ordinal());
+        PerformanceManager pm = strategy.getPerformanceManager();
+        row.put(Trades, df0.format(pm.getTrades()));
+        row.put(ProfitFactor, df2.format(pm.getProfitFactor()));
+        row.put(PI, df2.format(pm.getPerformanceIndex()));
+        row.put(Kelly, df0.format(pm.getKellyCriterion()));
+        row.put(MaxDD, df0.format(pm.getMaxDrawdown()));
+        row.put(NetProfit, df0.format(pm.getNetProfit()));
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                fireTableRowsUpdated(row, row);
-            }
-        });
+        updateRow(rowIndex, row);
     }
 
     public void addStrategy(Strategy strategy) {

@@ -53,11 +53,12 @@ public class ClassFinder {
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
             if (Modifier.isAbstract(clazz.getModifiers())) {
                 return null;
-            } else {
-                Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
-                Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-                return (Strategy) constructor.newInstance(params);
             }
+
+            Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
+            Constructor<?> constructor = clazz.getConstructor(parameterTypes);
+            return (Strategy) constructor.newInstance(params);
+
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend Strategy.");
         } catch (ClassNotFoundException cnte) {

@@ -9,24 +9,26 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Defender2 extends StrategyES {
+public class TensionSeeker extends StrategyES {
 
     // Technical indicators
     private final Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
-    private static final String SLOW_PERIOD = "Slow Period";
+    private static final String FAST_PERIOD = "FastPeriod";
+    private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
+
 
     // Strategy parameters values
     private final int entry;
 
-    public Defender2(StrategyParams optimizationParams) throws JBookTraderException {
+
+    public TensionSeeker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 2);
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 1);
         addIndicator(tensionInd);
     }
 
@@ -38,9 +40,9 @@ public class Defender2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 20, 40, 1, 28);
-        addParam(SLOW_PERIOD, 8000, 12000, 100, 8985);
-        addParam(ENTRY, 30, 35, 1, 32);
+        addParam(FAST_PERIOD, 200, 5000, 50, 456);
+        addParam(SLOW_PERIOD, 2000, 6000, 100, 4410);
+        addParam(ENTRY, 1, 20, 1, 14);
     }
 
     /**
@@ -55,8 +57,6 @@ public class Defender2 extends StrategyES {
             setPosition(1);
         } else if (tension <= -entry) {
             setPosition(-1);
-        } else if (Math.abs(tension) <= 2) {
-            setPosition(0);
         }
     }
 }

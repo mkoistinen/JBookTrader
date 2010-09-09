@@ -4,12 +4,12 @@ import java.text.*;
 import java.util.*;
 
 /**
- * Certain futures contracts (such as ES) expire on the 3rd Friday of the contract
- * month, but the volume shifts to the next month contract on the business day
- * preceeding the 2nd Friday of the expiration month. For example, a 200606
- * contract had more volume than a 200609 contract on Wednesday June 7, 2006,
- * but on Thursday, June 8th (the day preceeding the 2nd Friday of the expiration),
- * the 200609 contract had more volume than the 200606 contract.
+ * Certain futures contracts (such as ES) expire on the 3rd Friday of the
+ * contract month, but the volume shifts to the next month contract on the
+ * business day preceding the 2nd Friday of the expiration month. For example,
+ * a 200606 contract had more volume than a 200609 contract on Wednesday June 7,
+ * 2006, but on Thursday, June 8th (the day preceding the 2nd Friday of the
+ * expiration), the 200609 contract had more volume than the 200606 contract.
  * <p/>
  * This utility calculates the most liquid contract traded as of given date.
  */
@@ -68,8 +68,9 @@ public class MostLiquidContract {
     }
 
     /**
-     * For the contracts whose volume shifts from the front contract to the back contract
-     * on the day preceding the 2nd Friday of expiration month of the front contract.
+     * For the contracts whose volume shifts from the front contract to the back
+     * contract on the day preceding the 2nd Friday of expiration month of the
+     * front contract.
      */
     public static String getMostLiquid(Calendar asOfDate) {
 

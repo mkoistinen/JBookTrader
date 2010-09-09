@@ -3,16 +3,16 @@ package com.jbooktrader.indicator.velocity;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Measures the velocity of the strength of a trend.
+ * Measures the velocity of the price trend velocity.
  */
-public class TrendStrengthVelocity extends Indicator {
+public class PriceTrendVelocity extends Indicator {
     private final double multiplier;
     private double upEma, downEma;
     private double smoothedTrend, doubleSmoothedTrend;
     private double previousPrice;
 
 
-    public TrendStrengthVelocity(int periodLength) {
+    public PriceTrendVelocity(int periodLength) {
         multiplier = 2.0 / (periodLength + 1.0);
     }
 

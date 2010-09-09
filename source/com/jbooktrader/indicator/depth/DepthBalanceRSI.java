@@ -4,7 +4,7 @@ import com.jbooktrader.platform.indicator.*;
 
 
 /**
- * Relative Strength Index of the market depth balance
+ * Relative Strength Index of the balance in the market limit order book
  * Specification: http://en.wikipedia.org/wiki/Relative_strength
  */
 public class DepthBalanceRSI extends Indicator {

@@ -4,15 +4,11 @@ import javax.swing.table.*;
 import java.util.*;
 
 public class TableDataModel extends AbstractTableModel {
-    private final List<Object> rows;
+    protected final List<Object> rows;
     private String[] schema;
 
     public TableDataModel() {
         rows = new ArrayList<Object>();
-    }
-
-    protected void addRowFast(Object[] item) {
-        rows.add(item);
     }
 
     public void addRow(Object[] item) {
@@ -24,12 +20,15 @@ public class TableDataModel extends AbstractTableModel {
     public void setValueAt(Object value, int row, int col) {
         Object[] changedItem = (Object[]) rows.get(row);
         changedItem[col] = value;
-        fireTableCellUpdated(row, col);
+        fireTableRowsUpdated(row, row);
     }
 
-    protected void setValueAtFast(Object value, int row, int col) {
+    protected void updateRow(int row, Map<StrategyTableColumn, Object> rowData) {
         Object[] changedItem = (Object[]) rows.get(row);
-        changedItem[col] = value;
+        for (Map.Entry<StrategyTableColumn, Object> entry : rowData.entrySet()) {
+            changedItem[entry.getKey().ordinal()] = entry.getValue();
+        }
+        fireTableRowsUpdated(row, row);
     }
 
     protected void removeAllData() {

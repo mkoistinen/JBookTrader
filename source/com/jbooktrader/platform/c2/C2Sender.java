@@ -2,6 +2,7 @@ package com.jbooktrader.platform.c2;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.report.*;
+import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
 import java.net.*;
@@ -10,7 +11,7 @@ import java.util.concurrent.*;
 
 
 public class C2Sender extends Thread {
-    private static final EventReport report = Dispatcher.getEventReport();
+    private static final EventReport report = Dispatcher.getInstance().getEventReport();
     private static boolean shutdown;
     private final Queue<URL> urls;
     private static C2Sender instance;
@@ -32,7 +33,7 @@ public class C2Sender extends Thread {
     }
 
     private void send(URL url) throws IOException {
-        report.report("submitting signal to Collective2");
+        report.report(JBookTrader.APP_NAME, "submitting signal to Collective2");
         URLConnection connection = url.openConnection();
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -46,7 +47,7 @@ public class C2Sender extends Thread {
             reader.close();
         }
 
-        report.report("Collective2: " + response.toString());
+        report.report(JBookTrader.APP_NAME, "Collective2: " + response.toString());
     }
 
 
@@ -71,7 +72,7 @@ public class C2Sender extends Thread {
                     try {
                         // the job is still in the queue, retry again in one second
                         report.report(e);
-                        report.report("Failed sending trade to Collective2, will retry in 1 second.");
+                        report.report(JBookTrader.APP_NAME, "Failed sending trade to Collective2, will retry in 1 second.");
                         sleep(1000);
                     } catch (InterruptedException ie) {
                         // ignore

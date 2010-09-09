@@ -9,6 +9,7 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
+
 /**
  * Writes historical market data to a file which is used for
  * backtesting and optimization of trading strategies.
@@ -21,7 +22,7 @@ public class BackTestFileWriter {
     private final SimpleDateFormat dateFormat;
     private PrintWriter writer;
 
-    public BackTestFileWriter(String fileName, TimeZone timeZone, boolean isAutoSave) throws JBookTraderException {
+    public BackTestFileWriter(String strategyName, TimeZone timeZone) throws JBookTraderException {
         decimalFormat = NumberFormatterFactory.getNumberFormatter(5);
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
@@ -31,16 +32,13 @@ public class BackTestFileWriter {
             marketDataDir.mkdir();
         }
 
-        String fullFileName = fileName;
-        if (isAutoSave) {
-            fullFileName = MARKET_DATA_DIR + FILE_SEP + fileName + ".txt";
-        }
-
+        String fileName = MARKET_DATA_DIR + FILE_SEP + strategyName + ".txt";
         try {
-            boolean fileExisted = new File(fullFileName).exists();
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
+            boolean fileExisted = new File(fileName).exists();
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
             if (!fileExisted) {
-                writeHeader();
+                StringBuilder header = getHeader();
+                writer.println(header);
             }
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not write to file " + fileName);
@@ -50,21 +48,12 @@ public class BackTestFileWriter {
 
     public void write(MarketSnapshot marketSnapshot) {
         StringBuilder sb = new StringBuilder();
-        sb.append(dateFormat.format(new Date(marketSnapshot.getTime()))).append(",");
+        sb.append(dateFormat.format(marketSnapshot.getTime())).append(",");
         sb.append(marketSnapshot.getBalance()).append(",");
         sb.append(decimalFormat.format(marketSnapshot.getPrice()));
 
         writer.println(sb);
         writer.flush();
-    }
-
-    public void close() {
-        writer.close();
-    }
-
-    private void writeHeader() {
-        StringBuilder header = getHeader();
-        writer.println(header);
     }
 
     private StringBuilder getHeader() {

@@ -13,8 +13,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "7.06";
-    public static final String RELEASE_DATE = "June 12, 2010";
+    public static final String VERSION = "7.07";
+    public static final String RELEASE_DATE = "September 8, 2010";
     private static String appPath;
 
     /**
@@ -22,24 +22,18 @@ public class JBookTrader {
      * views, and controller.
      */
     private JBookTrader() throws JBookTraderException {
-
+        Dispatcher.getInstance().setReporter();
         try {
-            LookAndFeelManager.setFromPreferences();
-        } catch (Throwable t) {
-            String msg = t.getMessage() + ": Unable to set custom look & feel. The default L&F will be used.";
-            MessageDialog.showMessage(msg);
-        }
-
-        Dispatcher.setReporter();
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    new MainFrameController();
-                } catch (Exception e) {
-                    MessageDialog.showError(e);
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
                 }
             }
-        });
+        } catch (Exception e) {
+            throw new JBookTraderException(e);
+        }
+        new MainFrameController();
     }
 
     /**

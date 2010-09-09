@@ -23,7 +23,7 @@ import java.util.*;
  * Dialog to specify options for back testing using a historical data file.
  */
 public class BackTestDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(770, 450);// minimum frame size
+    private static final Dimension MIN_SIZE = new Dimension(600, 350);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JButton cancelButton, backTestButton, selectFileButton;
@@ -71,27 +71,19 @@ public class BackTestDialog extends JBTDialog {
     }
 
 
-    public void setProgress(final long count, final long iterations) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                int percent = (int) (100 * (count / (double) iterations));
-                progressBar.setValue(percent);
-                progressBar.setString("Running back test: " + percent + "%");
-            }
-        });
+    public void setProgress(long count, long iterations) {
+        int percent = (int) (100 * (count / (double) iterations));
+        progressBar.setValue(percent);
+        progressBar.setString("Running back test: " + percent + "%");
     }
 
     public void enableProgress() {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                progressBar.setValue(0);
-                progressBar.setString("Starting back test...");
-                progressBar.setVisible(true);
-                backTestButton.setEnabled(false);
-                cancelButton.setEnabled(true);
-                getRootPane().setDefaultButton(cancelButton);
-            }
-        });
+        progressBar.setValue(0);
+        progressBar.setString("Starting back test...");
+        progressBar.setVisible(true);
+        backTestButton.setEnabled(false);
+        cancelButton.setEnabled(true);
+        getRootPane().setDefaultButton(cancelButton);
     }
 
     public void showProgress(String progressText) {
@@ -249,9 +241,6 @@ public class BackTestDialog extends JBTDialog {
         paramTable.setShowVerticalLines(false);
         paramTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        TableColumnModel columns = paramTable.getColumnModel();
-        columns.getColumn(1).setCellRenderer(new ValueColumnRenderer());
-
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.getViewport().add(paramTable);
         centerPanel.add(scrollPane);
@@ -271,7 +260,6 @@ public class BackTestDialog extends JBTDialog {
         backTestButton = new JButton("Back Test");
         backTestButton.setMnemonic('B');
         cancelButton = new JButton("Cancel");
-        cancelButton.setMnemonic('C');
         buttonsPanel.add(backTestButton);
         buttonsPanel.add(cancelButton);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);
@@ -294,12 +282,10 @@ public class BackTestDialog extends JBTDialog {
     }
 
     public MarketSnapshotFilter getDateFilter() {
-        MarketSnapshotFilter filter = null;
-
-        if (useDateRangeCheckBox.isSelected()) {
-            filter = new MarketSnapshotFilter(fromDateEditor, toDateEditor);
+        if (!useDateRangeCheckBox.isSelected()) {
+            return null;
         }
 
-        return filter;
+        return new MarketSnapshotFilter(fromDateEditor, toDateEditor);
     }
 }

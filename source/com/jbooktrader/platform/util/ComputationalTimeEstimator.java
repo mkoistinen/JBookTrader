@@ -24,14 +24,13 @@ public class ComputationalTimeEstimator {
         this.totalIterations = totalIterations;
     }
 
-    public String getTimeLeft(long iterationsSoFar) {
+    public String getTimeLeft(long completedIterations) {
         String timeLeft = "";
 
-        if (iterationsSoFar > MIN_ITERATIONS) {
+        if (completedIterations > MIN_ITERATIONS) {
             long elapsedTime = System.currentTimeMillis() - startTime;
-            double millisPerIteration = (double) elapsedTime / iterationsSoFar;
-            long remainingMillis = (long) (millisPerIteration * (totalIterations - iterationsSoFar));
-
+            double millisPerIteration = (double) elapsedTime / completedIterations;
+            long remainingMillis = (long) (millisPerIteration * (totalIterations - completedIterations));
 
             long remainingDays = remainingMillis / MILLIS_IN_DAY;
             if (remainingDays == 0) {

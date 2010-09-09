@@ -2,7 +2,6 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.Dispatcher.Mode.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -18,7 +17,7 @@ import java.util.*;
 
 /**
  * Main application window. All the system logic is intentionally left out if this class,
- * which acts as a simple "view" of the undelying model.
+ * which acts as a simple "view" of the underlying model.
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private final Toolkit toolkit;
@@ -41,7 +40,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     public void modelChanged(Event event, Object value) {
         switch (event) {
             case ModeChanged:
-                String subTitle = Dispatcher.getMode().getName();
+                String subTitle = Dispatcher.getInstance().getMode().getName();
                 setTitle(JBookTrader.APP_NAME + " - [" + subTitle + "]");
                 break;
             case Error:
@@ -58,11 +57,11 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 strategyTableModel.update(strategy);
                 break;
             case StrategiesStart:
-                Dispatcher.Mode mode = Dispatcher.getMode();
-                if (mode == Trade) {
+                Mode mode = Dispatcher.getInstance().getMode();
+                if (mode == Mode.Trade) {
                     forwardTestMenuItem.setEnabled(false);
                 }
-                if (mode == ForwardTest) {
+                if (mode == Mode.ForwardTest) {
                     tradeMenuItem.setEnabled(false);
                 }
 
@@ -247,7 +246,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         strategyTable.setShowGrid(false);
 
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) strategyTable.getDefaultRenderer(String.class);
-        renderer.setHorizontalAlignment(JLabel.RIGHT);
+        renderer.setHorizontalAlignment(SwingConstants.RIGHT);
 
         // Make some columns wider than the rest, so that the info fits in.
         TableColumnModel columnModel = strategyTable.getColumnModel();

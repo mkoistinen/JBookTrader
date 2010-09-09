@@ -10,24 +10,16 @@ import javax.swing.*;
  */
 public class MessageDialog {
 
-    public static void showMessage(final String msg) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(null, msg, JBookTrader.APP_NAME, JOptionPane.INFORMATION_MESSAGE);
-            }
-        });
+    public static void showMessage(String msg) {
+        JOptionPane.showMessageDialog(null, msg, JBookTrader.APP_NAME, JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public static void showError(final String msg) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                JOptionPane.showMessageDialog(null, msg, JBookTrader.APP_NAME, JOptionPane.ERROR_MESSAGE);
-            }
-        });
+    public static void showError(String msg) {
+        JOptionPane.showMessageDialog(null, msg, JBookTrader.APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
     public static void showError(Throwable t) {
-        Dispatcher.getEventReport().report(t);
+        Dispatcher.getInstance().getEventReport().report(t);
         showError(t.getMessage());
     }
 }

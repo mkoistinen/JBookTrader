@@ -2,6 +2,7 @@ package com.jbooktrader.platform.strategy;
 
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
@@ -13,6 +14,7 @@ public class StrategyRunner {
     private final TraderAssistant traderAssistant;
     private final NTPClock ntpClock;
     private Collection<MarketBook> marketBooks;
+    private final Dispatcher dispatcher;
     private static StrategyRunner instance;
 
     class SnapshotHandler implements Runnable {
@@ -38,10 +40,10 @@ public class StrategyRunner {
                         }
                     }
 
-                    Dispatcher.fireModelChanged(ModelListener.Event.TimeUpdate, snapshotTime);
+                    dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
                 }
             } catch (Throwable t) {
-                Dispatcher.getEventReport().report(t);
+                dispatcher.getEventReport().report(t);
             }
         }
     }
@@ -54,9 +56,10 @@ public class StrategyRunner {
     }
 
     private StrategyRunner() {
-        ntpClock = NTPClock.getInstance();
+        dispatcher = Dispatcher.getInstance();
+        ntpClock = dispatcher.getNTPClock();
         ntpClock.reportAttributes();
-        traderAssistant = Dispatcher.getTrader().getAssistant();
+        traderAssistant = dispatcher.getTrader().getAssistant();
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleWithFixedDelay(new SnapshotHandler(), 0, 500, TimeUnit.MILLISECONDS);

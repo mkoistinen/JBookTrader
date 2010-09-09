@@ -1,0 +1,67 @@
+body {
+	background: white url(background.png) repeat; 
+	margin: 0;
+	font-family: Arial, sans-serif;
+	color: black;
+}
+
+h1 {
+	margin: 0; 
+	padding: 8px; 
+	font-size: 14px; 
+	text-align: center; 
+	color: black; 
+	border-bottom: 1px solid #2d3642;
+	text-decoration: none; 
+}
+
+table {
+	table-layout: auto;
+	background-color: white;
+	border-style: none; 
+	border-collapse: collapse;
+	width: 100%
+}
+
+td, th {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow-x: clip;
+}
+
+/* Odd table rows are rendered in light blue, by default */
+tr.oddRow td {background-color: #edf1ff;}
+
+/* Default table cell */
+td {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	font-weight: bold;
+	text-align: right;
+	white-space: nowrap;
+}
+
+
+tr th {
+	background-color: rgb(255, 204, 51); 
+	font-style: bold;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: right;
+	border-width: 0px 1px;
+}
+
+tr th.last {padding-right: 8px;}
+tr td.last {padding-right: 8px;}
+
+tr.strategy td {
+	color: black;
+	font-size: 13px;
+	line-height: 15px;
+	text-align: right;
+	border-top: 1px solid #E0E0E0;
+}
+
+tr.strategy span.na {color: #7f7f7f;}
+

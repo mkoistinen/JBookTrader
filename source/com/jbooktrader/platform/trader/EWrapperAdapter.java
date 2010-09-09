@@ -71,9 +71,6 @@ public class EWrapperAdapter implements EWrapper {
     public void bondContractDetails(int reqId, ContractDetails contractDetails) {
     }
 
-    public void bondContractDetails(ContractDetails contractDetails) {
-    }
-
     public void execDetails(int reqId, Contract contract, Execution execution) {
     }
 

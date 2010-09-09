@@ -34,36 +34,25 @@ public class PerformanceChart {
     private final Strategy strategy;
     private final ArrayList<CircledTextAnnotation> annotations = new ArrayList<CircledTextAnnotation>();
     private final PreferencesHolder prefs;
-    private final List<FastXYPlot> indicatorPlots;
+    private final List<XYPlot> indicatorPlots;
     private final PerformanceChartData performanceChartData;
 
     private JFreeChart chart;
     private JFrame chartFrame;
     private CombinedDomainXYPlot combinedPlot;
     private DateAxis dateAxis;
-    private FastXYPlot pricePlot, pnlPlot;
+    private XYPlot pricePlot, pnlPlot;
     private CandlestickRenderer candleRenderer;
-    private MultiColoredBarRenderer mcbRenderer;
-    private JComboBox chartTypeCombo, timeLineCombo, timeZoneCombo;
+    private JComboBox timeLineCombo, timeZoneCombo;
     private JCheckBox indicatorVisibilityCheck, tradesVisibilityCheck, pnlVisibilityCheck;
 
     public PerformanceChart(JFrame parent, Strategy strategy) {
-        indicatorPlots = new ArrayList<FastXYPlot>();
+        indicatorPlots = new ArrayList<XYPlot>();
         performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
         prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
         createChartFrame(parent);
         registerListeners();
-    }
-
-    private void setRenderer() {
-        int chartType = chartTypeCombo.getSelectedIndex();
-        XYItemRenderer renderer = (chartType == 0) ? candleRenderer : mcbRenderer;
-        pricePlot.setRenderer(renderer);
-
-        for (XYPlot indicatorPlot : indicatorPlots) {
-            indicatorPlot.setRenderer(renderer);
-        }
     }
 
     private void setTimeline() {
@@ -80,12 +69,6 @@ public class PerformanceChart {
     }
 
     private void registerListeners() {
-        chartTypeCombo.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setRenderer();
-            }
-        });
-
         timeLineCombo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setTimeline();
@@ -104,14 +87,14 @@ public class PerformanceChart {
                     if (pnlVisibilityCheck.isSelected()) {
                         combinedPlot.remove(pnlPlot);
                     }
-                    for (FastXYPlot plot : indicatorPlots) {
+                    for (XYPlot plot : indicatorPlots) {
                         combinedPlot.add(plot);
                     }
                     if (pnlVisibilityCheck.isSelected()) {
                         combinedPlot.add(pnlPlot);
                     }
                 } else {
-                    for (FastXYPlot plot : indicatorPlots) {
+                    for (XYPlot plot : indicatorPlots) {
                         combinedPlot.remove(plot);
                     }
                 }
@@ -149,7 +132,7 @@ public class PerformanceChart {
                 prefs.set(PerformanceChartX, chartFrame.getX());
                 prefs.set(PerformanceChartY, chartFrame.getY());
                 prefs.set(PerformanceChartState, chartFrame.getExtendedState());
-                chartFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                chartFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             }
         });
 
@@ -163,30 +146,22 @@ public class PerformanceChart {
         JPanel chartOptionsPanel = new JPanel(new SpringLayout());
         Border etchedBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
         TitledBorder chartOptionsBorder = BorderFactory.createTitledBorder(etchedBorder, "Chart Options");
+        chartOptionsBorder.setTitlePosition(TitledBorder.TOP);
         chartOptionsPanel.setBorder(chartOptionsBorder);
 
-        JLabel chartTypeLabel = new JLabel("Chart Type:", JLabel.TRAILING);
-        chartTypeCombo = new JComboBox(new String[] {"Candle", "OHLC"});
-        chartTypeLabel.setLabelFor(chartTypeCombo);
-
-        JLabel timeLineLabel = new JLabel("Timeline:", JLabel.TRAILING);
+        JLabel timeLineLabel = new JLabel("Timeline:", SwingConstants.TRAILING);
         timeLineCombo = new JComboBox(new String[] {"All Hours", "Trading Hours"});
         timeLineLabel.setLabelFor(timeLineCombo);
 
-        JLabel timeZoneLabel = new JLabel("Time Zone:", JLabel.TRAILING);
+        JLabel timeZoneLabel = new JLabel("Time Zone:", SwingConstants.TRAILING);
         timeZoneCombo = new JComboBox(new String[] {"Exchange", "Local"});
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
         JLabel visibilityLabel = new JLabel("Show:");
-
         indicatorVisibilityCheck = new JCheckBox("Indicators", true);
-
         tradesVisibilityCheck = new JCheckBox("Trades", true);
-
         pnlVisibilityCheck = new JCheckBox("Net Profit", true);
 
-        chartOptionsPanel.add(chartTypeLabel);
-        chartOptionsPanel.add(chartTypeCombo);
         chartOptionsPanel.add(timeLineLabel);
         chartOptionsPanel.add(timeLineCombo);
         chartOptionsPanel.add(timeZoneLabel);
@@ -206,6 +181,7 @@ public class PerformanceChart {
 
         JPanel chartPanel = new JPanel(new BorderLayout());
         TitledBorder chartBorder = BorderFactory.createTitledBorder(etchedBorder, "Performance Chart");
+        chartBorder.setTitlePosition(TitledBorder.TOP);
         chartPanel.setBorder(chartBorder);
 
         JPanel scrollBarPanel = new JPanel(new BorderLayout());
@@ -247,12 +223,6 @@ public class PerformanceChart {
 
 
     private void createChart() {
-        // create OHLC bar renderer
-        mcbRenderer = new MultiColoredBarRenderer();
-        mcbRenderer.setSeriesPaint(0, Color.WHITE);
-        mcbRenderer.setBaseStroke(new BasicStroke(3));
-        mcbRenderer.setSeriesPaint(0, new Color(250, 240, 150));
-
         // create candlestick renderer
         candleRenderer = new CandlestickRenderer(3);
         candleRenderer.setDrawVolume(false);
@@ -273,7 +243,7 @@ public class PerformanceChart {
         OHLCDataset priceDataset = performanceChartData.getPriceDataset();
         NumberAxis priceAxis = new NumberAxis("Price");
         priceAxis.setAutoRangeIncludesZero(false);
-        pricePlot = new FastXYPlot(priceDataset, dateAxis, priceAxis, null);
+        pricePlot = new XYPlot(priceDataset, dateAxis, priceAxis, candleRenderer);
         pricePlot.setBackgroundPaint(BACKGROUND_COLOR);
         combinedPlot.add(pricePlot, PRICE_PLOT_WEIGHT);
 
@@ -282,7 +252,7 @@ public class PerformanceChart {
             NumberAxis indicatorAxis = new NumberAxis(indicator.getName());
             indicatorAxis.setLabelFont(new Font("Arial Narrow", Font.PLAIN, 11));
             OHLCDataset ds = performanceChartData.getIndicatorDataset(indicator);
-            FastXYPlot indicatorPlot = new FastXYPlot(ds, dateAxis, indicatorAxis, null);
+            XYPlot indicatorPlot = new XYPlot(ds, dateAxis, indicatorAxis, candleRenderer);
             indicatorPlot.setBackgroundPaint(BACKGROUND_COLOR);
             combinedPlot.add(indicatorPlot);
             indicatorPlots.add(indicatorPlot);
@@ -305,13 +275,11 @@ public class PerformanceChart {
         NumberAxis pnlAxis = new NumberAxis("Net Profit");
         pnlAxis.setAutoRangeIncludesZero(false);
         StandardXYItemRenderer pnlRenderer = new StandardXYItemRenderer();
-        pnlPlot = new FastXYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);
+        pnlPlot = new XYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);
         pnlPlot.setBackgroundPaint(BACKGROUND_COLOR);
         combinedPlot.add(pnlPlot);
 
         combinedPlot.setDomainAxis(dateAxis);
-        setRenderer();
-
         setTimeline();
         setTimeZone();
 

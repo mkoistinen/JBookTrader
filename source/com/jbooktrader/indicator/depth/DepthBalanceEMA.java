@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.depth;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Exponential moving average of the market depth balance.
+ * Exponential moving average of the balance in the limit order book.
  */
 public class DepthBalanceEMA extends Indicator {
     private final double multiplier;

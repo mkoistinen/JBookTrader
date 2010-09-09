@@ -12,12 +12,11 @@ import com.jbooktrader.strategy.base.*;
 public class Defender1 extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, trendStrengthVelocityInd;
+    private final Indicator tensionInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
-    private static final String TREND_PERIOD = "Trend Period";
     private static final String ENTRY = "Entry";
 
 
@@ -28,10 +27,8 @@ public class Defender1 extends StrategyES {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        trendStrengthVelocityInd = new TrendStrengthVelocity(getParam(TREND_PERIOD));
-        addIndicator(balanceVelocityInd);
-        addIndicator(trendStrengthVelocityInd);
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 2);
+        addIndicator(tensionInd);
     }
 
     /**
@@ -42,10 +39,9 @@ public class Defender1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 5, 50, 1, 26);
-        addParam(SLOW_PERIOD, 100, 1500, 100, 600);
-        addParam(TREND_PERIOD, 50, 600, 10, 400);
-        addParam(ENTRY, 9, 18, 1, 12);
+        addParam(FAST_PERIOD, 20, 40, 1, 28);
+        addParam(SLOW_PERIOD, 8000, 12000, 100, 9079);
+        addParam(ENTRY, 30, 35, 1, 32);
     }
 
     /**
@@ -55,24 +51,13 @@ public class Defender1 extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        double trendStrengthVelocity = trendStrengthVelocityInd.getValue();
-
-        int currentPosition = getPositionManager().getPosition();
-        if (currentPosition > 0 && balanceVelocity <= -entry) {
+        double tension = tensionInd.getValue();
+        if (tension >= entry) {
+            setPosition(1);
+        } else if (tension <= -entry) {
+            setPosition(-1);
+        } else if (Math.abs(tension) <= 2) {
             setPosition(0);
         }
-        if (currentPosition < 0 && balanceVelocity >= entry) {
-            setPosition(0);
-        }
-
-        if (trendStrengthVelocity < 0) {
-            if (balanceVelocity >= entry) {
-                setPosition(1);
-            } else if (balanceVelocity <= -entry) {
-                setPosition(-1);
-            }
-        }
-
     }
 }

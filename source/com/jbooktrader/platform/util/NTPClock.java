@@ -2,6 +2,7 @@ package com.jbooktrader.platform.util;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
+import com.jbooktrader.platform.startup.*;
 import org.apache.commons.net.ntp.*;
 
 import java.net.*;
@@ -19,14 +20,6 @@ public class NTPClock {
     private final NTPUDPClient ntpClient;
     private final InetAddress host;
     private final AtomicLong offset;
-    private static NTPClock instance;
-
-    public static synchronized NTPClock getInstance() {
-        if (instance == null) {
-            instance = new NTPClock();
-        }
-        return instance;
-    }
 
     private class NTPClockPoller implements Runnable {
         public void run() {
@@ -40,17 +33,18 @@ public class NTPClock {
             timeInfo.computeDetails();
             NtpV3Packet message = timeInfo.getMessage();
 
-            String msg = "NTP clock: [name:" + message.getReferenceIdString();
-            msg += ", stratum:" + message.getStratum();
-            msg += ", mode:" + message.getModeName();
-            msg += ", precision:" + message.getPrecision();
-            msg += ", type:" + message.getType();
-            msg += ", dispersion (ms):" + message.getRootDispersionInMillisDouble();
-            msg += "]";
+            String msg = "Time host: " + host.getHostName();
+            msg += ", name: " + message.getReferenceIdString();
+            msg += ", stratum: " + message.getStratum();
+            msg += ", mode: " + message.getModeName();
+            msg += ", type: " + message.getType() + ",<br>";
+            msg += "precision (microseconds): " + Math.pow(2, message.getPrecision()) * Math.pow(10, 6);
+            msg += ", dispersion (milliseconds): " + message.getRootDispersionInMillisDouble();
 
-            Dispatcher.getEventReport().report(msg);
+
+            Dispatcher.getInstance().getEventReport().report(JBookTrader.APP_NAME, msg);
         } catch (Exception e) {
-            Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
+            Dispatcher.getInstance().getEventReport().report(JBookTrader.APP_NAME, ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
     }
 
@@ -59,31 +53,27 @@ public class NTPClock {
         try {
             TimeInfo timeInfo = ntpClient.getTime(host);
             timeInfo.computeDetails();
-            long currentOffset = timeInfo.getOffset();
-            if (currentOffset != 0) {
-                offset.set(currentOffset);
+            long offsetNow = timeInfo.getOffset();
+            if (offsetNow != 0) {
+                offset.set(offsetNow);
             }
         } catch (Exception e) {
-            Dispatcher.getEventReport().report(ERROR_MSG + host.getHostName() + ": " + e.getMessage());
+            Dispatcher.getInstance().getEventReport().report(JBookTrader.APP_NAME, ERROR_MSG + host.getHostName() + ": " + e.getMessage());
         }
     }
 
-    // private constructor for non-instantiability
-    private NTPClock() {
+    public NTPClock() throws UnknownHostException, SocketException {
         ntpClient = new NTPUDPClient();
         ntpClient.setDefaultTimeout(10000);
+        ntpClient.open();
         offset = new AtomicLong();
-        try {
-            String hostName = PreferencesHolder.getInstance().get(JBTPreferences.NTPTimeServer);
-            host = InetAddress.getByName(hostName);
-        } catch (UnknownHostException uhe) {
-            Dispatcher.getEventReport().report(uhe);
-            throw new RuntimeException(uhe);
-        }
+
+        String hostName = PreferencesHolder.getInstance().get(JBTPreferences.NTPTimeServer);
+        host = InetAddress.getByName(hostName);
 
         getOffset();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new NTPClockPoller(), 0, 1, TimeUnit.MINUTES);
+        scheduler.scheduleWithFixedDelay(new NTPClockPoller(), 0, 5, TimeUnit.MINUTES);
     }
 
     public long getTime() {
