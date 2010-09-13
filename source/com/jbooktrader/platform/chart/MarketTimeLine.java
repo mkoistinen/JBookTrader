@@ -34,7 +34,6 @@ public class MarketTimeLine {
             previousTime = time;
         }
 
-
         return timeline;
     }
 

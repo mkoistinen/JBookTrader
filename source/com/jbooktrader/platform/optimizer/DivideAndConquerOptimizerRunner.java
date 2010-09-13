@@ -62,7 +62,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 }
             }
 
-            long totalSteps = completedSteps + snapshotCount * iterationsRemaining * filteredTasks.size();
+            long totalSteps = completedSteps + snapshotCount * iterationsRemaining * filteredTasks.size() / 3;
             setTotalSteps(totalSteps);
             filteredTasksSize = filteredTasks.size();
             setTotalStrategies(filteredTasksSize);

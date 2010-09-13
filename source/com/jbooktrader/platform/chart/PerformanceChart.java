@@ -42,7 +42,6 @@ public class PerformanceChart {
     private CombinedDomainXYPlot combinedPlot;
     private DateAxis dateAxis;
     private XYPlot pricePlot, pnlPlot;
-    private CandlestickRenderer candleRenderer;
     private JComboBox timeLineCombo, timeZoneCombo;
     private JCheckBox indicatorVisibilityCheck, tradesVisibilityCheck, pnlVisibilityCheck;
 
@@ -223,8 +222,7 @@ public class PerformanceChart {
 
 
     private void createChart() {
-        // create candlestick renderer
-        candleRenderer = new CandlestickRenderer(3);
+        CandlestickRenderer candleRenderer = new CandlestickRenderer(3);
         candleRenderer.setDrawVolume(false);
         candleRenderer.setAutoWidthMethod(CandlestickRenderer.WIDTHMETHOD_AVERAGE);
         candleRenderer.setUpPaint(Color.GREEN);

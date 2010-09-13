@@ -11,14 +11,12 @@ import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
-import com.jbooktrader.platform.trader.*;
 
 /**
  * Base class for all classes that implement trading strategies.
  */
 
 public abstract class Strategy implements Comparable<Strategy> {
-    private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final StrategyParams params;
     private MarketBook marketBook;
     private final EventReport eventReport;
@@ -30,11 +28,9 @@ public abstract class Strategy implements Comparable<Strategy> {
     private PerformanceManager performanceManager;
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
-    private boolean isActive;
     private int position;
     private long time;
     private double bidAskSpread;
-    private long lastInstant;
 
     /**
      * Framework calls this method when a new snapshot of the limit order book is taken.
@@ -45,14 +41,6 @@ public abstract class Strategy implements Comparable<Strategy> {
      * Framework calls this method to set strategy parameter ranges and values.
      */
     protected abstract void setParams();
-
-    /**
-     * Framework calls this method when the last snapshot was more than 1 hour ago.
-     * Override in implementing strategy as required.
-     */
-    protected void reset() {
-    }
-
 
     protected Strategy(StrategyParams params) {
         this.params = params;
@@ -70,14 +58,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         indicatorManager.setMarketBook(marketBook);
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean isActive) {
-        this.isActive = isActive;
-    }
-
     public int getPosition() {
         return position;
     }
@@ -88,10 +68,6 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     public double getBidAskSpread() {
         return bidAskSpread;
-    }
-
-    public void setBidAskSpread(double bidAskSpread) {
-        this.bidAskSpread = bidAskSpread;
     }
 
     public void closePosition() {
@@ -156,8 +132,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         performanceManager = new PerformanceManager(this, multiplier, commission);
         positionManager = new PositionManager(this);
         strategyReportManager = new StrategyReportManager(this);
-        TraderAssistant traderAssistant = dispatcher.getTrader().getAssistant();
-        marketBook = traderAssistant.createMarketBook(this);
+        marketBook = dispatcher.getTrader().getAssistant().createMarketBook(this);
         this.bidAskSpread = bidAskSpread;
         indicatorManager = new IndicatorManager();
     }
@@ -170,6 +145,15 @@ public abstract class Strategy implements Comparable<Strategy> {
         return contract;
     }
 
+    public String getSymbol() {
+        String symbol = contract.m_symbol;
+        if (contract.m_currency != null) {
+            symbol += "." + contract.m_currency;
+        }
+        return symbol;
+    }
+
+
     public String getName() {
         return name;
     }
@@ -179,11 +163,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         indicatorManager.updateIndicators();
 
         if (isInSchedule) {
-            if (instant - lastInstant > GAP_SIZE) {
-                reset();
-            }
-            lastInstant = instant;
-
             if (indicatorManager.hasValidIndicators()) {
                 onBookSnapshot();
             }
@@ -196,7 +175,7 @@ public abstract class Strategy implements Comparable<Strategy> {
 
 
     public void process() {
-        if (isActive && !marketBook.isEmpty()) {
+        if (!marketBook.isEmpty()) {
             MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
             processInstant(instant, tradingSchedule.contains(instant));

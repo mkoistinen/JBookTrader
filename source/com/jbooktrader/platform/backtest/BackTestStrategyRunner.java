@@ -25,11 +25,11 @@ public class BackTestStrategyRunner implements Runnable {
     }
 
     public void cancel() {
+        backTestDialog.showProgress("Stopping back test...");
         backTestFileReader.cancel();
         if (backTester != null) {
             backTester.cancel();
         }
-        backTestDialog.showProgress("Stopping back test...");
     }
 
     public void run() {
@@ -38,8 +38,7 @@ public class BackTestStrategyRunner implements Runnable {
             List<Indicator> indicators = strategy.getIndicatorManager().getIndicators();
             BarSize barSize = backTestDialog.getBarSize();
             strategy.getPerformanceManager().createPerformanceChartData(barSize, indicators);
-            backTestFileReader = new BackTestFileReader(backTestDialog.getFileName());
-            backTestFileReader.setFilter(backTestDialog.getDateFilter());
+            backTestFileReader = new BackTestFileReader(backTestDialog.getFileName(), backTestDialog.getDateFilter());
             backTestDialog.showProgress("Scanning historical data file...");
             backTestFileReader.scan();
 

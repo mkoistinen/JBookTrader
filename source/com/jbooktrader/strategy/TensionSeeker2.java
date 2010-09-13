@@ -9,7 +9,7 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Balancer extends StrategyES {
+public class TensionSeeker2 extends StrategyES {
 
     // Technical indicators
     private final Indicator tensionInd;
@@ -18,19 +18,17 @@ public class Balancer extends StrategyES {
     private static final String FAST_PERIOD = "FastPeriod";
     private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-    private static final String EXIT = "Exit";
 
 
     // Strategy parameters values
-    private final int entry, exit;
+    private final int entry;
 
 
-    public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
+    public TensionSeeker2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        exit = getParam(EXIT);
-        tensionInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 1);
         addIndicator(tensionInd);
     }
 
@@ -42,10 +40,9 @@ public class Balancer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 650, 1600, 10, 1330);
-        addParam(SLOW_PERIOD, 6000, 14000, 100, 8819);
-        addParam(ENTRY, 7, 13, 1, 10);
-        addParam(EXIT, -4, 1, 1, -1);
+        addParam(FAST_PERIOD, 10, 100, 50, 54);
+        addParam(SLOW_PERIOD, 8000, 18000, 100, 14787);
+        addParam(ENTRY, 20, 30, 1, 25);
     }
 
     /**
@@ -60,14 +57,6 @@ public class Balancer extends StrategyES {
             setPosition(1);
         } else if (tension <= -entry) {
             setPosition(-1);
-        } else {
-            int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && tension <= -exit) {
-                setPosition(0);
-            }
-            if (currentPosition < 0 && tension >= exit) {
-                setPosition(0);
-            }
         }
     }
 }

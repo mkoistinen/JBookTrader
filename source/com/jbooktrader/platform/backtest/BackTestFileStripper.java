@@ -25,8 +25,6 @@ public class BackTestFileStripper {
         BackTestFileStripper btfs = new BackTestFileStripper(args[0], args[1], Integer.valueOf(args[2]), Integer.valueOf(args[3]));
         btfs.process();
         System.out.println("Processed " + lineNumber + " lines. Completed.");
-
-
     }
 
     public BackTestFileStripper(String fileNameIn, String fileNameOut, int startHour, int endHour) throws JBookTraderException {
@@ -44,7 +42,6 @@ public class BackTestFileStripper {
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not write to file " + fileNameOut);
         }
-
     }
 
     public void process() throws IOException, JBookTraderException {
@@ -65,7 +62,6 @@ public class BackTestFileStripper {
         }
         reader.close();
         writer.close();
-
     }
 
     private boolean isInPeriod(String line) throws JBookTraderException {

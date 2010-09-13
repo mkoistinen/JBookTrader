@@ -75,7 +75,7 @@ public class AdvancedOptimizationOptionsDialog extends JBTDialog {
         divideAndConquerCoverageSlider.setMajorTickSpacing(25);
         divideAndConquerCoverageSlider.setPaintTicks(true);
         divideAndConquerCoverageSlider.setSnapToTicks(true);
-        Dictionary<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
+        Properties labels = new Properties();
         Font labelFont = divideAndConquerCoverageSlider.getFont().deriveFont(Font.ITALIC, 12);
         JLabel sparserLabel = new JLabel("Sparser");
         sparserLabel.setFont(labelFont);

@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.model;
 
-import com.ib.client.*;
 import com.jbooktrader.platform.marketbook.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.performance.*;
@@ -41,7 +40,7 @@ public class StrategyTableModel extends TableDataModel {
 
     public Strategy createStrategyForRow(int row) throws JBookTraderException {
         Strategy strategy = getStrategyForRow(row);
-        if (strategy != null && strategy.isActive()) {
+        if (strategy != null) {
             throw new JBookTraderException("Strategy " + strategy + " is already running.");
         }
         String strategyName = getStrategyNameForRow(row);
@@ -66,7 +65,7 @@ public class StrategyTableModel extends TableDataModel {
 
     public void update(Strategy strategy) {
         int rowIndex = getRowForStrategy(strategy);
-        Map<StrategyTableColumn, Object> row = new HashMap<StrategyTableColumn, Object>();
+        EnumMap<StrategyTableColumn, Object> row = new EnumMap<StrategyTableColumn, Object>(StrategyTableColumn.class);
 
         MarketBook marketBook = strategy.getMarketBook();
         if (!marketBook.isEmpty()) {
@@ -91,11 +90,7 @@ public class StrategyTableModel extends TableDataModel {
     public void addStrategy(Strategy strategy) {
         Object[] row = new Object[getColumnCount()];
         row[Strategy.ordinal()] = strategy.getName();
-        Contract contract = strategy.getContract();
-        String symbol = contract.m_symbol;
-        if (contract.m_currency != null) {
-            symbol += "." + contract.m_currency;
-        }
+        String symbol = strategy.getSymbol();
         row[Symbol.ordinal()] = symbol;
         addRow(row);
     }

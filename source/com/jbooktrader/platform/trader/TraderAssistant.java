@@ -174,11 +174,9 @@ public class TraderAssistant {
         if (!subscribedTickers.contains(ticker)) {
             subscribedTickers.add(ticker);
             socket.reqContractDetails(strategy.getContract().m_conId, strategy.getContract());
-            String msg = "Requested contract details for instrument " + instrument;
-            eventReport.report(strategy.getName(), msg);
+            eventReport.report(strategy.getName(), "Requested contract details for instrument " + instrument);
             socket.reqMktDepth(ticker, contract, 10);
-            msg = "Requested market depth for instrument " + instrument;
-            eventReport.report(strategy.getName(), msg);
+            eventReport.report(strategy.getName(), "Requested market depth for instrument " + instrument);
         }
     }
 
@@ -192,7 +190,6 @@ public class TraderAssistant {
             eventReport.report(strategy.getName(), msg);
             requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);
-            strategy.setIsActive(true);
             dispatcher.strategyStarted();
         }
     }

@@ -22,7 +22,7 @@ public class BackTestFileReader {
     private long snapshotCount, firstMarketLine, lineNumber;
     private MarketSnapshotFilter filter;
 
-    public BackTestFileReader(String fileName) throws JBookTraderException {
+    public BackTestFileReader(String fileName, MarketSnapshotFilter filter) throws JBookTraderException {
         this.fileName = fileName;
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
@@ -51,10 +51,6 @@ public class BackTestFileReader {
         // Enforce strict interpretation of date and time formats
         sdf.setLenient(false);
         sdf.setTimeZone(tz);
-    }
-
-    public void setFilter(MarketSnapshotFilter mssFilter) {
-        filter = mssFilter;
     }
 
     public void scan() throws JBookTraderException {

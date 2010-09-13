@@ -39,7 +39,7 @@ public class Defender2 extends StrategyES {
     @Override
     public void setParams() {
         addParam(FAST_PERIOD, 20, 40, 1, 28);
-        addParam(SLOW_PERIOD, 8000, 12000, 100, 8985);
+        addParam(SLOW_PERIOD, 8000, 10000, 100, 8985);
         addParam(ENTRY, 30, 35, 1, 32);
     }
 

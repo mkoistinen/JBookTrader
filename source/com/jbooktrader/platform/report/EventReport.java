@@ -11,7 +11,7 @@ import java.util.*;
 public class EventReport extends Report {
     private boolean isEnabled;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS z");
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
 
     public EventReport() throws JBookTraderException {
         super("EventReport");
@@ -21,7 +21,7 @@ public class EventReport extends Report {
         StringBuilder sb = new StringBuilder();
         sb.append(ROW_START);
         sb.append("<TH WIDTH=\"80\">").append("Date").append(HEADER_END);
-        sb.append("<TH WIDTH=\"130\">").append("Time").append(HEADER_END);
+        sb.append("<TH WIDTH=\"120\">").append("Time").append(HEADER_END);
         sb.append("<TH WIDTH=\"130\">").append("Reporter").append(HEADER_END);
         sb.append(HEADER_START).append("Message").append(HEADER_END);
         sb.append(ROW_END);
@@ -30,6 +30,8 @@ public class EventReport extends Report {
         StringBuilder startupMessage = new StringBuilder();
         startupMessage.append("New Report Started. ").append(JBookTrader.APP_NAME).append(" version ").append(JBookTrader.VERSION);
         report(JBookTrader.APP_NAME, startupMessage);
+        TimeZone tz = TimeZone.getDefault();
+        report(JBookTrader.APP_NAME, "All times will be reported in the local time zone: " + tz.getID() + ", " + tz.getDisplayName());
     }
 
     public void disable() {

@@ -13,7 +13,6 @@ import com.jbooktrader.platform.util.*;
 import com.toedter.calendar.*;
 
 import javax.swing.*;
-import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -26,6 +25,7 @@ public class BackTestDialog extends JBTDialog {
     private static final Dimension MIN_SIZE = new Dimension(600, 350);// minimum frame size
     private final PreferencesHolder prefs;
     private final String strategyName;
+    private final StrategyParams strategyParams;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
@@ -36,21 +36,6 @@ public class BackTestDialog extends JBTDialog {
     private JProgressBar progressBar;
     private BackTestStrategyRunner btsr;
     private BackTestParamTableModel backTestParamTableModel;
-
-
-    private final StrategyParams strategyParams;
-
-    class ValueColumnRenderer extends DefaultTableCellRenderer {
-        @Override
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            component.setBackground(Color.WHITE);
-            component.setForeground(Color.BLACK);
-            setHorizontalAlignment(RIGHT);
-            return component;
-        }
-    }
-
 
     public BackTestDialog(JFrame parent, Strategy strategy) {
         super(parent);
@@ -65,6 +50,7 @@ public class BackTestDialog extends JBTDialog {
         setVisible(true);
     }
 
+    @Override
     public void dispose() {
         btsr = null;
         super.dispose();

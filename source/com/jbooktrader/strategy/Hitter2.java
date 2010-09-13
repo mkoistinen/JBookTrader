@@ -9,29 +9,28 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Predator2 extends StrategyES {
+public class Hitter2 extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, priceTrendVelocityInd;
+    private final Indicator tensionInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
-    private static final String MAGNIFIER = "Magnifier";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
+
 
     // Strategy parameters values
-    private final int entry, magnifier;
+    private final int entry, exit;
 
-    public Predator2(StrategyParams optimizationParams) throws JBookTraderException {
+    public Hitter2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
-        magnifier = getParam(MAGNIFIER);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        priceTrendVelocityInd = new PriceTrendVelocity(getParam(SLOW_PERIOD));
-        addIndicator(balanceVelocityInd);
-        addIndicator(priceTrendVelocityInd);
+        exit = getParam(EXIT);
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 1);
+        addIndicator(tensionInd);
     }
 
     /**
@@ -42,11 +41,10 @@ public class Predator2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 5, 250, 1, 131);
-        addParam(SLOW_PERIOD, 6000, 13000, 100, 7400);
-        addParam(MAGNIFIER, 1, 13, 1, 5);
-        addParam(ENTRY, 17, 30, 1, 20);
-
+        addParam(FAST_PERIOD, 900, 1100, 1, 993);
+        addParam(SLOW_PERIOD, 6000, 8000, 100, 6948);
+        addParam(ENTRY, 10, 15, 1, 13);
+        addParam(EXIT, -10, -1, 1, -7);
     }
 
     /**
@@ -56,14 +54,19 @@ public class Predator2 extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double balanceVelocity = balanceVelocityInd.getValue();
-        double priceTrendVelocity = priceTrendVelocityInd.getValue();
-
-        double power = balanceVelocity - magnifier * priceTrendVelocity;
-        if (power >= entry) {
+        double tension = tensionInd.getValue();
+        if (tension >= entry) {
             setPosition(1);
-        } else if (power <= -entry) {
+        } else if (tension <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getPosition();
+            if (currentPosition > 0 && tension <= -exit) {
+                setPosition(0);
+            }
+            if (currentPosition < 0 && tension >= exit) {
+                setPosition(0);
+            }
         }
     }
 }

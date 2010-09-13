@@ -23,7 +23,7 @@ public class TableDataModel extends AbstractTableModel {
         fireTableRowsUpdated(row, row);
     }
 
-    protected void updateRow(int row, Map<StrategyTableColumn, Object> rowData) {
+    protected void updateRow(int row, EnumMap<StrategyTableColumn, Object> rowData) {
         Object[] changedItem = (Object[]) rows.get(row);
         for (Map.Entry<StrategyTableColumn, Object> entry : rowData.entrySet()) {
             changedItem[entry.getKey().ordinal()] = entry.getValue();

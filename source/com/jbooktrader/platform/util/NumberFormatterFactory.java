@@ -12,6 +12,7 @@ public class NumberFormatterFactory {
         DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getNumberInstance();
         DecimalFormatSymbols decimalFormatSeparator = new DecimalFormatSymbols();
         decimalFormatSeparator.setDecimalSeparator('.');
+        decimalFormatSeparator.setGroupingSeparator(',');
         decimalFormat.setGroupingUsed(grouping);
         decimalFormat.setMinimumFractionDigits(0);
         decimalFormat.setMaximumFractionDigits(maxFractionDigits);

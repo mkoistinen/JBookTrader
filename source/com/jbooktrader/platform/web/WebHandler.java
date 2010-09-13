@@ -1,63 +1,80 @@
 package com.jbooktrader.platform.web;
 
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
+import com.jbooktrader.platform.util.*;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
 import java.net.*;
+import java.text.*;
 import java.util.*;
 
 public class WebHandler implements HttpHandler {
+    private static final DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
+    private static final DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
+    private static final String RESOURCE_DIR = JBookTrader.getAppPath() + "/resources";
+    private static final String REPORT_DIR = JBookTrader.getAppPath() + "/reports";
 
-    public static final String WEBROOT = JBookTrader.getAppPath() + "/resources";
-    public static final String REPORT_DIR = "/reports/";
+    private void addRow(StringBuilder response, List<Object> cells, int rowCount) {
+        response.append((rowCount % 2 == 0) ? "<tr>" : "<tr class=oddRow>");
+        for (Object cell : cells) {
+            response.append("<td>").append(cell).append("</td>");
+        }
+        response.append("</tr>");
+    }
 
+    @Override
     public void handle(HttpExchange httpExchange) throws IOException {
-        Dispatcher dispatcher = Dispatcher.getInstance();
-        URI requestURI = httpExchange.getRequestURI();
-        String resource = requestURI.getPath();
-        StringBuilder response = new StringBuilder();
-
+        byte[] out;
+        String resource = httpExchange.getRequestURI().getPath();
 
         if (resource.equals("") || resource.equals("/")) {
-            response.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">\n");
-            response.append("<html>\n<head>\n<title>\n");
-            response.append(JBookTrader.APP_NAME).append(", version: ").append(JBookTrader.VERSION).append("</title>\n");
-            response.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"JBookTrader.css\" />\n");
-            response.append("</head>\n");
-
-            response.append("<body>\n");
-            response.append("<h1>");
-            response.append(JBookTrader.APP_NAME).append(" - ");
-            response.append("<a href=\"/reports/EventReport.htm\" target=\"_new\">" + dispatcher.getMode().getName() + "</a>");
-            response.append("</h1>");
-
+            Dispatcher dispatcher = Dispatcher.getInstance();
             List<Strategy> strategies = new ArrayList<Strategy>(dispatcher.getTrader().getAssistant().getAllStrategies());
             Collections.sort(strategies);
 
+            StringBuilder response = new StringBuilder();
+            response.append("<html><head><title>");
+            response.append(JBookTrader.APP_NAME + ", version " + JBookTrader.VERSION + "</title>");
+            response.append("<link rel=stylesheet type=text/css href=JBookTrader.css />");
+            response.append("<link rel=\"shortcut icon\" type=image/x-icon href=JBookTrader.ico />");
+            response.append("</head><body><h1>" + JBookTrader.APP_NAME + " - ");
+            response.append("<a href=EventReport.htm target=_new>" + dispatcher.getMode().getName() + "</a></h1><table>");
+            response.append("<tr><th>Strategy</th><th>Symbol</th><th>Price</th><th>Position</th><th>Trades</th><th>Net Profit</th></tr>");
 
-            SimpleTableLayout tableLayout = new SimpleTableLayout(response, strategies);
-            tableLayout.render();
+            int strategyRowCount = 0;
+            for (Strategy strategy : strategies) {
+                MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
+                PerformanceManager pm = strategy.getPerformanceManager();
 
-            response.append("</body>\n");
-            response.append("</html>\n");
-            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, response.length());
+                List<Object> cells = new ArrayList<Object>();
+                cells.add("<a href=" + strategy.getName() + ".htm target=_new>" + strategy.getName() + "</a>");
+                cells.add(strategy.getSymbol());
+                cells.add((marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "n/a");
+                cells.add(strategy.getPositionManager().getPosition());
+                cells.add(pm.getTrades());
+                cells.add(df0.format(pm.getNetProfit()));
+                addRow(response, cells, strategyRowCount++);
+            }
+
+            response.append("</table></body></html>");
+            out = response.toString().getBytes();
         } else {
-            String absoluteResource = resource.startsWith(REPORT_DIR) ? (JBookTrader.getAppPath() + resource) : (WEBROOT + resource);
-            int resourceLength = (int) new File(absoluteResource).length();
-            httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, resourceLength);
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(absoluteResource));
-            byte[] buffer = new byte[resourceLength];
-            bis.read(buffer);
-            httpExchange.getResponseBody().write(buffer, 0, resourceLength);
+            String path = (resource.endsWith("htm") ? REPORT_DIR : RESOURCE_DIR) + resource;
+            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path));
+            out = new byte[(int) new File(path).length()];
+            bis.read(out);
             bis.close();
         }
 
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(response.toString().getBytes());
-        os.close();
+        httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, out.length);
+        OutputStream responseBody = httpExchange.getResponseBody();
+        responseBody.write(out);
+        responseBody.close();
     }
 
 }

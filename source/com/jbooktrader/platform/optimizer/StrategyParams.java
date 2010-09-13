@@ -53,7 +53,7 @@ public class StrategyParams {
         return params.get(index);
     }
 
-    public StrategyParam get(String name) throws RuntimeException {
+    public StrategyParam get(String name) {
         for (StrategyParam param : params) {
             if (param.getName().equals(name)) {
                 return param;

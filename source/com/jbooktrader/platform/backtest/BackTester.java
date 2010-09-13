@@ -56,7 +56,6 @@ public class BackTester {
             // go flat at the end of the test period to finalize the run
             strategy.closePosition();
             positionManager.trade();
-            strategy.setIsActive(false);
             Dispatcher.getInstance().fireModelChanged(Event.StrategyUpdate, strategy);
         }
     }

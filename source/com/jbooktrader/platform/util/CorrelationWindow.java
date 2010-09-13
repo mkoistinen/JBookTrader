@@ -4,7 +4,7 @@ public class CorrelationWindow {
     private class Pair {
         public final double value1, value2;
 
-        public Pair(double value1, double value2) {
+        private Pair(double value1, double value2) {
             this.value1 = value1;
             this.value2 = value2;
         }

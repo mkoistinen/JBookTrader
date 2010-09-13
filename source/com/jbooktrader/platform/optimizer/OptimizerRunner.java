@@ -256,8 +256,7 @@ public abstract class OptimizerRunner implements Runnable {
             optimizerDialog.setResults(optimizationResults);
             optimizerDialog.enableProgress();
             optimizerDialog.showProgress("Scanning historical data file...");
-            BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName());
-            backTestFileReader.setFilter(optimizerDialog.getDateFilter());
+            BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName(), optimizerDialog.getDateFilter());
             backTestFileReader.scan();
             snapshotCount = backTestFileReader.getSnapshotCount();
 

@@ -38,8 +38,8 @@ public class BackTestParamTableModel extends TableDataModel {
     public StrategyParams getParams() {
         StrategyParams strategyParams = new StrategyParams();
 
-        int rows = getRowCount();
-        for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
+        int rowCount = getRowCount();
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
             Object[] row = getRow(rowIndex);
             String name = (String) row[0];
             int value = (Integer) row[1];

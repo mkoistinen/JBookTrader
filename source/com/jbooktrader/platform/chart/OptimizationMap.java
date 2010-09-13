@@ -33,7 +33,6 @@ public class OptimizationMap {
     private final Strategy strategy;
     private final JDialog parent;
     private final List<OptimizationResult> optimizationResults;
-
     private JFreeChart chart;
     private JComboBox horizontalCombo, verticalCombo, caseCombo, colorMapCombo;
     private double min, max;
