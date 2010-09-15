@@ -9,7 +9,7 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Hitter1 extends StrategyES {
+public class Balancer2 extends StrategyES {
 
     // Technical indicators
     private final Indicator tensionInd;
@@ -24,7 +24,7 @@ public class Hitter1 extends StrategyES {
     // Strategy parameters values
     private final int entry, exit;
 
-    public Hitter1(StrategyParams optimizationParams) throws JBookTraderException {
+    public Balancer2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);

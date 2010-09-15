@@ -21,10 +21,6 @@ public class SpringUtilities {
         return layout.getConstraints(c);
     }
 
-    //public static void makeOneLineGrid(Container parent, int cols) {
-    //  makeCompactGrid(parent, 1, cols, 6, 0, 7, 6);
-    //}
-
     public static void makeOneLineGrid(Container parent) {
         makeCompactGrid(parent, 1, parent.getComponentCount(), 10, 0, 10, 10);
     }

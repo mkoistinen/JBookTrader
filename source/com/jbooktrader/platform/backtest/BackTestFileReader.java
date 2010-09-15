@@ -24,6 +24,7 @@ public class BackTestFileReader {
 
     public BackTestFileReader(String fileName, MarketSnapshotFilter filter) throws JBookTraderException {
         this.fileName = fileName;
+        this.filter = filter;
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
         } catch (FileNotFoundException fnfe) {

@@ -52,7 +52,12 @@ public class WebHandler implements HttpHandler {
                 PerformanceManager pm = strategy.getPerformanceManager();
 
                 List<Object> cells = new ArrayList<Object>();
-                cells.add("<a href=" + strategy.getName() + ".htm target=_new>" + strategy.getName() + "</a>");
+                String path = REPORT_DIR + "/" + strategy.getName() + ".htm";
+                if (new File(path).exists()) {
+                    cells.add("<a href=" + strategy.getName() + ".htm target=_new>" + strategy.getName() + "</a>");
+                } else {
+                    cells.add(strategy.getName());
+                }
                 cells.add(strategy.getSymbol());
                 cells.add((marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "n/a");
                 cells.add(strategy.getPositionManager().getPosition());

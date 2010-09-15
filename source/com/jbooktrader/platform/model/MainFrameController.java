@@ -13,6 +13,7 @@ import com.jbooktrader.platform.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.*;
 
 /**
  * Acts as a controller in the Model-View-Controller pattern
@@ -64,7 +65,8 @@ public class MainFrameController {
 
     private void openURL(String url) {
         try {
-            Browser.openURL(url);
+            Desktop desktop = Desktop.getDesktop();
+            desktop.browse(new URI(url));
         } catch (Throwable t) {
             dispatcher.getEventReport().report(t);
             MessageDialog.showError(t);

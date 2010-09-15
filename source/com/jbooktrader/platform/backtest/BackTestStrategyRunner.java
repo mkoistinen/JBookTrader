@@ -9,7 +9,7 @@ import com.jbooktrader.platform.util.*;
 import java.util.*;
 
 /**
- * Runs a trading strategy in the backtesting mode using a file containing
+ * Runs a trading strategy in the back testing mode using a file containing
  * historical market data.
  */
 public class BackTestStrategyRunner implements Runnable {

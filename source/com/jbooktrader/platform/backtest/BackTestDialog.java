@@ -268,10 +268,6 @@ public class BackTestDialog extends JBTDialog {
     }
 
     public MarketSnapshotFilter getDateFilter() {
-        if (!useDateRangeCheckBox.isSelected()) {
-            return null;
-        }
-
-        return new MarketSnapshotFilter(fromDateEditor, toDateEditor);
+        return useDateRangeCheckBox.isSelected() ? new MarketSnapshotFilter(fromDateEditor, toDateEditor) : null;
     }
 }

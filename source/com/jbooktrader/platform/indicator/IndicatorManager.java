@@ -52,9 +52,9 @@ public class IndicatorManager {
             try {
                 indicator.calculate();
             } catch (IndexOutOfBoundsException iobe) {
-                hasValidIndicators = false;
                 // This exception will occur if book size is insufficient to calculate
                 // the indicator. This is normal.
+                hasValidIndicators = false;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

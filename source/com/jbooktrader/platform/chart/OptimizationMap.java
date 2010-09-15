@@ -283,17 +283,7 @@ public class OptimizationMap {
 
         XYBlockRenderer renderer = new XYBlockRenderer();
         int paintScaleIndex = (colorMapCombo == null) ? 0 : colorMapCombo.getSelectedIndex();
-        PaintScale paintScale = null;
-        switch (paintScaleIndex) {
-            case 0:
-                paintScale = new HeatPaintScale();
-                break;
-            case 1:
-                paintScale = new GrayPaintScale();
-                break;
-
-        }
-
+        PaintScale paintScale = (paintScaleIndex == 0) ? new HeatPaintScale() : new GrayPaintScale();
         renderer.setPaintScale(paintScale);
 
 

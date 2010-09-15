@@ -9,14 +9,14 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Balancer extends StrategyES {
+public class Balancer3 extends StrategyES {
 
     // Technical indicators
     private final Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
+    private static final String FAST_PERIOD = "Fast Period";
+    private static final String SLOW_PERIOD = "Slow Period";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
@@ -24,13 +24,12 @@ public class Balancer extends StrategyES {
     // Strategy parameters values
     private final int entry, exit;
 
-
-    public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
+    public Balancer3(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
-        tensionInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 1);
         addIndicator(tensionInd);
     }
 
@@ -42,10 +41,10 @@ public class Balancer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 650, 1600, 10, 1330);
-        addParam(SLOW_PERIOD, 6000, 14000, 100, 8819);
-        addParam(ENTRY, 7, 13, 1, 10);
-        addParam(EXIT, -4, 1, 1, -1);
+        addParam(FAST_PERIOD, 900, 1100, 1, 993);
+        addParam(SLOW_PERIOD, 6000, 8000, 100, 6948);
+        addParam(ENTRY, 10, 15, 1, 13);
+        addParam(EXIT, -10, -1, 1, -7);
     }
 
     /**
