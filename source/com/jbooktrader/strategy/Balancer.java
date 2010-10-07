@@ -9,28 +9,25 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Balancer3 extends StrategyES {
+public class Balancer extends StrategyES {
 
     // Technical indicators
-    private final Indicator tensionInd;
+    private final Indicator balanceVelocityInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
-    private static final String SLOW_PERIOD = "Slow Period";
+    private static final String FAST_PERIOD = "FastPeriod";
+    private static final String SLOW_PERIOD = "SlowPeriod";
     private static final String ENTRY = "Entry";
-    private static final String EXIT = "Exit";
-
 
     // Strategy parameters values
-    private final int entry, exit;
+    private final int entry;
 
-    public Balancer3(StrategyParams optimizationParams) throws JBookTraderException {
+
+    public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
-
         entry = getParam(ENTRY);
-        exit = getParam(EXIT);
-        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 1);
-        addIndicator(tensionInd);
+        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        addIndicator(balanceVelocityInd);
     }
 
     /**
@@ -41,10 +38,9 @@ public class Balancer3 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 900, 1100, 1, 993);
-        addParam(SLOW_PERIOD, 6000, 8000, 100, 6948);
-        addParam(ENTRY, 10, 15, 1, 13);
-        addParam(EXIT, -10, -1, 1, -7);
+        addParam(FAST_PERIOD, 50, 1050, 10, 948);
+        addParam(SLOW_PERIOD, 2000, 12000, 100, 8181);
+        addParam(ENTRY, 5, 25, 1, 13);
     }
 
     /**
@@ -54,17 +50,17 @@ public class Balancer3 extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double tension = tensionInd.getValue();
-        if (tension >= entry) {
+        double balanceVelocity = balanceVelocityInd.getValue();
+        if (balanceVelocity >= entry) {
             setPosition(1);
-        } else if (tension <= -entry) {
+        } else if (balanceVelocity <= -entry) {
             setPosition(-1);
         } else {
             int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && tension <= -exit) {
+            if (currentPosition > 0 && balanceVelocity < 0) {
                 setPosition(0);
             }
-            if (currentPosition < 0 && tension >= exit) {
+            if (currentPosition < 0 && balanceVelocity > 0) {
                 setPosition(0);
             }
         }

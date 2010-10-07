@@ -21,7 +21,6 @@ public abstract class StrategyEUR extends Strategy {
     * Initial Overnight:
     * Overnight Maintenance:
     */
-
     protected StrategyEUR(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade

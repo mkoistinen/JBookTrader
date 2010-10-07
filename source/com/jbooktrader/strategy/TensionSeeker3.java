@@ -9,7 +9,7 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Defender2 extends StrategyES {
+public class TensionSeeker3 extends StrategyES {
 
     // Technical indicators
     private final Indicator tensionInd;
@@ -19,12 +19,12 @@ public class Defender2 extends StrategyES {
     private static final String SLOW_PERIOD = "Slow Period";
     private static final String ENTRY = "Entry";
 
+
     // Strategy parameters values
     private final int entry;
 
-    public Defender2(StrategyParams optimizationParams) throws JBookTraderException {
+    public TensionSeeker3(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
-
         entry = getParam(ENTRY);
         tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 2);
         addIndicator(tensionInd);
@@ -38,9 +38,9 @@ public class Defender2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 20, 40, 1, 28);
-        addParam(SLOW_PERIOD, 8000, 10000, 100, 8985);
-        addParam(ENTRY, 30, 35, 1, 32);
+        addParam(FAST_PERIOD, 20, 1200, 1, 212);
+        addParam(SLOW_PERIOD, 2000, 14000, 100, 10695);
+        addParam(ENTRY, 5, 35, 1, 23);
     }
 
     /**
@@ -55,8 +55,6 @@ public class Defender2 extends StrategyES {
             setPosition(1);
         } else if (tension <= -entry) {
             setPosition(-1);
-        } else if (Math.abs(tension) <= 2) {
-            setPosition(0);
         }
     }
 }

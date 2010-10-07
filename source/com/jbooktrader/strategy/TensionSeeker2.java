@@ -15,18 +15,16 @@ public class TensionSeeker2 extends StrategyES {
     private final Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
+    private static final String FAST_PERIOD = "Fast Period";
+    private static final String SLOW_PERIOD = "Slow Period";
     private static final String ENTRY = "Entry";
 
 
     // Strategy parameters values
     private final int entry;
 
-
     public TensionSeeker2(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
-
         entry = getParam(ENTRY);
         tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 1);
         addIndicator(tensionInd);
@@ -40,9 +38,9 @@ public class TensionSeeker2 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 10, 100, 50, 54);
-        addParam(SLOW_PERIOD, 8000, 18000, 100, 14787);
-        addParam(ENTRY, 20, 30, 1, 25);
+        addParam(FAST_PERIOD, 20, 1200, 1, 368);
+        addParam(SLOW_PERIOD, 2000, 14000, 100, 9600);
+        addParam(ENTRY, 5, 35, 1, 16);
     }
 
     /**

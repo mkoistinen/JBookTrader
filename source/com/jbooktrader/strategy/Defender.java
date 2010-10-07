@@ -9,14 +9,14 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Balancer1 extends StrategyES {
+public class Defender extends StrategyES {
 
     // Technical indicators
     private final Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "FastPeriod";
-    private static final String SLOW_PERIOD = "SlowPeriod";
+    private static final String FAST_PERIOD = "Fast Period";
+    private static final String SLOW_PERIOD = "Slow Period";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
@@ -24,13 +24,11 @@ public class Balancer1 extends StrategyES {
     // Strategy parameters values
     private final int entry, exit;
 
-
-    public Balancer1(StrategyParams optimizationParams) throws JBookTraderException {
+    public Defender(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
-
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
-        tensionInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 2);
         addIndicator(tensionInd);
     }
 
@@ -42,10 +40,10 @@ public class Balancer1 extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 650, 1600, 10, 1330);
-        addParam(SLOW_PERIOD, 6000, 14000, 100, 8819);
-        addParam(ENTRY, 7, 13, 1, 10);
-        addParam(EXIT, -4, 1, 1, -1);
+        addParam(FAST_PERIOD, 150, 450, 1, 358);
+        addParam(SLOW_PERIOD, 4500, 9000, 100, 7643);
+        addParam(ENTRY, 18, 25, 1, 21);
+        addParam(EXIT, 6, 12, 1, 9);
     }
 
     /**
@@ -62,10 +60,10 @@ public class Balancer1 extends StrategyES {
             setPosition(-1);
         } else {
             int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && tension <= -exit) {
+            if (currentPosition > 0 && tension <= exit) {
                 setPosition(0);
             }
-            if (currentPosition < 0 && tension >= exit) {
+            if (currentPosition < 0 && tension >= -exit) {
                 setPosition(0);
             }
         }

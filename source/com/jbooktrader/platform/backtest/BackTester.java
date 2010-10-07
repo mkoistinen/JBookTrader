@@ -41,6 +41,7 @@ public class BackTester {
         MarketSnapshot marketSnapshot;
         while (!isCanceled && (marketSnapshot = backTestFileReader.next()) != null) {
             marketDepthCounter++;
+            strategy.checkForGap(marketSnapshot);
             marketBook.setSnapshot(marketSnapshot);
             performanceChartData.update(marketSnapshot);
             long instant = marketSnapshot.getTime();

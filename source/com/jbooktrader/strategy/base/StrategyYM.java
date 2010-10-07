@@ -21,7 +21,6 @@ public abstract class StrategyYM extends Strategy {
     * Initial Overnight: $6,500
     * Overnight Maintenance: $5,200
     */
-
     protected StrategyYM(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade

@@ -48,6 +48,10 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
 
                 List<MarketSnapshot> snapshots = optimizerRunner.getSnapshots();
                 for (MarketSnapshot marketSnapshot : snapshots) {
+                    for (Strategy strategy : strategies) {
+                        strategy.checkForGap(marketSnapshot);
+                    }
+
                     marketBook.setSnapshot(marketSnapshot);
                     long time = marketSnapshot.getTime();
                     boolean isInSchedule = tradingSchedule.contains(time);

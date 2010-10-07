@@ -40,11 +40,16 @@ public class MarketDepth {
             cumulativeSize += item.getSize();
         }
 
-        return cumulativeSize / uniquePriceLevels.size();
+        return (uniquePriceLevels.size() == 0) ? 0 : cumulativeSize / uniquePriceLevels.size();
     }
 
 
     public synchronized void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
+        if (price < 0) {
+            // IB API sometimes sends "-1" as the price when market depth is resetting.
+            return;
+        }
+
         List<MarketDepthItem> items = (side == MarketDepthSide.Bid) ? bids : asks;
         int levels = items.size();
 
@@ -74,31 +79,32 @@ public class MarketDepth {
                 int cumulativeBid = getCumulativeSize(bids);
                 int cumulativeAsk = getCumulativeSize(asks);
                 double totalDepth = cumulativeBid + cumulativeAsk;
-
-                double balance = 100.0d * (cumulativeBid - cumulativeAsk) / totalDepth;
-                balances.add(balance);
-                midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
+                if (totalDepth != 0) {
+                    double balance = 100.0d * (cumulativeBid - cumulativeAsk) / totalDepth;
+                    balances.add(balance);
+                    midPointPrice = (bids.getFirst().getPrice() + asks.getFirst().getPrice()) / 2;
+                }
             }
         }
     }
 
 
     public synchronized MarketSnapshot getMarketSnapshot(long time) {
-        if (midPointPrice == 0) {
-            // This is normal. It happens at the very start when market depth is initializing.
+        if (balances.isEmpty()) {
             return null;
         }
 
-        if (!balances.isEmpty()) {
-            double multiplier = 2.0 / (balances.size() + 1.0);
-            for (double balance : balances) {
-                averageBalance += (balance - averageBalance) * multiplier;
-            }
+        double multiplier = 2.0 / (balances.size() + 1.0);
+        for (double balance : balances) {
+            averageBalance += (balance - averageBalance) * multiplier;
         }
 
         double oneSecondBalance = Double.valueOf(df2.format(averageBalance));
         MarketSnapshot marketSnapshot = new MarketSnapshot(time, oneSecondBalance, midPointPrice);
+        double lastBalance = balances.removeLast();
+        // retain last balance, clear the rest
         balances.clear();
+        balances.add(lastBalance);
 
         return marketSnapshot;
     }

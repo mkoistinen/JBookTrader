@@ -21,7 +21,6 @@ public abstract class StrategyNQ extends Strategy {
     * Initial Overnight: $3,500
     * Overnight Maintenance: $2,800
     */
-
     protected StrategyNQ(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
