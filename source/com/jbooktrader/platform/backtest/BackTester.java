@@ -45,7 +45,7 @@ public class BackTester {
             marketBook.setSnapshot(marketSnapshot);
             performanceChartData.update(marketSnapshot);
             long instant = marketSnapshot.getTime();
-            strategy.processInstant(instant, tradingSchedule.contains(instant));
+            strategy.processInstant(tradingSchedule.contains(instant));
             performanceChartData.update(indicatorManager.getIndicators(), instant);
 
             if (marketDepthCounter % 50000 == 0) {

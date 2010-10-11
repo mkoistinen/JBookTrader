@@ -78,6 +78,7 @@ public class StrategyTableModel extends TableDataModel {
 
         PerformanceManager pm = strategy.getPerformanceManager();
         row.put(Trades, df0.format(pm.getTrades()));
+        row.put(AveDuration, df0.format(pm.getAveDuration()));
         row.put(ProfitFactor, df2.format(pm.getProfitFactor()));
         row.put(PI, df2.format(pm.getPerformanceIndex()));
         row.put(Kelly, df0.format(pm.getKellyCriterion()));

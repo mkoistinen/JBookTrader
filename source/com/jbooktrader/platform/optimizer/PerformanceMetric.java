@@ -2,11 +2,13 @@ package com.jbooktrader.platform.optimizer;
 
 public enum PerformanceMetric {
     Trades("Trades"),
+    AverageDuration("Ave Duration"),
     PF("Profit Factor"),
     PI("PI"),
     Kelly("Kelly"),
     MaxDD("Max DD"),
     NetProfit("Net Profit");
+
 
     private final String name;
 

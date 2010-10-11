@@ -9,7 +9,6 @@ import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 import com.jbooktrader.platform.web.*;
 
-import java.net.*;
 import java.util.*;
 
 /**
@@ -97,14 +96,9 @@ public class Dispatcher {
     }
 
     public void setMode(Mode mode) throws JBookTraderException {
-
         if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-            try {
+            if (ntpClock == null) {
                 ntpClock = new NTPClock();
-            } catch (UnknownHostException uhe) {
-                throw new JBookTraderException(uhe);
-            } catch (SocketException se) {
-                throw new JBookTraderException(se);
             }
         }
 

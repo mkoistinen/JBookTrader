@@ -77,7 +77,7 @@ public class PositionManager {
 
         Mode mode = Dispatcher.getInstance().getMode();
         if (mode == Mode.BackTest) {
-            positionsHistory.add(new Position(openOrder.getDate(), position, avgFillPrice));
+            positionsHistory.add(new Position(strategy.getMarketBook().getSnapshot().getTime(), position, avgFillPrice));
         }
 
         if (mode != Mode.Optimization) {

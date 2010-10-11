@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.text.*;
-import java.util.*;
 
 /**
  * Main application window. All the system logic is intentionally left out if this class,
@@ -27,7 +26,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private StrategyTableModel strategyTableModel;
     private JTable strategyTable;
     private JPopupMenu popupMenu;
-    private Calendar ntpTime;
     private SimpleDateFormat sdf;
 
     public MainFrameDialog() throws JBookTraderException {
@@ -48,9 +46,7 @@ public class MainFrameDialog extends JFrame implements ModelListener {
                 MessageDialog.showError(msg);
                 break;
             case TimeUpdate:
-                long time = (Long) value;
-                ntpTime.setTimeInMillis(time);
-                timeLabel.setText(sdf.format(ntpTime.getTime()));
+                timeLabel.setText(sdf.format(value));
                 break;
             case StrategyUpdate:
                 Strategy strategy = (Strategy) value;
@@ -173,8 +169,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     private void init() throws JBookTraderException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         getContentPane().setLayout(new BorderLayout());
-
-        ntpTime = Calendar.getInstance();
         sdf = new SimpleDateFormat("HH:mm:ss");
 
         // session menu

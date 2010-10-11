@@ -13,8 +13,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "7.08";
-    public static final String RELEASE_DATE = "October 6, 2010";
+    public static final String VERSION = "7.09";
+    public static final String RELEASE_DATE = "October 11, 2010";
     private static String appPath;
 
     /**

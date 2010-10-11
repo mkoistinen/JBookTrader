@@ -30,7 +30,6 @@ public abstract class Strategy implements Comparable<Strategy> {
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
     private int position;
-    private long time;
     private double bidAskSpread;
 
     /**
@@ -114,14 +113,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         return tradingSchedule;
     }
 
-    public void setTime(long time) {
-        this.time = time;
-    }
-
-    public long getTime() {
-        return time;
-    }
-
     protected void addIndicator(Indicator indicator) {
         indicatorManager.addIndicator(indicator);
     }
@@ -159,8 +150,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         return name;
     }
 
-    public void processInstant(long instant, boolean isInSchedule) {
-        time = instant;
+    public void processInstant(boolean isInSchedule) {
         indicatorManager.updateIndicators();
 
         if (isInSchedule) {
@@ -193,7 +183,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         if (!marketBook.isEmpty()) {
             MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
-            processInstant(instant, tradingSchedule.contains(instant));
+            processInstant(tradingSchedule.contains(instant));
             performanceManager.updatePositionValue(marketSnapshot.getPrice(), positionManager.getPosition());
             dispatcher.fireModelChanged(Event.StrategyUpdate, this);
         }

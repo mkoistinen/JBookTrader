@@ -6,7 +6,7 @@ import com.jbooktrader.platform.performance.*;
  * Optimization result.
  */
 public class OptimizationResult {
-    private final double netProfit, maxDrawdown, profitFactor, performanceIndex, kellyCriterion;
+    private final double netProfit, maxDrawdown, profitFactor, performanceIndex, kellyCriterion, aveDuration;
     private final int trades;
     private final StrategyParams params;
 
@@ -18,6 +18,7 @@ public class OptimizationResult {
         profitFactor = performanceManager.getProfitFactor();
         kellyCriterion = performanceManager.getKellyCriterion();
         performanceIndex = performanceManager.getPerformanceIndex();
+        aveDuration = performanceManager.getAveDuration();
     }
 
     public StrategyParams getParams() {
@@ -38,6 +39,8 @@ public class OptimizationResult {
                 return maxDrawdown;
             case NetProfit:
                 return netProfit;
+            case AverageDuration:
+                return aveDuration;
         }
         throw new RuntimeException("Performance metric " + pm + " is not recognized.");
     }

@@ -57,7 +57,7 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
                     boolean isInSchedule = tradingSchedule.contains(time);
 
                     for (Strategy strategy : strategies) {
-                        strategy.processInstant(time, isInSchedule);
+                        strategy.processInstant(isInSchedule);
                     }
 
                     optimizerRunner.iterationsCompleted(strategies.size());

@@ -58,7 +58,6 @@ public class StrategyRunner {
     private StrategyRunner() {
         dispatcher = Dispatcher.getInstance();
         ntpClock = dispatcher.getNTPClock();
-        ntpClock.reportAttributes();
         traderAssistant = dispatcher.getTrader().getAssistant();
         strategies = new ArrayList<Strategy>();
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();

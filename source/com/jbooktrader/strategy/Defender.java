@@ -28,7 +28,7 @@ public class Defender extends StrategyES {
         super(optimizationParams);
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
-        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 2);
+        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
         addIndicator(tensionInd);
     }
 
@@ -58,14 +58,8 @@ public class Defender extends StrategyES {
             setPosition(1);
         } else if (tension <= -entry) {
             setPosition(-1);
-        } else {
-            int currentPosition = getPositionManager().getPosition();
-            if (currentPosition > 0 && tension <= exit) {
-                setPosition(0);
-            }
-            if (currentPosition < 0 && tension >= -exit) {
-                setPosition(0);
-            }
+        } else if (Math.abs(tension) <= exit) {
+            setPosition(0);
         }
     }
 }

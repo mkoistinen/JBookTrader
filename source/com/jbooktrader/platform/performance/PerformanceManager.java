@@ -48,6 +48,15 @@ public class PerformanceManager {
         return trades;
     }
 
+    public double getAveDuration() {
+        if (trades == 0) {
+            return 0;
+        }
+        // average number of minutes per trade
+        return (double) timeInMarket / (trades * 1000 * 60);
+    }
+
+
     public boolean getIsCompletedTrade() {
         return isCompletedTrade;
     }
@@ -120,12 +129,13 @@ public class PerformanceManager {
     }
 
     public void updateOnTrade(int quantity, double avgFillPrice, int position) {
+        long snapshotTime = strategy.getMarketBook().getSnapshot().getTime();
         if (position != 0) {
             if (timeInMarketStart == 0) {
-                timeInMarketStart = strategy.getTime();
+                timeInMarketStart = snapshotTime;
             }
         } else {
-            timeInMarket += (strategy.getTime() - timeInMarketStart);
+            timeInMarket += (snapshotTime - timeInMarketStart);
             timeInMarketStart = 0;
         }
 
@@ -168,7 +178,7 @@ public class PerformanceManager {
 
 
         if (Dispatcher.getInstance().getMode() == Mode.BackTest) {
-            performanceChartData.update(new TimedValue(strategy.getTime(), netProfit));
+            performanceChartData.update(new TimedValue(snapshotTime, netProfit));
         }
 
         previousPosition = position;

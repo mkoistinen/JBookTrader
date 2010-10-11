@@ -10,7 +10,6 @@ public class OpenOrder {
     private final int id;
     private final Order order;
     private final Strategy strategy;
-    private long date;
     private int sharesFilled;
     private boolean isFilled;
     private double avgFillPrice;
@@ -35,7 +34,6 @@ public class OpenOrder {
 
         if (sharesFilled == order.m_totalQuantity) {
             avgFillPrice /= sharesFilled;
-            date = strategy.getTime();
             isFilled = true;
         }
     }
@@ -59,10 +57,6 @@ public class OpenOrder {
 
     public double getAvgFillPrice() {
         return avgFillPrice;
-    }
-
-    public long getDate() {
-        return date;
     }
 
 }
