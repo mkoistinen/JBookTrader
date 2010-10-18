@@ -17,7 +17,6 @@ import com.jbooktrader.platform.schedule.*;
  */
 
 public abstract class Strategy implements Comparable<Strategy> {
-    private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private final StrategyParams params;
     private MarketBook marketBook;
     private final EventReport eventReport;
@@ -78,6 +77,7 @@ public abstract class Strategy implements Comparable<Strategy> {
                 String msg = "End of trading interval. Closing current position.";
                 eventReport.report(name, msg);
             }
+            positionManager.trade();
         }
     }
 
@@ -156,25 +156,10 @@ public abstract class Strategy implements Comparable<Strategy> {
         if (isInSchedule) {
             if (indicatorManager.hasValidIndicators()) {
                 onBookSnapshot();
+                positionManager.trade();
             }
         } else {
             closePosition();// force flat position
-        }
-
-        positionManager.trade();
-    }
-
-
-    public void checkForGap(MarketSnapshot newMarketSnapshot) {
-        if (!marketBook.isEmpty()) {
-            long previousTime = marketBook.getSnapshot().getTime();
-            if (newMarketSnapshot.getTime() - previousTime > GAP_SIZE) {
-                // This may occur if the trading interval extends beyond the recorded data for the day.
-                // For example, trading interval is 10:00-15:00, but the recorded data for the day ends at 14:00.
-                // In such cases, position will be closed at 14:00. 
-                closePosition();
-                positionManager.trade();
-            }
         }
     }
 

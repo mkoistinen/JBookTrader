@@ -25,14 +25,14 @@ public class CircledTextAnnotation extends XYTextAnnotation {
     public CircledTextAnnotation(int quantity, double x, double y) {
         super(String.valueOf(Math.abs(quantity)), x, y);
 
-        Color bkColor = Color.YELLOW;
         if (quantity > 0) {
-            bkColor = Color.GREEN;
+            color = Color.GREEN;
         } else if (quantity < 0) {
-            bkColor = Color.RED;
+            color = Color.RED;
+        } else {
+            color = Color.YELLOW;
         }
 
-        color = bkColor;
         setFont(ANNOTATION_FONT);
         setPaint(Color.BLACK);
         setTextAnchor(TextAnchor.CENTER);

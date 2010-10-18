@@ -6,7 +6,6 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.model.ModelListener.*;
-import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
 
@@ -31,7 +30,6 @@ public class BackTester {
 
     public void execute() {
         MarketBook marketBook = strategy.getMarketBook();
-        PositionManager positionManager = strategy.getPositionManager();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
         PerformanceChartData performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
@@ -41,7 +39,9 @@ public class BackTester {
         MarketSnapshot marketSnapshot;
         while (!isCanceled && (marketSnapshot = backTestFileReader.next()) != null) {
             marketDepthCounter++;
-            strategy.checkForGap(marketSnapshot);
+            if (marketBook.isGapping(marketSnapshot)) {
+                strategy.closePosition();
+            }
             marketBook.setSnapshot(marketSnapshot);
             performanceChartData.update(marketSnapshot);
             long instant = marketSnapshot.getTime();
@@ -56,7 +56,6 @@ public class BackTester {
         if (!isCanceled) {
             // go flat at the end of the test period to finalize the run
             strategy.closePosition();
-            positionManager.trade();
             Dispatcher.getInstance().fireModelChanged(Event.StrategyUpdate, strategy);
         }
     }

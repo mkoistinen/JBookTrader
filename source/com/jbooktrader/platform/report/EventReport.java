@@ -12,6 +12,7 @@ public class EventReport extends Report {
     private boolean isEnabled;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
+    private final Dispatcher dispatcher = Dispatcher.getInstance();
 
     public EventReport() throws JBookTraderException {
         super("EventReport");
@@ -69,9 +70,9 @@ public class EventReport extends Report {
     }
 
     private Date getDate() {
-        Mode mode = Dispatcher.getInstance().getMode();
+        Mode mode = dispatcher.getMode();
         if (mode == Mode.ForwardTest || mode == Mode.Trade) {
-            return new Date(Dispatcher.getInstance().getNTPClock().getTime());
+            return new Date(dispatcher.getNTPClock().getTime());
         }
         return new Date();
     }

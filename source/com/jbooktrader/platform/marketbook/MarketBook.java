@@ -10,6 +10,7 @@ import java.util.*;
  * Holds history of market snapshots for a trading instrument.
  */
 public class MarketBook {
+    private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
     private MarketSnapshot marketSnapshot;
     private final MarketDepth marketDepth;
     private final String name;
@@ -49,6 +50,12 @@ public class MarketBook {
         this.marketSnapshot = marketSnapshot;
     }
 
+    public boolean isGapping(MarketSnapshot newMarketSnapshot) {
+        if (!isEmpty()) {
+            return (newMarketSnapshot.getTime() - marketSnapshot.getTime() > GAP_SIZE);
+        }
+        return false;
+    }
 
     public MarketSnapshot getSnapshot() {
         return marketSnapshot;

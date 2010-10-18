@@ -48,8 +48,10 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
 
                 List<MarketSnapshot> snapshots = optimizerRunner.getSnapshots();
                 for (MarketSnapshot marketSnapshot : snapshots) {
-                    for (Strategy strategy : strategies) {
-                        strategy.checkForGap(marketSnapshot);
+                    if (marketBook.isGapping(marketSnapshot)) {
+                        for (Strategy strategy : strategies) {
+                            strategy.closePosition();
+                        }
                     }
 
                     marketBook.setSnapshot(marketSnapshot);
@@ -73,8 +75,6 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
 
                 for (Strategy strategy : strategies) {
                     strategy.closePosition();
-                    strategy.getPositionManager().trade();
-
 
                     PerformanceManager performanceManager = strategy.getPerformanceManager();
                     int trades = performanceManager.getTrades();

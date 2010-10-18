@@ -96,18 +96,18 @@ public class Trader extends EWrapperAdapter {
     }
 
     @Override
-    public void contractDetails(int id, ContractDetails contractDetails) {
+    public void contractDetails(int id, ContractDetails cd) {
         String lineSep = "<br>";
         StringBuilder details = new StringBuilder("Contract details:").append(lineSep);
-        details.append("Trading class: ").append(contractDetails.m_tradingClass).append(lineSep);
-        details.append("Exchanges: ").append(contractDetails.m_validExchanges).append(lineSep);
-        details.append("Long name: ").append(contractDetails.m_longName).append(lineSep);
-        details.append("Market name: ").append(contractDetails.m_marketName).append(lineSep);
-        details.append("Minimum tick: ").append(contractDetails.m_minTick).append(lineSep);
-        details.append("Contract month: ").append(contractDetails.m_contractMonth).append(lineSep);
-        details.append("Time zone id: ").append(contractDetails.m_timeZoneId).append(lineSep);
-        details.append("Trading hours: ").append(contractDetails.m_tradingHours).append(lineSep);
-        details.append("Liquid hours: ").append(contractDetails.m_liquidHours).append(lineSep);
+        details.append("Trading class: ").append(cd.m_tradingClass).append(lineSep);
+        details.append("Exchanges: ").append(cd.m_validExchanges).append(lineSep);
+        details.append("Long name: ").append(cd.m_longName).append(lineSep);
+        details.append("Market name: ").append(cd.m_marketName).append(lineSep);
+        details.append("Minimum tick: ").append(cd.m_minTick).append(lineSep);
+        details.append("Contract month: ").append(cd.m_contractMonth).append(lineSep);
+        details.append("Time zone id: ").append(cd.m_timeZoneId).append(lineSep);
+        details.append("Trading hours: ").append(cd.m_tradingHours).append(lineSep);
+        details.append("Liquid hours: ").append(cd.m_liquidHours).append(lineSep);
         eventReport.report("IB API", details.toString());
     }
 

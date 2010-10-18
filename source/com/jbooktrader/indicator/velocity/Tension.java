@@ -31,6 +31,7 @@ public class Tension extends Indicator {
         slowPrice += (price - slowPrice) * slowMultiplier;
         double priceVelocity = 2 * (fastPrice - slowPrice);
 
+        // tension
         value = balanceVelocity - priceVelocity;
     }
 

@@ -101,10 +101,10 @@ public class MarketDepth {
 
         double oneSecondBalance = Double.valueOf(df2.format(averageBalance));
         MarketSnapshot marketSnapshot = new MarketSnapshot(time, oneSecondBalance, midPointPrice);
-        double lastBalance = balances.removeLast();
         // retain last balance, clear the rest
-        balances.clear();
-        balances.add(lastBalance);
+        while (balances.size() > 1) {
+            balances.removeFirst();
+        }
 
         return marketSnapshot;
     }

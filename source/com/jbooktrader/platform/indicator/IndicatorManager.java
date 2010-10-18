@@ -9,10 +9,12 @@ import java.util.*;
  */
 public class IndicatorManager {
     private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
+    private static final long MIN_SAMPLE_SIZE = 60 * 60;// 1 hour worth of samples
     private final List<Indicator> indicators;
     private MarketBook marketBook;
     private boolean hasValidIndicators;
     private long previousSnapshotTime;
+    private long samples;
 
     public IndicatorManager() {
         indicators = new ArrayList<Indicator>();
@@ -26,7 +28,7 @@ public class IndicatorManager {
     }
 
     public boolean hasValidIndicators() {
-        return hasValidIndicators;
+        return hasValidIndicators && (samples >= MIN_SAMPLE_SIZE);
     }
 
     public void addIndicator(Indicator indicator) {
@@ -40,10 +42,12 @@ public class IndicatorManager {
     public void updateIndicators() {
         hasValidIndicators = true;
         long lastSnapshotTime = marketBook.getSnapshot().getTime();
+        samples++;
 
         if (lastSnapshotTime - previousSnapshotTime > GAP_SIZE) {
             for (Indicator indicator : indicators) {
                 indicator.reset();
+                samples = 0;
             }
         }
         previousSnapshotTime = lastSnapshotTime;
