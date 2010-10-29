@@ -156,6 +156,7 @@ public class BackTestFileReader {
             }
         }
 
+
         double balance = Double.parseDouble(st.nextToken());
         double price = Double.parseDouble(st.nextToken());
         return new MarketSnapshot(time, balance, price);

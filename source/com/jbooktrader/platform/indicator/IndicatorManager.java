@@ -15,6 +15,7 @@ public class IndicatorManager {
     private boolean hasValidIndicators;
     private long previousSnapshotTime;
     private long samples;
+    private int size;
 
     public IndicatorManager() {
         indicators = new ArrayList<Indicator>();
@@ -33,6 +34,7 @@ public class IndicatorManager {
 
     public void addIndicator(Indicator indicator) {
         indicators.add(indicator);
+        size = indicators.size();
     }
 
     public List<Indicator> getIndicators() {
@@ -45,22 +47,22 @@ public class IndicatorManager {
         samples++;
 
         if (lastSnapshotTime - previousSnapshotTime > GAP_SIZE) {
-            for (Indicator indicator : indicators) {
-                indicator.reset();
-                samples = 0;
+            samples = 0;
+            for (int index = 0; index < size; index++) {
+                indicators.get(index).reset();
             }
         }
         previousSnapshotTime = lastSnapshotTime;
 
-        for (Indicator indicator : indicators) {
+        for (int index = 0; index < size; index++) {
             try {
-                indicator.calculate();
+                indicators.get(index).calculate();
             } catch (IndexOutOfBoundsException iobe) {
                 // This exception will occur if book size is insufficient to calculate
                 // the indicator. This is normal.
                 hasValidIndicators = false;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
     }

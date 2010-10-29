@@ -69,7 +69,7 @@ public class NTPClock {
         msg.append(", name: ").append(ntpMsg.getReferenceIdString());
         msg.append(", stratum: ").append(ntpMsg.getStratum());
         msg.append(", type: ").append(ntpMsg.getType());
-        msg.append(", precision (µs): ").append(df4.format(Math.pow(2, ntpMsg.getPrecision()) * Math.pow(10, 6)));
+        msg.append(", precision (\u00b5s): ").append(df4.format(Math.pow(2, ntpMsg.getPrecision()) * Math.pow(10, 6)));
         eventReport.report(JBookTrader.APP_NAME, msg.toString());
         eventReport.report(JBookTrader.APP_NAME, "NTP clock initialized. Offset: " + offsetNow + " ms");
 

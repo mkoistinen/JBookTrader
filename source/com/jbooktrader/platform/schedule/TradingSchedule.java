@@ -30,11 +30,11 @@ import java.util.*;
  */
 public class TradingSchedule {
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final int start, end;
     private final TimeZone tz;
-    private final Calendar instant;
+    private final Calendar startCalendar, endCalendar, nowCalendar;
+    private Calendar exclusionStartCalendar, exclusionEndCalendar;
     private final String text;
-    private int exclusionStart, exclusionEnd;
+    private long start, end, exclusionStart, exclusionEnd;
     private boolean hasExclusion;
 
     public TradingSchedule(String startTime, String endTime, String timeZone) throws JBookTraderException {
@@ -44,11 +44,12 @@ public class TradingSchedule {
             msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
             throw new JBookTraderException(msg);
         }
-        instant = Calendar.getInstance(tz);
 
-        start = getMinutes(startTime);
-        end = getMinutes(endTime);
-        if (start >= end) {
+        nowCalendar = Calendar.getInstance(tz);
+        startCalendar = getCalendar(startTime);
+        endCalendar = getCalendar(endTime);
+
+        if (!endCalendar.after(startCalendar)) {
             String msg = "End time must be after the start time in trading schedule.";
             throw new JBookTraderException(msg);
         }
@@ -56,16 +57,22 @@ public class TradingSchedule {
         text = startTime + " to " + endTime + " (" + timeZone + ")";
     }
 
+    public TimeZone getTimeZone() {
+        return tz;
+    }
+
     public void setExclusion(String startExclusionTime, String endExclusionTime) throws JBookTraderException {
-        exclusionStart = getMinutes(startExclusionTime);
-        exclusionEnd = getMinutes(endExclusionTime);
-        if (exclusionStart >= exclusionEnd) {
+        exclusionStartCalendar = getCalendar(startExclusionTime);
+        exclusionEndCalendar = getCalendar(endExclusionTime);
+
+        if (!exclusionEndCalendar.after(exclusionStartCalendar)) {
             String msg = "Exclusion end time must be after the exclusion start time in trading schedule.";
             throw new JBookTraderException(msg);
         }
 
-        boolean isValidExclusion = (exclusionStart > start) && (exclusionEnd < end);
-        if (!isValidExclusion) {
+        boolean isValidExclusionStart = (exclusionStartCalendar.after(startCalendar) && endCalendar.after(exclusionStartCalendar));
+        boolean isValidExclusionEnd = (exclusionEndCalendar.after(startCalendar) && endCalendar.after(exclusionEndCalendar));
+        if (!isValidExclusionStart || !isValidExclusionEnd) {
             String msg = "Exclusion period must be within trading period in trading schedule.";
             throw new JBookTraderException(msg);
         }
@@ -73,26 +80,45 @@ public class TradingSchedule {
         hasExclusion = true;
     }
 
-    public TimeZone getTimeZone() {
-        return tz;
-    }
-
     public boolean contains(long time) {
-        instant.setTimeInMillis(time);
-        int minutes = instant.get(Calendar.HOUR_OF_DAY) * 60 + instant.get(Calendar.MINUTE);
+        if (time > end) {
+            updateCalendars(time);
+        }
 
-        boolean containsTime;
+        boolean containsTime = time >= start && time < end;
+
         if (hasExclusion) {
-            containsTime = (minutes >= start && minutes < exclusionStart);
-            containsTime = containsTime || (minutes >= exclusionEnd && minutes < end);
-        } else {
-            containsTime = minutes >= start && minutes < end;
+            containsTime = containsTime && (time < exclusionStart || time >= exclusionEnd);
         }
 
         return containsTime;
     }
 
-    private int getMinutes(String time) throws JBookTraderException {
+    private void updateCalendars(long time) {
+        nowCalendar.setTimeInMillis(time);
+
+        int daysForward = 0;
+        while (nowCalendar.after(endCalendar)) {
+            endCalendar.add(Calendar.DAY_OF_YEAR, 1);
+            daysForward++;
+        }
+
+        startCalendar.add(Calendar.DAY_OF_YEAR, daysForward);
+        start = startCalendar.getTimeInMillis();
+        end = endCalendar.getTimeInMillis();
+
+        if (hasExclusion) {
+            exclusionStartCalendar.add(Calendar.DAY_OF_YEAR, daysForward);
+            exclusionEndCalendar.add(Calendar.DAY_OF_YEAR, daysForward);
+            exclusionStart = exclusionStartCalendar.getTimeInMillis();
+            exclusionEnd = exclusionEndCalendar.getTimeInMillis();
+        }
+
+    }
+
+    private Calendar getCalendar(String time) throws JBookTraderException {
+        Calendar calendar = Calendar.getInstance(tz);
+
         StringTokenizer st = new StringTokenizer(time, ":");
         int tokens = st.countTokens();
         if (tokens != 2) {
@@ -128,7 +154,13 @@ public class TradingSchedule {
             throw new JBookTraderException(msg);
         }
 
-        return hours * 60 + minutes;
+        calendar.set(Calendar.YEAR, 2008); // has to be before the first timestamp in the data file
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar;
     }
 
     @Override

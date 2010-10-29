@@ -86,7 +86,7 @@ public class ClassFinder {
             } catch (Exception e) {
                 String msg = "Could not create strategy " + strategyName + ": ";
                 msg += (e.getCause() != null) ? e.getCause().getMessage() : e.getMessage();
-                throw new RuntimeException(msg);
+                throw new RuntimeException(msg, e);
             }
         }
 

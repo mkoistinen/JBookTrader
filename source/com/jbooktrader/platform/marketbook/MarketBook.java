@@ -36,7 +36,7 @@ public class MarketBook {
             try {
                 backTestFileWriter = new BackTestFileWriter(name, timeZone);
             } catch (JBookTraderException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage(), e);
             }
         }
         backTestFileWriter.write(marketSnapshot);

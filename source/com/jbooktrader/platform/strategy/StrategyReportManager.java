@@ -54,7 +54,7 @@ public class StrategyReportManager {
             try {
                 strategyReport = new StrategyReport(strategy.getName());
             } catch (JBookTraderException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e.getMessage(), e);
             }
             strategyReport.reportHeaders(strategyReportHeaders);
         }

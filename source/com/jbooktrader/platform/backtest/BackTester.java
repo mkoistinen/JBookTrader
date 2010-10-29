@@ -37,10 +37,10 @@ public class BackTester {
         long marketDepthCounter = 0;
         long size = backTestFileReader.getSnapshotCount();
         MarketSnapshot marketSnapshot;
-        while (!isCanceled && (marketSnapshot = backTestFileReader.next()) != null) {
+        while ((marketSnapshot = backTestFileReader.next()) != null) {
             marketDepthCounter++;
             if (marketBook.isGapping(marketSnapshot)) {
-                strategy.closePosition();
+            	strategy.closePosition();
             }
             marketBook.setSnapshot(marketSnapshot);
             performanceChartData.update(marketSnapshot);
@@ -50,6 +50,9 @@ public class BackTester {
 
             if (marketDepthCounter % 50000 == 0) {
                 backTestDialog.setProgress(marketDepthCounter, size);
+                if (isCanceled) {
+                	break;
+                }
             }
         }
 

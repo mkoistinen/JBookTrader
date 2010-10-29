@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.*;
  * historical market snapshots.
  */
 public abstract class OptimizerRunner implements Runnable {
-    protected final ArrayList<OptimizationResult> optimizationResults;
+    protected final List<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
     protected long snapshotCount;
     protected boolean cancelled;
@@ -64,7 +64,7 @@ public abstract class OptimizerRunner implements Runnable {
         this.optimizerDialog = optimizerDialog;
         strategyName = strategy.getName();
         strategyParams = params;
-        optimizationResults = new ArrayList<OptimizationResult>();
+        optimizationResults = new LinkedList<OptimizationResult>();
         snapshots = new LinkedList<MarketSnapshot>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);

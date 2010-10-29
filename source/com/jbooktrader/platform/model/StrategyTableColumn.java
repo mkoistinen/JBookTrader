@@ -3,11 +3,11 @@ package com.jbooktrader.platform.model;
 public enum StrategyTableColumn {
     Strategy("Strategy"),
     Symbol("Symbol"),
-    DepthBalance("Book Balance"),
+    DepthBalance("Book"),
     Price("Price"),
     Position("Position"),
     Trades("Trades"),
-    AveDuration("Ave Duration"),
+    AveDuration("Duration"),
     ProfitFactor("PF"),
     PI("PI"),
     Kelly("Kelly"),

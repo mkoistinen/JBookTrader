@@ -19,7 +19,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
     @Override
     public void optimize() throws JBookTraderException {
-        List<StrategyParams> topParams = new ArrayList<StrategyParams>();
+        List<StrategyParams> topParams = new LinkedList<StrategyParams>();
         StrategyParams startingParams = new StrategyParams(strategyParams);
         topParams.add(startingParams);
         int dimensions = strategyParams.size();

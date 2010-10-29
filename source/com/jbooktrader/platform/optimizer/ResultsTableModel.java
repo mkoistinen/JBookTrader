@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class ResultsTableModel extends TableDataModel {
     public ResultsTableModel(Strategy strategy) {
-        List<String> columnNames = new ArrayList<String>();
+        List<String> columnNames = new LinkedList<String>();
         for (StrategyParam param : strategy.getParams().getAll()) {
             columnNames.add(param.getName());
         }

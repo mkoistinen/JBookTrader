@@ -14,6 +14,10 @@ public class MovingWindow {
         buffer = new double[size];
     }
 
+    public double getElement(int index) {
+        return buffer[index];
+    }
+
     public void add(double value) {
         sum += value;
         sumSquared += (value * value);
