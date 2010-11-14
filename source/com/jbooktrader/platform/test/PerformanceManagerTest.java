@@ -26,7 +26,7 @@ public class PerformanceManagerTest {
             setStrategy(contract, tradingSchedule, multiplier, commission, 0.25);
 
             MarketBook marketBook = new MarketBook();
-            marketBook.setSnapshot(new MarketSnapshot(0, 0, 0));
+            marketBook.setSnapshot(new MarketSnapshot(0, 0, 0, 0));
 
             setMarketBook(marketBook);
         }

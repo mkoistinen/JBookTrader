@@ -2,6 +2,10 @@ package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
 
+/**
+ * Double-smoothed average of price. 
+ * Reference: http://en.wikipedia.org/wiki/Double_exponential_smoothing#Double_exponential_smoothing
+ */
 public class PriceDoubleEMA extends Indicator {
 
     private final double alpha, beta;

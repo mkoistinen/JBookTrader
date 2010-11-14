@@ -1,6 +1,6 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.util.movingwindow;
 
-public class CorrelationWindow {
+public class MovingWindowCorrelation {
     private class Pair {
         public final double value1, value2;
 
@@ -11,12 +11,27 @@ public class CorrelationWindow {
     }
 
     private final Pair[] buffer;
+    //private final int capacity;
     private double sum1, sum1Squared, sum2, sum2Squared, sumProduct;
     private int start, end;
     private boolean isFull;
 
-    public CorrelationWindow(int size) {
-        buffer = new Pair[size];
+    public MovingWindowCorrelation(int capacity) {
+        //this.capacity = capacity;
+        buffer = new Pair[capacity];
+        for (int i = 0; i < capacity; i++) {
+            buffer[i] = new Pair(0, 0);
+        }
+
+    }
+
+    public Pair get(int position) {
+        int index = (start + position - 1) % buffer.length;
+        if (index < 0) {
+            index = buffer.length + index;
+        }
+
+        return buffer[index];
     }
 
     public void add(double value1, double value2) {
@@ -27,15 +42,15 @@ public class CorrelationWindow {
         sumProduct += (value1 * value2);
 
 
-        Pair oldestPair = buffer[end];
-        double oldest1 = oldestPair.value1;
-        double oldest2 = oldestPair.value2;
+        Pair firstPair = get(0);
+        double first1 = firstPair.value1;
+        double first2 = firstPair.value2;
 
-        sum1 -= oldest1;
-        sum1Squared -= (oldest1 * oldest1);
-        sum2 -= oldest2;
-        sum2Squared -= (oldest2 * oldest2);
-        sumProduct -= (oldest1 * oldest2);
+        sum1 -= first1;
+        sum1Squared -= (first1 * first1);
+        sum2 -= first2;
+        sum2Squared -= (first2 * first2);
+        sumProduct -= (first1 * first2);
 
 
         buffer[end] = new Pair(value1, value2);

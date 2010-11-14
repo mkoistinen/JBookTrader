@@ -172,11 +172,14 @@ public class TraderAssistant {
         String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
         if (!subscribedTickers.contains(ticker)) {
+            String name = strategy.getName();
             subscribedTickers.add(ticker);
             socket.reqContractDetails(strategy.getContract().m_conId, strategy.getContract());
-            eventReport.report(strategy.getName(), "Requested contract details for instrument " + instrument);
+            eventReport.report(name, "Requested contract details for instrument " + instrument);
             socket.reqMktDepth(ticker, contract, 10);
-            eventReport.report(strategy.getName(), "Requested market depth for instrument " + instrument);
+            eventReport.report(name, "Requested book data for instrument " + instrument);
+            socket.reqMktData(ticker, contract, "", false);
+            eventReport.report(name, "Requested market data for instrument " + instrument);
         }
     }
 

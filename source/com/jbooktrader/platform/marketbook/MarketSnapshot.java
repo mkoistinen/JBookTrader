@@ -7,12 +7,14 @@ public class MarketSnapshot {
     private final long time;
     private final double balance;
     private final double price;
+    private final int volume;
 
 
-    public MarketSnapshot(long time, double balance, double price) {
+    public MarketSnapshot(long time, double balance, double price, int volume) {
         this.time = time;
         this.balance = balance;
         this.price = price;
+        this.volume = volume;
     }
 
     public double getBalance() {
@@ -25,6 +27,10 @@ public class MarketSnapshot {
 
     public double getPrice() {
         return price;
+    }
+
+    public int getVolume() {
+        return volume;
     }
 
     @Override

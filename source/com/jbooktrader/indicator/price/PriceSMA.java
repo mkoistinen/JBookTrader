@@ -1,13 +1,13 @@
 package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.movingwindow.*;
 
 public class PriceSMA extends Indicator {
-    private final MovingWindow prices;
+    private final MovingWindowMean prices;
 
     public PriceSMA(int period) {
-        prices = new MovingWindow(period);
+        prices = new MovingWindowMean(period);
     }
 
     @Override

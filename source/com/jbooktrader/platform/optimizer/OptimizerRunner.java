@@ -197,7 +197,8 @@ public abstract class OptimizerRunner implements Runnable {
             }
 
             columns.add(nf0.format(optimizationResult.get(Trades)));
-            columns.add(nf0.format(optimizationResult.get(AverageDuration)));
+            columns.add(nf0.format(optimizationResult.get(Duration)));
+            columns.add(nf0.format(optimizationResult.get(Bias)));
             columns.add(nf2.format(optimizationResult.get(PF)));
             columns.add(nf2.format(optimizationResult.get(PI)));
             columns.add(nf0.format(optimizationResult.get(Kelly)));

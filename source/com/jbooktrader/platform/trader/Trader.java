@@ -196,6 +196,19 @@ public class Trader extends EWrapperAdapter {
         }
     }
 
+    @Override
+    public void tickSize(int tickerId, int tickType, int size) {
+        try {
+            if (tickType == TickType.VOLUME && size != 0) {
+                MarketDepth marketDepth = traderAssistant.getMarketBook(tickerId).getMarketDepth();
+                marketDepth.update(size);
+            }
+        } catch (Throwable t) {
+            // Do not allow exceptions come back to the socket -- it will cause disconnects
+            eventReport.report(t);
+        }
+    }
+
 
     @Override
     public void nextValidId(int orderId) {

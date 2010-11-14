@@ -1,18 +1,18 @@
-package com.jbooktrader.indicator.depth;
+package com.jbooktrader.indicator.correlation;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.movingwindow.*;
 
 
 /**
  *
  */
-public class DepthPriceCorrelation extends Indicator {
-    private final CorrelationWindow window;
+public class BalancePriceCorrelation extends Indicator {
+    private final MovingWindowCorrelation window;
 
-    public DepthPriceCorrelation(int periodLength) {
-        window = new CorrelationWindow(periodLength);
+    public BalancePriceCorrelation(int periodLength) {
+        window = new MovingWindowCorrelation(periodLength);
     }
 
     @Override

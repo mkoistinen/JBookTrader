@@ -50,7 +50,8 @@ public class BackTestFileWriter {
         StringBuilder sb = new StringBuilder();
         sb.append(dateFormat.format(marketSnapshot.getTime())).append(",");
         sb.append(marketSnapshot.getBalance()).append(",");
-        sb.append(decimalFormat.format(marketSnapshot.getPrice()));
+        sb.append(decimalFormat.format(marketSnapshot.getPrice())).append(",");
+        sb.append(marketSnapshot.getVolume());
 
         writer.println(sb);
         writer.flush();
@@ -65,6 +66,7 @@ public class BackTestFileWriter {
         header.append("# 2. time in the HHmmss format").append(LINE_SEP);
         header.append("# 3. book balance").append(LINE_SEP);
         header.append("# 4. price").append(LINE_SEP);
+        header.append("# 5. volume").append(LINE_SEP);
         header.append(LINE_SEP);
         header.append("timeZone=").append(dateFormat.getTimeZone().getID()).append(LINE_SEP);
         return header;

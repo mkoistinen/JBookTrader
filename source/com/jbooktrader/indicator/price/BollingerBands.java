@@ -1,7 +1,7 @@
 package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.movingwindow.*;
 
 /**
  * This indicator computes the standard deviation of the last <period> prices.
@@ -20,7 +20,7 @@ import com.jbooktrader.platform.util.*;
 public class BollingerBands extends Indicator {
 
     private final double multiple;
-    private final MovingWindow prices;
+    private final MovingWindowStDev prices;
     private double mean, sigma;
 
     public BollingerBands(int period) {
@@ -29,7 +29,7 @@ public class BollingerBands extends Indicator {
 
     public BollingerBands(int period, double multiple) {
         this.multiple = multiple;
-        prices = new MovingWindow(period);
+        prices = new MovingWindowStDev(period);
     }
 
     @Override

@@ -1,8 +1,6 @@
 package com.jbooktrader.indicator.velocity;
 
-import com.jbooktrader.indicator.depth.*;
 import com.jbooktrader.platform.indicator.*;
-import com.jbooktrader.platform.marketbook.*;
 
 /**
  * Velocity of balance in the market limit order book
@@ -10,7 +8,6 @@ import com.jbooktrader.platform.marketbook.*;
 public class BalanceVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;
     private double fast, slow;
-    private DepthBalance depthBalance;
 
     public BalanceVelocity(int fastPeriod, int slowPeriod) {
         fastMultiplier = 2.0 / (fastPeriod + 1.0);
@@ -18,18 +15,10 @@ public class BalanceVelocity extends Indicator {
     }
 
     @Override
-    public void setMarketBook(MarketBook marketBook) {
-        super.setMarketBook(marketBook);
-        depthBalance = new DepthBalance();
-        depthBalance.setMarketBook(marketBook);
-    }
-
-    @Override
     public void calculate() {
-        depthBalance.calculate();
-        double depthBalanceValue = depthBalance.getValue();
-        fast += (depthBalanceValue - fast) * fastMultiplier;
-        slow += (depthBalanceValue - slow) * slowMultiplier;
+        double balance = marketBook.getSnapshot().getBalance();
+        fast += (balance - fast) * fastMultiplier;
+        slow += (balance - slow) * slowMultiplier;
 
         value = fast - slow;
     }

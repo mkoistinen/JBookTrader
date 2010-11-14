@@ -2,8 +2,9 @@ package com.jbooktrader.platform.optimizer;
 
 public enum PerformanceMetric {
     Trades("Trades"),
-    AverageDuration("Ave Duration"),
-    PF("Profit Factor"),
+    Duration("Duration"),
+    Bias("Bias"),
+    PF("PF"),
     PI("PI"),
     Kelly("Kelly"),
     MaxDD("Max DD"),

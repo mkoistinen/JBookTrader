@@ -8,6 +8,7 @@ public enum StrategyTableColumn {
     Position("Position"),
     Trades("Trades"),
     AveDuration("Duration"),
+    Bias("Bias"),
     ProfitFactor("PF"),
     PI("PI"),
     Kelly("Kelly"),

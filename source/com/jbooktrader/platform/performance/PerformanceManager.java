@@ -28,6 +28,7 @@ public class PerformanceManager {
     private boolean isCompletedTrade;
     private double sumTradeProfit, sumTradeProfitSquared;
     private long timeInMarketStart, timeInMarket;
+    private long longTrades, shortTrades;
 
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
@@ -47,6 +48,14 @@ public class PerformanceManager {
     public int getTrades() {
         return trades;
     }
+
+    public double getBias() {
+        if (trades == 0) {
+            return 0;
+        }
+        return 100 * (longTrades - shortTrades) / (double) trades;
+    }
+
 
     public double getAveDuration() {
         if (trades == 0) {
@@ -156,6 +165,12 @@ public class PerformanceManager {
 
         if (isCompletedTrade) {
             trades++;
+            if (previousPosition > 0) {
+                longTrades++;
+            } else if (previousPosition < 0) {
+                shortTrades++;
+            }
+
 
             netProfit = totalSold - totalBought + positionValue - totalCommission;
             peakNetProfit = Math.max(netProfit, peakNetProfit);

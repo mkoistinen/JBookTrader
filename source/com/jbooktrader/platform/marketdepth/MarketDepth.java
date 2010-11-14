@@ -15,6 +15,7 @@ public class MarketDepth {
     private double averageBalance;
     private double midPointPrice;
     private final DecimalFormat df2;
+    private int volume, previousVolume;
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
@@ -88,11 +89,17 @@ public class MarketDepth {
         }
     }
 
+    public synchronized void update(int volume) {
+        this.volume = volume;
+    }
 
     public synchronized MarketSnapshot getMarketSnapshot(long time) {
         if (balances.isEmpty()) {
             return null;
         }
+
+        int oneSecondVolume = (previousVolume == 0) ? 0 : Math.max(0, volume - previousVolume);
+        previousVolume = volume;
 
         double multiplier = 2.0 / (balances.size() + 1.0);
         for (double balance : balances) {
@@ -100,7 +107,7 @@ public class MarketDepth {
         }
 
         double oneSecondBalance = Double.valueOf(df2.format(averageBalance));
-        MarketSnapshot marketSnapshot = new MarketSnapshot(time, oneSecondBalance, midPointPrice);
+        MarketSnapshot marketSnapshot = new MarketSnapshot(time, oneSecondBalance, midPointPrice, oneSecondVolume);
         // retain last balance, clear the rest
         while (balances.size() > 1) {
             balances.removeFirst();

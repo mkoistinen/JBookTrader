@@ -53,7 +53,8 @@ public class ResultsTableModel extends TableDataModel {
                 DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
 
                 item[column + Trades.ordinal()] = df0.format(optimizationResult.get(Trades));
-                item[column + AverageDuration.ordinal()] = df0.format(optimizationResult.get(AverageDuration));
+                item[column + Duration.ordinal()] = df0.format(optimizationResult.get(Duration));
+                item[column + Bias.ordinal()] = df0.format(optimizationResult.get(Bias));
                 item[column + PF.ordinal()] = df2.format(optimizationResult.get(PF));
                 item[column + PI.ordinal()] = df2.format(optimizationResult.get(PI));
                 item[column + Kelly.ordinal()] = df0.format(optimizationResult.get(Kelly));

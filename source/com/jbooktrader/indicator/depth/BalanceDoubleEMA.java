@@ -2,10 +2,14 @@ package com.jbooktrader.indicator.depth;
 
 import com.jbooktrader.platform.indicator.*;
 
+/**
+ * Double-smoothed average of depth balance.
+ * Reference: http://en.wikipedia.org/wiki/Double_exponential_smoothing#Double_exponential_smoothing
+ */
 public class BalanceDoubleEMA extends Indicator {
 
     private final double alpha, beta;
-    double s0, s1, b;
+    private double s0, b;
 
     public BalanceDoubleEMA(int period1, int period2) {
         alpha = 2.0 / (period1 + 1.0);
@@ -20,7 +24,7 @@ public class BalanceDoubleEMA extends Indicator {
     @Override
     public void calculate() {
         double balance = marketBook.getSnapshot().getBalance();
-        s1 = alpha * balance + (1 - alpha) * value;
+        double s1 = alpha * balance + (1 - alpha) * value;
         b = beta * (s1 - s0) + (1 - beta) * b;
         s0 = s1;
         value = s1 + b;
