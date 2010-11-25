@@ -27,7 +27,6 @@ public class PerformanceManagerTest {
 
             MarketBook marketBook = new MarketBook();
             marketBook.setSnapshot(new MarketSnapshot(0, 0, 0, 0));
-
             setMarketBook(marketBook);
         }
 
@@ -39,6 +38,9 @@ public class PerformanceManagerTest {
         protected void setParams() {
         }
 
+        @Override
+        public void setIndicators() {
+        }
     }
 
     /**

@@ -15,6 +15,7 @@ public class TrendVelocity extends Indicator {
 
 
     public TrendVelocity(int periodLength) {
+        super(periodLength);
         this.periodLength = periodLength;
         multiplier = 2.0 / (periodLength + 1.0);
     }

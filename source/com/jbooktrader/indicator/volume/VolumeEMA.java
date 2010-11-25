@@ -3,12 +3,13 @@ package com.jbooktrader.indicator.volume;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Exponential moving average of the balance in the limit order book.
+ * Exponential moving average of volume.
  */
 public class VolumeEMA extends Indicator {
     private final double multiplier;
 
     public VolumeEMA(int length) {
+        super(length);
         multiplier = 2.0 / (length + 1.0);
     }
 

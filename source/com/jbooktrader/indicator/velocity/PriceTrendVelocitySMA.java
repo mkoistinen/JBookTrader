@@ -12,6 +12,7 @@ public class PriceTrendVelocitySMA extends Indicator {
     private double previousPrice;
 
     public PriceTrendVelocitySMA(int period) {
+        super(period);
         upPrices = new MovingWindowMean(period);
         downPrices = new MovingWindowMean(period);
     }

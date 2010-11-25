@@ -12,7 +12,7 @@ import com.jbooktrader.strategy.base.*;
 public class Defender extends StrategyES {
 
     // Technical indicators
-    private final Indicator tensionInd;
+    private Indicator tensionInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
@@ -28,8 +28,11 @@ public class Defender extends StrategyES {
         super(optimizationParams);
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
-        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(tensionInd);
+    }
+
+    @Override
+    public void setIndicators() {
+        tensionInd = addIndicator(new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD)));
     }
 
     /**

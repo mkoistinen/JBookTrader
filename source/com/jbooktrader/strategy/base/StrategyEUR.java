@@ -13,13 +13,7 @@ import com.jbooktrader.platform.util.*;
  */
 public abstract class StrategyEUR extends Strategy {
     /*
-    * MARGIN REQUIREMENTS for ES: GLOBEX as of 13-July-2009
-    * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
     *
-    * Initial Intra-day:
-    * Intra-day Maintenance:
-    * Initial Overnight:
-    * Overnight Maintenance:
     */
     protected StrategyEUR(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);

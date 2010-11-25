@@ -6,12 +6,13 @@ import com.jbooktrader.platform.util.movingwindow.*;
 
 
 /**
- *
+ * Correlation between balance and price in a moving window.
  */
 public class BalancePriceCorrelation extends Indicator {
     private final MovingWindowCorrelation window;
 
     public BalancePriceCorrelation(int periodLength) {
+        super(periodLength);
         window = new MovingWindowCorrelation(periodLength);
     }
 

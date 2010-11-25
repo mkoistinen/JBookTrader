@@ -38,8 +38,23 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     public void modelChanged(Event event, Object value) {
         switch (event) {
             case ModeChanged:
-                String subTitle = Dispatcher.getInstance().getMode().getName();
-                setTitle(JBookTrader.APP_NAME + " - [" + subTitle + "]");
+                Mode mode = Dispatcher.getInstance().getMode();
+                if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+                    backTestMenuItem.setEnabled(false);
+                    optimizeMenuItem.setEnabled(false);
+                    chartMenuItem.setEnabled(false);
+                    if (mode == Mode.Trade) {
+                        forwardTestMenuItem.setEnabled(false);
+                    }
+                    if (mode == Mode.ForwardTest) {
+                        tradeMenuItem.setEnabled(false);
+                    }
+                }
+                if (mode == Mode.BackTest || mode == Mode.Optimization) {
+                    forwardTestMenuItem.setEnabled(false);
+                    tradeMenuItem.setEnabled(false);
+                }
+                setTitle(JBookTrader.APP_NAME + " - [" + mode.getName() + "]");
                 break;
             case Error:
                 String msg = (String) value;
@@ -51,25 +66,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
             case StrategyUpdate:
                 Strategy strategy = (Strategy) value;
                 strategyTableModel.update(strategy);
-                break;
-            case StrategiesStart:
-                Mode mode = Dispatcher.getInstance().getMode();
-                if (mode == Mode.Trade) {
-                    forwardTestMenuItem.setEnabled(false);
-                }
-                if (mode == Mode.ForwardTest) {
-                    tradeMenuItem.setEnabled(false);
-                }
-
-                backTestMenuItem.setEnabled(false);
-                optimizeMenuItem.setEnabled(false);
-                chartMenuItem.setEnabled(true);
-                break;
-            case StrategiesEnd:
-                forwardTestMenuItem.setEnabled(true);
-                tradeMenuItem.setEnabled(true);
-                backTestMenuItem.setEnabled(true);
-                optimizeMenuItem.setEnabled(true);
                 break;
         }
     }

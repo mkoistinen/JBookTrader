@@ -8,6 +8,7 @@ import com.jbooktrader.platform.marketbook.*;
  */
 public abstract class Indicator {
     private final String name;
+    private final String key;
     protected MarketBook marketBook;
     protected double value;
 
@@ -15,8 +16,22 @@ public abstract class Indicator {
 
     public abstract void reset();
 
-    protected Indicator() {
+    protected Indicator(int... parameters) {
         name = getClass().getSimpleName();
+        if (parameters.length == 0) {
+            throw new RuntimeException("No parameters passed from the constructor of indicator " + name);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(name);
+        for (int parameter : parameters) {
+            sb.append("/").append(parameter);
+        }
+        key = sb.toString();
+    }
+
+    public String getKey() {
+        return key;
     }
 
     public void setMarketBook(MarketBook marketBook) {

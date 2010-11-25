@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
+import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.position.*;
@@ -184,7 +185,8 @@ public class TraderAssistant {
     }
 
     public synchronized void addStrategy(Strategy strategy) {
-        strategy.getIndicatorManager().setMarketBook(strategy.getMarketBook());
+        strategy.setIndicatorManager(new IndicatorManager());
+        strategy.setIndicators();
         nextStrategyID++;
         strategies.put(nextStrategyID, strategy);
         Mode mode = dispatcher.getMode();
@@ -193,7 +195,6 @@ public class TraderAssistant {
             eventReport.report(strategy.getName(), msg);
             requestMarketData(strategy);
             StrategyRunner.getInstance().addListener(strategy);
-            dispatcher.strategyStarted();
         }
     }
 

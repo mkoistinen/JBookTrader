@@ -13,6 +13,7 @@ public class PriceRSI extends Indicator {
     private double previousPrice;
 
     public PriceRSI(int periodLength) {
+        super(periodLength);
         multiplier = 2.0 / (periodLength + 1.0);
     }
 

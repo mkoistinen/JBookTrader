@@ -90,12 +90,15 @@ public class StrategyInformationDialog extends JBTDialog {
         makeCompactGrid(parametersPanel);
 
 
-        JPanel indicatorsPanel = new JPanel(new SpringLayout());
-        tabbedPane.addTab("Indicators", indicatorsPanel);
-        for (Indicator indicator : strategy.getIndicatorManager().getIndicators()) {
-            add(indicatorsPanel, indicator.getName(), indicator.getValue());
+        IndicatorManager indicatorManager = strategy.getIndicatorManager();
+        if (indicatorManager != null) {
+            JPanel indicatorsPanel = new JPanel(new SpringLayout());
+            tabbedPane.addTab("Indicators", indicatorsPanel);
+            for (Indicator indicator : strategy.getIndicatorManager().getIndicators()) {
+                add(indicatorsPanel, indicator.getName(), indicator.getValue());
+            }
+            makeCompactGrid(indicatorsPanel);
         }
-        makeCompactGrid(indicatorsPanel);
 
         getContentPane().setPreferredSize(new Dimension(450, 400));
     }

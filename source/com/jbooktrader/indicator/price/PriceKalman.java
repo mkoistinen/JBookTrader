@@ -8,9 +8,10 @@ public class PriceKalman extends Indicator {
     private final JKalman kalman;
     private final Matrix m;
 
-    public PriceKalman() {
+    public PriceKalman(int size) {
+        super(size);
         try {
-            kalman = new JKalman(1, 1);
+            kalman = new JKalman(size, size);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

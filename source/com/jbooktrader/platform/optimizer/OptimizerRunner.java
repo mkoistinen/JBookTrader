@@ -40,7 +40,6 @@ public abstract class OptimizerRunner implements Runnable {
     private String totalStrategiesString;
     private long previousResultsSize;
 
-
     class ProgressRunner implements Runnable {
         public void run() {
             if (completedSteps.get() > 0) {
@@ -58,7 +57,6 @@ public abstract class OptimizerRunner implements Runnable {
             }
         }
     }
-
 
     protected OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         this.optimizerDialog = optimizerDialog;
@@ -92,7 +90,6 @@ public abstract class OptimizerRunner implements Runnable {
         optimizationExecutor = Executors.newFixedThreadPool(availableProcessors);
     }
 
-
     public Strategy getStrategyInstance(StrategyParams params) throws JBookTraderException {
         try {
             return (Strategy) strategyConstructor.newInstance(params);
@@ -102,7 +99,6 @@ public abstract class OptimizerRunner implements Runnable {
             throw new JBookTraderException(e);
         }
     }
-
 
     protected abstract void optimize() throws JBookTraderException;
 
@@ -122,7 +118,6 @@ public abstract class OptimizerRunner implements Runnable {
         return minTrades;
     }
 
-
     public List<MarketSnapshot> getSnapshots() {
         return snapshots;
     }
@@ -136,17 +131,20 @@ public abstract class OptimizerRunner implements Runnable {
 
     void execute(Queue<StrategyParams> tasks) throws JBookTraderException {
         if (!tasks.isEmpty()) {
-            Set<Callable<List<OptimizationResult>>> workers = new HashSet<Callable<List<OptimizationResult>>>();
+            Set<Callable<Void>> workers = new HashSet<Callable<Void>>();
             for (int worker = 0; worker < availableProcessors; worker++) {
-                Callable<List<OptimizationResult>> optimizerWorker = new OptimizerWorker(this, tasks);
+                Callable<Void> optimizerWorker = new OptimizerWorker(this, tasks);
                 workers.add(optimizerWorker);
             }
-
             try {
-                // this blocks until all workers are done
-                optimizationExecutor.invokeAll(workers);
-            } catch (InterruptedException ie) {
-                throw new JBookTraderException(ie);
+                // submit all workers and wait until they are done
+                List<Future<Void>> futureResults = optimizationExecutor.invokeAll(workers);
+                // all workers are done, call the "get()" to check for exceptions
+                for (Future<Void> futureResult : futureResults) {
+                    futureResult.get();
+                }
+            } catch (Exception e) {
+                throw new JBookTraderException(e.getMessage(), e);
             }
         }
     }
@@ -211,7 +209,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     private void showProgress(long counter, String text) {
-        String remainingTime = (counter == totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
+        String remainingTime = (counter >= totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
         optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
     }
 
@@ -284,7 +282,6 @@ public abstract class OptimizerRunner implements Runnable {
             long end = System.currentTimeMillis();
             progressExecutor.shutdownNow();
             resultsTableExecutor.shutdownNow();
-
 
             optimizerDialog.setResults(optimizationResults);
 

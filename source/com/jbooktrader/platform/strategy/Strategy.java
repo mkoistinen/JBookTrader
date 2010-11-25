@@ -41,6 +41,11 @@ public abstract class Strategy implements Comparable<Strategy> {
      */
     protected abstract void setParams();
 
+    /**
+     * Framework calls this method to instantiate indicators.
+     */
+    public abstract void setIndicators();
+
     protected Strategy(StrategyParams params) {
         this.params = params;
         if (params.size() == 0) {
@@ -54,8 +59,13 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     public void setMarketBook(MarketBook marketBook) {
         this.marketBook = marketBook;
+    }
+
+    public void setIndicatorManager(IndicatorManager indicatorManager) {
+        this.indicatorManager = indicatorManager;
         indicatorManager.setMarketBook(marketBook);
     }
+
 
     public int getPosition() {
         return position;
@@ -113,8 +123,8 @@ public abstract class Strategy implements Comparable<Strategy> {
         return tradingSchedule;
     }
 
-    protected void addIndicator(Indicator indicator) {
-        indicatorManager.addIndicator(indicator);
+    protected Indicator addIndicator(Indicator indicator) {
+        return indicatorManager.addIndicator(indicator);
     }
 
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread) {
@@ -126,7 +136,6 @@ public abstract class Strategy implements Comparable<Strategy> {
         strategyReportManager = new StrategyReportManager(this);
         marketBook = dispatcher.getTrader().getAssistant().createMarketBook(this);
         this.bidAskSpread = bidAskSpread;
-        indicatorManager = new IndicatorManager();
     }
 
     public MarketBook getMarketBook() {
@@ -151,8 +160,6 @@ public abstract class Strategy implements Comparable<Strategy> {
     }
 
     public void processInstant(boolean isInSchedule) {
-        indicatorManager.updateIndicators();
-
         if (isInSchedule) {
             if (indicatorManager.hasValidIndicators()) {
                 onBookSnapshot();

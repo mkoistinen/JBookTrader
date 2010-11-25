@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
@@ -12,7 +13,7 @@ import java.util.concurrent.*;
 
 /**
  */
-public class OptimizerWorker implements Callable<List<OptimizationResult>> {
+public class OptimizerWorker implements Callable<Void> {
     private final OptimizerRunner optimizerRunner;
     private final Queue<StrategyParams> tasks;
 
@@ -21,24 +22,25 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
         this.tasks = tasks;
     }
 
-
-    public List<OptimizationResult> call() throws JBookTraderException {
+    public Void call() throws JBookTraderException {
         List<Strategy> strategies = new ArrayList<Strategy>();
         List<OptimizationResult> optimizationResults = new LinkedList<OptimizationResult>();
         int strategiesPerProcessor = PreferencesHolder.getInstance().getInt(JBTPreferences.StrategiesPerProcessor);
 
         while (!tasks.isEmpty()) {
             MarketBook marketBook = new MarketBook();
+            IndicatorManager indicatorManager = new IndicatorManager();
             strategies.clear();
             while (strategies.size() < strategiesPerProcessor && !tasks.isEmpty()) {
                 StrategyParams params = tasks.poll();
                 if (params != null) {
                     Strategy strategy = optimizerRunner.getStrategyInstance(params);
                     strategy.setMarketBook(marketBook);
+                    strategy.setIndicatorManager(indicatorManager);
+                    strategy.setIndicators();
                     strategies.add(strategy);
                 }
             }
-
 
             if (!strategies.isEmpty()) {
                 TradingSchedule tradingSchedule = strategies.get(0).getTradingSchedule();
@@ -53,8 +55,8 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
                         }
                     }
 
-
                     marketBook.setSnapshot(marketSnapshot);
+                    indicatorManager.updateIndicators();
                     boolean isInSchedule = tradingSchedule.contains(marketSnapshot.getTime());
 
                     // For efficiency, avoid the (Strategy strategy : strategies) construct
@@ -64,14 +66,12 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
 
                     optimizerRunner.iterationsCompleted(size);
                     if (optimizerRunner.isCancelled()) {
-                        return optimizationResults;
+                        break;
                     }
                 }
 
-
                 optimizationResults.clear();
                 int minTrades = optimizerRunner.getMinTrades();
-
 
                 for (Strategy strategy : strategies) {
                     strategy.closePosition();
@@ -88,6 +88,6 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
             }
         }
 
-        return optimizationResults;
+        return null;
     }
 }

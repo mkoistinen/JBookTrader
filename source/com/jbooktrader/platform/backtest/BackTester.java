@@ -9,6 +9,8 @@ import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
 
+import java.util.*;
+
 /**
  * This class is responsible for running the strategy against historical market data
  */
@@ -31,6 +33,10 @@ public class BackTester {
     public void execute() {
         MarketBook marketBook = strategy.getMarketBook();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
+        BarSize barSize = backTestDialog.getBarSize();
+        strategy.getPerformanceManager().createPerformanceChartData(barSize, indicatorManager.getIndicators());
+
+        List<Indicator> indicators = indicatorManager.getIndicators();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
         PerformanceChartData performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
 
@@ -44,9 +50,10 @@ public class BackTester {
             }
             marketBook.setSnapshot(marketSnapshot);
             performanceChartData.update(marketSnapshot);
+            indicatorManager.updateIndicators();
             long instant = marketSnapshot.getTime();
             strategy.processInstant(tradingSchedule.contains(instant));
-            performanceChartData.update(indicatorManager.getIndicators(), instant);
+            performanceChartData.update(indicators, instant);
 
             if (marketDepthCounter % 50000 == 0) {
                 backTestDialog.setProgress(marketDepthCounter, size);

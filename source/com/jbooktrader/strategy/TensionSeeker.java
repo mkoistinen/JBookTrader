@@ -12,7 +12,7 @@ import com.jbooktrader.strategy.base.*;
 public class TensionSeeker extends StrategyES {
 
     // Technical indicators
-    private final Indicator tensionInd;
+    private Indicator tensionInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
@@ -26,9 +26,13 @@ public class TensionSeeker extends StrategyES {
     public TensionSeeker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         entry = getParam(ENTRY);
-        tensionInd = new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(tensionInd);
     }
+
+    @Override
+    public void setIndicators() {
+        tensionInd = addIndicator(new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD)));
+    }
+
 
     /**
      * Adds parameters to strategy. Each parameter must have 5 values:

@@ -12,7 +12,7 @@ import com.jbooktrader.strategy.base.*;
 public class Predator extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd, priceTrendVelocityInd;
+    private Indicator balanceVelocityInd, priceTrendVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "Fast Period";
@@ -28,11 +28,14 @@ public class Predator extends StrategyES {
 
         entry = getParam(ENTRY);
         magnifier = getParam(MAGNIFIER);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        priceTrendVelocityInd = new PriceTrendVelocity(getParam(SLOW_PERIOD));
-        addIndicator(balanceVelocityInd);
-        addIndicator(priceTrendVelocityInd);
     }
+
+    @Override
+    public void setIndicators() {
+        balanceVelocityInd = addIndicator(new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD)));
+        priceTrendVelocityInd = addIndicator(new PriceTrendVelocity(getParam(SLOW_PERIOD)));
+    }
+
 
     /**
      * Adds parameters to strategy. Each parameter must have 5 values:

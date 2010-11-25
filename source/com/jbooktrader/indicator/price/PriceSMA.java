@@ -3,10 +3,14 @@ package com.jbooktrader.indicator.price;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.util.movingwindow.*;
 
+/**
+ * Simple moving average of price
+ */
 public class PriceSMA extends Indicator {
     private final MovingWindowMean prices;
 
     public PriceSMA(int period) {
+        super(period);
         prices = new MovingWindowMean(period);
     }
 

@@ -10,6 +10,7 @@ public class PriceVelocitySMA extends Indicator {
     private MovingWindowMean fast, slow;
 
     public PriceVelocitySMA(int fastPeriod, int slowPeriod) {
+        super(fastPeriod, slowPeriod);
         fast = new MovingWindowMean(fastPeriod);
         slow = new MovingWindowMean(slowPeriod);
     }

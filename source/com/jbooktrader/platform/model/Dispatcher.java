@@ -22,7 +22,6 @@ public class Dispatcher {
     private Trader trader;
     private NTPClock ntpClock;
     private Mode mode;
-    private int activeStrategies;
 
     private Dispatcher() {
         listeners = new ArrayList<ModelListener>();
@@ -124,17 +123,5 @@ public class Dispatcher {
         }
 
         fireModelChanged(Event.ModeChanged);
-    }
-
-    public synchronized void strategyStarted() {
-        activeStrategies++;
-        fireModelChanged(Event.StrategiesStart);
-    }
-
-    public synchronized void strategyCompleted() {
-        activeStrategies--;
-        if (activeStrategies == 0) {
-            fireModelChanged(Event.StrategiesEnd);
-        }
     }
 }

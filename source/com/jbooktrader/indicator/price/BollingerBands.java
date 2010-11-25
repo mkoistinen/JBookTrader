@@ -19,15 +19,16 @@ import com.jbooktrader.platform.util.movingwindow.*;
  */
 public class BollingerBands extends Indicator {
 
-    private final double multiple;
+    private final int multiple;
     private final MovingWindowStDev prices;
     private double mean, sigma;
 
     public BollingerBands(int period) {
-        this(period, 1.0);
+        this(period, 1);
     }
 
-    public BollingerBands(int period, double multiple) {
+    public BollingerBands(int period, int multiple) {
+        super(period, multiple);
         this.multiple = multiple;
         prices = new MovingWindowStDev(period);
     }

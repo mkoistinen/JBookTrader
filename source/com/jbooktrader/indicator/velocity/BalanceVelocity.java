@@ -10,6 +10,7 @@ public class BalanceVelocity extends Indicator {
     private double fast, slow;
 
     public BalanceVelocity(int fastPeriod, int slowPeriod) {
+        super(fastPeriod, slowPeriod);
         fastMultiplier = 2.0 / (fastPeriod + 1.0);
         slowMultiplier = 2.0 / (slowPeriod + 1.0);
     }

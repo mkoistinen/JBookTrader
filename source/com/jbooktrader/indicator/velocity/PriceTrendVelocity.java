@@ -13,6 +13,7 @@ public class PriceTrendVelocity extends Indicator {
 
 
     public PriceTrendVelocity(int periodLength) {
+        super(periodLength);
         multiplier = 2.0 / (periodLength + 1.0);
     }
 

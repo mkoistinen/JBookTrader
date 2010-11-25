@@ -12,6 +12,7 @@ public class ExtraTension extends Indicator {
     private final int size;
 
     public ExtraTension(int fastPeriod, int slowPeriod, int size) {
+        super(fastPeriod, slowPeriod, size);
         this.size = size;
         fastMultipliers = new double[size];
         slowMultipliers = new double[size];

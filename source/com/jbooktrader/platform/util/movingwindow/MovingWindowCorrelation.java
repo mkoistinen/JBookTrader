@@ -11,13 +11,11 @@ public class MovingWindowCorrelation {
     }
 
     private final Pair[] buffer;
-    //private final int capacity;
     private double sum1, sum1Squared, sum2, sum2Squared, sumProduct;
     private int start, end;
     private boolean isFull;
 
     public MovingWindowCorrelation(int capacity) {
-        //this.capacity = capacity;
         buffer = new Pair[capacity];
         for (int i = 0; i < capacity; i++) {
             buffer[i] = new Pair(0, 0);

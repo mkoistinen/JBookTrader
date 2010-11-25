@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator.depth;
+package com.jbooktrader.indicator.balance;
 
 import com.jbooktrader.platform.indicator.*;
 
@@ -12,6 +12,7 @@ public class BalanceDoubleEMA extends Indicator {
     private double s0, b;
 
     public BalanceDoubleEMA(int period1, int period2) {
+        super(period1, period2);
         alpha = 2.0 / (period1 + 1.0);
         beta = 2.0 / (period2 + 1.0);
     }

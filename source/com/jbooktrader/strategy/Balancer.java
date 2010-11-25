@@ -12,7 +12,7 @@ import com.jbooktrader.strategy.base.*;
 public class Balancer extends StrategyES {
 
     // Technical indicators
-    private final Indicator balanceVelocityInd;
+    private Indicator balanceVelocityInd;
 
     // Strategy parameters names
     private static final String FAST_PERIOD = "FastPeriod";
@@ -26,9 +26,13 @@ public class Balancer extends StrategyES {
     public Balancer(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         entry = getParam(ENTRY);
-        balanceVelocityInd = new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD));
-        addIndicator(balanceVelocityInd);
     }
+
+    @Override
+    public void setIndicators() {
+        balanceVelocityInd = addIndicator(new BalanceVelocity(getParam(FAST_PERIOD), getParam(SLOW_PERIOD)));
+    }
+
 
     /**
      * Adds parameters to strategy. Each parameter must have 5 values:

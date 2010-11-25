@@ -27,15 +27,16 @@ public class StrategyRunner {
 
                 if (marketBooks != null) {
                     for (MarketBook marketBook : marketBooks) {
-                        MarketSnapshot marketSnapshot = marketBook.getNextMarketSnapshot(snapshotTime);
-                        if (marketSnapshot != null) {
-                            marketBook.setSnapshot(marketSnapshot);
-                            marketBook.saveSnapshot(marketSnapshot);
+                        MarketSnapshot snapshot = marketBook.getNextMarketSnapshot(snapshotTime);
+                        if (snapshot != null) {
+                            marketBook.setSnapshot(snapshot);
+                            marketBook.saveSnapshot(snapshot);
                         }
                     }
 
                     synchronized (strategies) {
                         for (Strategy strategy : strategies) {
+                            strategy.getIndicatorManager().updateIndicators();
                             strategy.process();
                         }
                     }
