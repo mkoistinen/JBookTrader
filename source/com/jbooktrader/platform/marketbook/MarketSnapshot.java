@@ -39,6 +39,7 @@ public class MarketSnapshot {
         marketDepth.append("time: ").append(time);
         marketDepth.append(" balance: ").append(balance);
         marketDepth.append(" price: ").append(price);
+        marketDepth.append(" volume: ").append(volume);
 
         return marketDepth.toString();
     }

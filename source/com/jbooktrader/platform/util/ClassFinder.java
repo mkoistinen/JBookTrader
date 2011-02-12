@@ -60,7 +60,7 @@ public class ClassFinder {
             return (Strategy) constructor.newInstance(params);
 
         } catch (ClassCastException cce) {
-            throw new JBookTraderException("Class " + name + " does not extend Strategy.");
+            throw new JBookTraderException("Class " + name + " does not extend class Strategy.");
         } catch (ClassNotFoundException cnte) {
             throw new JBookTraderException("Class " + name + " not found");
         } catch (Exception e) {

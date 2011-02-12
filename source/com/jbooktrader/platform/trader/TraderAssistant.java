@@ -28,7 +28,6 @@ public class TraderAssistant {
     private EClientSocket socket;
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
-    private boolean isConnected;
     private boolean isOrderExecutionPending;
 
 
@@ -95,9 +94,6 @@ public class TraderAssistant {
             socket.setServerLogLevel(3);
             socket.reqNewsBulletins(true);
             serverVersion = socket.serverVersion();
-            isConnected = true;
-
-
             eventReport.report(JBookTrader.APP_NAME, "Connected to TWS");
             checkAccountType();
         }
@@ -262,15 +258,6 @@ public class TraderAssistant {
 
     public void setOrderID(int orderID) {
         this.orderID = orderID;
-    }
-
-    public boolean isConnected() {
-        Mode mode = Dispatcher.getInstance().getMode();
-        return mode == Mode.BackTest || mode == Mode.Optimization || isConnected;
-    }
-
-    public void setIsConnected(boolean isConnected) {
-        this.isConnected = isConnected;
     }
 
     private void checkAccountType() throws JBookTraderException {

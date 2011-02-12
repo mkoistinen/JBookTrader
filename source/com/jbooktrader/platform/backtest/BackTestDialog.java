@@ -21,8 +21,7 @@ import java.util.*;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class BackTestDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(600, 350);// minimum frame size
+public class BackTestDialog extends JBTDialog implements ProgressListener {
     private final PreferencesHolder prefs;
     private final String strategyName;
     private final StrategyParams strategyParams;
@@ -56,12 +55,24 @@ public class BackTestDialog extends JBTDialog {
         super.dispose();
     }
 
+    @Override
+    public boolean isCancelled() {
+        return btsr == null;
+    }
 
-    public void setProgress(long count, long iterations) {
+    @Override
+    public void setProgress(long count, long iterations, String text, String label) {
         int percent = (int) (100 * (count / (double) iterations));
         progressBar.setValue(percent);
-        progressBar.setString("Running back test: " + percent + "%");
+        progressBar.setString(text + ": " + percent + "% completed");
     }
+
+    @Override
+    public void setProgress(String progressText) {
+        progressBar.setValue(0);
+        progressBar.setString(progressText);
+    }
+
 
     public void enableProgress() {
         progressBar.setValue(0);
@@ -70,11 +81,6 @@ public class BackTestDialog extends JBTDialog {
         backTestButton.setEnabled(false);
         cancelButton.setEnabled(true);
         getRootPane().setDefaultButton(cancelButton);
-    }
-
-    public void showProgress(String progressText) {
-        progressBar.setValue(0);
-        progressBar.setString(progressText);
     }
 
     private void assignListeners() {
@@ -255,7 +261,7 @@ public class BackTestDialog extends JBTDialog {
         add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(backTestButton);
-        setMinimumSize(MIN_SIZE);
+        setMinimumSize(new Dimension(600, 350));
         setPreferredSize(getMinimumSize());
     }
 

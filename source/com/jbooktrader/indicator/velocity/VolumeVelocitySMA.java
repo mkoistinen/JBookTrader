@@ -7,7 +7,7 @@ import com.jbooktrader.platform.util.movingwindow.*;
  * Velocity of volume
  */
 public class VolumeVelocitySMA extends Indicator {
-    private MovingWindowMean fast, slow;
+    private final MovingWindowMean fast, slow;
 
     public VolumeVelocitySMA(int fastPeriod, int slowPeriod) {
         super(fastPeriod, slowPeriod);

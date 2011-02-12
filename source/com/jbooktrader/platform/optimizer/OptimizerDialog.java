@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
+import com.jbooktrader.platform.backtest.*;
 import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketbook.*;
@@ -25,8 +26,7 @@ import java.util.List;
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
-public class OptimizerDialog extends JBTDialog {
-    private static final Dimension MIN_SIZE = new Dimension(890, 500);// minimum frame size
+public class OptimizerDialog extends JBTDialog implements ProgressListener {
     private final PreferencesHolder prefs;
     private final String strategyName;
     private JPanel progressPanel;
@@ -59,6 +59,7 @@ public class OptimizerDialog extends JBTDialog {
         initParams();
     }
 
+    @Override
     public void setProgress(long count, long iterations, String text, String label) {
         progressLabel.setText(label);
         int percent = (int) (100 * (count / (double) iterations));
@@ -66,10 +67,15 @@ public class OptimizerDialog extends JBTDialog {
         progressBar.setString(text + ": " + percent + "% completed");
     }
 
-    public void setProgress(long count, long iterations, String text) {
-        int percent = (int) (100 * (count / (double) iterations));
-        progressBar.setValue(percent);
-        progressBar.setString(text + percent + "%");
+    @Override
+    public void setProgress(String progressText) {
+        progressBar.setValue(0);
+        progressBar.setString(progressText);
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return optimizerRunner == null || optimizerRunner.isCancelled();
     }
 
     public void enableProgress() {
@@ -79,11 +85,6 @@ public class OptimizerDialog extends JBTDialog {
         optimizeButton.setEnabled(false);
         cancelButton.setEnabled(true);
         getRootPane().setDefaultButton(cancelButton);
-    }
-
-    public void showProgress(String progressText) {
-        progressBar.setValue(0);
-        progressBar.setString(progressText);
     }
 
     public void signalCompleted() {
@@ -441,7 +442,7 @@ public class OptimizerDialog extends JBTDialog {
         getContentPane().add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(optimizeButton);
-        setMinimumSize(MIN_SIZE);
+        setMinimumSize(new Dimension(890, 500));
         setPreferredSize(getMinimumSize());
     }
 

@@ -59,7 +59,7 @@ public class StrategyInformationDialog extends JBTDialog {
         NumberFormat nf2 = NumberFormatterFactory.getNumberFormatter(2);
 
         PerformanceManager pm = strategy.getPerformanceManager();
-        add(performancePanel, "Position", strategy.getPositionManager().getPosition());
+        add(performancePanel, "Position", strategy.getPositionManager().getCurrentPosition());
         add(performancePanel, "Trades", pm.getTrades());
         add(performancePanel, "% Profitable", nf2.format(pm.getPercentProfitableTrades()));
         add(performancePanel, "Average trade", nf2.format(pm.getAverageProfitPerTrade()));

@@ -34,7 +34,7 @@ public abstract class OptimizerRunner implements Runnable {
     private final OptimizerDialog optimizerDialog;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
-    private final List<MarketSnapshot> snapshots;
+    private List<MarketSnapshot> snapshots;
     private AtomicLong completedSteps;
     private long totalSteps;
     private String totalStrategiesString;
@@ -63,7 +63,6 @@ public abstract class OptimizerRunner implements Runnable {
         strategyName = strategy.getName();
         strategyParams = params;
         optimizationResults = new LinkedList<OptimizationResult>();
-        snapshots = new LinkedList<MarketSnapshot>();
         nf2 = NumberFormatterFactory.getNumberFormatter(2);
         nf0 = NumberFormatterFactory.getNumberFormatter(0);
         gnf0 = NumberFormatterFactory.getNumberFormatter(0, true);
@@ -150,7 +149,7 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     public void cancel() {
-        optimizerDialog.showProgress("Stopping optimization...");
+        optimizerDialog.setProgress("Stopping optimization...");
         cancelled = true;
     }
 
@@ -255,26 +254,12 @@ public abstract class OptimizerRunner implements Runnable {
             optimizationResults.clear();
             optimizerDialog.setResults(optimizationResults);
             optimizerDialog.enableProgress();
-            optimizerDialog.showProgress("Scanning historical data file...");
             BackTestFileReader backTestFileReader = new BackTestFileReader(optimizerDialog.getFileName(), optimizerDialog.getDateFilter());
-            backTestFileReader.scan();
-            snapshotCount = backTestFileReader.getSnapshotCount();
+            optimizerDialog.setProgress("Loading historical data file...");
+            snapshots = backTestFileReader.load(optimizerDialog);
+            snapshotCount = snapshots.size();
 
-            MarketSnapshot marketSnapshot;
-            long count = 0;
-            String progressMessage = "Loading historical data file: ";
-            while ((marketSnapshot = backTestFileReader.next()) != null) {
-                snapshots.add(marketSnapshot);
-                count++;
-                if (count % 50000 == 0) {
-                    optimizerDialog.setProgress(count, snapshotCount, progressMessage);
-                }
-                if (cancelled) {
-                    return;
-                }
-            }
-
-            optimizerDialog.showProgress("Starting optimization ...");
+            optimizerDialog.setProgress("Starting optimization ...");
             progressExecutor.scheduleWithFixedDelay(new ProgressRunner(), 0, 1, TimeUnit.SECONDS);
             resultsTableExecutor.scheduleWithFixedDelay(new ResultsTableRunner(), 0, 30, TimeUnit.SECONDS);
             long start = System.currentTimeMillis();
@@ -286,7 +271,7 @@ public abstract class OptimizerRunner implements Runnable {
             optimizerDialog.setResults(optimizationResults);
 
             if (!cancelled) {
-                optimizerDialog.showProgress("Saving optimization results ...");
+                optimizerDialog.setProgress("Saving optimization results ...");
                 saveToFile();
                 long totalTimeInSecs = (end - start) / 1000;
                 showProgress(totalSteps, "Optimization");

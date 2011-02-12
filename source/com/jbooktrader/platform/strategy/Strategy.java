@@ -28,7 +28,6 @@ public abstract class Strategy implements Comparable<Strategy> {
     private PerformanceManager performanceManager;
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
-    private int position;
     private double bidAskSpread;
 
     /**
@@ -66,13 +65,8 @@ public abstract class Strategy implements Comparable<Strategy> {
         indicatorManager.setMarketBook(marketBook);
     }
 
-
-    public int getPosition() {
-        return position;
-    }
-
     protected void setPosition(int position) {
-        this.position = position;
+        positionManager.setTargetPosition(position);
     }
 
     public double getBidAskSpread() {
@@ -80,8 +74,8 @@ public abstract class Strategy implements Comparable<Strategy> {
     }
 
     public void closePosition() {
-        position = 0;
-        if (positionManager.getPosition() != 0) {
+        setPosition(0);
+        if (positionManager.getCurrentPosition() != 0) {
             Mode mode = dispatcher.getMode();
             if (mode == Mode.ForwardTest || mode == Mode.Trade) {
                 String msg = "End of trading interval. Closing current position.";
@@ -160,6 +154,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     }
 
     public void processInstant(boolean isInSchedule) {
+
         if (isInSchedule) {
             if (indicatorManager.hasValidIndicators()) {
                 onBookSnapshot();
@@ -170,13 +165,12 @@ public abstract class Strategy implements Comparable<Strategy> {
         }
     }
 
-
     public void process() {
         if (!marketBook.isEmpty()) {
             MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
             processInstant(tradingSchedule.contains(instant));
-            performanceManager.updatePositionValue(marketSnapshot.getPrice(), positionManager.getPosition());
+            performanceManager.updatePositionValue(marketSnapshot.getPrice(), positionManager.getCurrentPosition());
             dispatcher.fireModelChanged(Event.StrategyUpdate, this);
         }
     }

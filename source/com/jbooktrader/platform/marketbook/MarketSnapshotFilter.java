@@ -21,9 +21,8 @@ public class MarketSnapshotFilter {
     }
 
 
-    public boolean accept(MarketSnapshot marketSnapshot) {
-        long snapshotTime = marketSnapshot.getTime();
-        return (snapshotTime >= fromDate && snapshotTime <= toDate);
+    public boolean contains(long time) {
+        return (time >= fromDate && time <= toDate);
     }
 
 }

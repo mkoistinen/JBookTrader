@@ -30,33 +30,36 @@ public class BackTester {
         isCanceled = true;
     }
 
-    public void execute() {
+    public void execute() throws JBookTraderException {
+        List<MarketSnapshot> snapshots = backTestFileReader.load(backTestDialog);
         MarketBook marketBook = strategy.getMarketBook();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
-        BarSize barSize = backTestDialog.getBarSize();
-        strategy.getPerformanceManager().createPerformanceChartData(barSize, indicatorManager.getIndicators());
+        strategy.getPerformanceManager().createPerformanceChartData(backTestDialog.getBarSize(), indicatorManager.getIndicators());
 
         List<Indicator> indicators = indicatorManager.getIndicators();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
         PerformanceChartData performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
 
-        long marketDepthCounter = 0;
-        long size = backTestFileReader.getSnapshotCount();
-        MarketSnapshot marketSnapshot;
-        while ((marketSnapshot = backTestFileReader.next()) != null) {
-            marketDepthCounter++;
-            if (marketBook.isGapping(marketSnapshot)) {
-                strategy.closePosition();
-            }
+        long snapshotCount = 0;
+
+        long snapshotsCount = snapshots.size();
+        for (int count = 0; count < snapshotsCount; count++) {
+            MarketSnapshot marketSnapshot = snapshots.get(count);
             marketBook.setSnapshot(marketSnapshot);
             performanceChartData.update(marketSnapshot);
             indicatorManager.updateIndicators();
             long instant = marketSnapshot.getTime();
-            strategy.processInstant(tradingSchedule.contains(instant));
+
+            boolean isInSchedule = tradingSchedule.contains(instant);
+            if (count < snapshotsCount - 1) {
+                isInSchedule = isInSchedule && !marketBook.isGapping(snapshots.get(count + 1));
+            }
+
+            strategy.processInstant(isInSchedule);
             performanceChartData.update(indicators, instant);
 
-            if (marketDepthCounter % 50000 == 0) {
-                backTestDialog.setProgress(marketDepthCounter, size);
+            if (snapshotCount % 50000 == 0) {
+                backTestDialog.setProgress(count, snapshotsCount, "Running back test", "");
                 if (isCanceled) {
                     break;
                 }

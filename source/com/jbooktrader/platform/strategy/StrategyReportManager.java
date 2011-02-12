@@ -63,7 +63,7 @@ public class StrategyReportManager {
 
         strategyReportColumns.clear();
         strategyReportColumns.add(isCompletedTrade ? String.valueOf(performanceManager.getTrades()) : "--");
-        strategyReportColumns.add(String.valueOf(positionManager.getPosition()));
+        strategyReportColumns.add(String.valueOf(positionManager.getCurrentPosition()));
         double averageFillPrice = positionManager.getAvgFillPrice();
         double expectedFillPrice = positionManager.getExpectedFillPrice();
         String decoratedExpectedFillPrice = df5.format(expectedFillPrice);

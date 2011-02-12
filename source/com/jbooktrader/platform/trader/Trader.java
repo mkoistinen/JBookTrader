@@ -137,10 +137,6 @@ public class Trader extends EWrapperAdapter {
             previousErrorMessage = msg;
             eventReport.report("IB API", msg);
 
-            if (errorCode == 1100) {// Connectivity between IB and TWS has been lost.
-                traderAssistant.setIsConnected(false);
-            }
-
             // Errors 1101 and 1102 are sent when connectivity is restored. However, sometimes TWS fails
             // to send these error codes. To compensate, we also listen for error code 2104 which indicates
             // that market data is restored, which we can interpret as restored connection.
@@ -150,7 +146,6 @@ public class Trader extends EWrapperAdapter {
                     eventReport.report(JBookTrader.APP_NAME, "Checking for executions while TWS was disconnected from the IB server.");
                     traderAssistant.requestExecutions();
                 }
-                traderAssistant.setIsConnected(true);
             }
 
             // Error 322 occurs from time to time when the first order is submitted. The cause is unknown,

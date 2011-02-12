@@ -26,6 +26,8 @@ public class StrategyRunner {
                 long snapshotTime = ntpTime + delay;
 
                 if (marketBooks != null) {
+                    dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
+
                     for (MarketBook marketBook : marketBooks) {
                         MarketSnapshot snapshot = marketBook.getNextMarketSnapshot(snapshotTime);
                         if (snapshot != null) {
@@ -40,8 +42,6 @@ public class StrategyRunner {
                             strategy.process();
                         }
                     }
-
-                    dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
                 }
             } catch (Throwable t) {
                 dispatcher.getEventReport().report(t);

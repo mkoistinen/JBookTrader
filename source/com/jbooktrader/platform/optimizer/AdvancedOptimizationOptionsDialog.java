@@ -69,10 +69,10 @@ public class AdvancedOptimizationOptionsDialog extends JBTDialog {
         add(contentPanel, StrategiesPerProcessor, strategiesPerProcessorText);
 
 
-        int min = 25;
-        int max = 1000;
+        int min = 100;
+        int max = 5000;
         divideAndConquerCoverageSlider = new JSlider(min, max);
-        divideAndConquerCoverageSlider.setMajorTickSpacing(25);
+        divideAndConquerCoverageSlider.setMajorTickSpacing(min);
         divideAndConquerCoverageSlider.setPaintTicks(true);
         divideAndConquerCoverageSlider.setSnapToTicks(true);
         Properties labels = new Properties();

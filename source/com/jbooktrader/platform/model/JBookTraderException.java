@@ -6,7 +6,7 @@ public class JBookTraderException extends Exception {
     }
 
     public JBookTraderException(Throwable e) {
-        super(e);
+        super(e.getMessage(), e);
     }
 
     public JBookTraderException(String message, Throwable cause) {

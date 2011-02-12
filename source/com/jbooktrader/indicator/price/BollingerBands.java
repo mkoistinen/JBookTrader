@@ -35,7 +35,7 @@ public class BollingerBands extends Indicator {
 
     @Override
     public void reset() {
-        value = 0.0;
+        value = 0;
         prices.clear();
     }
 
@@ -51,7 +51,7 @@ public class BollingerBands extends Indicator {
     }
 
     /**
-     * This returns the mean of the sample of prices and is the same as the midpoint of the Bollinger Bands
+     * Returns the mean of the sample of prices and is the same as the midpoint of the Bollinger Bands
      *
      * @return Midpoint of the Bollinger Bands or the mean of the prices sampled.
      */

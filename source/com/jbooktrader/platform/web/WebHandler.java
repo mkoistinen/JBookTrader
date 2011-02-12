@@ -60,7 +60,7 @@ public class WebHandler implements HttpHandler {
                 }
                 cells.add(strategy.getSymbol());
                 cells.add((marketSnapshot != null) ? df6.format(marketSnapshot.getPrice()) : "n/a");
-                cells.add(strategy.getPositionManager().getPosition());
+                cells.add(strategy.getPositionManager().getCurrentPosition());
                 cells.add(pm.getTrades());
                 cells.add(df0.format(pm.getNetProfit()));
                 addRow(response, cells, strategyRowCount++);

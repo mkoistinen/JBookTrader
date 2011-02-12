@@ -14,30 +14,23 @@ import java.util.*;
 public class BackTestFileReader {
     public static final int COLUMNS = 5;
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private final String fileName;
-    private long previousTime;
+    private final BufferedReader reader;
+    private final MarketSnapshotFilter filter;
+    private final long fileSize;
+    private long previousTime, time;
     private SimpleDateFormat sdf;
-    private volatile boolean cancelled;
-    private BufferedReader reader;
-    private long snapshotCount, firstMarketLine, lineNumber;
-    private MarketSnapshotFilter filter;
+    private String previousDateTimeWithoutSeconds;
 
     public BackTestFileReader(String fileName, MarketSnapshotFilter filter) throws JBookTraderException {
-        this.fileName = fileName;
         this.filter = filter;
+        previousDateTimeWithoutSeconds = "";
+
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
+            fileSize = new File(fileName).length();
         } catch (FileNotFoundException fnfe) {
             throw new JBookTraderException("Could not find file " + fileName);
         }
-    }
-
-    public void cancel() {
-        cancelled = true;
-    }
-
-    public long getSnapshotCount() {
-        return snapshotCount;
     }
 
     private void setTimeZone(String line) throws JBookTraderException {
@@ -48,26 +41,39 @@ public class BackTestFileReader {
             msg += "Examples of valid time zones: " + " America/New_York, Europe/London, Asia/Singapore.";
             throw new JBookTraderException(msg);
         }
-        sdf = new SimpleDateFormat("MMddyy,HHmmss");
+        sdf = new SimpleDateFormat("MMddyyHHmmss");
         // Enforce strict interpretation of date and time formats
         sdf.setLenient(false);
         sdf.setTimeZone(tz);
     }
 
-    public void scan() throws JBookTraderException {
+    public List<MarketSnapshot> load(ProgressListener progressListener) throws JBookTraderException {
+        String line = "";
+        int lineSeparatorSize = System.getProperty("line.separator").length();
+        long sizeRead = 0, lineNumber = 0;
+
+        List<MarketSnapshot> snapshots = new ArrayList<MarketSnapshot>();
+
         try {
-            String line;
-            while ((line = reader.readLine()) != null && !cancelled) {
+            while ((line = reader.readLine()) != null) {
+                if (lineNumber % 100000 == 0) {
+                    progressListener.setProgress(sizeRead, fileSize, "Loading historical data file", "");
+                    if (progressListener.isCancelled()) {
+                        break;
+                    }
+                }
                 lineNumber++;
+                sizeRead += line.length() + lineSeparatorSize;
                 boolean isComment = line.startsWith("#");
                 boolean isProperty = line.contains("=");
                 boolean isBlankLine = (line.trim().length() == 0);
                 boolean isMarketDepthLine = !(isComment || isProperty || isBlankLine);
                 if (isMarketDepthLine) {
-                    snapshotCount++;
-                    if (firstMarketLine == 0) {
-                        firstMarketLine = lineNumber;
+                    MarketSnapshot marketSnapshot = toMarketDepth(line);
+                    if (filter == null || filter.contains(time)) {
+                        snapshots.add(marketSnapshot);
                     }
+                    previousTime = time;
                 } else if (isProperty) {
                     if (line.startsWith("timeZone")) {
                         setTimeZone(line);
@@ -80,45 +86,10 @@ public class BackTestFileReader {
                 throw new JBookTraderException(msg);
             }
 
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
-            for (int lineCount = 1; lineCount < firstMarketLine; lineCount++) {
-                reader.readLine();
-            }
-            lineNumber = firstMarketLine;
         } catch (IOException ioe) {
             throw new JBookTraderException("Could not read data file");
-        }
-
-    }
-
-    public MarketSnapshot next() {
-        String line = "";
-        MarketSnapshot marketSnapshot = null;
-
-        try {
-            while (marketSnapshot == null) {
-                line = reader.readLine();
-
-                if (line == null) {
-                    reader.close();
-                    break;
-                }
-                marketSnapshot = toMarketDepth(line);
-                lineNumber++;
-                if (filter == null || filter.accept(marketSnapshot)) {
-                    previousTime = marketSnapshot.getTime();
-                } else {
-                    marketSnapshot = null;
-                }
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeException("Could not read data file");
-        } catch (JBookTraderException e) {
-            String errorMsg = "";
-            if (lineNumber > 0) {
-                errorMsg = "Problem parsing line #" + lineNumber + LINE_SEP;
-                errorMsg += line + LINE_SEP;
-            }
+        } catch (Exception e) {
+            String errorMsg = "Problem parsing line #" + lineNumber + ": " + line + LINE_SEP;
             String description = e.getMessage();
             if (description == null) {
                 description = e.toString();
@@ -127,40 +98,51 @@ public class BackTestFileReader {
             throw new RuntimeException(errorMsg);
         }
 
-        return marketSnapshot;
+        return snapshots;
+
     }
 
+    private MarketSnapshot toMarketDepth(String line) throws JBookTraderException, ParseException {
+        List<String> tokens = fastSplit(line);
 
-    private MarketSnapshot toMarketDepth(String line) throws JBookTraderException {
-        StringTokenizer st = new StringTokenizer(line, ",");
-
-        int tokenCount = st.countTokens();
-        if (tokenCount != COLUMNS) {
+        if (tokens.size() != COLUMNS) {
             String msg = "The line should contain exactly " + COLUMNS + " comma-separated columns.";
             throw new JBookTraderException(msg);
         }
 
-        String dateToken = st.nextToken();
-        String timeToken = st.nextToken();
-        long time;
-        try {
-            time = sdf.parse(dateToken + "," + timeToken).getTime();
-        } catch (ParseException pe) {
-            throw new JBookTraderException("Could not parse date/time in " + dateToken + "," + timeToken);
+        String dateTime = tokens.get(0) + tokens.get(1);
+        String dateTimeWithoutSeconds = dateTime.substring(0, 10);
+
+        if (dateTimeWithoutSeconds.equals(previousDateTimeWithoutSeconds)) {
+            // only seconds need to be set
+            int milliSeconds = 1000 * Integer.parseInt(dateTime.substring(10));
+            long previousMilliSeconds = previousTime % 60000;
+            time = previousTime + (milliSeconds - previousMilliSeconds);
+        } else {
+            time = sdf.parse(dateTime).getTime();
+            previousDateTimeWithoutSeconds = dateTimeWithoutSeconds;
         }
 
-        if (previousTime != 0) {
-            if (time <= previousTime) {
-                String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
-                throw new JBookTraderException(msg);
-            }
+        if (time <= previousTime) {
+            String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
+            throw new JBookTraderException(msg);
         }
 
-
-        double balance = Double.parseDouble(st.nextToken());
-        double price = Double.parseDouble(st.nextToken());
-        int volume = Integer.parseInt(st.nextToken());
+        double balance = Double.parseDouble(tokens.get(2));
+        double price = Double.parseDouble(tokens.get(3));
+        int volume = Integer.parseInt(tokens.get(4));
         return new MarketSnapshot(time, balance, price, volume);
     }
-}
 
+    private List<String> fastSplit(String s) {
+        ArrayList<String> tokens = new ArrayList<String>();
+        int index, lastIndex = 0;
+        while ((index = s.indexOf(',', lastIndex)) != -1) {
+            tokens.add(s.substring(lastIndex, index));
+            lastIndex = index + 1;
+        }
+        tokens.add(s.substring(lastIndex));
+        return tokens;
+    }
+
+}

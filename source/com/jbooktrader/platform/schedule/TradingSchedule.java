@@ -13,7 +13,7 @@ import java.util.*;
  * <p/>
  * Example: A strategy defines the following trading schedule:
  * tradingSchedule = new TradingSchedule("9:35", "15:45", "America/New_York");
- * Then the following trading timeline is formed:
+ * Then the following trading time line is formed:
  * -- start trading at 9:35 EST
  * -- close open positions at 15:45 EST
  * <p/>
@@ -22,7 +22,7 @@ import java.util.*;
  * Example: A strategy defines the following trading interval, along with the exclusion period:
  * tradingSchedule = new TradingSchedule("9:35", "15:45", "America/New_York");
  * tradingSchedule.setExclusion("12:00", "13:00");
- * Then the following trading timeline is formed:
+ * Then the following trading time line is formed:
  * -- start trading at 9:35 EST
  * -- close open positions at 12:00 EST
  * -- resume trading at 13:00 EST

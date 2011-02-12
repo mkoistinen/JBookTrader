@@ -21,8 +21,6 @@ public class BackTestStrategyRunner implements Runnable {
     }
 
     public void cancel() {
-        backTestDialog.showProgress("Stopping back test...");
-        backTestFileReader.cancel();
         if (backTester != null) {
             backTester.cancel();
         }
@@ -32,10 +30,6 @@ public class BackTestStrategyRunner implements Runnable {
         try {
             backTestDialog.enableProgress();
             backTestFileReader = new BackTestFileReader(backTestDialog.getFileName(), backTestDialog.getDateFilter());
-            backTestDialog.showProgress("Scanning historical data file...");
-            backTestFileReader.scan();
-
-            backTestDialog.showProgress("Running back test...");
             backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
             backTester.execute();
         } catch (Throwable t) {

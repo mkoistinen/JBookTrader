@@ -4,20 +4,26 @@ import com.jbooktrader.platform.indicator.*;
 import jama.*;
 import jkalman.*;
 
+/**
+ * Kalman filter applied to price.
+ * Reference: http://en.wikipedia.org/wiki/Kalman_filter
+ */
 public class PriceKalman extends Indicator {
     private final JKalman kalman;
     private final Matrix m;
 
-    public PriceKalman(int size) {
-        super(size);
+    public PriceKalman(int noise) {
+        super(noise);
         try {
-            kalman = new JKalman(size, size);
+            kalman = new JKalman(1, 1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         m = new Matrix(1, 1);
         kalman.setTransition_matrix(Matrix.identity(1, 1));
+        Matrix measurement_noise_cov = Matrix.identity(1, 1, noise);
+        kalman.setMeasurement_noise_cov(measurement_noise_cov);
         kalman.setError_cov_post(kalman.getError_cov_post().identity());
 
     }

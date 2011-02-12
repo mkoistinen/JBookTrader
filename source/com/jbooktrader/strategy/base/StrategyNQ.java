@@ -26,7 +26,7 @@ public abstract class StrategyNQ extends Strategy {
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("NQ", "GLOBEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("10:20", "15:25", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:30", "America/New_York");
         int multiplier = 20;// contract multiplier
         double bidAskSpread = 0.25; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();

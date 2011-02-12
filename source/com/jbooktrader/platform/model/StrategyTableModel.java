@@ -74,7 +74,7 @@ public class StrategyTableModel extends TableDataModel {
             row.put(DepthBalance, df0.format(lastMarketSnapshot.getBalance()));
         }
 
-        row.put(Position, strategy.getPositionManager().getPosition());
+        row.put(Position, strategy.getPositionManager().getCurrentPosition());
 
         PerformanceManager pm = strategy.getPerformanceManager();
         row.put(Trades, df0.format(pm.getTrades()));

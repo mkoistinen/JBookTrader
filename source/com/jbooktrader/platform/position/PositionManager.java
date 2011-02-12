@@ -18,7 +18,7 @@ public class PositionManager {
     private final EventReport eventReport;
     private final TraderAssistant traderAssistant;
     private final PerformanceManager performanceManager;
-    private int position;
+    private int currentPosition, targetPosition;
     private double avgFillPrice, expectedFillPrice;
 
     public PositionManager(Strategy strategy) {
@@ -33,10 +33,17 @@ public class PositionManager {
         return positionsHistory;
     }
 
-    public int getPosition() {
-        return position;
+    public int getCurrentPosition() {
+        return currentPosition;
     }
 
+    public int getTargetPosition() {
+        return targetPosition;
+    }
+
+    public void setTargetPosition(int targetPosition) {
+        this.targetPosition = targetPosition;
+    }
 
     public void setAvgFillPrice(double avgFillPrice) {
         this.avgFillPrice = avgFillPrice;
@@ -69,15 +76,15 @@ public class PositionManager {
         }
 
         // current position after the execution
-        position += quantity;
+        currentPosition += quantity;
         avgFillPrice = openOrder.getAvgFillPrice();
 
 
-        performanceManager.updateOnTrade(quantity, avgFillPrice, position);
+        performanceManager.updateOnTrade(quantity, avgFillPrice, currentPosition);
 
         Mode mode = Dispatcher.getInstance().getMode();
         if (mode == Mode.BackTest) {
-            positionsHistory.add(new Position(strategy.getMarketBook().getSnapshot().getTime(), position, avgFillPrice));
+            positionsHistory.add(new Position(strategy.getMarketBook().getSnapshot().getTime(), currentPosition, avgFillPrice));
         }
 
         if (mode != Mode.Optimization) {
@@ -88,18 +95,17 @@ public class PositionManager {
             StringBuilder msg = new StringBuilder();
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");
             msg.append("Avg Fill Price: ").append(avgFillPrice).append(". ");
-            msg.append("Position: ").append(getPosition());
+            msg.append("Position: ").append(getCurrentPosition());
             eventReport.report(strategy.getName(), msg.toString());
         }
     }
 
     public void trade() {
-        int newPosition = strategy.getPosition();
-        int quantity = newPosition - position;
+        int quantity = targetPosition - currentPosition;
         if (quantity != 0) {
             Mode mode = Dispatcher.getInstance().getMode();
             if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-                Dispatcher.getInstance().getC2Manager().sendSignal(strategy.getName(), position, newPosition);
+                Dispatcher.getInstance().getC2Manager().sendSignal(strategy.getName(), currentPosition, targetPosition);
             }
 
             String action = (quantity > 0) ? "BUY" : "SELL";

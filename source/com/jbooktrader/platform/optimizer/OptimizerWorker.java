@@ -44,30 +44,32 @@ public class OptimizerWorker implements Callable<Void> {
 
             if (!strategies.isEmpty()) {
                 TradingSchedule tradingSchedule = strategies.get(0).getTradingSchedule();
-                int size = strategies.size();
+                int strategiesCount = strategies.size();
 
                 List<MarketSnapshot> snapshots = optimizerRunner.getSnapshots();
-                for (MarketSnapshot marketSnapshot : snapshots) {
-                    if (marketBook.isGapping(marketSnapshot)) {
-                        // For efficiency, avoid the (Strategy strategy : strategies) construct
-                        for (int index = 0; index < size; index++) {
-                            strategies.get(index).closePosition();
-                        }
-                    }
-
+                long snapshotsCount = snapshots.size();
+                for (int count = 0; count < snapshotsCount; count++) {
+                    MarketSnapshot marketSnapshot = snapshots.get(count);
                     marketBook.setSnapshot(marketSnapshot);
                     indicatorManager.updateIndicators();
                     boolean isInSchedule = tradingSchedule.contains(marketSnapshot.getTime());
+                    if (count < snapshotsCount - 1) {
+                        isInSchedule = isInSchedule && !marketBook.isGapping(snapshots.get(count + 1));
+                    }
 
                     // For efficiency, avoid the (Strategy strategy : strategies) construct
-                    for (int index = 0; index < size; index++) {
+                    for (int index = 0; index < strategiesCount; index++) {
                         strategies.get(index).processInstant(isInSchedule);
                     }
 
-                    optimizerRunner.iterationsCompleted(size);
-                    if (optimizerRunner.isCancelled()) {
+                    if (count % 1000 == 0) {
+                        optimizerRunner.iterationsCompleted(strategiesCount * 1000);
+                    }
+
+                    if (count % 100 == 0 && optimizerRunner.isCancelled()) {
                         break;
                     }
+
                 }
 
                 optimizationResults.clear();
@@ -77,8 +79,7 @@ public class OptimizerWorker implements Callable<Void> {
                     strategy.closePosition();
 
                     PerformanceManager performanceManager = strategy.getPerformanceManager();
-                    int trades = performanceManager.getTrades();
-                    if (trades >= minTrades) {
+                    if (performanceManager.getTrades() >= minTrades) {
                         OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
                         optimizationResults.add(optimizationResult);
                     }

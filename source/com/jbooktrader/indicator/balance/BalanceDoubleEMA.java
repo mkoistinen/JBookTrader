@@ -3,7 +3,7 @@ package com.jbooktrader.indicator.balance;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Double-smoothed average of depth balance.
+ * Double-smoothed average of the limit order book balance.
  * Reference: http://en.wikipedia.org/wiki/Double_exponential_smoothing#Double_exponential_smoothing
  */
 public class BalanceDoubleEMA extends Indicator {

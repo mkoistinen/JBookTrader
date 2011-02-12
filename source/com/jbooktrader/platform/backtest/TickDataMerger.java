@@ -6,7 +6,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * Reads a JBT data file, TickDat file, and merges the two.
+ * Reads a JBT data file, TickData file, and merges the two.
  */
 public class TickDataMerger {
     public static final int COLUMNS = 4;
