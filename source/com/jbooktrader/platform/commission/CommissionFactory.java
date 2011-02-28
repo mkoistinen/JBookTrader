@@ -26,10 +26,10 @@ public class CommissionFactory {
     }
 
     /**
-     * Futures comissions: http://individuals.interactivebrokers.com/en/p.php?f=commission#futures1
+     * Futures commissions: http://individuals.interactivebrokers.com/en/p.php?f=commission#futures1
      */
     public static Commission getBundledNorthAmericaFutureCommission() {
-        return getCommission(2.0, 2.0);
+        return getCommission(2.01, 2.01);
     }
 
 

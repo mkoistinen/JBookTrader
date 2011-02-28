@@ -9,11 +9,13 @@ import com.jbooktrader.platform.marketbook.*;
 public class Tension extends Indicator {
     private final double fastMultiplier, slowMultiplier;
     private double fastBalance, slowBalance, fastPrice, slowPrice;
+    private final double scaleFactor;
 
-    public Tension(int fastPeriod, int slowPeriod) {
-        super(fastPeriod, slowPeriod);
+    public Tension(int fastPeriod, int slowPeriod, int scaleFactor) {
+        super(fastPeriod, slowPeriod, scaleFactor);
         fastMultiplier = 2.0 / (fastPeriod + 1.0);
         slowMultiplier = 2.0 / (slowPeriod + 1.0);
+        this.scaleFactor = scaleFactor / 10.0;
     }
 
     @Override
@@ -30,7 +32,7 @@ public class Tension extends Indicator {
         double price = snapshot.getPrice();
         fastPrice += (price - fastPrice) * fastMultiplier;
         slowPrice += (price - slowPrice) * slowMultiplier;
-        double priceVelocity = 2 * (fastPrice - slowPrice);
+        double priceVelocity = scaleFactor * (fastPrice - slowPrice);
 
         // tension
         value = balanceVelocity - priceVelocity;

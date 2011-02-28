@@ -138,8 +138,8 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
-                    prefs.set(OptimizerTestingPeriodStart, fromDateEditor.getText());
-                    prefs.set(OptimizerTestingPeriodEnd, toDateEditor.getText());
+                    prefs.set(BackTesterTestingPeriodStart, fromDateEditor.getText());
+                    prefs.set(BackTesterTestingPeriodEnd, toDateEditor.getText());
                     prefs.set(OptimizerUseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
 
                     setOptions();
@@ -291,7 +291,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         // From date
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
-        fromDateEditor.setText(prefs.get(OptimizerTestingPeriodStart));
+        fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
         fromDatePanel.add(fromDateEditor);
         dateRangePanel.add(fromDatePanel);
 
@@ -299,7 +299,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         JLabel toLabel = new JLabel("to:");
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
-        toDateEditor.setText(prefs.get(OptimizerTestingPeriodEnd));
+        toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);

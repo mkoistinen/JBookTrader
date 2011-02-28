@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.util;
 
-import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 
 import javax.swing.*;
@@ -19,7 +18,6 @@ public class MessageDialog {
     }
 
     public static void showError(Throwable t) {
-        Dispatcher.getInstance().getEventReport().report(t);
         showError(t.getMessage());
     }
 }

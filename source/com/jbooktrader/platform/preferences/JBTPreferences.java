@@ -27,8 +27,6 @@ public enum JBTPreferences {
     OptimizerWindowX("optimizerwindow.x", "-1"),
     OptimizerWindowY("optimizerwindow.y", "-1"),
     OptimizerUseDateRange("optimizer.useDateRange", "false"),
-    OptimizerTestingPeriodStart("optimizer.testingPeriodStart", ""),
-    OptimizerTestingPeriodEnd("optimizer.testingPeriodEnd", ""),
 
     // Main window
     MainWindowWidth("mainwindow.width", "-1"),

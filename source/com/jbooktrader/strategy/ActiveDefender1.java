@@ -9,14 +9,14 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class Defender extends StrategyES {
+public class ActiveDefender1 extends StrategyES {
 
     // Technical indicators
     private Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
+    private static final String SCALE_FACTOR = "Scale Factor";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
@@ -24,16 +24,18 @@ public class Defender extends StrategyES {
     // Strategy parameters values
     private final int entry, exit;
 
-    public Defender(StrategyParams optimizationParams) throws JBookTraderException {
+    public ActiveDefender1(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
     }
 
+
     @Override
     public void setIndicators() {
-        tensionInd = addIndicator(new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD), 20));
+        tensionInd = addIndicator(new Tension(1, getParam(SLOW_PERIOD), getParam(SCALE_FACTOR)));
     }
+
 
     /**
      * Adds parameters to strategy. Each parameter must have 5 values:
@@ -43,10 +45,10 @@ public class Defender extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 150, 450, 1, 358);
-        addParam(SLOW_PERIOD, 4500, 9000, 100, 7643);
-        addParam(ENTRY, 18, 25, 1, 21);
-        addParam(EXIT, 6, 12, 1, 9);
+        addParam(SLOW_PERIOD, 200, 2500, 100, 1242);
+        addParam(SCALE_FACTOR, 5, 35, 100, 22);
+        addParam(ENTRY, 26, 34, 1, 29);
+        addParam(EXIT, 14, 19, 1, 16);
     }
 
     /**
@@ -61,8 +63,14 @@ public class Defender extends StrategyES {
             setPosition(1);
         } else if (tension <= -entry) {
             setPosition(-1);
-        } else if (Math.abs(tension) <= exit) {
-            setPosition(0);
+        } else {
+            int currentPosition = getPositionManager().getCurrentPosition();
+            if (tension >= exit && currentPosition < 0) {
+                setPosition(0);
+            }
+            if (tension <= -exit && currentPosition > 0) {
+                setPosition(0);
+            }
         }
     }
 }

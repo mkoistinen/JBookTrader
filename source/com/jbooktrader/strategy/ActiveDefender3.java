@@ -9,28 +9,31 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class TensionSeeker extends StrategyES {
+public class ActiveDefender3 extends StrategyES {
 
     // Technical indicators
     private Indicator tensionInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
+    private static final String SCALE_FACTOR = "Scale Factor";
     private static final String ENTRY = "Entry";
+    private static final String EXIT = "Exit";
 
 
     // Strategy parameters values
-    private final int entry;
+    private final int entry, exit;
 
-    public TensionSeeker(StrategyParams optimizationParams) throws JBookTraderException {
+    public ActiveDefender3(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         entry = getParam(ENTRY);
+        exit = getParam(EXIT);
     }
+
 
     @Override
     public void setIndicators() {
-        tensionInd = addIndicator(new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD)));
+        tensionInd = addIndicator(new Tension(1, getParam(SLOW_PERIOD), getParam(SCALE_FACTOR)));
     }
 
 
@@ -42,9 +45,10 @@ public class TensionSeeker extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 20, 1200, 1, 210);
-        addParam(SLOW_PERIOD, 1000, 14000, 100, 10768);
-        addParam(ENTRY, 5, 35, 1, 23);
+        addParam(SLOW_PERIOD, 300, 2400, 100, 2070);
+        addParam(SCALE_FACTOR, 44, 57, 100, 45);
+        addParam(ENTRY, 25, 34, 1, 32);
+        addParam(EXIT, 13, 17, 1, 14);
     }
 
     /**
@@ -59,6 +63,14 @@ public class TensionSeeker extends StrategyES {
             setPosition(1);
         } else if (tension <= -entry) {
             setPosition(-1);
+        } else {
+            int currentPosition = getPositionManager().getCurrentPosition();
+            if (tension >= exit && currentPosition < 0) {
+                setPosition(0);
+            }
+            if (tension <= -exit && currentPosition > 0) {
+                setPosition(0);
+            }
         }
     }
 }

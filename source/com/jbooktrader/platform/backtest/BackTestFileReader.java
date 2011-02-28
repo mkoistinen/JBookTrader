@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * Reads and validates a data file containing historical market depth records.
- * The data file is used for backtesting and optimization of trading strategies.
+ * The data file is used for back testing and optimization of trading strategies.
  */
 public class BackTestFileReader {
     public static final int COLUMNS = 5;

@@ -11,7 +11,7 @@ import java.util.*;
 
 /**
  * Performance manager evaluates trading strategy performance based on statistics
- * which include various factors, such as net profit, maximum drawdown, profit factor, etc.
+ * which include various factors, such as net profit, maximum draw down, profit factor, etc.
  */
 public class PerformanceManager {
     private final int multiplier;

@@ -42,8 +42,8 @@ public class Balancer extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 50, 1050, 10, 948);
-        addParam(SLOW_PERIOD, 2000, 12000, 100, 8181);
+        addParam(FAST_PERIOD, 1, 2000, 10, 948);
+        addParam(SLOW_PERIOD, 200, 12000, 100, 8181);
         addParam(ENTRY, 5, 25, 1, 13);
     }
 
@@ -60,7 +60,7 @@ public class Balancer extends StrategyES {
         } else if (balanceVelocity <= -entry) {
             setPosition(-1);
         } else {
-            int currentPosition = getPositionManager().getPosition();
+            int currentPosition = getPositionManager().getCurrentPosition();
             if (currentPosition > 0 && balanceVelocity < 0) {
                 setPosition(0);
             }

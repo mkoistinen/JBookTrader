@@ -9,31 +9,33 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class DefenderActive extends StrategyES {
+public class VolumeSeeker extends StrategyES {
 
     // Technical indicators
-    private Indicator tensionInd;
+    private Indicator balanceVelocityInd, priceVelocityInd, volumeVelocityInd;
 
     // Strategy parameters names
-    private static final String FAST_PERIOD = "Fast Period";
     private static final String SLOW_PERIOD = "Slow Period";
+    private static final String DIVIDER = "Divider";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
 
 
     // Strategy parameters values
-    private final int entry, exit;
+    private final int entry, exit, divider;
 
-    public DefenderActive(StrategyParams optimizationParams) throws JBookTraderException {
+    public VolumeSeeker(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         entry = getParam(ENTRY);
         exit = getParam(EXIT);
+        divider = getParam(DIVIDER);
     }
-
 
     @Override
     public void setIndicators() {
-        tensionInd = addIndicator(new Tension(getParam(FAST_PERIOD), getParam(SLOW_PERIOD)));
+        balanceVelocityInd = addIndicator(new BalanceVelocity(1, getParam(SLOW_PERIOD)));
+        priceVelocityInd = addIndicator(new PriceTrendVelocitySMA(getParam(SLOW_PERIOD)));
+        volumeVelocityInd = addIndicator(new VolumeVelocitySMA(1, getParam(SLOW_PERIOD)));
     }
 
 
@@ -45,10 +47,10 @@ public class DefenderActive extends StrategyES {
      */
     @Override
     public void setParams() {
-        addParam(FAST_PERIOD, 1, 10, 1, 3);
-        addParam(SLOW_PERIOD, 100, 7500, 100, 475);
-        addParam(ENTRY, 5, 35, 1, 20);
-        addParam(EXIT, -10, 25, 1, 13);
+        addParam(SLOW_PERIOD, 3200, 6700, 50, 5326);
+        addParam(DIVIDER, 10, 35, 1, 20);
+        addParam(ENTRY, 32, 42, 1, 34);
+        addParam(EXIT, 11, 18, 1, 14);
     }
 
     /**
@@ -58,19 +60,25 @@ public class DefenderActive extends StrategyES {
      */
     @Override
     public void onBookSnapshot() {
-        double tension = tensionInd.getValue();
-        if (tension >= entry) {
+        double priceVelocity = priceVelocityInd.getValue();
+        double balanceVelocity = balanceVelocityInd.getValue();
+        double volumeVelocity = volumeVelocityInd.getValue();
+        volumeVelocity = balanceVelocity > 0 ? volumeVelocity : -volumeVelocity;
+        double superTension = balanceVelocity + (volumeVelocity / divider) - priceVelocity;
+
+        if (superTension >= entry) {
             setPosition(1);
-        } else if (tension <= -entry) {
+        } else if (superTension <= -entry) {
             setPosition(-1);
         } else {
             int currentPosition = getPositionManager().getCurrentPosition();
-            if (tension >= exit && currentPosition < 0) {
+            if (superTension >= exit && currentPosition < 0) {
                 setPosition(0);
             }
-            if (tension <= -exit && currentPosition > 0) {
+            if (superTension <= -exit && currentPosition > 0) {
                 setPosition(0);
             }
         }
+
     }
 }

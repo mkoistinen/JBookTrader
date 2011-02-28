@@ -13,7 +13,6 @@ public class BackTestParamTableModel extends TableDataModel {
         setSchema(SCHEMA);
     }
 
-
     @Override
     public Class<?> getColumnClass(int column) {
         return column == 0 ? String.class : Integer.class;

@@ -62,7 +62,7 @@ public class StrategyReportManager {
         boolean isCompletedTrade = performanceManager.getIsCompletedTrade();
 
         strategyReportColumns.clear();
-        strategyReportColumns.add(isCompletedTrade ? String.valueOf(performanceManager.getTrades()) : "--");
+        strategyReportColumns.add(isCompletedTrade ? String.valueOf(performanceManager.getTrades()) : "&nbsp;");
         strategyReportColumns.add(String.valueOf(positionManager.getCurrentPosition()));
         double averageFillPrice = positionManager.getAvgFillPrice();
         double expectedFillPrice = positionManager.getExpectedFillPrice();
@@ -73,8 +73,8 @@ public class StrategyReportManager {
         strategyReportColumns.add(df5.format(averageFillPrice));
         strategyReportColumns.add(decoratedExpectedFillPrice);
         strategyReportColumns.add(df2.format(performanceManager.getTradeCommission()));
-        strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "--");
-        strategyReportColumns.add(df2.format(performanceManager.getNetProfit()));
+        strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getTradeProfit()) : "&nbsp;");
+        strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getNetProfit()) : "&nbsp;");
 
         Mode mode = Dispatcher.getInstance().getMode();
         boolean useNTPTime = (mode == Mode.ForwardTest || mode == Mode.Trade);

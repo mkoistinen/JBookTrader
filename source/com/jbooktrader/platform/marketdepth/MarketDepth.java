@@ -24,13 +24,11 @@ public class MarketDepth {
         df2 = NumberFormatterFactory.getNumberFormatter(2);
     }
 
-
     public void reset() {
         bids.clear();
         asks.clear();
         balances.clear();
     }
-
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
         Set<Double> uniquePriceLevels = new HashSet<Double>();
@@ -43,7 +41,6 @@ public class MarketDepth {
 
         return (uniquePriceLevels.size() == 0) ? 0 : cumulativeSize / uniquePriceLevels.size();
     }
-
 
     public synchronized void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
         if (price < 0) {
