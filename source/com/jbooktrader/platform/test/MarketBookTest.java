@@ -38,7 +38,7 @@ public class MarketBookTest {
         marketDepth.update(1, MarketDepthOperation.Update, MarketDepthSide.Ask, 1, 1);
         marketDepth.update(1, MarketDepthOperation.Update, MarketDepthSide.Bid, 1, 1);
 
-        MarketSnapshot marketSnapshot = marketDepth.getMarketSnapshot(0);
+        MarketSnapshot marketSnapshot = marketDepth.takeMarketSnapshot(0);
         int balance = (int) marketSnapshot.getBalance();
         int price = (int) marketSnapshot.getPrice();
 

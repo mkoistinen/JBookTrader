@@ -1,6 +1,5 @@
 package com.jbooktrader.platform.report;
 
-import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
@@ -27,13 +26,10 @@ public abstract class Report {
         }
     }
 
-    protected Report(String reportName) throws JBookTraderException {
+    protected Report(String reportName) throws IOException {
         String fullFileName = REPORT_DIR + reportName + ".htm";
-        try {
-            writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
-        } catch (IOException ioe) {
-            throw new JBookTraderException(ioe);
-        }
+
+        writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
 
         StringBuilder sb = new StringBuilder();
         sb.append("</table><br>"); // close the previously created table, if any

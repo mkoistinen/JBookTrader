@@ -1,5 +1,6 @@
 package com.jbooktrader.platform.util;
 
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 
 import javax.swing.*;
@@ -17,7 +18,8 @@ public class MessageDialog {
         JOptionPane.showMessageDialog(null, msg, JBookTrader.APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
-    public static void showError(Throwable t) {
+    public static void showException(Throwable t) {
         showError(t.getMessage());
+        Dispatcher.getInstance().getEventReport().report(t);
     }
 }

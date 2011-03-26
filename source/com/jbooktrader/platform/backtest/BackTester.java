@@ -18,7 +18,6 @@ public class BackTester {
     private final Strategy strategy;
     private final BackTestFileReader backTestFileReader;
     private final BackTestDialog backTestDialog;
-    private boolean isCanceled;
 
     public BackTester(Strategy strategy, BackTestFileReader backTestFileReader, BackTestDialog backTestDialog) {
         this.strategy = strategy;
@@ -26,12 +25,9 @@ public class BackTester {
         this.backTestDialog = backTestDialog;
     }
 
-    public void cancel() {
-        isCanceled = true;
-    }
-
     public void execute() throws JBookTraderException {
         List<MarketSnapshot> snapshots = backTestFileReader.load(backTestDialog);
+
         MarketBook marketBook = strategy.getMarketBook();
         IndicatorManager indicatorManager = strategy.getIndicatorManager();
         strategy.getPerformanceManager().createPerformanceChartData(backTestDialog.getBarSize(), indicatorManager.getIndicators());
@@ -39,8 +35,6 @@ public class BackTester {
         List<Indicator> indicators = indicatorManager.getIndicators();
         TradingSchedule tradingSchedule = strategy.getTradingSchedule();
         PerformanceChartData performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
-
-        long snapshotCount = 0;
 
         long snapshotsCount = snapshots.size();
         for (int count = 0; count < snapshotsCount; count++) {
@@ -58,15 +52,15 @@ public class BackTester {
             strategy.processInstant(isInSchedule);
             performanceChartData.update(indicators, instant);
 
-            if (snapshotCount % 50000 == 0) {
-                backTestDialog.setProgress(count, snapshotsCount, "Running back test", "");
-                if (isCanceled) {
+            if (count % 100000 == 0) {
+                backTestDialog.setProgress(count, snapshotsCount, "Running back test");
+                if (backTestDialog.isCancelled()) {
                     break;
                 }
             }
         }
 
-        if (!isCanceled) {
+        if (!backTestDialog.isCancelled()) {
             // go flat at the end of the test period to finalize the run
             strategy.closePosition();
             Dispatcher.getInstance().fireModelChanged(Event.StrategyUpdate, strategy);

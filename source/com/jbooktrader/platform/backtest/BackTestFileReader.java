@@ -56,8 +56,8 @@ public class BackTestFileReader {
 
         try {
             while ((line = reader.readLine()) != null) {
-                if (lineNumber % 100000 == 0) {
-                    progressListener.setProgress(sizeRead, fileSize, "Loading historical data file", "");
+                if (lineNumber % 50000 == 0) {
+                    progressListener.setProgress(sizeRead, fileSize, "Loading historical data file");
                     if (progressListener.isCancelled()) {
                         break;
                     }

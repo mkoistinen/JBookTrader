@@ -4,7 +4,6 @@ import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.optimizer.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
@@ -24,7 +23,6 @@ import java.util.*;
 public class BackTestDialog extends JBTDialog implements ProgressListener {
     private final PreferencesHolder prefs;
     private final String strategyName;
-    private final StrategyParams strategyParams;
     private JButton cancelButton, backTestButton, selectFileButton;
     private JTextField fileNameText;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
@@ -33,35 +31,26 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
     private JComboBox barSizeCombo;
     private JLabel toLabel;
     private JProgressBar progressBar;
-    private BackTestStrategyRunner btsr;
-    private BackTestParamTableModel backTestParamTableModel;
+    private boolean isCancelled;
 
     public BackTestDialog(JFrame parent, Strategy strategy) {
         super(parent);
         strategyName = strategy.getName();
-        strategyParams = strategy.getParams();
         prefs = PreferencesHolder.getInstance();
         init();
         pack();
         assignListeners();
-
         setLocationRelativeTo(parent);
         setVisible(true);
     }
 
     @Override
-    public void dispose() {
-        btsr = null;
-        super.dispose();
-    }
-
-    @Override
     public boolean isCancelled() {
-        return btsr == null;
+        return isCancelled;
     }
 
     @Override
-    public void setProgress(long count, long iterations, String text, String label) {
+    public void setProgress(long count, long iterations, String text) {
         int percent = (int) (100 * (count / (double) iterations));
         progressBar.setValue(percent);
         progressBar.setString(text + ": " + percent + "% completed");
@@ -88,10 +77,10 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         backTestButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    prefs.set(BackTesterFileName, fileNameText.getText());
-                    prefs.set(BackTesterTestingPeriodStart, fromDateEditor.getText());
-                    prefs.set(BackTesterTestingPeriodEnd, toDateEditor.getText());
-                    prefs.set(BackTesterUseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
+                    prefs.set(DataFileName, fileNameText.getText());
+                    prefs.set(DateRangeStart, fromDateEditor.getText());
+                    prefs.set(DateRangeEnd, toDateEditor.getText());
+                    prefs.set(UseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
                     prefs.set(PerformanceChartBarSize, (String) barSizeCombo.getSelectedItem());
                     String historicalFileName = fileNameText.getText();
                     File file = new File(historicalFileName);
@@ -101,14 +90,12 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
                         throw new JBookTraderException(msg);
                     }
 
-                    StrategyParams newStrategyParams = backTestParamTableModel.getParams();
-
-                    Strategy strategyInstance = ClassFinder.getInstance(strategyName, newStrategyParams);
-                    btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
+                    Strategy strategyInstance = ClassFinder.getInstance(strategyName);
+                    BackTestStrategyRunner btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
                     new Thread(btsr).start();
                 }
                 catch (Exception ex) {
-                    MessageDialog.showError(ex);
+                    MessageDialog.showException(ex);
                 }
             }
         });
@@ -124,9 +111,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
 
         cancelButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (btsr != null) {
-                    btsr.cancel();
-                }
+                isCancelled = true;
                 dispose();
             }
         });
@@ -134,9 +119,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (btsr != null) {
-                    btsr.cancel();
-                }
+                isCancelled = true;
             }
         });
 
@@ -159,17 +142,18 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
     }
 
     private void init() {
-        setModal(true);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setModal(true);
+
         setTitle("Back Test - " + strategyName);
         setLayout(new BorderLayout());
 
-        JPanel northPanel = new JPanel(new SpringLayout());
+        JPanel centerPanel = new JPanel(new SpringLayout());
 
         JPanel filePanel = new JPanel(new SpringLayout());
         JLabel fileNameLabel = new JLabel("Historical data file: ");
         fileNameText = new JTextField();
-        fileNameText.setText(prefs.get(BackTesterFileName));
+        fileNameText.setText(prefs.get(DataFileName));
         selectFileButton = new JButton("Browse...");
         fileNameLabel.setLabelFor(fileNameText);
         filePanel.add(fileNameLabel);
@@ -180,13 +164,13 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         // historical data range filter panel
         JPanel dateRangePanel = new JPanel(new SpringLayout());
         String dateFormat = "MMMMM d, yyyy";
-        useDateRangeCheckBox = new JCheckBox("Use date range from:", prefs.get(BackTesterUseDateRange).equals("true"));
+        useDateRangeCheckBox = new JCheckBox("Use date range from:", prefs.get(UseDateRange).equals("true"));
         dateRangePanel.add(useDateRangeCheckBox);
 
         // From date
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
-        fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
+        fromDateEditor.setText(prefs.get(DateRangeStart));
         fromDatePanel.add(fromDateEditor);
         dateRangePanel.add(fromDatePanel);
 
@@ -194,7 +178,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         toLabel = new JLabel("to:");
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
-        toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
+        toDateEditor.setText(prefs.get(DateRangeEnd));
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
@@ -221,22 +205,11 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         SpringUtilities.makeOneLineGrid(barSizePanel);
 
 
-        northPanel.add(filePanel);
-        northPanel.add(dateRangePanel);
-        northPanel.add(barSizePanel);
-        SpringUtilities.makeCompactGrid(northPanel, 3, 1, 0, 8, 0, 0);
+        centerPanel.add(filePanel);
+        centerPanel.add(dateRangePanel);
+        centerPanel.add(barSizePanel);
+        SpringUtilities.makeCompactGrid(centerPanel, 3, 1, 0, 8, 0, 0);
 
-        JPanel centerPanel = new JPanel(new SpringLayout());
-        backTestParamTableModel = new BackTestParamTableModel();
-        backTestParamTableModel.setParams(strategyParams);
-        JTable paramTable = new JTable(backTestParamTableModel);
-        paramTable.setShowVerticalLines(false);
-        paramTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.getViewport().add(paramTable);
-        centerPanel.add(scrollPane);
-        SpringUtilities.makeOneLineGrid(centerPanel);
 
         JPanel southPanel = new JPanel(new BorderLayout());
 
@@ -256,12 +229,11 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         buttonsPanel.add(cancelButton);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
-        add(northPanel, BorderLayout.NORTH);
-        add(centerPanel, BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.NORTH);
         add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(backTestButton);
-        setMinimumSize(new Dimension(600, 350));
+        setMinimumSize(new Dimension(650, 250));
         setPreferredSize(getMinimumSize());
     }
 

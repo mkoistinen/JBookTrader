@@ -13,8 +13,8 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "8.04";
-    public static final String RELEASE_DATE = "February 27, 2011";
+    public static final String VERSION = "8.05";
+    public static final String RELEASE_DATE = "March 26, 2011";
     private static String appPath;
 
     /**
@@ -22,8 +22,8 @@ public class JBookTrader {
      * views, and controller.
      */
     private JBookTrader() throws JBookTraderException {
-        Dispatcher.getInstance().setReporter();
         try {
+            Dispatcher.getInstance().setReporter();
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
@@ -58,7 +58,7 @@ public class JBookTrader {
             appPath = args[0];
             new JBookTrader();
         } catch (Throwable t) {
-            MessageDialog.showError(t);
+            MessageDialog.showException(t);
         }
     }
 

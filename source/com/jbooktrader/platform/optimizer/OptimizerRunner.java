@@ -8,6 +8,7 @@ import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
+import java.io.*;
 import java.lang.reflect.*;
 import java.text.*;
 import java.util.*;
@@ -31,16 +32,16 @@ public abstract class OptimizerRunner implements Runnable {
     private final NumberFormat nf2, nf0, gnf0;
     private final String strategyName;
     private final int minTrades;
+    private final AtomicLong completedSteps;
     private final OptimizerDialog optimizerDialog;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private List<MarketSnapshot> snapshots;
-    private AtomicLong completedSteps;
     private long totalSteps;
     private String totalStrategiesString;
     private long previousResultsSize;
 
-    class ProgressRunner implements Runnable {
+    private class ProgressRunner implements Runnable {
         public void run() {
             if (completedSteps.get() > 0) {
                 showProgress(completedSteps.get(), "Optimizing " + totalStrategiesString + " strategies");
@@ -48,7 +49,7 @@ public abstract class OptimizerRunner implements Runnable {
         }
     }
 
-    class ResultsTableRunner implements Runnable {
+    private class ResultsTableRunner implements Runnable {
         public void run() {
             int size = optimizationResults.size();
             if (size > previousResultsSize) {
@@ -157,7 +158,7 @@ public abstract class OptimizerRunner implements Runnable {
         return cancelled;
     }
 
-    private void saveToFile() throws JBookTraderException {
+    private void saveToFile() throws IOException {
         if (optimizationResults.isEmpty()) {
             return;
         }
@@ -208,8 +209,9 @@ public abstract class OptimizerRunner implements Runnable {
     }
 
     private void showProgress(long counter, String text) {
+        optimizerDialog.setProgress(counter, totalSteps, text);
         String remainingTime = (counter >= totalSteps) ? "00:00:00" : timeEstimator.getTimeLeft(counter);
-        optimizerDialog.setProgress(counter, totalSteps, text, remainingTime);
+        optimizerDialog.setRemainingTime(remainingTime);
     }
 
     public void iterationsCompleted(long iterationsCompleted) {
@@ -278,7 +280,7 @@ public abstract class OptimizerRunner implements Runnable {
                 MessageDialog.showMessage("Optimization completed successfully in " + totalTimeInSecs + " seconds.");
             }
         } catch (Throwable t) {
-            MessageDialog.showError(t);
+            MessageDialog.showException(t);
         } finally {
             progressExecutor.shutdownNow();
             resultsTableExecutor.shutdownNow();

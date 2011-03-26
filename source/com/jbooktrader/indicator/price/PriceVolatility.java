@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator.volatility;
+package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.util.movingwindow.*;

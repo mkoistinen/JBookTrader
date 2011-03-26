@@ -61,7 +61,12 @@ public class MarketBook {
         return marketSnapshot;
     }
 
-    public MarketSnapshot getNextMarketSnapshot(long time) {
-        return marketDepth.getMarketSnapshot(time);
+    public void takeMarketSnapshot(long time) {
+        MarketSnapshot snapshot = marketDepth.takeMarketSnapshot(time);
+        if (snapshot != null) {
+            setSnapshot(snapshot);
+            saveSnapshot(snapshot);
+        }
+
     }
 }

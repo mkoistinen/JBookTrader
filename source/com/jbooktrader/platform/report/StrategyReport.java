@@ -1,13 +1,12 @@
 package com.jbooktrader.platform.report;
 
-import com.jbooktrader.platform.model.*;
-
+import java.io.*;
 import java.util.*;
 
 
 public class StrategyReport extends Report {
 
-    public StrategyReport(String reportName) throws JBookTraderException {
+    public StrategyReport(String reportName) throws IOException {
         super(reportName);
     }
 

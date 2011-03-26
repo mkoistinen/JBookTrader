@@ -47,7 +47,7 @@ public class ClassFinder {
         return classNames;
     }
 
-    public static Strategy getInstance(String name, StrategyParams params) throws JBookTraderException {
+    public static Strategy getInstance(String name) throws JBookTraderException {
         try {
             String className = "com.jbooktrader.strategy." + name;
             Class<? extends Strategy> clazz = Class.forName(className).asSubclass(Strategy.class);
@@ -57,7 +57,7 @@ public class ClassFinder {
 
             Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
             Constructor<?> constructor = clazz.getConstructor(parameterTypes);
-            return (Strategy) constructor.newInstance(params);
+            return (Strategy) constructor.newInstance(new StrategyParams());
 
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend class Strategy.");
@@ -68,10 +68,6 @@ public class ClassFinder {
         }
     }
 
-
-    public static Strategy getInstance(String name) throws JBookTraderException {
-        return getInstance(name, new StrategyParams());
-    }
 
     public static List<Strategy> getStrategies() {
         List<Strategy> strategies = new ArrayList<Strategy>();

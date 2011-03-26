@@ -90,7 +90,7 @@ public class MarketDepth {
         this.volume = volume;
     }
 
-    public synchronized MarketSnapshot getMarketSnapshot(long time) {
+    public synchronized MarketSnapshot takeMarketSnapshot(long time) {
         if (balances.isEmpty()) {
             return null;
         }

@@ -1,15 +1,15 @@
-package com.jbooktrader.indicator.velocity;
+package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
 
 /**
  * Velocity of price
  */
-public class PriceVelocityEMA extends Indicator {
+public class PriceVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;
     private double fast, slow;
 
-    public PriceVelocityEMA(int fastPeriod, int slowPeriod) {
+    public PriceVelocity(int fastPeriod, int slowPeriod) {
         super(fastPeriod, slowPeriod);
         fastMultiplier = 2.0 / (fastPeriod + 1.0);
         slowMultiplier = 2.0 / (slowPeriod + 1.0);

@@ -128,9 +128,6 @@ public class PerformanceChart {
             public void windowClosing(WindowEvent e) {
                 prefs.set(PerformanceChartWidth, chartFrame.getWidth());
                 prefs.set(PerformanceChartHeight, chartFrame.getHeight());
-                prefs.set(PerformanceChartX, chartFrame.getX());
-                prefs.set(PerformanceChartY, chartFrame.getY());
-                prefs.set(PerformanceChartState, chartFrame.getExtendedState());
                 chartFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             }
         });
@@ -203,21 +200,10 @@ public class PerformanceChart {
         contentPane.add(northPanel, BorderLayout.NORTH);
         contentPane.add(centerPanel, BorderLayout.CENTER);
         chartFrame.pack();
-
-        RefineryUtilities.centerFrameOnScreen(chartFrame);
-
         int chartWidth = prefs.getInt(PerformanceChartWidth);
         int chartHeight = prefs.getInt(PerformanceChartHeight);
-        int chartX = prefs.getInt(PerformanceChartX);
-        int chartY = prefs.getInt(PerformanceChartY);
-        int chartState = prefs.getInt(PerformanceChartState);
-
-        if (chartX >= 0 && chartY >= 0 && chartHeight > 0 && chartWidth > 0) {
-            chartFrame.setBounds(chartX, chartY, chartWidth, chartHeight);
-        }
-        if (chartState >= 0) {
-            chartFrame.setExtendedState(chartState);
-        }
+        chartFrame.setSize(chartWidth, chartHeight);
+        RefineryUtilities.centerFrameOnScreen(chartFrame);
     }
 
 
@@ -247,7 +233,7 @@ public class PerformanceChart {
 
         // indicator plots
         for (Indicator indicator : strategy.getIndicatorManager().getIndicators()) {
-            NumberAxis indicatorAxis = new NumberAxis(indicator.getName());
+            NumberAxis indicatorAxis = new NumberAxis(indicator.getKey());
             indicatorAxis.setLabelFont(new Font("Arial Narrow", Font.PLAIN, 11));
             OHLCDataset ds = performanceChartData.getIndicatorDataset(indicator);
             XYPlot indicatorPlot = new XYPlot(ds, dateAxis, indicatorAxis, candleRenderer);

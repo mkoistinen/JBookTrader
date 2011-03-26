@@ -27,7 +27,6 @@ import java.util.List;
  * Contour plot of optimization results
  */
 public class OptimizationMap {
-    private static final Dimension MIN_SIZE = new Dimension(720, 550);// minimum frame size
     private final PreferencesHolder prefs;
     private final PerformanceMetric sortPerformanceMetric;
     private final Strategy strategy;
@@ -113,8 +112,6 @@ public class OptimizationMap {
 
         int chartWidth = prefs.getInt(OptimizationMapWidth);
         int chartHeight = prefs.getInt(OptimizationMapHeight);
-        int chartX = prefs.getInt(OptimizationMapX);
-        int chartY = prefs.getInt(OptimizationMapY);
 
 
         chartFrame.addWindowListener(new WindowAdapter() {
@@ -122,8 +119,6 @@ public class OptimizationMap {
             public void windowClosing(WindowEvent e) {
                 prefs.set(OptimizationMapWidth, chartFrame.getWidth());
                 prefs.set(OptimizationMapHeight, chartFrame.getHeight());
-                prefs.set(OptimizationMapX, chartFrame.getX());
-                prefs.set(OptimizationMapY, chartFrame.getY());
                 chartFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             }
         });
@@ -156,12 +151,10 @@ public class OptimizationMap {
         repaint();
         chartFrame.getContentPane().add(northPanel, BorderLayout.NORTH);
         chartFrame.getContentPane().add(centerPanel, BorderLayout.CENTER);
-        chartFrame.getContentPane().setMinimumSize(MIN_SIZE);
+        chartFrame.getContentPane().setMinimumSize(new Dimension(720, 550));
         chartFrame.pack();
+        chartFrame.setSize(chartWidth, chartHeight);
         chartFrame.setLocationRelativeTo(null);
-        if (chartX >= 0 && chartY >= 0 && chartHeight > 0 && chartWidth > 0) {
-            chartFrame.setBounds(chartX, chartY, chartWidth, chartHeight);
-        }
 
 
         return chartFrame;
@@ -195,7 +188,7 @@ public class OptimizationMap {
 
             int index = 0;
             min = max = getMetric(optimizationResults.get(index));
-            int selectedsCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
+            int selectedCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
 
             for (OptimizationResult optimizationResult : optimizationResults) {
                 StrategyParams params = optimizationResult.getParams();
@@ -209,9 +202,9 @@ public class OptimizationMap {
 
 
                 if (value != null) {
-                    if (selectedsCase == 0) {
+                    if (selectedCase == 0) {
                         z[index] = Math.max(value, z[index]);
-                    } else if (selectedsCase == 1) {
+                    } else if (selectedCase == 1) {
                         z[index] = Math.min(value, z[index]);
                     }
                 }
@@ -231,17 +224,7 @@ public class OptimizationMap {
         return dataset;
     }
 
-    private class HeatPaintScale implements PaintScale {
-        public Paint getPaint(double z) {
-            double normalizedZ = (z - min) / (max - min);
-            double brightness = 1;
-            double saturation = Math.max(0.1, Math.abs(2 * normalizedZ - 1));
-            double red = 0;
-            double blue = 0.7;
-            double hue = blue - normalizedZ * (blue - red);
-            return Color.getHSBColor((float) hue, (float) saturation, (float) brightness);
-        }
-
+    private abstract class PaintScaleAdapter implements PaintScale {
         public double getUpperBound() {
             return max;
         }
@@ -251,20 +234,24 @@ public class OptimizationMap {
         }
     }
 
-    public class GrayPaintScale implements PaintScale {
-        public Paint getPaint(double z) {
-            double normalizedZ = z - min;
+
+    private class HeatPaintScale extends PaintScaleAdapter {
+        public Paint getPaint(double value) {
+            double normalizedValue = (value - min) / (max - min);
+            double saturation = Math.max(0.1, Math.abs(2 * normalizedValue - 1));
+            double red = 0;
+            double blue = 0.7;
+            double hue = blue - normalizedValue * (blue - red);
+            return Color.getHSBColor((float) hue, (float) saturation, 1);
+        }
+    }
+
+    public class GrayPaintScale extends PaintScaleAdapter {
+        public Paint getPaint(double value) {
+            double normalizedValue = value - min;
             double clrs = 255.0 / (max - min);
-            int color = (int) (255 - normalizedZ * clrs);
+            int color = (int) (255 - normalizedValue * clrs);
             return new Color(color, color, color, 255);
-        }
-
-        public double getUpperBound() {
-            return max;
-        }
-
-        public double getLowerBound() {
-            return min;
         }
     }
 

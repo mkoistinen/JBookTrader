@@ -12,7 +12,7 @@ public class TitledSeparator extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1;
-        constraints.insets = new Insets(0, 6, 0, 14);
+        constraints.insets = new Insets(0, 6, 0, 10);
 
         add(new JSeparator(), constraints);
     }

@@ -22,22 +22,12 @@ public class MainFrameController {
     private final MainFrameDialog mainViewDialog;
     private final JTable strategyTable;
     private final StrategyTableModel strategyTableModel;
-    private final PreferencesHolder prefs = PreferencesHolder.getInstance();
     private final Dispatcher dispatcher;
 
     public MainFrameController() throws JBookTraderException {
         mainViewDialog = new MainFrameDialog();
         dispatcher = Dispatcher.getInstance();
         dispatcher.addListener(mainViewDialog);
-        int width = prefs.getInt(MainWindowWidth);
-        int height = prefs.getInt(MainWindowHeight);
-        int x = prefs.getInt(MainWindowX);
-        int y = prefs.getInt(MainWindowY);
-
-        if (width > 0 && height > 0) {
-            mainViewDialog.setBounds(x, y, width, height);
-        }
-
         strategyTable = mainViewDialog.getStrategyTable();
         strategyTableModel = mainViewDialog.getStrategyTableModel();
         assignListeners();
@@ -47,10 +37,9 @@ public class MainFrameController {
         String question = "Are you sure you want to exit " + JBookTrader.APP_NAME + "?";
         int answer = JOptionPane.showConfirmDialog(mainViewDialog, question, JBookTrader.APP_NAME, JOptionPane.YES_NO_OPTION);
         if (answer == JOptionPane.YES_OPTION) {
+            PreferencesHolder prefs = PreferencesHolder.getInstance();
             prefs.set(MainWindowWidth, mainViewDialog.getSize().width);
             prefs.set(MainWindowHeight, mainViewDialog.getSize().height);
-            prefs.set(MainWindowX, mainViewDialog.getX());
-            prefs.set(MainWindowY, mainViewDialog.getY());
             dispatcher.exit();
         }
     }
@@ -69,7 +58,7 @@ public class MainFrameController {
             desktop.browse(new URI(url));
         } catch (Throwable t) {
             dispatcher.getEventReport().report(t);
-            MessageDialog.showError(t);
+            MessageDialog.showException(t);
         }
     }
 
@@ -108,7 +97,7 @@ public class MainFrameController {
 
                     new StrategyInformationDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -125,7 +114,7 @@ public class MainFrameController {
                     dispatcher.setMode(Mode.BackTest);
                     new BackTestDialog(mainViewDialog, strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -134,7 +123,6 @@ public class MainFrameController {
 
         mainViewDialog.optimizeAction(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {
-                OptimizerDialog optimizerDialog = null;
                 try {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     int selectedRow = strategyTable.getSelectedRow();
@@ -143,26 +131,11 @@ public class MainFrameController {
                     }
                     String name = strategyTableModel.getStrategyNameForRow(selectedRow);
                     dispatcher.setMode(Mode.Optimization);
-                    optimizerDialog = new OptimizerDialog(mainViewDialog, name);
-
-                    int width = prefs.getInt(OptimizerWindowWidth);
-                    int height = prefs.getInt(OptimizerWindowHeight);
-                    int x = prefs.getInt(OptimizerWindowX);
-                    int y = prefs.getInt(OptimizerWindowY);
-
-                    if (width > 0 && height > 0) {
-                        optimizerDialog.setBounds(x, y, width, height);
-                    }
+                    OptimizerDialog optimizerDialog = new OptimizerDialog(mainViewDialog, name);
                     optimizerDialog.setVisible(true);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
-                    if (optimizerDialog != null) {
-                        prefs.set(OptimizerWindowWidth, optimizerDialog.getSize().width);
-                        prefs.set(OptimizerWindowHeight, optimizerDialog.getSize().height);
-                        prefs.set(OptimizerWindowX, optimizerDialog.getX());
-                        prefs.set(OptimizerWindowY, optimizerDialog.getY());
-                    }
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
             }
@@ -176,7 +149,7 @@ public class MainFrameController {
                     dispatcher.setMode(Mode.ForwardTest);
                     dispatcher.getTrader().getAssistant().addStrategy(strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -191,7 +164,7 @@ public class MainFrameController {
                     dispatcher.setMode(Mode.Trade);
                     dispatcher.getTrader().getAssistant().addStrategy(strategy);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -226,7 +199,7 @@ public class MainFrameController {
                     JFrame chartFrame = spChart.getChart();
                     chartFrame.setVisible(true);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -239,7 +212,7 @@ public class MainFrameController {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     new PreferencesDialog(mainViewDialog);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 } finally {
                     mainViewDialog.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
@@ -248,19 +221,19 @@ public class MainFrameController {
 
 
         mainViewDialog.discussionAction(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
+            public void actionPerformed(ActionEvent e) {
                 openURL("http://groups.google.com/group/jbooktrader/topics?gvc=2");
             }
         });
 
         mainViewDialog.releaseNotesAction(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
+            public void actionPerformed(ActionEvent e) {
                 openURL("http://code.google.com/p/jbooktrader/wiki/ReleaseNotes");
             }
         });
 
         mainViewDialog.userManualAction(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
+            public void actionPerformed(ActionEvent e) {
                 openURL("http://docs.google.com/View?id=dfzgvqp4_10gb63b8hg");
             }
         });
@@ -289,7 +262,7 @@ public class MainFrameController {
                 try {
                     new AboutDialog(mainViewDialog);
                 } catch (Throwable t) {
-                    MessageDialog.showError(t);
+                    MessageDialog.showException(t);
                 }
             }
         });

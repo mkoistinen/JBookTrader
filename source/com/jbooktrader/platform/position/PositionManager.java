@@ -94,7 +94,7 @@ public class PositionManager {
         if (mode == Mode.ForwardTest || mode == Mode.Trade) {
             StringBuilder msg = new StringBuilder();
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");
-            msg.append("Avg Fill Price: ").append(avgFillPrice).append(". ");
+            msg.append("Average fill price: ").append(avgFillPrice).append(". ");
             msg.append("Position: ").append(getCurrentPosition());
             eventReport.report(strategy.getName(), msg.toString());
         }
@@ -103,11 +103,6 @@ public class PositionManager {
     public void trade() {
         int quantity = targetPosition - currentPosition;
         if (quantity != 0) {
-            Mode mode = Dispatcher.getInstance().getMode();
-            if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-                Dispatcher.getInstance().getC2Manager().sendSignal(strategy.getName(), currentPosition, targetPosition);
-            }
-
             String action = (quantity > 0) ? "BUY" : "SELL";
             Contract contract = strategy.getContract();
             traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);

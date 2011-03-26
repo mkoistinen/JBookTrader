@@ -1,4 +1,4 @@
-package com.jbooktrader.indicator.velocity;
+package com.jbooktrader.indicator.volume;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.util.movingwindow.*;

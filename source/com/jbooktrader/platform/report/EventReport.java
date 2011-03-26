@@ -14,7 +14,7 @@ public class EventReport extends Report {
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss.SSS");
     private final Dispatcher dispatcher = Dispatcher.getInstance();
 
-    public EventReport() throws JBookTraderException {
+    public EventReport() throws IOException {
         super("EventReport");
 
         isEnabled = true;

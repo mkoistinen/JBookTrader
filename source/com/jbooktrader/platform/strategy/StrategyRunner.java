@@ -17,7 +17,7 @@ public class StrategyRunner {
     private final Dispatcher dispatcher;
     private static StrategyRunner instance;
 
-    class SnapshotHandler implements Runnable {
+    private class SnapshotHandler implements Runnable {
         public void run() {
             try {
                 long ntpTime = ntpClock.getTime();
@@ -29,16 +29,11 @@ public class StrategyRunner {
                     dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
 
                     for (MarketBook marketBook : marketBooks) {
-                        MarketSnapshot snapshot = marketBook.getNextMarketSnapshot(snapshotTime);
-                        if (snapshot != null) {
-                            marketBook.setSnapshot(snapshot);
-                            marketBook.saveSnapshot(snapshot);
-                        }
+                        marketBook.takeMarketSnapshot(snapshotTime);
                     }
 
                     synchronized (strategies) {
                         for (Strategy strategy : strategies) {
-                            strategy.getIndicatorManager().updateIndicators();
                             strategy.process();
                         }
                     }

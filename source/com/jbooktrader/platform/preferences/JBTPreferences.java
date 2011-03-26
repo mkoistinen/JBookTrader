@@ -7,54 +7,43 @@ public enum JBTPreferences {
     ClientID("Client ID", "0"),
 
     // Web Access
-    WebAccess("Web Access", "disabled"),
-    WebAccessPort("Web Access Port", "1234"),
+    WebAccess("Web Access", "enabled"),
+    WebAccessPort("Web Access Port", "1235"),
     WebAccessUser("Web Access User", "admin"),
     WebAccessPassword("Web Access Password", "admin"),
 
-    // Back tester
-    BackTesterFileName("backTester.dataFileName", ""),
-    BackTesterUseDateRange("backTester.useDateRange", "false"),
-    BackTesterTestingPeriodStart("backTester.testingPeriodStart", ""),
-    BackTesterTestingPeriodEnd("backTester.testingPeriodEnd", ""),
+    // Data file for backtester and optimizer
+    DataFileName("dataFileName"),
+
+    // Date range
+    DateRangeStart("dateRange.start", "January 1, 2011"),
+    DateRangeEnd("dateRange.end", "March 11, 2011"),
+    UseDateRange("dateRange.use", "false"),
 
     // Optimizer
     OptimizerMinTrades("optimizer.minTrades", "50"),
-    OptimizerSelectBy("optimizer.selectBy", ""),
-    OptimizerMethod("optimizer.method", ""),
-    OptimizerWindowWidth("optimizerwindow.width", "-1"),
-    OptimizerWindowHeight("optimizerwindow.height", "-1"),
-    OptimizerWindowX("optimizerwindow.x", "-1"),
-    OptimizerWindowY("optimizerwindow.y", "-1"),
-    OptimizerUseDateRange("optimizer.useDateRange", "false"),
+    OptimizerSelectBy("optimizer.selectBy", "PI"),
+    OptimizerMethod("optimizer.method", "Brute force"),
+    OptimizerWindowWidth("optimizerwindow.width", "950"),
+    OptimizerWindowHeight("optimizerwindow.height", "750"),
 
     // Main window
-    MainWindowWidth("mainwindow.width", "-1"),
-    MainWindowHeight("mainwindow.height", "-1"),
-    MainWindowX("mainwindow.x", "-1"),
-    MainWindowY("mainwindow.y", "-1"),
+    MainWindowWidth("mainwindow.width", "950"),
+    MainWindowHeight("mainwindow.height", "400"),
 
     // Performance chart
-    PerformanceChartWidth("performance.chart.width", "-1"),
-    PerformanceChartHeight("performance.chart.height", "-1"),
-    PerformanceChartX("performance.chart.x", "-1"),
-    PerformanceChartY("performance.chart.y", "-1"),
-    PerformanceChartState("performance.chart.state", "-1"),
+    PerformanceChartWidth("performance.chart.width", "950"),
+    PerformanceChartHeight("performance.chart.height", "750"),
     PerformanceChartBarSize("performance.chart.barSize", "1 minute"),
 
     // Optimizer
-    DivideAndConquerCoverage("Divide & Conquer coverage", "10"),
+    DivideAndConquerCoverage("Divide & Conquer coverage", "200"),
     StrategiesPerProcessor("Strategies per processor", "50"),
+    InclusionCriteria("Results inclusion criteria", "Profitable strategies"),
 
     // Optimization Map
-    OptimizationMapWidth("optimization.map.width", "-1"),
-    OptimizationMapHeight("optimization.map.height", "-1"),
-    OptimizationMapX("optimization.map.x", "-1"),
-    OptimizationMapY("optimization.map.y", "-1"),
-
-    // Collective2
-    Collective2Password("C2 Password", ""),
-    Collective2Strategies("C2 Strategies", ""),
+    OptimizationMapWidth("optimization.map.width", "720"),
+    OptimizationMapHeight("optimization.map.height", "550"),
 
     // Time Server
     NTPTimeServer("NTP time server", "ntp2.usno.navy.mil");
@@ -65,6 +54,11 @@ public enum JBTPreferences {
         this.name = name;
         this.defaultValue = defaultValue;
     }
+
+    JBTPreferences(String name) {
+        this(name, "");
+    }
+
 
     public String getDefault() {
         return defaultValue;

@@ -18,10 +18,10 @@ import com.jbooktrader.platform.schedule.*;
 
 public abstract class Strategy implements Comparable<Strategy> {
     private final StrategyParams params;
-    private MarketBook marketBook;
     private final EventReport eventReport;
     private final Dispatcher dispatcher;
     private final String name;
+    private MarketBook marketBook;
     private Contract contract;
     private TradingSchedule tradingSchedule;
     private PositionManager positionManager;
@@ -154,7 +154,6 @@ public abstract class Strategy implements Comparable<Strategy> {
     }
 
     public void processInstant(boolean isInSchedule) {
-
         if (isInSchedule) {
             if (indicatorManager.hasValidIndicators()) {
                 onBookSnapshot();
@@ -167,6 +166,7 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     public void process() {
         if (!marketBook.isEmpty()) {
+            indicatorManager.updateIndicators();
             MarketSnapshot marketSnapshot = marketBook.getSnapshot();
             long instant = marketSnapshot.getTime();
             processInstant(tradingSchedule.contains(instant));

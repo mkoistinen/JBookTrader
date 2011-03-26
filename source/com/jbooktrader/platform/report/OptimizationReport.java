@@ -1,13 +1,12 @@
 package com.jbooktrader.platform.report;
 
-import com.jbooktrader.platform.model.*;
-
+import java.io.*;
 import java.util.*;
 
 
 public class OptimizationReport extends StrategyReport {
 
-    public OptimizationReport(String reportName) throws JBookTraderException {
+    public OptimizationReport(String reportName) throws IOException {
         super(reportName);
     }
 

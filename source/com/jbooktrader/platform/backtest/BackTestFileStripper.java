@@ -10,7 +10,8 @@ import java.util.*;
  * which contains only the records within the specified time frame.
  */
 public class BackTestFileStripper {
-    public static final int COLUMNS = 4;
+    public static final int SECONDS_IN_HOUR = 3600;
+    public static final int COLUMNS = 5;
     private final BufferedReader reader;
     private final PrintWriter writer;
     private static long lineNumber;
@@ -28,8 +29,8 @@ public class BackTestFileStripper {
     }
 
     public BackTestFileStripper(String fileNameIn, String fileNameOut, int startHour, int endHour) throws JBookTraderException {
-        startSecond = startHour * 3600;
-        endSecond = endHour * 3600;
+        startSecond = startHour * SECONDS_IN_HOUR;
+        endSecond = endHour * SECONDS_IN_HOUR;
 
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileNameIn)));
@@ -80,7 +81,7 @@ public class BackTestFileStripper {
         int min = Integer.valueOf(timeToken.substring(2, 4));
         int sec = Integer.valueOf(timeToken.substring(4, 6));
 
-        int secondsOfDay = hour * 60 * 60 + min * 60 + sec;
+        int secondsOfDay = hour * SECONDS_IN_HOUR + min * 60 + sec;
 
         return (secondsOfDay >= startSecond && secondsOfDay <= endSecond);
     }

@@ -3,6 +3,8 @@ package com.jbooktrader.platform.dialog;
 
 import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -257,9 +259,14 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         statusBar.add(timeLabel, BorderLayout.EAST);
         add(statusBar, BorderLayout.SOUTH);
 
-        setMinimumSize(new Dimension(600, 200));
         setTitle(JBookTrader.APP_NAME);
+
+        setMinimumSize(new Dimension(600, 200));
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
+        int width = prefs.getInt(MainWindowWidth);
+        int height = prefs.getInt(MainWindowHeight);
         pack();
+        setSize(width, height);
         setLocationRelativeTo(null);
     }
 }

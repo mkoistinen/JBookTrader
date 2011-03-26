@@ -23,7 +23,7 @@ public class MovingWindowCorrelation {
 
     }
 
-    public Pair get(int position) {
+    private Pair get(int position) {
         int index = (start + position - 1) % buffer.length;
         if (index < 0) {
             index = buffer.length + index;

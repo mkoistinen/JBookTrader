@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class ComputationalTimeEstimator {
     private static final long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;
-    private static final long MIN_ITERATIONS = 15000000;
+    private static final long MIN_ITERATIONS = 50000000;
     private final long startTime;
     private final SimpleDateFormat sdf;
     private long totalIterations;
@@ -34,7 +34,7 @@ public class ComputationalTimeEstimator {
 
             long remainingDays = remainingMillis / MILLIS_IN_DAY;
             if (remainingDays == 0) {
-                timeLeft = sdf.format(new Date(remainingMillis));
+                timeLeft = sdf.format(remainingMillis);
             } else {
                 timeLeft = "more than " + remainingDays + " days";
             }

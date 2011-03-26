@@ -38,10 +38,6 @@ public class CircledTextAnnotation extends XYTextAnnotation {
         setTextAnchor(TextAnchor.CENTER);
     }
 
-    public void setBkColor(Color color) {
-        this.color = color;
-    }
-
     @Override
     public void draw(Graphics2D g2, XYPlot plot, Rectangle2D dataArea, ValueAxis domainAxis, ValueAxis rangeAxis, int rendererIndex, PlotRenderingInfo info) {
         PlotOrientation orientation = plot.getOrientation();

@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.model;
 
 
-import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
@@ -9,6 +8,7 @@ import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 import com.jbooktrader.platform.web.*;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -18,7 +18,6 @@ public class Dispatcher {
     private static Dispatcher instance;
     private final List<ModelListener> listeners;
     private EventReport eventReport;
-    private C2Manager c2Manager;
     private Trader trader;
     private NTPClock ntpClock;
     private Mode mode;
@@ -34,7 +33,7 @@ public class Dispatcher {
         return instance;
     }
 
-    public void setReporter() throws JBookTraderException {
+    public void setReporter() throws IOException {
         eventReport = new EventReport();
     }
 
@@ -70,13 +69,6 @@ public class Dispatcher {
 
     public NTPClock getNTPClock() {
         return ntpClock;
-    }
-
-    public synchronized C2Manager getC2Manager() {
-        if (c2Manager == null) {
-            c2Manager = new C2Manager();
-        }
-        return c2Manager;
     }
 
     public EventReport getEventReport() {

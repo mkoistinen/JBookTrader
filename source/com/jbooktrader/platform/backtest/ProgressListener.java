@@ -1,9 +1,9 @@
 package com.jbooktrader.platform.backtest;
 
 public interface ProgressListener {
-    public void setProgress(String progressText);
+    void setProgress(String progressText);
 
-    public void setProgress(long count, long iterations, String text, String label);
+    void setProgress(long count, long iterations, String progressText);
 
-    public boolean isCancelled();
+    boolean isCancelled();
 }

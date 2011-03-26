@@ -32,7 +32,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
     private JPanel progressPanel;
     private JButton cancelButton, optimizeButton, optimizationMapButton, closeButton, selectFileButton;
     private JTextField fileNameText, minTradesText;
-    private JComboBox selectionCriteriaCombo, optimizationMethodCombo;
+    private JComboBox selectionCriteriaCombo, inclusionCriteriaCombo, optimizationMethodCombo;
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
     private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
@@ -43,7 +43,6 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
     private TableColumn stepColumn;
 
     private ParamTableModel paramTableModel;
-    private ResultsTableModel resultsTableModel;
     private Strategy strategy;
     private List<OptimizationResult> optimizationResults;
     private OptimizerRunner optimizerRunner;
@@ -53,19 +52,21 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         prefs = PreferencesHolder.getInstance();
         this.strategyName = strategyName;
         init();
-        pack();
         assignListeners();
-        setLocationRelativeTo(null);
         initParams();
     }
 
     @Override
-    public void setProgress(long count, long iterations, String text, String label) {
-        progressLabel.setText(label);
+    public void setProgress(long count, long iterations, String text) {
         int percent = (int) (100 * (count / (double) iterations));
         progressBar.setValue(percent);
         progressBar.setString(text + ": " + percent + "% completed");
     }
+
+    public void setRemainingTime(String remainingTime) {
+        progressLabel.setText(remainingTime);
+    }
+
 
     @Override
     public void setProgress(String progressText) {
@@ -134,13 +135,16 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         optimizeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    prefs.set(BackTesterFileName, fileNameText.getText());
+                    prefs.set(OptimizerWindowWidth, getSize().width);
+                    prefs.set(OptimizerWindowHeight, getSize().height);
+                    prefs.set(DataFileName, fileNameText.getText());
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
                     prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
+                    prefs.set(InclusionCriteria, (String) inclusionCriteriaCombo.getSelectedItem());
                     prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
-                    prefs.set(BackTesterTestingPeriodStart, fromDateEditor.getText());
-                    prefs.set(BackTesterTestingPeriodEnd, toDateEditor.getText());
-                    prefs.set(OptimizerUseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
+                    prefs.set(DateRangeStart, fromDateEditor.getText());
+                    prefs.set(DateRangeEnd, toDateEditor.getText());
+                    prefs.set(UseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
 
                     setOptions();
                     StrategyParams params = paramTableModel.getParams();
@@ -154,7 +158,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
                     new Thread(optimizerRunner).start();
                 } catch (Exception ex) {
-                    MessageDialog.showError(ex);
+                    MessageDialog.showException(ex);
                 }
             }
         });
@@ -180,7 +184,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
                     JDialog chartFrame = optimizationMap.getChartFrame();
                     chartFrame.setVisible(true);
                 } catch (Exception ex) {
-                    MessageDialog.showError(ex);
+                    MessageDialog.showException(ex);
                 }
             }
         });
@@ -243,7 +247,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
                 if (e.getType() == TableModelEvent.UPDATE) {
                     // We ignore events from the combination field itself.
-                    if (e.getSource() != combinationLabel) {
+                    if (!e.getSource().equals(combinationLabel)) {
                         DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0, true);
 
                         // Get number of combinations and display then in the combinationField
@@ -271,7 +275,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
         JLabel fileNameLabel = new JLabel("Data file:", SwingConstants.TRAILING);
         fileNameText = new JTextField();
-        fileNameText.setText(prefs.get(BackTesterFileName));
+        fileNameText.setText(prefs.get(DataFileName));
         selectFileButton = new JButton("Browse...");
 
         fileNameLabel.setLabelFor(fileNameText);
@@ -279,19 +283,18 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         filenamePanel.add(fileNameLabel);
         filenamePanel.add(fileNameText);
         filenamePanel.add(selectFileButton);
-
-        SpringUtilities.makeCompactGrid(filenamePanel, 1, 3, 0, 0, 12, 0);
+        SpringUtilities.makeOneLineGrid(filenamePanel, 8);
 
         // historical data range filter panel
         JPanel dateRangePanel = new JPanel(new SpringLayout());
         String dateFormat = "MMMMM d, yyyy";
-        useDateRangeCheckBox = new JCheckBox("Use date range from:", prefs.get(OptimizerUseDateRange).equals("true"));
+        useDateRangeCheckBox = new JCheckBox("Use date range from:", prefs.get(UseDateRange).equals("true"));
         dateRangePanel.add(useDateRangeCheckBox);
 
         // From date
         fromDateEditor = new JTextFieldDateEditor();
         fromDatePanel = new JDateChooser(new Date(), dateFormat, fromDateEditor);
-        fromDateEditor.setText(prefs.get(BackTesterTestingPeriodStart));
+        fromDateEditor.setText(prefs.get(DateRangeStart));
         fromDatePanel.add(fromDateEditor);
         dateRangePanel.add(fromDatePanel);
 
@@ -299,7 +302,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         JLabel toLabel = new JLabel("to:");
         toDateEditor = new JTextFieldDateEditor();
         toDatePanel = new JDateChooser(new Date(), dateFormat, toDateEditor);
-        toDateEditor.setText(prefs.get(BackTesterTestingPeriodEnd));
+        toDateEditor.setText(prefs.get(DateRangeEnd));
         toLabel.setLabelFor(toDatePanel);
         dateRangePanel.add(toLabel);
         toDatePanel.add(toDateEditor);
@@ -310,7 +313,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
 
         dateRangePanel.add(toDatePanel);
-        SpringUtilities.makeCompactGrid(dateRangePanel, 1, dateRangePanel.getComponentCount(), 0, 0, 12, 10);
+        SpringUtilities.makeOneLineGrid(dateRangePanel, 8);
         // end of historical data range filter panel
 
         // strategy parameters panel and its components
@@ -335,36 +338,40 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         strategyParamPanel.add(paramScrollPane);
         strategyParamPanel.add(combinationLabel);
 
-        SpringUtilities.makeCompactGrid(strategyParamPanel, 2, 1, 0, 0, 12, 0);
+        SpringUtilities.makeCompactGrid(strategyParamPanel, 2, 1, 0, 0, 8, 0);
 
         // optimization options panel and its components
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
-        JLabel optimizationMethodLabel = new JLabel("Search method: ");
+        JLabel optimizationMethodLabel = new JLabel("Search method:");
         optimizationMethodCombo = new JComboBox(new String[] {"Brute force", "Divide & Conquer"});
         String optimizerMethod = prefs.get(OptimizerMethod);
-        if (optimizerMethod.length() > 0) {
-            optimizationMethodCombo.setSelectedItem(optimizerMethod);
-        }
+        optimizationMethodCombo.setSelectedItem(optimizerMethod);
+
 
         optimizationMethodLabel.setLabelFor(optimizationMethodCombo);
         optimizationOptionsPanel.add(optimizationMethodLabel);
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
-        JLabel selectionCriteriaLabel = new JLabel("Selection criteria: ");
+        JLabel selectionCriteriaLabel = new JLabel("Selection criteria:");
         String[] sortFactors = new String[] {PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName()};
 
         selectionCriteriaCombo = new JComboBox(sortFactors);
+        selectionCriteriaCombo.setSelectedItem(prefs.get(OptimizerSelectBy));
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
         optimizationOptionsPanel.add(selectionCriteriaCombo);
 
-        String selectBy = prefs.get(OptimizerSelectBy);
-        if (selectBy.length() > 0) {
-            selectionCriteriaCombo.setSelectedItem(selectBy);
-        }
 
-        JLabel minTradesLabel = new JLabel("Minimum trades: ");
+        JLabel inclusionCriteriaLabel = new JLabel("Inclusion criteria:");
+        inclusionCriteriaCombo = new JComboBox(new String[] {"All strategies", "Profitable strategies"});
+        inclusionCriteriaLabel.setLabelFor(inclusionCriteriaCombo);
+        optimizationOptionsPanel.add(inclusionCriteriaLabel);
+        optimizationOptionsPanel.add(inclusionCriteriaCombo);
+        inclusionCriteriaCombo.setSelectedItem(prefs.get(InclusionCriteria));
+
+
+        JLabel minTradesLabel = new JLabel("Min trades:");
         minTradesText = new JTextField();
 
         minTradesText.setText(prefs.get(OptimizerMinTrades));
@@ -381,7 +388,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         });
 
 
-        SpringUtilities.makeCompactGrid(optimizationOptionsPanel, 1, 7, 0, 0, 12, 8);
+        SpringUtilities.makeOneLineGrid(optimizationOptionsPanel, 8);
 
         northPanel.add(new TitledSeparator(new JLabel("Historical data")));
         northPanel.add(filenamePanel);
@@ -391,11 +398,11 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         northPanel.add(new TitledSeparator(new JLabel("Optimization options")));
         northPanel.add(optimizationOptionsPanel);
         northPanel.add(new TitledSeparator(new JLabel("Optimization Results")));
-        SpringUtilities.makeCompactGrid(northPanel, 8, 1, 12, 12, 0, 8);
+        SpringUtilities.makeCompactGrid(northPanel, 8, 1, 8, 12, 0, 8);
 
         JScrollPane resultsScrollPane = new JScrollPane();
         centerPanel.add(resultsScrollPane);
-        SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 12, 0, 12, 0);
+        SpringUtilities.makeCompactGrid(centerPanel, 1, 1, 7, 0, 8, 0);
 
         resultsTable = new JTable();
         resultsTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -432,7 +439,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         progressPanel.add(new JLabel(" Estimated remaining time: "));
         progressPanel.add(progressLabel);
         progressPanel.setVisible(false);
-        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 12, 12, 12, 0);
+        SpringUtilities.makeCompactGrid(progressPanel, 1, 3, 8, 8, 8, 0);
 
         southPanel.add(progressPanel, BorderLayout.NORTH);
         southPanel.add(buttonsPanel, BorderLayout.SOUTH);
@@ -442,8 +449,13 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         getContentPane().add(southPanel, BorderLayout.SOUTH);
 
         getRootPane().setDefaultButton(optimizeButton);
-        setMinimumSize(new Dimension(890, 500));
-        setPreferredSize(getMinimumSize());
+        setMinimumSize(new Dimension(950, 500));
+
+        pack();
+        int width = prefs.getInt(OptimizerWindowWidth);
+        int height = prefs.getInt(OptimizerWindowHeight);
+        setSize(width, height);
+        setLocationRelativeTo(null);
     }
 
     private void initParams() {
@@ -451,18 +463,15 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
             strategy = ClassFinder.getInstance(strategyName);
             paramTableModel.setParams(strategy.getParams());
             setParamTableColumns();
-            resultsTableModel = new ResultsTableModel(strategy);
-            resultsTable.setModel(resultsTableModel);
-            DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) resultsTable.getDefaultRenderer(String.class);
-            renderer.setHorizontalAlignment(SwingConstants.RIGHT);
+            resultsTable.setModel(new ResultsTableModel(strategy));
         } catch (Exception e) {
-            MessageDialog.showError(e);
+            MessageDialog.showException(e);
         }
     }
 
     public void setResults(List<OptimizationResult> optimizationResults) {
         this.optimizationResults = optimizationResults;
-        resultsTableModel.setResults(optimizationResults);
+        ((ResultsTableModel) resultsTable.getModel()).setResults(optimizationResults);
     }
 
     public String getFileName() {

@@ -27,7 +27,7 @@ public class PerformanceChartData {
         indicatorBars = new HashMap<String, Bar>();
         this.indicators = new HashMap<String, List<OHLCDataItem>>();
         for (Indicator indicator : indicators) {
-            this.indicators.put(indicator.getName(), new ArrayList<OHLCDataItem>());
+            this.indicators.put(indicator.getKey(), new ArrayList<OHLCDataItem>());
         }
     }
 
@@ -57,19 +57,19 @@ public class PerformanceChartData {
             long completedPeriods = time / frequency;
             long barTime = (completedPeriods + 1) * frequency;
 
-            Bar indicatorBar = indicatorBars.get(indicator.getName());
+            Bar indicatorBar = indicatorBars.get(indicator.getKey());
             if (indicatorBar == null) {
                 indicatorBar = new Bar(barTime, value);
-                indicatorBars.put(indicator.getName(), indicatorBar);
+                indicatorBars.put(indicator.getKey(), indicatorBar);
             }
 
             if (barTime > indicatorBar.getTime()) {
                 Date date = new Date(indicatorBar.getTime());
                 OHLCDataItem item = new OHLCDataItem(date, indicatorBar.getOpen(), indicatorBar.getHigh(), indicatorBar.getLow(), indicatorBar.getClose(), 0);
-                List<OHLCDataItem> ind = indicators.get(indicator.getName());
+                List<OHLCDataItem> ind = indicators.get(indicator.getKey());
                 ind.add(item);
                 indicatorBar = new Bar(barTime, value);
-                indicatorBars.put(indicator.getName(), indicatorBar);
+                indicatorBars.put(indicator.getKey(), indicatorBar);
             }
 
             indicatorBar.setClose(value);
@@ -108,7 +108,7 @@ public class PerformanceChartData {
     }
 
     public OHLCDataset getIndicatorDataset(Indicator indicator) {
-        List<OHLCDataItem> ind = indicators.get(indicator.getName());
+        List<OHLCDataItem> ind = indicators.get(indicator.getKey());
         return new DefaultOHLCDataset("", ind.toArray(new OHLCDataItem[ind.size()]));
     }
 

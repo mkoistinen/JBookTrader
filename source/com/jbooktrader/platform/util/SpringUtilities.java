@@ -29,6 +29,12 @@ public class SpringUtilities {
         makeCompactGrid(parent, 1, parent.getComponentCount(), 10, 10, 10, 10);
     }
 
+    /**
+     * @param xPad x padding between cells
+     */
+    public static void makeOneLineGrid(Container parent, int xPad) {
+        makeCompactGrid(parent, 1, parent.getComponentCount(), 0, 0, xPad, 0);
+    }
 
     /**
      * Aligns the first <code>rows</code> * <code>cols</code>

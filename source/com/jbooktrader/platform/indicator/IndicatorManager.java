@@ -12,7 +12,6 @@ public class IndicatorManager {
     private final List<Indicator> indicators;
 
     private MarketBook marketBook;
-    private boolean hasValidIndicators;
     private long previousSnapshotTime;
     private long samples;
 
@@ -43,7 +42,7 @@ public class IndicatorManager {
     }
 
     public boolean hasValidIndicators() {
-        return hasValidIndicators && (samples >= MIN_SAMPLE_SIZE);
+        return (samples >= MIN_SAMPLE_SIZE);
     }
 
 
@@ -52,7 +51,6 @@ public class IndicatorManager {
     }
 
     public void updateIndicators() {
-        hasValidIndicators = true;
         MarketSnapshot snapshot = marketBook.getSnapshot();
         if (snapshot == null) {
             return;
@@ -70,16 +68,7 @@ public class IndicatorManager {
         previousSnapshotTime = lastSnapshotTime;
 
         for (int index = 0; index < size; index++) {
-            try {
-                indicators.get(index).calculate();
-            } catch (IndexOutOfBoundsException iobe) {
-                // This exception will occur if book size is insufficient to calculate
-                // the indicator. This is normal.
-                hasValidIndicators = false;
-            } catch (Exception e) {
-                hasValidIndicators = false;
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            indicators.get(index).calculate();
         }
     }
 }

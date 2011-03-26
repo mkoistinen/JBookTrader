@@ -6,6 +6,7 @@ import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.util.*;
 
+import java.io.*;
 import java.text.*;
 import java.util.*;
 
@@ -53,7 +54,7 @@ public class StrategyReportManager {
         if (strategyReport == null) {
             try {
                 strategyReport = new StrategyReport(strategy.getName());
-            } catch (JBookTraderException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e.getMessage(), e);
             }
             strategyReport.reportHeaders(strategyReportHeaders);

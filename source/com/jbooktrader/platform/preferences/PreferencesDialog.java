@@ -1,8 +1,6 @@
 package com.jbooktrader.platform.preferences;
 
-import com.jbooktrader.platform.c2.*;
 import com.jbooktrader.platform.dialog.*;
-import com.jbooktrader.platform.model.*;
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
@@ -16,11 +14,10 @@ public class PreferencesDialog extends JBTDialog {
     private final PreferencesHolder prefs;
     private JTextField hostText, portText, webAccessUser, ntpTimeServer;
     private JSpinner clientIDSpin, webAccessPortSpin;
-    private JPasswordField webAccessPasswordField, c2PasswordField;
+    private JPasswordField webAccessPasswordField;
     private JComboBox webAccessCombo;
-    private C2TableModel c2TableModel;
 
-    public PreferencesDialog(JFrame parent) throws JBookTraderException {
+    public PreferencesDialog(JFrame parent) {
         super(parent);
         prefs = PreferencesHolder.getInstance();
         init();
@@ -46,21 +43,16 @@ public class PreferencesDialog extends JBTDialog {
     }
 
 
-    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp, Dimension dimension) {
+    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
         JLabel fieldNameLabel = new JLabel(pref.getName() + ":");
         fieldNameLabel.setLabelFor(comp);
-        comp.setPreferredSize(dimension);
-        comp.setMaximumSize(dimension);
+        comp.setMaximumSize(FIELD_DIMENSION);
         panel.add(fieldNameLabel);
         panel.add(comp);
     }
 
 
-    private void genericAdd(JPanel panel, JBTPreferences pref, Component comp) {
-        genericAdd(panel, pref, comp, FIELD_DIMENSION);
-    }
-
-    private void init() throws JBookTraderException {
+    private void init() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Preferences");
 
@@ -71,11 +63,11 @@ public class PreferencesDialog extends JBTDialog {
         JButton cancelButton = new JButton("Cancel");
         buttonsPanel.add(okButton);
         buttonsPanel.add(cancelButton);
-        getContentPane().add(contentPanel, BorderLayout.CENTER);
+        getContentPane().add(contentPanel, BorderLayout.NORTH);
         getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 
         JTabbedPane tabbedPane = new JTabbedPane();
-        contentPanel.add(tabbedPane, BorderLayout.CENTER);
+        contentPanel.add(tabbedPane, BorderLayout.NORTH);
 
         JPanel connectionTab = new JPanel(new SpringLayout());
         tabbedPane.addTab("TWS Connection", connectionTab);
@@ -86,7 +78,6 @@ public class PreferencesDialog extends JBTDialog {
         add(connectionTab, Port, portText);
         add(connectionTab, ClientID, clientIDSpin);
         SpringUtilities.makeCompactGrid(connectionTab, 3, 2, 12, 12, 8, 8);
-        setWidth(connectionTab, clientIDSpin, 45);
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
         tabbedPane.addTab("Web Access", webAcessTab);
@@ -100,20 +91,6 @@ public class PreferencesDialog extends JBTDialog {
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
         SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 8);
 
-        JPanel c2Tab = new JPanel(new SpringLayout());
-        tabbedPane.addTab("Collective2", c2Tab);
-        JPanel passwordPanel = new JPanel(new SpringLayout());
-        c2PasswordField = new JPasswordField();
-        add(passwordPanel, Collective2Password, c2PasswordField);
-        SpringUtilities.makeCompactGrid(passwordPanel, 1, 2, 0, 8, 4, 0);
-        JScrollPane scrollPane = new JScrollPane();
-        c2Tab.add(passwordPanel);
-        c2Tab.add(scrollPane);
-        SpringUtilities.makeCompactGrid(c2Tab, 2, 1, 12, 12, 12, 12);
-        c2TableModel = new C2TableModel();
-        JTable c2Table = new JTable(c2TableModel);
-        c2Table.setShowGrid(false);
-        scrollPane.getViewport().add(c2Table);
 
         JPanel timeServerTab = new JPanel(new SpringLayout());
         tabbedPane.addTab("Time Server", timeServerTab);
@@ -133,9 +110,6 @@ public class PreferencesDialog extends JBTDialog {
                     prefs.set(WebAccessUser, webAccessUser.getText());
                     prefs.set(WebAccessPassword, new String(webAccessPasswordField.getPassword()));
 
-                    prefs.set(Collective2Password, new String(c2PasswordField.getPassword()));
-                    prefs.set(Collective2Strategies, c2TableModel.getStrategies());
-
                     prefs.set(NTPTimeServer, ntpTimeServer.getText());
 
                     String msg = "Some of the preferences will not take effect until " + JBookTrader.APP_NAME + " is restarted.";
@@ -143,7 +117,7 @@ public class PreferencesDialog extends JBTDialog {
 
                     dispose();
                 } catch (Exception ex) {
-                    MessageDialog.showError(ex);
+                    MessageDialog.showException(ex);
                 }
             }
         });
@@ -156,15 +130,5 @@ public class PreferencesDialog extends JBTDialog {
 
 
         setPreferredSize(new Dimension(600, 380));
-    }
-
-    private void setWidth(JPanel p, Component c, int width) throws JBookTraderException {
-        try {
-            SpringLayout layout = (SpringLayout) p.getLayout();
-            SpringLayout.Constraints spinLayoutConstraint = layout.getConstraints(c);
-            spinLayoutConstraint.setWidth(Spring.constant(width));
-        } catch (ClassCastException exc) {
-            throw new JBookTraderException("The first argument to makeGrid must use SpringLayout.");
-        }
     }
 }

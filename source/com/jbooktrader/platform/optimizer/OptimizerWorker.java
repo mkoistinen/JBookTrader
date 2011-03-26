@@ -26,8 +26,9 @@ public class OptimizerWorker implements Callable<Void> {
         List<Strategy> strategies = new ArrayList<Strategy>();
         List<OptimizationResult> optimizationResults = new LinkedList<OptimizationResult>();
         int strategiesPerProcessor = PreferencesHolder.getInstance().getInt(JBTPreferences.StrategiesPerProcessor);
+        String inclusionCriteria = PreferencesHolder.getInstance().get(JBTPreferences.InclusionCriteria);
 
-        while (!tasks.isEmpty()) {
+        while (!tasks.isEmpty() && !optimizerRunner.isCancelled()) {
             MarketBook marketBook = new MarketBook();
             IndicatorManager indicatorManager = new IndicatorManager();
             strategies.clear();
@@ -57,19 +58,18 @@ public class OptimizerWorker implements Callable<Void> {
                         isInSchedule = isInSchedule && !marketBook.isGapping(snapshots.get(count + 1));
                     }
 
+
                     // For efficiency, avoid the (Strategy strategy : strategies) construct
                     for (int index = 0; index < strategiesCount; index++) {
                         strategies.get(index).processInstant(isInSchedule);
                     }
 
-                    if (count % 1000 == 0) {
-                        optimizerRunner.iterationsCompleted(strategiesCount * 1000);
+                    if (count % 10000 == 0) {
+                        optimizerRunner.iterationsCompleted(strategiesCount * 10000);
+                        if (optimizerRunner.isCancelled()) {
+                            break;
+                        }
                     }
-
-                    if (count % 100 == 0 && optimizerRunner.isCancelled()) {
-                        break;
-                    }
-
                 }
 
                 optimizationResults.clear();
@@ -80,8 +80,10 @@ public class OptimizerWorker implements Callable<Void> {
 
                     PerformanceManager performanceManager = strategy.getPerformanceManager();
                     if (performanceManager.getTrades() >= minTrades) {
-                        OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
-                        optimizationResults.add(optimizationResult);
+                        if (inclusionCriteria.equals("All strategies") || performanceManager.getNetProfit() > 0) {
+                            OptimizationResult optimizationResult = new OptimizationResult(strategy.getParams(), performanceManager);
+                            optimizationResults.add(optimizationResult);
+                        }
                     }
                 }
 

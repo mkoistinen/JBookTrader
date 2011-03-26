@@ -18,6 +18,9 @@ public class MarketSnapshotFilter {
         calendar.setTime(toDateEditor.getDate());
         calendar.set(Calendar.HOUR_OF_DAY, 23);
         toDate = calendar.getTimeInMillis();
+        if (fromDate > toDate) {
+            throw new RuntimeException("The \"from\" date must be before or the same as the \"to\" date.");
+        }
     }
 
 

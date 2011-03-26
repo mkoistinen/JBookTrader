@@ -11,7 +11,6 @@ import com.jbooktrader.platform.util.*;
 public class BackTestStrategyRunner implements Runnable {
     private final BackTestDialog backTestDialog;
     private final Strategy strategy;
-    private BackTestFileReader backTestFileReader;
     private BackTester backTester;
 
     public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
@@ -20,20 +19,14 @@ public class BackTestStrategyRunner implements Runnable {
         Dispatcher.getInstance().getTrader().getAssistant().addStrategy(strategy);
     }
 
-    public void cancel() {
-        if (backTester != null) {
-            backTester.cancel();
-        }
-    }
-
     public void run() {
         try {
             backTestDialog.enableProgress();
-            backTestFileReader = new BackTestFileReader(backTestDialog.getFileName(), backTestDialog.getDateFilter());
+            BackTestFileReader backTestFileReader = new BackTestFileReader(backTestDialog.getFileName(), backTestDialog.getDateFilter());
             backTester = new BackTester(strategy, backTestFileReader, backTestDialog);
             backTester.execute();
         } catch (Throwable t) {
-            MessageDialog.showError(t);
+            MessageDialog.showException(t);
         } finally {
             backTestDialog.dispose();
         }
