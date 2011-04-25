@@ -11,11 +11,11 @@ import com.jbooktrader.platform.util.*;
 /**
  *
  */
-public abstract class StrategyQQQQ extends Strategy {
-    protected StrategyQQQQ(StrategyParams optimizationParams) throws JBookTraderException {
+public abstract class StrategyQQQ extends Strategy {
+    protected StrategyQQQ(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeStockContract("QQQQ", "SMART");
+        Contract contract = ContractFactory.makeStockContract("QQQ", "SMART");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:20", "15:25", "America/New_York");
         int multiplier = 1;// contract multiplier

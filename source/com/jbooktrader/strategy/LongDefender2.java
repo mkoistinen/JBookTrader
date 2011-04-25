@@ -4,6 +4,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.strategy.common.*;
 
+
 /**
  *
  */
@@ -15,9 +16,11 @@ public class LongDefender2 extends LongDefender {
 
     @Override
     public void setParams() {
-        addParam(PERIOD, 5, 600, 100, 5622);
-        addParam(SCALE_FACTOR, -30, 120, 5, 54);
-        addParam(ENTRY, 5, 60, 1, 55);
-        addParam(EXIT, -25, 30, 1, -12);
+        addParam(PERIOD, 2000, 9000, 250, 7963);
+        addParam(SCALE_FACTOR, 10, 130, 1, 87);
+        addParam(ENTRY, 20, 100, 1, 85);
+        addParam(EXIT, 0, 80, 1, -39);
     }
+
+
 }

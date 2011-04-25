@@ -2,16 +2,21 @@ package com.jbooktrader.platform.strategy;
 
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.marketdepth.*;
+import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.text.*;
 
-public class StrategyInformationDialog extends JBTDialog {
+public class StrategyInformationDialog extends JBTDialog implements ModelListener {
     private final Strategy strategy;
+    private JLabel cumBidAskSizesLabel, bidAskLabel;
+
 
     public StrategyInformationDialog(JFrame parent, Strategy strategy) {
         super(parent);
@@ -20,12 +25,25 @@ public class StrategyInformationDialog extends JBTDialog {
         pack();
         setLocationRelativeTo(parent);
         setVisible(true);
+        Dispatcher dispatcher = Dispatcher.getInstance();
+        dispatcher.addListener(this);
+
+    }
+
+
+    public void modelChanged(Event event, Object value) {
+        switch (event) {
+            case StrategyUpdate:
+                MarketDepth marketDepth = strategy.getMarketBook().getMarketDepth();
+                cumBidAskSizesLabel.setText(marketDepth.getSizes());
+                bidAskLabel.setText(marketDepth.getTop());
+                break;
+        }
     }
 
     private void add(JPanel panel, String fieldName, String fieldValue) {
         JLabel fieldNameLabel = new JLabel(fieldName + ":");
         JLabel fieldValueLabel = new JLabel(fieldValue);
-        fieldValueLabel.setForeground(Color.BLACK);
         panel.add(fieldNameLabel);
         panel.add(fieldValueLabel);
     }
@@ -46,6 +64,16 @@ public class StrategyInformationDialog extends JBTDialog {
     private void init() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setTitle("Strategy Information - " + strategy.getName());
+
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                Dispatcher dispatcher = Dispatcher.getInstance();
+                dispatcher.removeListener(StrategyInformationDialog.this);
+            }
+        });
+
 
         JPanel contentPanel = new JPanel(new BorderLayout());
         getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -78,6 +106,15 @@ public class StrategyInformationDialog extends JBTDialog {
         add(securityPanel, "Exchange", strategy.getContract().m_exchange);
         add(securityPanel, "Multiplier", strategy.getContract().m_multiplier);
         add(securityPanel, "Commission", strategy.getPerformanceManager().getCommission().toString());
+
+        bidAskLabel = new JLabel();
+        securityPanel.add(new JLabel("Best bid-ask" + ":"));
+        securityPanel.add(bidAskLabel);
+
+        cumBidAskSizesLabel = new JLabel();
+        securityPanel.add(new JLabel("Book bid-ask size" + ":"));
+        securityPanel.add(cumBidAskSizesLabel);
+
         makeCompactGrid(securityPanel);
 
         JPanel parametersPanel = new JPanel(new SpringLayout());

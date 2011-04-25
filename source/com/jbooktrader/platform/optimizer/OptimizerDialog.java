@@ -322,7 +322,6 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         paramTableModel = new ParamTableModel();
         JTable paramTable = new JTable(paramTableModel);
         paramTable.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        paramTable.setShowGrid(false);
 
         paramTableColumnModel = paramTable.getColumnModel();
         stepColumn = paramTableColumnModel.getColumn(3);

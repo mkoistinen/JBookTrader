@@ -58,7 +58,6 @@ public class OptimizerWorker implements Callable<Void> {
                         isInSchedule = isInSchedule && !marketBook.isGapping(snapshots.get(count + 1));
                     }
 
-
                     // For efficiency, avoid the (Strategy strategy : strategies) construct
                     for (int index = 0; index < strategiesCount; index++) {
                         strategies.get(index).processInstant(isInSchedule);

@@ -16,6 +16,8 @@ public class MarketDepth {
     private double midPointPrice;
     private final DecimalFormat df2;
     private int volume, previousVolume;
+    private int cumulativeBid, cumulativeAsk;
+
 
     public MarketDepth() {
         bids = new LinkedList<MarketDepthItem>();
@@ -24,6 +26,15 @@ public class MarketDepth {
         df2 = NumberFormatterFactory.getNumberFormatter(2);
     }
 
+    public synchronized String getSizes() {
+        return cumulativeBid + "-" + cumulativeAsk;
+    }
+
+    public synchronized String getTop() {
+        return bids.getFirst().getPrice() + "-" + asks.getFirst().getPrice();
+    }
+
+
     public void reset() {
         bids.clear();
         asks.clear();
@@ -31,15 +42,12 @@ public class MarketDepth {
     }
 
     private int getCumulativeSize(LinkedList<MarketDepthItem> items) {
-        Set<Double> uniquePriceLevels = new HashSet<Double>();
         int cumulativeSize = 0;
-
         for (MarketDepthItem item : items) {
-            uniquePriceLevels.add(item.getPrice());
             cumulativeSize += item.getSize();
         }
 
-        return (uniquePriceLevels.size() == 0) ? 0 : cumulativeSize / uniquePriceLevels.size();
+        return cumulativeSize;
     }
 
     public synchronized void update(int position, MarketDepthOperation operation, MarketDepthSide side, double price, int size) {
@@ -74,8 +82,9 @@ public class MarketDepth {
 
         if (operation == MarketDepthOperation.Update) {
             if (!bids.isEmpty() && !asks.isEmpty()) {
-                int cumulativeBid = getCumulativeSize(bids);
-                int cumulativeAsk = getCumulativeSize(asks);
+                cumulativeBid = getCumulativeSize(bids);
+                cumulativeAsk = getCumulativeSize(asks);
+
                 double totalDepth = cumulativeBid + cumulativeAsk;
                 if (totalDepth != 0) {
                     double balance = 100.0d * (cumulativeBid - cumulativeAsk) / totalDepth;

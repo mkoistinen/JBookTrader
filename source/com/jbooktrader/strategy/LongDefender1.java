@@ -15,9 +15,9 @@ public class LongDefender1 extends LongDefender {
 
     @Override
     public void setParams() {
-        addParam(PERIOD, 3500, 5000, 100, 4725);
-        addParam(SCALE_FACTOR, 45, 55, 5, 45);
-        addParam(ENTRY, 47, 54, 1, 49);
-        addParam(EXIT, -6, 10, 1, 4);
+        addParam(PERIOD, 2500, 9000, 100, 4725);
+        addParam(SCALE_FACTOR, 15, 125, 5, 45);
+        addParam(ENTRY, 15, 125, 1, 49);
+        addParam(EXIT, -85, 20, 1, 4);
     }
 }
