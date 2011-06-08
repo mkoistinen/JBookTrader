@@ -1,6 +1,5 @@
 echo off
 set appHome=..
-set javaHome=C:/WINDOWS/system32/
 
 set cp=%appHome%
 set cp=%cp%;%appHome%/classes
@@ -20,5 +19,5 @@ set javaOptions=-XX:+AggressiveHeap
 set mainClass=com.jbooktrader.platform.startup.JBookTrader
 
 echo on
-%javaHome%java.exe -cp "%cp%" %javaOptions% %mainClass% "%appHome%"
+java.exe -cp "%cp%" %javaOptions% %mainClass% "%appHome%"
 
