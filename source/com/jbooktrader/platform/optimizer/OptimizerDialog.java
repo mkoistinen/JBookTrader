@@ -462,7 +462,9 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
             strategy = ClassFinder.getInstance(strategyName);
             paramTableModel.setParams(strategy.getParams());
             setParamTableColumns();
-            resultsTable.setModel(new ResultsTableModel(strategy));
+            ResultsTableModel model = new ResultsTableModel(strategy);
+            resultsTable.setModel(model);
+            resultsTable.setRowSorter(new TableRowSorter<ResultsTableModel>(model));
         } catch (Exception e) {
             MessageDialog.showException(e);
         }

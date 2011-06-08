@@ -15,9 +15,9 @@ public class ShortDefender1 extends ShortDefender {
 
     @Override
     public void setParams() {
-        addParam(PERIOD, 3500, 5500, 100, 4500);
-        addParam(SCALE_FACTOR, 46, 56, 1, 51);
-        addParam(ENTRY, 35, 43, 1, 41);
-        addParam(EXIT, -2, 10, 1, 3);
+        addParam(PERIOD, 3000, 6000, 100, 4500);
+        addParam(SCALE_FACTOR, 30, 80, 1, 51);
+        addParam(ENTRY, 30, 50, 1, 41);
+        addParam(EXIT, -2, 15, 1, 3);
     }
 }

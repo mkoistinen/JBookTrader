@@ -27,7 +27,7 @@ public class ResultsTableModel extends TableDataModel {
 
     @Override
     public Class<?> getColumnClass(int c) {
-        return String.class;
+        return DoubleNumericString.class;
     }
 
     @Override
@@ -52,14 +52,14 @@ public class ResultsTableModel extends TableDataModel {
                 DecimalFormat df2 = NumberFormatterFactory.getNumberFormatter(2);
                 DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
 
-                item[column + Trades.ordinal()] = df0.format(optimizationResult.get(Trades));
-                item[column + Duration.ordinal()] = df0.format(optimizationResult.get(Duration));
-                item[column + Bias.ordinal()] = df0.format(optimizationResult.get(Bias));
-                item[column + PF.ordinal()] = df2.format(optimizationResult.get(PF));
-                item[column + PI.ordinal()] = df2.format(optimizationResult.get(PI));
-                item[column + Kelly.ordinal()] = df0.format(optimizationResult.get(Kelly));
-                item[column + MaxDD.ordinal()] = df0.format(optimizationResult.get(MaxDD));
-                item[column + NetProfit.ordinal()] = df0.format(optimizationResult.get(NetProfit));
+                item[column + Trades.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Trades)));
+                item[column + Duration.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Duration)));
+                item[column + Bias.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Bias)));
+                item[column + PF.ordinal()] = new DoubleNumericString(df2.format(optimizationResult.get(PF)));
+                item[column + PI.ordinal()] = new DoubleNumericString(df2.format(optimizationResult.get(PI)));
+                item[column + Kelly.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Kelly)));
+                item[column + MaxDD.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(MaxDD)));
+                item[column + NetProfit.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(NetProfit)));
 
                 rows.add(item);
             }
