@@ -261,6 +261,8 @@ public class PerformanceChart {
         StandardXYItemRenderer pnlRenderer = new StandardXYItemRenderer();
         pnlPlot = new XYPlot(profitAndLossCollection, dateAxis, pnlAxis, pnlRenderer);
         pnlPlot.setBackgroundPaint(BACKGROUND_COLOR);
+        pnlPlot.getRenderer().setSeriesStroke(0, new BasicStroke(2));
+        pnlPlot.getRenderer().setSeriesPaint(0, Color.GREEN);
         combinedPlot.add(pnlPlot);
 
         combinedPlot.setDomainAxis(dateAxis);

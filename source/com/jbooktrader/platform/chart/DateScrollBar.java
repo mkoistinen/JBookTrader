@@ -15,6 +15,7 @@ import java.util.*;
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
     private static final long SCALER = 10000;
+    private static final double EXTRA_MARGIN_FACTOR = 0.05; // factor above and below the min/max to produce some margin
     private final DateAxis dateAxis;
     private final CombinedDomainXYPlot combinedDomainPlot;
 
@@ -60,7 +61,24 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
                     int firstItem = itemBounds[0];
                     int lastItem = itemBounds[1];
 
-                    for (int item = firstItem; item < lastItem; item++) {
+                    int dataSetSize = dataset.getItemCount(series);
+
+                    if (dataSetSize == 0) {
+                        continue;
+                    }
+
+                    // Extend the range of applicable data to be one point before and after the range,
+                    // so that we get the lines (such as profit graph) that extend off the edges
+                    if (isOHLC) {
+                        if (firstItem != 0) {
+                            firstItem--;
+                        }
+                        if (lastItem != dataSetSize - 1) {
+                            lastItem++;
+                        }
+                    }
+
+                    for (int item = firstItem; item <= lastItem; item++) {
                         double high, low;
                         if (isOHLC) {
                             high = ohlcDataset.getHighValue(datasetNumber, item);
@@ -76,7 +94,12 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
             }
 
             if (max > min) {
-                plot.getRangeAxis().setRange(min, max);
+                if (plot.getDataset(0) instanceof OHLCDataset) {
+                    plot.getRangeAxis().setRange(min, max);
+                } else {
+                    double margin = (max - min) * EXTRA_MARGIN_FACTOR;
+                    plot.getRangeAxis().setRange(min - margin, max + margin);
+                }
             }
         }
     }
