@@ -16,7 +16,7 @@ public abstract class StrategyES extends Strategy {
     * MARGIN REQUIREMENTS for ES: GLOBEX as of 13-July-2009
     * Source: http://www.interactivebrokers.com/en/p.php?f=margin&ib_entity=llc
     *
-    * Initial Intra-day: $2,813
+    * Initial Intra-day: $2,500
     * Intra-day Maintenance: $2,250
     * Initial Overnight: $5,625
     * Overnight Maintenance: $4,500
@@ -26,7 +26,7 @@ public abstract class StrategyES extends Strategy {
         // Specify the contract to trade
         Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:30", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("10:35", "14:55", "America/New_York");
         int multiplier = 50;// contract multiplier
         double bidAskSpread = 0.25; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();

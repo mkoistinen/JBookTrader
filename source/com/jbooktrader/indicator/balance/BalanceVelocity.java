@@ -26,6 +26,6 @@ public class BalanceVelocity extends Indicator {
 
     @Override
     public void reset() {
-        fast = slow = value = 0;
+        fast = slow = marketBook.getSnapshot().getBalance();
     }
 }

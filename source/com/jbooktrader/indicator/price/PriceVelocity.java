@@ -26,6 +26,5 @@ public class PriceVelocity extends Indicator {
     @Override
     public void reset() {
         fast = slow = marketBook.getSnapshot().getPrice();
-        value = 0;
     }
 }

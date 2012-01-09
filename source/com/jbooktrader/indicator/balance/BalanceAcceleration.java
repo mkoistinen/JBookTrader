@@ -9,25 +9,25 @@ public class BalanceAcceleration extends Indicator {
     private final double fastMultiplier, intermMutiplier, slowMultiplier;
     private double fast, slow, interm;
 
-    public BalanceAcceleration(int period) {
-        super(period);
+    public BalanceAcceleration(int period, int mult) {
+        super(period, mult);
         fastMultiplier = 2.0 / (period + 1);
-        double multiplier = 2.2;
-        intermMutiplier = 2.0 / (period * multiplier + 1);
-        slowMultiplier = 2.0 / (period * 2 * multiplier + 1);
+        double multiplier = mult / 10.0;
+        intermMutiplier = 2.0 / (multiplier * period + 1);
+        slowMultiplier = 2.0 / (2 * multiplier * period + 1);
     }
 
     @Override
     public void calculate() {
-        double volume = marketBook.getSnapshot().getBalance();
-        fast += (volume - fast) * fastMultiplier;
-        interm += (volume - interm) * intermMutiplier;
-        slow += (volume - slow) * slowMultiplier;
+        double balance = marketBook.getSnapshot().getBalance();
+        fast += (balance - fast) * fastMultiplier;
+        interm += (balance - interm) * intermMutiplier;
+        slow += (balance - slow) * slowMultiplier;
         value = fast - 2 * interm + slow;
     }
 
     @Override
     public void reset() {
-        fast = slow = interm = value = 0;
+        fast = slow = interm = marketBook.getSnapshot().getBalance();
     }
 }

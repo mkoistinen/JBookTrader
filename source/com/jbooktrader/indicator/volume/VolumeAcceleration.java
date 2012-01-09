@@ -9,12 +9,12 @@ public class VolumeAcceleration extends Indicator {
     private final double fastMultiplier, intermMutiplier, slowMultiplier;
     private double fast, slow, interm;
 
-    public VolumeAcceleration(int period) {
-        super(period);
+    public VolumeAcceleration(int period, int mult) {
+        super(period, mult);
         fastMultiplier = 2.0 / (period + 1);
-        double multiplier = 2.2;
-        intermMutiplier = 2.0 / (period * multiplier + 1);
-        slowMultiplier = 2.0 / (period * 2 * multiplier + 1);
+        double multiplier = mult / 10.0;
+        intermMutiplier = 2.0 / (multiplier * period + 1);
+        slowMultiplier = 2.0 / (2 * multiplier * period + 1);
     }
 
     @Override
@@ -28,6 +28,6 @@ public class VolumeAcceleration extends Indicator {
 
     @Override
     public void reset() {
-        fast = slow = interm = value = 0;
+        fast = slow = interm = marketBook.getSnapshot().getVolume();
     }
 }

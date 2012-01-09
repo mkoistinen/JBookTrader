@@ -57,38 +57,31 @@ public class DateScrollBar extends JScrollBar implements AdjustmentListener, Axi
                 OHLCDataset ohlcDataset = isOHLC ? (OHLCDataset) dataset : null;
 
                 for (int series = 0; series < seriesCount; series++) {
+                    int datasetSize = dataset.getItemCount(series);
+                    if (datasetSize == 0) {
+                        continue;
+                    }
+
                     int[] itemBounds = RendererUtilities.findLiveItems(dataset, series, lowerBound, upperBound);
                     int firstItem = itemBounds[0];
                     int lastItem = itemBounds[1];
 
-                    int dataSetSize = dataset.getItemCount(series);
-
-                    if (dataSetSize == 0) {
-                        continue;
-                    }
-
                     // Extend the range of applicable data to be one point before and after the range,
                     // so that we get the lines (such as profit graph) that extend off the edges
-                    if (isOHLC) {
-                        if (firstItem != 0) {
-                            firstItem--;
-                        }
-                        if (lastItem != dataSetSize - 1) {
-                            lastItem++;
-                        }
+                    if (!isOHLC) {
+                        firstItem = Math.max(0, firstItem - 1);
+                        lastItem = Math.min(datasetSize - 1, lastItem + 1);
                     }
 
                     for (int item = firstItem; item <= lastItem; item++) {
-                        double high, low;
                         if (isOHLC) {
-                            high = ohlcDataset.getHighValue(datasetNumber, item);
-                            low = ohlcDataset.getLowValue(datasetNumber, item);
+                            max = Math.max(ohlcDataset.getHighValue(datasetNumber, item), max);
+                            min = Math.min(ohlcDataset.getLowValue(datasetNumber, item), min);
                         } else {
-                            high = low = dataset.getYValue(series, item);
+                            double value = dataset.getYValue(series, item);
+                            max = Math.max(value, max);
+                            min = Math.min(value, min);
                         }
-
-                        max = Math.max(high, max);
-                        min = Math.min(low, min);
                     }
                 }
             }

@@ -137,10 +137,8 @@ public class Trader extends EWrapperAdapter {
             previousErrorMessage = msg;
             eventReport.report("IB API", msg);
 
-            // Errors 1101 and 1102 are sent when connectivity is restored. However, sometimes TWS fails
-            // to send these error codes. To compensate, we also listen for error code 2104 which indicates
-            // that market data is restored, which we can interpret as restored connection.
-            boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102 || errorCode == 2104);
+            // Errors 1101 and 1102 are sent when connectivity is restored.
+            boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102);
             if (isConnectivityRestored) {
                 if (!traderAssistant.getOpenOrders().isEmpty()) {
                     eventReport.report(JBookTrader.APP_NAME, "Checking for executions while TWS was disconnected from the IB server.");
@@ -148,21 +146,17 @@ public class Trader extends EWrapperAdapter {
                 }
             }
 
-            // Error 322 occurs from time to time when the first order is submitted. The cause is unknown,
-            // it's assumed to be a bug in the IB API. When this error is generated, the order is rejected
-            // with a message such as this: Error processing request:-'ub' : cause - jextend.ub.f(ub.java:1193)
-            // To get around this problem, we simply request executions for open orders. If the order execution
-            // is not found, another order would be submitted.
-            if (errorCode == 322) {
-                if (!traderAssistant.getOpenOrders().isEmpty()) {
-                    eventReport.report(JBookTrader.APP_NAME, "Checking for executions after error 322.");
-                    traderAssistant.requestExecutions();
-                }
-            }
-
             if (errorCode == 317) {// Market depth data has been reset
                 traderAssistant.getMarketBook(id).getMarketDepth().reset();
                 eventReport.report(JBookTrader.APP_NAME, "Market data for book " + id + " has been reset.");
+            }
+
+            if (errorCode == 202) { // Order Canceled - reason:Can't handle negative priced order
+                traderAssistant.getOpenOrders().remove(id);
+                traderAssistant.resetOrderExecutionPending();
+                String reportMsg = "Removed order " + id + " because IB reported error " + errorCode + ". ";
+                reportMsg += "Another order will be submitted. The strategy will continue to run normally";
+                eventReport.report(JBookTrader.APP_NAME, reportMsg);
             }
 
             // 200: bad contract
