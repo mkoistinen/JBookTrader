@@ -11,14 +11,13 @@ import com.jbooktrader.strategy.base.*;
 /**
  *
  */
-public class SampleLongStrat extends StrategyES {
+public class Sample extends StrategyES {
 
     // Technical indicators
     private Indicator balanceVelocityInd, priceVelocityInd;
 
     // Strategy parameters names
     private static final String PERIOD = "Period";
-    private static final String MULTIPLIER = "Multiplier";
     private static final String SCALE = "Scale";
     private static final String ENTRY = "Entry";
     private static final String EXIT = "Exit";
@@ -27,7 +26,7 @@ public class SampleLongStrat extends StrategyES {
     private final int entry, exit, scale;
 
 
-    public SampleLongStrat(StrategyParams optimizationParams) throws JBookTraderException {
+    public Sample(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
 
         entry = getParam(ENTRY);
@@ -37,11 +36,10 @@ public class SampleLongStrat extends StrategyES {
 
     @Override
     public void setParams() {
-        addParam(PERIOD, 600, 3600, 5, 1210);
-        addParam(MULTIPLIER, 5, 80, 5, 17);
-        addParam(SCALE, 2, 30, 1, 17);
-        addParam(ENTRY, 25, 110, 1, 85);
-        addParam(EXIT, -20, 60, 1, 33);
+        addParam(PERIOD, 2200, 3600, 5, 3200);
+        addParam(SCALE, 5, 25, 1, 16);
+        addParam(ENTRY, 55, 120, 1, 92);
+        addParam(EXIT, -50, 0, 1, -21);
     }
 
     @Override
