@@ -39,6 +39,10 @@ public class ContractFactory {
         return makeFutureContract(symbol, exchange, MostLiquidContract.getMostLiquid());
     }
 
+    public static Contract makeNYMEXFutureContract(String symbol,String exchange) {
+        return makeFutureContract(symbol, exchange, NYMEXMostLiquid.getMostLiquid());
+    }
+
     public static Contract makeCashContract(String symbol, String currency) {
         return makeContract(symbol, "CASH", "IDEALPRO", null, currency);
     }
