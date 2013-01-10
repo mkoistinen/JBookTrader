@@ -15,7 +15,7 @@ public abstract class StrategySPY extends Strategy {
     protected StrategySPY(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeStockContract("SPY", "SMART");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:20", "15:25", "America/New_York");
         int multiplier = 1;// contract multiplier
@@ -24,4 +24,8 @@ public abstract class StrategySPY extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
     }
 
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeStockContract("SPY", "SMART");
+    }
 }

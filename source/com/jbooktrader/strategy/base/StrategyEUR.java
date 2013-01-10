@@ -18,12 +18,17 @@ public abstract class StrategyEUR extends Strategy {
     protected StrategyEUR(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("EUR", "GLOBEX");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("0:15", "23:45", "America/New_York");
         int multiplier = 125000;// contract multiplier
         double bidAskSpread = 0.0001; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
+    }
+
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeFutureContract("EUR", "GLOBEX");
     }
 }

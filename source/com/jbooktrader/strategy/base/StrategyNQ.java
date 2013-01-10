@@ -24,7 +24,7 @@ public abstract class StrategyNQ extends Strategy {
     protected StrategyNQ(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("NQ", "GLOBEX");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:30", "America/New_York");
         int multiplier = 20;// contract multiplier
@@ -33,4 +33,8 @@ public abstract class StrategyNQ extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
     }
 
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeFutureContract("NQ", "GLOBEX");
+    }
 }

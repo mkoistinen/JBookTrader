@@ -15,7 +15,7 @@ public abstract class StrategyQQQ extends Strategy {
     protected StrategyQQQ(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeStockContract("QQQ", "SMART");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:20", "15:25", "America/New_York");
         int multiplier = 1;// contract multiplier
@@ -24,4 +24,8 @@ public abstract class StrategyQQQ extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
     }
 
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeStockContract("QQQ", "SMART");
+    }
 }

@@ -25,12 +25,17 @@ public abstract class StrategyCL extends Strategy {
     protected StrategyCL(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeNYMEXFutureContract("CL", "NYMEX");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:35", "14:55", "America/New_York");
         int multiplier = 1000;// contract 1000 barrels
         double bidAskSpread = 0.01; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
+    }
+
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeNYMEXFutureContract("CL", "NYMEX");
     }
 }

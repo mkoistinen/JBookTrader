@@ -12,6 +12,10 @@ import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
 
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Base class for all classes that implement trading strategies.
  */
@@ -29,6 +33,11 @@ public abstract class Strategy implements Comparable<Strategy> {
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
     private double bidAskSpread;
+    private Date lastContractCheck;
+
+    private static int HOUR_IN_MS = 1000*60*60;
+
+    private final static Logger LOGGER = Logger.getLogger(Strategy.class.getName());
 
     /**
      * Framework calls this method when a new snapshot of the limit order book is taken.
@@ -44,6 +53,16 @@ public abstract class Strategy implements Comparable<Strategy> {
      * Framework calls this method to instantiate indicators.
      */
     public abstract void setIndicators();
+
+    /**
+     * Framework calls this to check and replace contract if needed
+     * optional override
+     */
+    public Contract getNewContract() {
+        String msg = "getNewContract was not implemented by Strategy, override getNewContract to be sure you end up with proper contract every day.";
+        eventReport.report(name, msg);
+        return contract; // default impl returns existing contract, no check is done
+    }
 
     protected Strategy(StrategyParams params) {
         this.params = params;
@@ -123,6 +142,7 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     protected void setStrategy(Contract contract, TradingSchedule tradingSchedule, int multiplier, Commission commission, double bidAskSpread) {
         this.contract = contract;
+        lastContractCheck = new Date(); // set this, as our contract is valid now, just created
         contract.m_multiplier = String.valueOf(multiplier);
         this.tradingSchedule = tradingSchedule;
         performanceManager = new PerformanceManager(this, multiplier, commission);
@@ -161,8 +181,26 @@ public abstract class Strategy implements Comparable<Strategy> {
             }
         } else {
             closePosition();// force flat position
+            // check if we have a current position, because it may take time to close, if zero, replace contract if needed
+            if (positionManager.getCurrentPosition() == 0)
+            {
+                // checking only after trading hours, and after positions are all closed
+                Date now = new Date();
+                if (lastContractCheck == null || (lastContractCheck.getTime() < now.getTime() - HOUR_IN_MS)) {
+                    LOGGER.log(Level.FINEST,"Checking contract");
+                    Contract newContract = getNewContract();
+                    lastContractCheck = now;
+                    if (!contract.m_expiry.equals(newContract.m_expiry)) {
+                        // need to switch contracts, should be ok, we have no open positions and we are not in side trading hours
+                        String msg = "Switching Contract from" + contract.m_symbol+"-"+contract.m_expiry + "to " + newContract.m_symbol+"-"+newContract.m_expiry;
+                        eventReport.report(name, msg);
+                        contract = newContract;
+                    }
+                }
+            }
         }
     }
+
 
     public void process() {
         if (!marketBook.isEmpty()) {

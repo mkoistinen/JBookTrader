@@ -24,7 +24,7 @@ public abstract class StrategyYM extends Strategy {
     protected StrategyYM(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("YM", "ECBOT");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:55", "America/New_York");
         int multiplier = 5;// contract multiplier
@@ -33,4 +33,8 @@ public abstract class StrategyYM extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
     }
 
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeFutureContract("YM", "ECBOT");
+    }
 }

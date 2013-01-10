@@ -24,12 +24,17 @@ public abstract class StrategyZB extends Strategy {
     protected StrategyZB(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeFutureContract("ZB", "ECBOT");
+        Contract contract = getNewContract();
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:30", "America/New_York");
         int multiplier = 1000;// contract multiplier
         double bidAskSpread = 0.03125; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
+    }
+
+    @Override
+    public Contract getNewContract() {
+        return ContractFactory.makeFutureContract("ZB", "ECBOT");
     }
 }
