@@ -4,7 +4,6 @@ import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -17,6 +16,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+
 /**
  * Dialog to specify options for back testing using a historical data file.
  */
@@ -28,7 +29,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
     private JTextFieldDateEditor fromDateEditor, toDateEditor;
     private JCheckBox useDateRangeCheckBox;
     private JPanel fromDatePanel, toDatePanel;
-    private JComboBox barSizeCombo;
+    private JComboBox<String> barSizeCombo;
     private JLabel toLabel;
     private JProgressBar progressBar;
     private boolean isCancelled;
@@ -93,8 +94,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
                     Strategy strategyInstance = ClassFinder.getInstance(strategyName);
                     BackTestStrategyRunner btsr = new BackTestStrategyRunner(BackTestDialog.this, strategyInstance);
                     new Thread(btsr).start();
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     MessageDialog.showException(ex);
                 }
             }
@@ -192,7 +192,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         SpringUtilities.makeOneLineGrid(dateRangePanel);
 
         JPanel barSizePanel = new JPanel(new SpringLayout());
-        barSizeCombo = new JComboBox();
+        barSizeCombo = new JComboBox<String>();
         for (BarSize barSize : BarSize.values()) {
             barSizeCombo.addItem(barSize.getName());
         }
