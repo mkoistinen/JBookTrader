@@ -1,13 +1,11 @@
 package com.jbooktrader.strategy;
 
-import com.jbooktrader.indicator.balance.BalanceVelocity;
-import com.jbooktrader.indicator.price.PriceKalman;
-import com.jbooktrader.indicator.price.PriceVelocity;
-import com.jbooktrader.platform.indicator.Indicator;
-import com.jbooktrader.platform.model.JBookTraderException;
-import com.jbooktrader.platform.optimizer.StrategyParams;
-import com.jbooktrader.strategy.base.StrategyCL;
-import com.jbooktrader.strategy.base.StrategyES;
+import com.jbooktrader.indicator.balance.*;
+import com.jbooktrader.indicator.price.*;
+import com.jbooktrader.platform.indicator.*;
+import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.optimizer.*;
+import com.jbooktrader.strategy.base.*;
 
 
 /**
@@ -44,7 +42,7 @@ public class SampleCL extends StrategyCL {
         addParam(SCALE, 5, 25, 1, 25);
         addParam(ENTRY, 55, 120, 1, 95);
         addParam(EXIT, -50, 0, 1, 0);
-        addParam(NOISE, 1, 50 , 1 , 2);
+        addParam(NOISE, 1, 50, 1, 2);
     }
 
     @Override
