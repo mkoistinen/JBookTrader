@@ -2,13 +2,14 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.preferences.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 public class AdvancedOptimizationOptionsDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
