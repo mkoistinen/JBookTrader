@@ -7,6 +7,8 @@ import com.jbooktrader.platform.util.*;
 /**
  * Runs a trading strategy in the back testing mode using a file containing
  * historical market data.
+ *
+ * @author Eugene Kononov
  */
 public class BackTestStrategyRunner implements Runnable {
     private final BackTestDialog backTestDialog;

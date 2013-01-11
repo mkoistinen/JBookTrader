@@ -12,6 +12,8 @@ import java.util.*;
  * expiration), the 200609 contract had more volume than the 200606 contract.
  * <p/>
  * This utility calculates the most liquid contract traded as of given date.
+ *
+ * @author Eugene Kononov
  */
 public class MostLiquidContract {
     private static final Map<Integer, Integer> frontMonths = new HashMap<Integer, Integer>();

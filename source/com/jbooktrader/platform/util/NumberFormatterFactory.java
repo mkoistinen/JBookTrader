@@ -2,6 +2,9 @@ package com.jbooktrader.platform.util;
 
 import java.text.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class NumberFormatterFactory {
 
     public static DecimalFormat getNumberFormatter(int maxFractionDigits) {

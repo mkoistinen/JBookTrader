@@ -5,6 +5,8 @@ import com.jbooktrader.platform.strategy.*;
 
 /**
  * Encapsulates the order execution information.
+ *
+ * @author Eugene Kononov
  */
 public class OpenOrder {
     private final int id;

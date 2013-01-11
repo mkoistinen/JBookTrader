@@ -27,6 +27,8 @@ import java.util.*;
  * -- close open positions at 12:00 EST
  * -- resume trading at 13:00 EST
  * -- close open positions at 15:45 EST
+ *
+ * @author Eugene Kononov
  */
 public class TradingSchedule {
     private static final String LINE_SEP = System.getProperty("line.separator");

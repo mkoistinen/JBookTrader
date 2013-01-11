@@ -13,6 +13,8 @@ import java.util.*;
 
 /**
  * This class is responsible for running the strategy against historical market data
+ *
+ * @author Eugene Kononov
  */
 public class BackTester {
     private final Strategy strategy;

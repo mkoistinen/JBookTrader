@@ -4,6 +4,8 @@ import com.ib.client.*;
 
 /**
  * Provides convenience methods to create stock, futures, and Forex contracts
+ *
+ * @author Eugene Kononov
  */
 public class ContractFactory {
 

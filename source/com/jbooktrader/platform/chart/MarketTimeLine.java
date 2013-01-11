@@ -6,7 +6,9 @@ import org.jfree.data.xy.*;
 
 import java.util.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public class MarketTimeLine {
     /**
      * Gaps less than MAX_GAP will be ignored, gaps greater than MAX_GAP will be removed

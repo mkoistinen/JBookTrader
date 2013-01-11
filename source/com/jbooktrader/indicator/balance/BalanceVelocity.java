@@ -3,7 +3,8 @@ package com.jbooktrader.indicator.balance;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Velocity of balance in the market limit order book
+ * @author Eugene Kononov
+ *         Velocity of balance in the market limit order book
  */
 public class BalanceVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;

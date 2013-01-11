@@ -10,6 +10,8 @@ import java.util.concurrent.*;
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
  * historical market snapshots.
+ *
+ * @author Eugene Kononov
  */
 public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 

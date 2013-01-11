@@ -26,6 +26,8 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
+ *
+ * @author Eugene Kononov
  */
 public class OptimizerDialog extends JBTDialog implements ProgressListener {
     private final PreferencesHolder prefs;

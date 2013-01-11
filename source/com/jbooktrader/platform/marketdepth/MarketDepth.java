@@ -8,6 +8,8 @@ import java.util.*;
 
 /**
  * Holds history of market snapshots for a trading instrument.
+ *
+ * @author Eugene Kononov
  */
 public class MarketDepth {
     private final LinkedList<MarketDepthItem> bids, asks;

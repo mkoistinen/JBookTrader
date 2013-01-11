@@ -5,6 +5,8 @@ import com.jbooktrader.platform.util.movingwindow.*;
 
 /**
  * Price volatility
+ *
+ * @author Eugene Kononov
  */
 public class PriceVolatility extends Indicator {
     private final MovingWindowStDev prices;

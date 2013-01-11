@@ -4,6 +4,9 @@ import org.jfree.chart.*;
 
 import java.awt.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class ChartMonitor extends ChartPanel {
     public ChartMonitor(JFreeChart chart) {
         super(chart, true);

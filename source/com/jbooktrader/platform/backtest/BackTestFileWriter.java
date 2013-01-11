@@ -13,6 +13,8 @@ import java.util.*;
 /**
  * Writes historical market data to a file which is used for
  * back testing and optimization of trading strategies.
+ *
+ * @author Eugene Kononov
  */
 public class BackTestFileWriter {
     private static final String FILE_SEP = System.getProperty("file.separator");

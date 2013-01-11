@@ -9,6 +9,10 @@ import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 
+
+/**
+ * @author Eugene Kononov
+ */
 public class ClassFinder {
 
     /**

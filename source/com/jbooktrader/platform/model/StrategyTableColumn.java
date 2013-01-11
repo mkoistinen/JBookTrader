@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.model;
 
+/**
+ * @author Eugene Kononov
+ */
 public enum StrategyTableColumn {
     Strategy("Strategy"),
     Symbol("Symbol"),

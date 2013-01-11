@@ -2,6 +2,8 @@ package com.jbooktrader.platform.util;
 
 /**
  * A container holding time and the value.
+ *
+ * @author Eugene Kononov
  */
 public class TimedValue {
     private final long time;

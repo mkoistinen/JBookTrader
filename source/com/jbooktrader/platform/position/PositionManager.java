@@ -12,6 +12,8 @@ import java.util.*;
 
 /**
  * Position manager keeps track of current positions and executions.
+ *
+ * @author Eugene Kononov
  */
 public class PositionManager {
     private final LinkedList<Position> positionsHistory;

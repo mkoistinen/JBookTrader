@@ -23,6 +23,8 @@ import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 /**
  * Runs a trading strategy in the optimizer mode using a data file containing
  * historical market snapshots.
+ *
+ * @author Eugene Kononov
  */
 public abstract class OptimizerRunner implements Runnable {
     protected final List<OptimizationResult> optimizationResults;

@@ -2,6 +2,9 @@ package com.jbooktrader.platform.marketdepth;
 
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public enum MarketDepthSide {
 
     Ask(0), Bid(1);

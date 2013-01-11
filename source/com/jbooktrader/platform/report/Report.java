@@ -4,7 +4,9 @@ import com.jbooktrader.platform.startup.*;
 
 import java.io.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public abstract class Report {
     protected static final String FIELD_START = "<td>";
     protected static final String FIELD_END = "</td>";

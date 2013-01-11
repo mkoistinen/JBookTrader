@@ -4,11 +4,7 @@ import java.text.*;
 import java.util.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: marcus
- * Date: 1/8/13
- * Time: 11:26 PM
- * To change this template use File | Settings | File Templates.
+ * @author marcus
  */
 public class NYMEXMostLiquid {
 

@@ -3,6 +3,9 @@ package com.jbooktrader.platform.test;
 import com.jbooktrader.platform.util.movingwindow.*;
 import org.junit.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class MovingWindowTest {
     private final double delta = 0;
 

@@ -6,8 +6,9 @@ import org.junit.*;
 
 /**
  * unit tests for com.jbooktrader.platform.marketbook.MarketBook
+ *
+ * @author Eugene Kononov
  */
-
 public class MarketBookTest {
 
     /**

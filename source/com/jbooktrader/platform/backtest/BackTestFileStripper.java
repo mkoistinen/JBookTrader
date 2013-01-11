@@ -8,6 +8,8 @@ import java.util.*;
 /**
  * Reads a data file containing historical market depth records, and creates another file,
  * which contains only the records within the specified time frame.
+ *
+ * @author Eugene Kononov
  */
 public class BackTestFileStripper {
     public static final int SECONDS_IN_HOUR = 3600;

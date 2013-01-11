@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.preferences;
 
+/**
+ * @author Eugene Kononov
+ */
 public enum JBTPreferences {
     // TWS connection
     Host("Host", "localhost"),

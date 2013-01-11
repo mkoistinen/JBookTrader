@@ -2,6 +2,8 @@ package com.jbooktrader.platform.chart;
 
 /**
  * Encapsulates the price/indicator bar information.
+ *
+ * @author Eugene Kononov
  */
 public class Bar {
     private final long time;

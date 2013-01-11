@@ -4,6 +4,8 @@ import com.jbooktrader.platform.util.*;
 
 /**
  * A string wrapper class that has a sorting algorithm for Doubles (including positive infinity).
+ *
+ * @author Eugene Kononov
  */
 public class DoubleNumericString implements Comparable<DoubleNumericString> {
     private final String value;

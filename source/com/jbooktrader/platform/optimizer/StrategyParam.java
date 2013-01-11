@@ -1,11 +1,12 @@
 package com.jbooktrader.platform.optimizer;
 
 /**
+ * @author Eugene Kononov
  */
 public class StrategyParam {
+    private final String name;
     private int min, max;
     private int value, step;
-    private final String name;
 
     public StrategyParam(String name, int min, int max, int step, int value) {
         this.name = name;
@@ -41,12 +42,24 @@ public class StrategyParam {
         return min;
     }
 
+    public void setMin(int min) {
+        this.min = min;
+    }
+
     public int getMax() {
         return max;
     }
 
+    public void setMax(int max) {
+        this.max = max;
+    }
+
     public int getStep() {
         return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 
     public int getValue() {
@@ -55,17 +68,5 @@ public class StrategyParam {
 
     public void setValue(int value) {
         this.value = value;
-    }
-
-    public void setStep(int step) {
-        this.step = step;
-    }
-
-    public void setMin(int min) {
-        this.min = min;
-    }
-
-    public void setMax(int max) {
-        this.max = max;
     }
 }

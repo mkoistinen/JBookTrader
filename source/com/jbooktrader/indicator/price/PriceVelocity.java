@@ -4,6 +4,8 @@ import com.jbooktrader.platform.indicator.*;
 
 /**
  * Velocity of price
+ *
+ * @author Eugene Kononov
  */
 public class PriceVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;

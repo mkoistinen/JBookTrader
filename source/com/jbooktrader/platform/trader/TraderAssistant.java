@@ -16,7 +16,9 @@ import java.util.*;
 
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public class TraderAssistant {
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;

@@ -7,7 +7,9 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public class EventReport extends Report {
     private boolean isEnabled;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");

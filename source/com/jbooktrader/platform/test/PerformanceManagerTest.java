@@ -13,6 +13,9 @@ import org.junit.*;
 
 import static org.junit.Assert.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class PerformanceManagerTest {
 
     private class DummyStrategy extends Strategy {

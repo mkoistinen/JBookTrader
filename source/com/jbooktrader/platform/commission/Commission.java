@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.commission;
 
 /**
+ * @author Eugene Kononov
  */
 public class Commission {
     private final double rate, minimum, maximumPercent;

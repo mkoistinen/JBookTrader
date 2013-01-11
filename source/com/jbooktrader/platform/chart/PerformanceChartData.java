@@ -11,6 +11,8 @@ import java.util.*;
 
 /**
  * Encapsulates performance chart data.
+ *
+ * @author Eugene Kononov
  */
 public class PerformanceChartData {
     private final TimeSeries netProfit;

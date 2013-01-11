@@ -3,6 +3,9 @@ package com.jbooktrader.platform.model;
 import javax.swing.table.*;
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class TableDataModel extends AbstractTableModel {
     protected final List<Object> rows;
     private String[] schema;

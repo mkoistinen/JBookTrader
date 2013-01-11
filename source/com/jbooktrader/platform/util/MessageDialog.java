@@ -7,6 +7,8 @@ import javax.swing.*;
 
 /**
  * Utility class to display message and error dialogs.
+ *
+ * @author Eugene Kononov
  */
 public class MessageDialog {
 

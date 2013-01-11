@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.backtest;
 
+/**
+ * @author Eugene Kononov
+ */
 public interface ProgressListener {
     void setProgress(String progressText);
 

@@ -14,6 +14,8 @@ import java.util.*;
 
 /**
  * Acts as the dispatcher of the services.
+ *
+ * @author Eugene Kononov
  */
 public class Dispatcher {
     private static Dispatcher instance;

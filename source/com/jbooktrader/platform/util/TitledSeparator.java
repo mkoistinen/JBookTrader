@@ -3,7 +3,9 @@ package com.jbooktrader.platform.util;
 import javax.swing.*;
 import java.awt.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public class TitledSeparator extends JPanel {
     public TitledSeparator(Component component) {
         component.setFont(component.getFont().deriveFont(Font.BOLD));

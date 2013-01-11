@@ -10,6 +10,8 @@ import java.nio.channels.*;
 
 /**
  * Application starter.
+ *
+ * @author Eugene Kononov
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";

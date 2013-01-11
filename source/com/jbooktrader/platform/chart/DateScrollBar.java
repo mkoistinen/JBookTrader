@@ -12,6 +12,8 @@ import java.util.*;
 
 /**
  * Scroll bar for a combined chart where the horizontal axis represents dates
+ *
+ * @author Eugene Kononov
  */
 public class DateScrollBar extends JScrollBar implements AdjustmentListener, AxisChangeListener {
     private static final long SCALER = 10000;

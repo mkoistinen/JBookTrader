@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.marketdepth;
 
+/**
+ * @author Eugene Kononov
+ */
 public class MarketDepthItem {
     private int size;
     private double price;

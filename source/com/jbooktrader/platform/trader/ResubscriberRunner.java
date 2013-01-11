@@ -5,6 +5,9 @@ import com.jbooktrader.platform.strategy.*;
 
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class ResubscriberRunner implements Runnable {
     public void run() {
         Dispatcher dispatcher = Dispatcher.getInstance();

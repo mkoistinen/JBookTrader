@@ -4,6 +4,8 @@ import com.jbooktrader.platform.performance.*;
 
 /**
  * Optimization result.
+ *
+ * @author Eugene Kononov
  */
 public class OptimizationResult {
     private final double netProfit, maxDrawdown, profitFactor, performanceIndex, kellyCriterion, cpi, aveDuration, bias;

@@ -4,6 +4,8 @@ import com.jbooktrader.platform.model.*;
 
 /**
  * Strategy parameters table model.
+ *
+ * @author Eugene Kononov
  */
 public class ParamTableModel extends TableDataModel {
     private static final String[] SCHEMA = {"Parameter", "Min Value", "Max Value", "Step"};

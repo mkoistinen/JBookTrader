@@ -3,7 +3,8 @@ package com.jbooktrader.indicator.balance;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Exponential moving average of the balance in the limit order book.
+ * @author Eugene Kononov
+ *         Exponential moving average of the balance in the limit order book.
  */
 public class BalanceEMA extends Indicator {
     private final double multiplier;

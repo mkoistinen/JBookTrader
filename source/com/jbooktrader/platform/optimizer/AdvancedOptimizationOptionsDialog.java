@@ -11,6 +11,9 @@ import java.util.*;
 
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class AdvancedOptimizationOptionsDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 22);
     private final PreferencesHolder prefs;

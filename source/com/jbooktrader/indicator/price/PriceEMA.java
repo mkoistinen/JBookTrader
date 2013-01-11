@@ -2,6 +2,9 @@ package com.jbooktrader.indicator.price;
 
 import com.jbooktrader.platform.indicator.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class PriceEMA extends Indicator {
 
     private final double alpha;

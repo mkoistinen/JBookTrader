@@ -9,7 +9,7 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 /**
- *
+ * @author marcus
  */
 public abstract class StrategyCL extends Strategy {
     /*

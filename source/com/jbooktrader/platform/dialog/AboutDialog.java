@@ -12,6 +12,8 @@ import java.util.*;
 
 /**
  * Dialog to show the application info, system info, and IB API info.
+ *
+ * @author Eugene Kononov
  */
 public class AboutDialog extends JBTDialog {
 

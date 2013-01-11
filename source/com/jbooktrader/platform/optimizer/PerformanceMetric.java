@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.optimizer;
 
+/**
+ * @author Eugene Kononov
+ */
 public enum PerformanceMetric {
     Trades("Trades"),
     Duration("Duration"),

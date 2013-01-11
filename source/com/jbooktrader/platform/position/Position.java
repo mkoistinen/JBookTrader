@@ -2,6 +2,8 @@ package com.jbooktrader.platform.position;
 
 /**
  * Encapsulates the strategy position information
+ *
+ * @author Eugene Kononov
  */
 public class Position {
     private final int position;

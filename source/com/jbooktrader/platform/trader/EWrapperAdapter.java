@@ -6,6 +6,8 @@ import com.ib.client.*;
  * Adapter pattern: provides empty implementation for all the methods in the
  * interface, so that the implementing classes can selectively override only
  * the needed methods.
+ *
+ * @author Eugene Kononov
  */
 public class EWrapperAdapter implements EWrapper {
     public void error(Exception e) {

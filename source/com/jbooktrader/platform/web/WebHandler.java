@@ -13,6 +13,9 @@ import java.net.*;
 import java.text.*;
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class WebHandler implements HttpHandler {
     private static final DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
     private static final DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);

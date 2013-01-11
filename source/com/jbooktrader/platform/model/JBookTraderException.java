@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.model;
 
+/**
+ * @author Eugene Kononov
+ */
 public class JBookTraderException extends Exception {
     public JBookTraderException(String message) {
         super(message);

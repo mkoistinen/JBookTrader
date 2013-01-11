@@ -2,6 +2,8 @@ package com.jbooktrader.platform.chart;
 
 /**
  * Bar sizes for performance charts
+ *
+ * @author Eugene Kononov
  */
 public enum BarSize {
     Second5("5 seconds", 5),

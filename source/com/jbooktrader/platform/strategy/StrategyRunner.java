@@ -7,6 +7,9 @@ import com.jbooktrader.platform.util.*;
 
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class StrategyRunner {
     private final Collection<Strategy> strategies;
     private Collection<MarketBook> marketBooks;

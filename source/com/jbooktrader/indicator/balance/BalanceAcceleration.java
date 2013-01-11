@@ -3,7 +3,8 @@ package com.jbooktrader.indicator.balance;
 import com.jbooktrader.platform.indicator.*;
 
 /**
- * Balance acceleration
+ * @author Eugene Kononov
+ *         Balance acceleration
  */
 public class BalanceAcceleration extends Indicator {
     private final double fastMultiplier, intermMultiplier, slowMultiplier;

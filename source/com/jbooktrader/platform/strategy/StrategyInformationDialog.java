@@ -13,6 +13,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.text.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class StrategyInformationDialog extends JBTDialog implements ModelListener {
     private final Strategy strategy;
     private JLabel cumBidAskSizesLabel, bidAskLabel;

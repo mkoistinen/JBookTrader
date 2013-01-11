@@ -5,6 +5,7 @@ import com.jbooktrader.platform.marketbook.*;
 import java.util.*;
 
 /**
+ * @author Eugene Kononov
  */
 public class IndicatorManager {
     private static final long GAP_SIZE = 5 * 60 * 1000;// 5 minutes

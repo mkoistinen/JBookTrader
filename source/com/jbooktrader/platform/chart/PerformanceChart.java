@@ -26,8 +26,9 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 /**
  * Multi-plot strategy performance chart which combines price,
  * indicators, executions, and net profit.
+ *
+ * @author Eugene Kononov
  */
-
 public class PerformanceChart {
     private static final int PRICE_PLOT_WEIGHT = 3;
     private static final Paint BACKGROUND_COLOR = new GradientPaint(0, 0, new Color(0, 0, 176), 0, 0, Color.BLACK);

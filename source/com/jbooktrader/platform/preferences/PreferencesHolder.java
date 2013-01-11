@@ -2,6 +2,9 @@ package com.jbooktrader.platform.preferences;
 
 import java.util.prefs.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class PreferencesHolder {
     private static PreferencesHolder instance;
     private final Preferences prefs;

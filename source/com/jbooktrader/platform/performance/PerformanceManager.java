@@ -12,12 +12,13 @@ import java.util.*;
 /**
  * Performance manager evaluates trading strategy performance based on statistics
  * which include various factors, such as net profit, maximum draw down, profit factor, etc.
+ *
+ * @author Eugene Kononov
  */
 public class PerformanceManager {
     private final int multiplier;
     private final Commission commission;
     private final Strategy strategy;
-
     private PerformanceChartData performanceChartData;
     private int trades, profitableTrades, previousPosition;
     private double tradeCommission, totalCommission;
@@ -32,7 +33,6 @@ public class PerformanceManager {
     private long timeInMarketStart, timeInMarket;
     private long longTrades, shortTrades;
     //private List<Double> allTrades;
-
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
@@ -60,7 +60,6 @@ public class PerformanceManager {
         return 100 * (longTrades - shortTrades) / (double) trades;
     }
 
-
     public double getAveDuration() {
         if (trades == 0) {
             return 0;
@@ -68,7 +67,6 @@ public class PerformanceManager {
         // average number of minutes per trade
         return (double) timeInMarket / (trades * 1000 * 60);
     }
-
 
     public boolean getIsCompletedTrade() {
         return isCompletedTrade;
@@ -136,7 +134,6 @@ public class PerformanceManager {
         cpi /= 100000;
         return cpi;
     }
-
 
     public double getPerformanceIndex() {
 

@@ -2,6 +2,7 @@ package com.jbooktrader.platform.marketbook;
 
 
 /**
+ * @author Eugene Kononov
  */
 public class MarketSnapshot {
     private final long time;

@@ -7,6 +7,9 @@ import com.toedter.calendar.*;
 
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class MarketSnapshotFilter {
     private final long fromDate, toDate;
 

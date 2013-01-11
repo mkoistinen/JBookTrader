@@ -3,7 +3,9 @@ package com.jbooktrader.platform.dialog;
 import javax.swing.*;
 import java.awt.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public class JBTDialog extends JDialog {
     public static final double MAC_MENUBAR_HEIGHT = 22;
 

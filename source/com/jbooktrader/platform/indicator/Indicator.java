@@ -5,6 +5,8 @@ import com.jbooktrader.platform.marketbook.*;
 
 /**
  * Base class for all classes implementing technical indicators.
+ *
+ * @author Eugene Kononov
  */
 public abstract class Indicator {
     private final String key;

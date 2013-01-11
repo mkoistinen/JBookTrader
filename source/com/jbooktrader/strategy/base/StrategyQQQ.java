@@ -9,7 +9,7 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 /**
- *
+ * @author Eugene Kononov
  */
 public abstract class StrategyQQQ extends Strategy {
     protected StrategyQQQ(StrategyParams optimizationParams) throws JBookTraderException {

@@ -1,5 +1,8 @@
 package com.jbooktrader.platform.util.movingwindow;
 
+/**
+ * @author Eugene Kononov
+ */
 public class MovingWindowCorrelation {
     private class Pair {
         public final double value1, value2;

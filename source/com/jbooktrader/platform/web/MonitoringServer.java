@@ -12,6 +12,9 @@ import java.util.concurrent.*;
 
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class MonitoringServer {
     private static HttpServer server;
 

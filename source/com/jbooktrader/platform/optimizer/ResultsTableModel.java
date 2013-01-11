@@ -12,6 +12,8 @@ import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
 
 /**
  * Optimization results table model
+ *
+ * @author Eugene Kononov
  */
 public class ResultsTableModel extends TableDataModel {
     public ResultsTableModel(Strategy strategy) {

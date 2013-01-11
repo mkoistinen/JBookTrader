@@ -3,6 +3,8 @@ package com.jbooktrader.platform.util.movingwindow;
 /**
  * For reference, see "Rapid calculation methods" section in this document:
  * http://en.wikipedia.org/wiki/Standard_deviation
+ *
+ * @author Eugene Kononov
  */
 public class MovingWindowStDev extends MovingWindow {
     private double sum, sumSquared;

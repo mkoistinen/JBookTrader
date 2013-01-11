@@ -4,6 +4,8 @@ import com.jbooktrader.platform.indicator.*;
 
 /**
  * Velocity of volume
+ *
+ * @author Eugene Kononov
  */
 public class VolumeVelocity extends Indicator {
     private final double fastMultiplier, slowMultiplier;

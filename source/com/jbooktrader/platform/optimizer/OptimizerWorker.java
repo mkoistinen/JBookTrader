@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
+ * @author Eugene Kononov
  */
 public class OptimizerWorker implements Callable<List<OptimizationResult>> {
     private final OptimizerRunner optimizerRunner;

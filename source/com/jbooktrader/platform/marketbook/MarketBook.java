@@ -8,6 +8,8 @@ import java.util.*;
 
 /**
  * Holds history of market snapshots for a trading instrument.
+ *
+ * @author Eugene Kononov
  */
 public class MarketBook {
     private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour

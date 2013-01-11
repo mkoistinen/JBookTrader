@@ -9,7 +9,7 @@ import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
 
 /**
- *
+ * @author Eugene Kononov
  */
 public abstract class StrategyNQ extends Strategy {
     /*

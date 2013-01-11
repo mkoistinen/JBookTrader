@@ -1,6 +1,9 @@
 package com.jbooktrader.platform.commission;
 
 
+/**
+ * @author Eugene Kononov
+ */
 public class CommissionFactory {
 
     private static Commission getCommission(double rate, double min) {

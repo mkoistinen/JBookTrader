@@ -5,6 +5,8 @@ import com.jbooktrader.platform.util.movingwindow.*;
 
 /**
  * Velocity of volume
+ *
+ * @author Eugene Kononov
  */
 public class VolumeVelocitySMA extends Indicator {
     private final MovingWindowMean fast, slow;

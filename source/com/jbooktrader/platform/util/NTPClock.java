@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.*;
  * http://www.faqs.org/ftp/rfc/rfc1305.pdf
  * <p/>
  * NTPClock does not synchronize the computer's clock, but merely uses NTP time to timestamp incoming market data.
+ *
+ * @author Eugene Kononov
  */
 public class NTPClock {
     private static final String ERROR_MSG = "Problem while requesting time from server ";

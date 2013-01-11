@@ -10,6 +10,8 @@ import java.util.*;
 /**
  * Reads and validates a data file containing historical market depth records.
  * The data file is used for back testing and optimization of trading strategies.
+ *
+ * @author Eugene Kononov
  */
 public class BackTestFileReader {
     public static final int COLUMNS = 5;
@@ -127,6 +129,14 @@ public class BackTestFileReader {
             String msg = "Timestamp of this line is before or the same as the timestamp of the previous line.";
             throw new JBookTraderException(msg);
         }
+
+        /*
+        //ekk
+        if (time - previousTime != 1000) {
+            System.out.println(line);
+        }
+        */
+
 
         double balance = Double.parseDouble(tokens.get(2));
         double price = Double.parseDouble(tokens.get(3));

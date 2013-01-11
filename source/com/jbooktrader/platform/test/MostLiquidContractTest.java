@@ -7,8 +7,9 @@ import java.util.*;
 
 /**
  * unit tests for com.jbooktrader.platform.marketbook.MarketBook
+ *
+ * @author Eugene Kononov
  */
-
 public class MostLiquidContractTest {
 
     @Test
