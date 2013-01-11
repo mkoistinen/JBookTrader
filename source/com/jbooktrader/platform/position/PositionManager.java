@@ -3,6 +3,7 @@ package com.jbooktrader.platform.position;
 import com.ib.client.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.portfolio.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
@@ -42,11 +43,14 @@ public class PositionManager {
     }
 
     public void setTargetPosition(int targetPosition) {
+        boolean isNewTargetPosition = (targetPosition != this.targetPosition);
         this.targetPosition = targetPosition;
-    }
-
-    public void setAvgFillPrice(double avgFillPrice) {
-        this.avgFillPrice = avgFillPrice;
+        if (targetPosition != currentPosition && isNewTargetPosition) {
+            Mode mode = Dispatcher.getInstance().getMode();
+            if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+                eventReport.report(strategy.getName(), "Target position is set to " + targetPosition);
+            }
+        }
     }
 
     public double getAvgFillPrice() {
@@ -91,6 +95,13 @@ public class PositionManager {
             strategy.getStrategyReportManager().report();
         }
 
+
+        if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+            PortfolioManager portfolioManager = Dispatcher.getInstance().getPortfolioManager();
+            portfolioManager.update(strategy.getName(), currentPosition);
+        }
+
+
         if (mode == Mode.ForwardTest || mode == Mode.Trade) {
             StringBuilder msg = new StringBuilder();
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");
@@ -101,11 +112,13 @@ public class PositionManager {
     }
 
     public void trade() {
-        int quantity = targetPosition - currentPosition;
-        if (quantity != 0) {
-            String action = (quantity > 0) ? "BUY" : "SELL";
-            Contract contract = strategy.getContract();
-            traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);
+        if (strategy.getMarketBook().isExchangeOpen()) {
+            int quantity = targetPosition - currentPosition;
+            if (quantity != 0) {
+                String action = (quantity > 0) ? "BUY" : "SELL";
+                Contract contract = strategy.getContract();
+                traderAssistant.placeMarketOrder(contract, Math.abs(quantity), action, strategy);
+            }
         }
     }
 }
