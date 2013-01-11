@@ -13,6 +13,8 @@ import com.jbooktrader.platform.strategy.*;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class TraderAssistant {
@@ -30,8 +32,10 @@ public class TraderAssistant {
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isOrderExecutionPending;
 
+    private Logger LOGGER = Logger.getLogger(TraderAssistant.class.getName());
 
     public TraderAssistant(Trader trader) {
+        LOGGER.log(Level.FINEST,"TraderAssistant Started");
         this.trader = trader;
         dispatcher = Dispatcher.getInstance();
         eventReport = dispatcher.getEventReport();
@@ -147,6 +151,7 @@ public class TraderAssistant {
     }
 
     public synchronized MarketBook createMarketBook(Strategy strategy) {
+        LOGGER.log(Level.FINEST,strategy.toString());
         Contract contract = strategy.getContract();
 
         String instrument = makeInstrument(contract);
@@ -165,6 +170,7 @@ public class TraderAssistant {
     }
 
     private synchronized void requestMarketData(Strategy strategy) {
+        LOGGER.log(Level.FINEST,strategy.toString());
         Contract contract = strategy.getContract();
         String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
@@ -180,6 +186,7 @@ public class TraderAssistant {
     }
 
     public synchronized void addStrategy(Strategy strategy) {
+        LOGGER.log(Level.FINEST,strategy.toString());
         strategy.setIndicatorManager(new IndicatorManager());
         strategy.setIndicators();
         nextStrategyID++;

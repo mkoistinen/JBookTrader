@@ -5,6 +5,8 @@ import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Holds history of market snapshots for a trading instrument.
@@ -17,7 +19,10 @@ public class MarketBook {
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
 
+    private final Logger LOGGER = Logger.getLogger(MarketBook.class.getName());
+
     public MarketBook(String name, TimeZone timeZone) {
+        LOGGER.log(Level.FINEST,"Creating MarketBook for " + name +" " +timeZone);
         this.name = name;
         this.timeZone = timeZone;
         marketDepth = new MarketDepth();

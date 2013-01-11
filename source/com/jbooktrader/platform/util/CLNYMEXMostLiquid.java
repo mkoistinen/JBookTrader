@@ -10,9 +10,9 @@ import java.util.Calendar;
  * Time: 11:26 PM
  * To change this template use File | Settings | File Templates.
  */
-public class NYMEXMostLiquid {
+public class CLNYMEXMostLiquid {
 
-    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 8; // in business days before expiration
+    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 5; // in business days before expiration
 
     /**
      * Given a month, what is the expiration day, based on the following rule
@@ -91,6 +91,7 @@ public class NYMEXMostLiquid {
         contract.add(Calendar.MONTH,1);  // contract is called by the month after's name for NYMEX
         // update:  we need to send normal month info, per this link: http://www.interactivebrokers.com/en/trading/expirationLabel.html
         SimpleDateFormat df = new SimpleDateFormat("yyyyMM");
+
         return df.format(contract.getTime());
 
     }

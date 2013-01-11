@@ -40,7 +40,7 @@ public class ContractFactory {
     }
 
     public static Contract makeNYMEXFutureContract(String symbol,String exchange) {
-        return makeFutureContract(symbol, exchange, NYMEXMostLiquid.getMostLiquid());
+        return makeFutureContract(symbol, exchange, CLNYMEXMostLiquid.getMostLiquid());
     }
 
     public static Contract makeCashContract(String symbol, String currency) {
