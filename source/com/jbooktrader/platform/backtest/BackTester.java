@@ -50,7 +50,9 @@ public class BackTester {
             }
 
             strategy.processInstant(isInSchedule);
-            performanceChartData.update(indicators, instant);
+            if (indicatorManager.hasValidIndicators()) {
+                performanceChartData.update(indicators, instant);
+            }
 
             if (count % 100000 == 0) {
                 backTestDialog.setProgress(count, snapshotsCount, "Running back test");
