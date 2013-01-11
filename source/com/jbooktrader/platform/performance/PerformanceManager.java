@@ -27,14 +27,18 @@ public class PerformanceManager {
     private double peakNetProfit, maxDrawdown;
     private boolean isCompletedTrade;
     private double sumTradeProfit, sumTradeProfitSquared;
+    //private double sumTradeProfit2, sumTradeProfitSquared2;
+    //private int down;
     private long timeInMarketStart, timeInMarket;
     private long longTrades, shortTrades;
+    //private List<Double> allTrades;
 
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
         this.multiplier = multiplier;
         this.commission = commission;
+        //allTrades = new ArrayList<Double>();
     }
 
     public void createPerformanceChartData(BarSize barSize, List<Indicator> indicators) {
@@ -123,11 +127,23 @@ public class PerformanceManager {
         return 0;
     }
 
+    public double getCPI() {
+        double cpi = getPerformanceIndex() * getProfitFactor() * getKellyCriterion() * getNetProfit();
+        //if (getAveDuration() == 0) {
+        //    return 0;
+        //}
+        //cpi /= Math.sqrt(getAveDuration()); //ekk
+        cpi /= 100000;
+        return cpi;
+    }
+
+
     public double getPerformanceIndex() {
+
         double pi = 0;
         if (trades > 0) {
-            double stdev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
-            pi = (stdev == 0) ? Double.POSITIVE_INFINITY : Math.sqrt(trades) * getAverageProfitPerTrade() / stdev;
+            double stDev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
+            pi = (stDev == 0) ? Double.POSITIVE_INFINITY : Math.sqrt(trades) * getAverageProfitPerTrade() / stDev;
         }
 
         return pi;
@@ -182,6 +198,12 @@ public class PerformanceManager {
             sumTradeProfit += tradeProfit;
             sumTradeProfitSquared += (tradeProfit * tradeProfit);
 
+            //if (tradeProfit < 0) {
+            //  sumTradeProfit2 += tradeProfit;
+            //sumTradeProfitSquared2 += (tradeProfit * tradeProfit);
+            //down++;
+            //}
+
 
             if (tradeProfit >= 0) {
                 profitableTrades++;
@@ -189,6 +211,8 @@ public class PerformanceManager {
             } else {
                 grossLoss += (-tradeProfit);
             }
+
+            //allTrades.add(tradeProfit);
         }
 
 

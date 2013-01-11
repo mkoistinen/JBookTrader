@@ -7,6 +7,7 @@ public enum PerformanceMetric {
     PF("PF"),
     PI("PI"),
     Kelly("Kelly"),
+    CPI("CPI"),
     MaxDD("Max DD"),
     NetProfit("Net Profit");
 

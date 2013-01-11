@@ -95,7 +95,8 @@ public class StrategyInformationDialog extends JBTDialog implements ModelListene
         add(performancePanel, "Max Drawdown", nf2.format(pm.getMaxDrawdown()));
         add(performancePanel, "Profit Factor", nf2.format(pm.getProfitFactor()));
         add(performancePanel, "Kelly", nf2.format(pm.getKellyCriterion()));
-        add(performancePanel, "Perf. Index", nf2.format(pm.getPerformanceIndex()));
+        add(performancePanel, "PI", nf2.format(pm.getPerformanceIndex()));
+        add(performancePanel, "CPI", nf2.format(pm.getCPI()));
         makeCompactGrid(performancePanel);
 
 

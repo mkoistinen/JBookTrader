@@ -18,8 +18,8 @@ public class TableDataModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        Object[] changedItem = (Object[]) rows.get(row);
-        changedItem[col] = value;
+        Object[] item = (Object[]) rows.get(row);
+        item[col] = value;
         fireTableRowsUpdated(row, row);
     }
 

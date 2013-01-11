@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.model;
 
 import com.jbooktrader.platform.marketbook.*;
-import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
@@ -9,6 +8,8 @@ import com.jbooktrader.platform.util.*;
 
 import java.text.*;
 import java.util.*;
+
+import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 
 /**
  */
@@ -83,6 +84,7 @@ public class StrategyTableModel extends TableDataModel {
         row.put(ProfitFactor, df2.format(pm.getProfitFactor()));
         row.put(PI, df2.format(pm.getPerformanceIndex()));
         row.put(Kelly, df0.format(pm.getKellyCriterion()));
+        row.put(CPI, df0.format(pm.getCPI()));
         row.put(MaxDD, df0.format(pm.getMaxDrawdown()));
         row.put(NetProfit, df0.format(pm.getNetProfit()));
 
