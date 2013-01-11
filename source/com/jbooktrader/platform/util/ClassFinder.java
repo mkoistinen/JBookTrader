@@ -55,7 +55,7 @@ public class ClassFinder {
                 return null;
             }
 
-            Class<?>[] parameterTypes = new Class[] {StrategyParams.class};
+            Class<?>[] parameterTypes = new Class[]{StrategyParams.class};
             Constructor<?> constructor = clazz.getConstructor(parameterTypes);
             return (Strategy) constructor.newInstance(new StrategyParams());
 

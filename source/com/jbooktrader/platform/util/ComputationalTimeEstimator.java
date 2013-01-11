@@ -31,7 +31,6 @@ public class ComputationalTimeEstimator {
             long elapsedTime = System.currentTimeMillis() - startTime;
             double millisPerIteration = (double) elapsedTime / completedIterations;
             long remainingMillis = (long) (millisPerIteration * (totalIterations - completedIterations));
-
             long remainingDays = remainingMillis / MILLIS_IN_DAY;
             if (remainingDays == 0) {
                 timeLeft = sdf.format(remainingMillis);

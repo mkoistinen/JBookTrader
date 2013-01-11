@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.web;
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
@@ -10,6 +9,8 @@ import com.sun.net.httpserver.*;
 
 import java.net.*;
 import java.util.concurrent.*;
+
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 public class MonitoringServer {
     private static HttpServer server;

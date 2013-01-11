@@ -1,9 +1,10 @@
 package com.jbooktrader.platform.web;
 
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.sun.net.httpserver.*;
+
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 public class WebAuthenticator extends BasicAuthenticator {
     private final String authPair;
