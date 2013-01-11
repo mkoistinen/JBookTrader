@@ -9,8 +9,9 @@ import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
-import static org.junit.Assert.*;
 import org.junit.*;
+
+import static org.junit.Assert.*;
 
 public class PerformanceManagerTest {
 
@@ -19,7 +20,7 @@ public class PerformanceManagerTest {
         protected DummyStrategy(StrategyParams params) throws JBookTraderException {
             super(params);
 
-            Contract contract = ContractFactory.makeFutureContract("ES", "GLOBEX");
+            Contract contract = getNewContract();
             TradingSchedule tradingSchedule = new TradingSchedule("9:35", "15:55", "America/New_York");
             int multiplier = 50;// contract multiplier
             Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
@@ -28,6 +29,11 @@ public class PerformanceManagerTest {
             MarketBook marketBook = new MarketBook();
             marketBook.setSnapshot(new MarketSnapshot(0, 0, 0, 0));
             setMarketBook(marketBook);
+        }
+
+        @Override
+        public Contract getNewContract() {
+            return ContractFactory.makeFutureContract("ES", "GLOBEX");
         }
 
         @Override
