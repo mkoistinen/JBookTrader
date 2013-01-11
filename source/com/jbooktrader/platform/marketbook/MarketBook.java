@@ -16,11 +16,13 @@ public class MarketBook {
     private final String name;
     private final TimeZone timeZone;
     private BackTestFileWriter backTestFileWriter;
+    private boolean isExchangeOpen;
 
     public MarketBook(String name, TimeZone timeZone) {
         this.name = name;
         this.timeZone = timeZone;
         marketDepth = new MarketDepth();
+        isExchangeOpen = true;
     }
 
     public MarketBook() {
@@ -48,6 +50,14 @@ public class MarketBook {
 
     public void setSnapshot(MarketSnapshot marketSnapshot) {
         this.marketSnapshot = marketSnapshot;
+    }
+
+    public boolean isExchangeOpen() {
+        return isExchangeOpen;
+    }
+
+    public void setExchangeOpen(boolean exchangeOpen) {
+        isExchangeOpen = exchangeOpen;
     }
 
     public boolean isGapping(MarketSnapshot newMarketSnapshot) {
