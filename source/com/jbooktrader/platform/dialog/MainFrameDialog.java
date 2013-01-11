@@ -2,8 +2,6 @@ package com.jbooktrader.platform.dialog;
 
 
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.model.StrategyTableColumn.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -15,6 +13,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.text.*;
+
+import static com.jbooktrader.platform.model.StrategyTableColumn.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 /**
  * Main application window. All the system logic is intentionally left out if this class,
