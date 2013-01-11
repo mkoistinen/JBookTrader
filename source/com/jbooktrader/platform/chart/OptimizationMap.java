@@ -1,7 +1,6 @@
 package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.optimizer.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -22,6 +21,8 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
+
 
 /**
  * Contour plot of optimization results
@@ -33,10 +34,10 @@ public class OptimizationMap {
     private final JDialog parent;
     private final List<OptimizationResult> optimizationResults;
     private JFreeChart chart;
-    private JComboBox horizontalCombo, verticalCombo, caseCombo, colorMapCombo;
+    private JComboBox<String> horizontalCombo, verticalCombo;
+    private JComboBox caseCombo, colorMapCombo;
     private double min, max;
     private ChartPanel chartPanel;
-
 
     public OptimizationMap(JDialog parent, Strategy strategy, List<OptimizationResult> optimizationResults,
                            PerformanceMetric sortPerformanceMetric) {
@@ -63,11 +64,11 @@ public class OptimizationMap {
         chartOptionsPanel.setBorder(border);
 
         JLabel horizontalLabel = new JLabel("Horizontal:", SwingConstants.TRAILING);
-        horizontalCombo = new JComboBox();
+        horizontalCombo = new JComboBox<String>();
         horizontalLabel.setLabelFor(horizontalCombo);
 
         JLabel verticalLabel = new JLabel("Vertical:", SwingConstants.TRAILING);
-        verticalCombo = new JComboBox();
+        verticalCombo = new JComboBox<String>();
         verticalLabel.setLabelFor(verticalCombo);
 
         StrategyParams params = optimizationResults.get(0).getParams();
@@ -80,13 +81,13 @@ public class OptimizationMap {
         verticalCombo.setSelectedIndex(1);
 
         JLabel caseLabel = new JLabel("Case:", SwingConstants.TRAILING);
-        caseCombo = new JComboBox(new String[] {"Best", "Worst"});
+        caseCombo = new JComboBox<String>(new String[]{"Best", "Worst"});
         caseCombo.setSelectedIndex(0);
         caseLabel.setLabelFor(caseCombo);
 
 
         JLabel colorMapLabel = new JLabel("Color map:", SwingConstants.TRAILING);
-        colorMapCombo = new JComboBox(new String[] {"Heat", "Gray"});
+        colorMapCombo = new JComboBox<String>(new String[]{"Heat", "Gray"});
         colorMapLabel.setLabelFor(colorMapCombo);
 
         chartOptionsPanel.add(horizontalLabel);
@@ -165,31 +166,28 @@ public class OptimizationMap {
         chartPanel.setChart(chart);
     }
 
-
     private double getMetric(OptimizationResult optimizationResult) {
         return optimizationResult.get(sortPerformanceMetric);
     }
 
-
     private XYZDataset createOptimizationDataset() {
         double[] x, y, z;
+        int size = optimizationResults.size();
+        x = new double[size];
+        y = new double[size];
+        z = new double[size];
+
+        Map<String, Double> values = new HashMap<String, Double>();
+
+
+        int xParameterIndex = (horizontalCombo == null) ? 0 : horizontalCombo.getSelectedIndex();
+        int yParameterIndex = (verticalCombo == null) ? 1 : verticalCombo.getSelectedIndex();
+
+        int index = 0;
+        min = max = getMetric(optimizationResults.get(index));
+        int selectedCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
 
         synchronized (optimizationResults) {
-            int size = optimizationResults.size();
-            x = new double[size];
-            y = new double[size];
-            z = new double[size];
-
-            Map<String, Double> values = new HashMap<String, Double>();
-
-
-            int xParameterIndex = (horizontalCombo == null) ? 0 : horizontalCombo.getSelectedIndex();
-            int yParameterIndex = (verticalCombo == null) ? 1 : verticalCombo.getSelectedIndex();
-
-            int index = 0;
-            min = max = getMetric(optimizationResults.get(index));
-            int selectedCase = (caseCombo == null) ? 0 : caseCombo.getSelectedIndex();
-
             for (OptimizationResult optimizationResult : optimizationResults) {
                 StrategyParams params = optimizationResult.getParams();
 
@@ -218,43 +216,12 @@ public class OptimizationMap {
             }
         }
 
+
         DefaultXYZDataset dataset = new DefaultXYZDataset();
-        dataset.addSeries("optimization", new double[][] {x, y, z});
+        dataset.addSeries("optimization", new double[][]{x, y, z});
 
         return dataset;
     }
-
-    private abstract class PaintScaleAdapter implements PaintScale {
-        public double getUpperBound() {
-            return max;
-        }
-
-        public double getLowerBound() {
-            return min;
-        }
-    }
-
-
-    private class HeatPaintScale extends PaintScaleAdapter {
-        public Paint getPaint(double value) {
-            double normalizedValue = (value - min) / (max - min);
-            double saturation = Math.max(0.1, Math.abs(2 * normalizedValue - 1));
-            double red = 0;
-            double blue = 0.7;
-            double hue = blue - normalizedValue * (blue - red);
-            return Color.getHSBColor((float) hue, (float) saturation, 1);
-        }
-    }
-
-    public class GrayPaintScale extends PaintScaleAdapter {
-        public Paint getPaint(double value) {
-            double normalizedValue = value - min;
-            double clrs = 255.0 / (max - min);
-            int color = (int) (255 - normalizedValue * clrs);
-            return new Color(color, color, color, 255);
-        }
-    }
-
 
     private JFreeChart createChart() {
         XYZDataset dataset = createOptimizationDataset();
@@ -289,5 +256,35 @@ public class OptimizationMap {
         chart.addSubtitle(legend);
 
         return chart;
+    }
+
+    private abstract class PaintScaleAdapter implements PaintScale {
+        public double getUpperBound() {
+            return max;
+        }
+
+        public double getLowerBound() {
+            return min;
+        }
+    }
+
+    private class HeatPaintScale extends PaintScaleAdapter {
+        public Paint getPaint(double value) {
+            double normalizedValue = (value - min) / (max - min);
+            double saturation = Math.max(0.1, Math.abs(2 * normalizedValue - 1));
+            double red = 0;
+            double blue = 0.7;
+            double hue = blue - normalizedValue * (blue - red);
+            return Color.getHSBColor((float) hue, (float) saturation, 1);
+        }
+    }
+
+    public class GrayPaintScale extends PaintScaleAdapter {
+        public Paint getPaint(double value) {
+            double normalizedValue = value - min;
+            double clrs = 255.0 / (max - min);
+            int color = (int) (255 - normalizedValue * clrs);
+            return new Color(color, color, color, 255);
+        }
     }
 }
