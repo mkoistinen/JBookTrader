@@ -2,7 +2,6 @@ package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.position.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.*;
@@ -20,6 +19,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 
 /**
@@ -42,7 +43,7 @@ public class PerformanceChart {
     private CombinedDomainXYPlot combinedPlot;
     private DateAxis dateAxis;
     private XYPlot pricePlot, pnlPlot;
-    private JComboBox timeLineCombo, timeZoneCombo;
+    private JComboBox<String> timeLineCombo, timeZoneCombo;
     private JCheckBox indicatorVisibilityCheck, tradesVisibilityCheck, pnlVisibilityCheck;
 
     public PerformanceChart(JFrame parent, Strategy strategy) {
@@ -146,11 +147,11 @@ public class PerformanceChart {
         chartOptionsPanel.setBorder(chartOptionsBorder);
 
         JLabel timeLineLabel = new JLabel("Timeline:", SwingConstants.TRAILING);
-        timeLineCombo = new JComboBox(new String[] {"All Hours", "Trading Hours"});
+        timeLineCombo = new JComboBox<String>(new String[]{"All Hours", "Trading Hours"});
         timeLineLabel.setLabelFor(timeLineCombo);
 
         JLabel timeZoneLabel = new JLabel("Time Zone:", SwingConstants.TRAILING);
-        timeZoneCombo = new JComboBox(new String[] {"Exchange", "Local"});
+        timeZoneCombo = new JComboBox<String>(new String[]{"Exchange", "Local"});
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
         JLabel visibilityLabel = new JLabel("Show:");
