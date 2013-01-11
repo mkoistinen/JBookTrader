@@ -28,13 +28,21 @@ public abstract class Report {
 
     protected Report(String reportName) throws IOException {
         String fullFileName = REPORT_DIR + reportName + ".htm";
+        File reportFile = new File(fullFileName);
+        boolean reportExisted = reportFile.exists();
 
         writer = new PrintWriter(new BufferedWriter(new FileWriter(fullFileName, true)));
-
         StringBuilder sb = new StringBuilder();
-        sb.append("</table><br>"); // close the previously created table, if any
+        if (reportExisted) {
+            sb.append("</table><br>"); // close the previously created table
+        } else {
+            sb.append("<html>");
+
+        }
+
         sb.append("<table border=\"1\" cellpadding=\"2\" cellspacing=\"0\" width=100%>");
         write(sb);
+
     }
 
 
