@@ -94,6 +94,15 @@ public class TradingSchedule {
         return containsTime;
     }
 
+    public long getRemainingTime(long time) {
+        if (time > end) {
+            updateCalendars(time);
+        }
+
+        return end - time;
+    }
+
+
     private void updateCalendars(long time) {
         nowCalendar.setTimeInMillis(time);
 
