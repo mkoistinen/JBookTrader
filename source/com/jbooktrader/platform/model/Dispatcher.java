@@ -2,6 +2,7 @@ package com.jbooktrader.platform.model;
 
 
 import com.jbooktrader.platform.model.ModelListener.*;
+import com.jbooktrader.platform.portfolio.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.trader.*;
@@ -19,6 +20,7 @@ public class Dispatcher {
     private final List<ModelListener> listeners;
     private EventReport eventReport;
     private Trader trader;
+    private PortfolioManager portfolioManager;
     private NTPClock ntpClock;
     private Mode mode;
 
@@ -66,6 +68,14 @@ public class Dispatcher {
         }
         return trader;
     }
+
+    public synchronized PortfolioManager getPortfolioManager() {
+        if (portfolioManager == null) {
+            portfolioManager = new PortfolioManager();
+        }
+        return portfolioManager;
+    }
+
 
     public NTPClock getNTPClock() {
         return ntpClock;
