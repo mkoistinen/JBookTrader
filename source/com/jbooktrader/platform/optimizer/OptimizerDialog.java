@@ -5,8 +5,6 @@ import com.jbooktrader.platform.chart.*;
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
@@ -22,6 +20,9 @@ import java.io.*;
 import java.text.*;
 import java.util.*;
 import java.util.List;
+
+import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 /**
  * Dialog to specify options for back testing using a historical data file.
@@ -89,10 +90,14 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
     }
 
     public void signalCompleted() {
-        progressPanel.setVisible(false);
-        optimizeButton.setEnabled(true);
-        cancelButton.setEnabled(false);
-        getRootPane().setDefaultButton(optimizationMapButton);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                progressPanel.setVisible(false);
+                optimizeButton.setEnabled(true);
+                cancelButton.setEnabled(false);
+                getRootPane().setDefaultButton(optimizationMapButton);
+            }
+        });
     }
 
     private void setOptions() throws JBookTraderException {
@@ -180,7 +185,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
                     }
 
                     OptimizationMap optimizationMap = new OptimizationMap(OptimizerDialog.this, strategy,
-                            optimizationResults, getSortCriteria());
+                        optimizationResults, getSortCriteria());
                     JDialog chartFrame = optimizationMap.getChartFrame();
                     chartFrame.setVisible(true);
                 } catch (Exception ex) {
@@ -343,7 +348,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
         JLabel optimizationMethodLabel = new JLabel("Search method:");
-        optimizationMethodCombo = new JComboBox(new String[] {"Brute force", "Divide & Conquer"});
+        optimizationMethodCombo = new JComboBox<String>(new String[]{"Brute force", "Divide & Conquer"});
         String optimizerMethod = prefs.get(OptimizerMethod);
         optimizationMethodCombo.setSelectedItem(optimizerMethod);
 
@@ -353,9 +358,9 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         optimizationOptionsPanel.add(optimizationMethodCombo);
 
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria:");
-        String[] sortFactors = new String[] {PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName()};
+        String[] sortFactors = new String[]{PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName(), CPI.getName()};
 
-        selectionCriteriaCombo = new JComboBox(sortFactors);
+        selectionCriteriaCombo = new JComboBox<String>(sortFactors);
         selectionCriteriaCombo.setSelectedItem(prefs.get(OptimizerSelectBy));
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -363,7 +368,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
 
         JLabel inclusionCriteriaLabel = new JLabel("Inclusion criteria:");
-        inclusionCriteriaCombo = new JComboBox(new String[] {"All strategies", "Profitable strategies"});
+        inclusionCriteriaCombo = new JComboBox<String>(new String[]{"All strategies", "Profitable strategies"});
         inclusionCriteriaLabel.setLabelFor(inclusionCriteriaCombo);
         optimizationOptionsPanel.add(inclusionCriteriaLabel);
         optimizationOptionsPanel.add(inclusionCriteriaCombo);
@@ -473,6 +478,15 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
     public void setResults(List<OptimizationResult> optimizationResults) {
         this.optimizationResults = optimizationResults;
         ((ResultsTableModel) resultsTable.getModel()).setResults(optimizationResults);
+    }
+
+
+    public void showMessage(final String msg) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                MessageDialog.showMessage(msg);
+            }
+        });
     }
 
     public String getFileName() {

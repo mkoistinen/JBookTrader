@@ -71,7 +71,7 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
             iterationsRemaining = Math.max(1, --iterationsRemaining);
             completedSteps += snapshotCount * filteredTasksSize;
 
-            if (optimizationResults.isEmpty() && !cancelled) {
+            if (optimizationResults.isEmpty() && !cancelled.get()) {
                 throw new JBookTraderException("No strategies found within the specified parameter boundaries.");
             }
 
@@ -93,6 +93,6 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
                 topParams.add(new StrategyParams(params));
             }
 
-        } while (filteredTasksSize > 0 && !cancelled);
+        } while (filteredTasksSize > 0 && !cancelled.get());
     }
 }
