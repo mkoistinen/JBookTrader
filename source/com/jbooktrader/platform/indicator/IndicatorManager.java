@@ -7,8 +7,8 @@ import java.util.*;
 /**
  */
 public class IndicatorManager {
-    private static final long GAP_SIZE = 60 * 60 * 1000;// 1 hour
-    private static final long MIN_SAMPLE_SIZE = 60 * 60;// 1 hour worth of samples
+    private static final long GAP_SIZE = 5 * 60 * 1000;// 5 minutes
+    private static final long MIN_SAMPLE_SIZE = 1 * 60 * 60;// 1 hour worth of samples
     private final List<Indicator> indicators;
 
     private MarketBook marketBook;
@@ -45,7 +45,6 @@ public class IndicatorManager {
         return (samples >= MIN_SAMPLE_SIZE);
     }
 
-
     public List<Indicator> getIndicators() {
         return indicators;
     }
@@ -61,8 +60,10 @@ public class IndicatorManager {
 
         if (lastSnapshotTime - previousSnapshotTime > GAP_SIZE) {
             samples = 0;
+            //System.out.println("resetting " + size + " indicators in " + this);
             for (int index = 0; index < size; index++) {
                 indicators.get(index).reset();
+                //System.out.println( "indicator " + indicators.get(index) + " reset");
             }
         }
         previousSnapshotTime = lastSnapshotTime;
