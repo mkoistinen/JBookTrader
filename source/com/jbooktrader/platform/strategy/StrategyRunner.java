@@ -3,43 +3,49 @@ package com.jbooktrader.platform.strategy;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.model.ModelListener.*;
-import com.jbooktrader.platform.trader.*;
 import com.jbooktrader.platform.util.*;
 
 import java.util.*;
-import java.util.concurrent.*;
 
 public class StrategyRunner {
     private final Collection<Strategy> strategies;
-    private final TraderAssistant traderAssistant;
-    private final NTPClock ntpClock;
     private Collection<MarketBook> marketBooks;
     private final Dispatcher dispatcher;
     private static StrategyRunner instance;
+    private static long ntpTime, snapshotTime;
+    private static final long ONE_SECOND = 1000;
+    private static final long HALF_SECOND = ONE_SECOND / 2;
 
     private class SnapshotHandler implements Runnable {
         public void run() {
-            try {
-                long ntpTime = ntpClock.getTime();
-                long delay = 1000 - ntpTime % 1000;
-                Thread.sleep(delay);
-                long snapshotTime = ntpTime + delay;
-
-                if (marketBooks != null) {
-                    dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
-
-                    for (MarketBook marketBook : marketBooks) {
-                        marketBook.takeMarketSnapshot(snapshotTime);
+            NTPClock ntpClock = dispatcher.getNTPClock();
+            while (true) {
+                try {
+                    while ((ntpTime = ntpClock.getTime()) < snapshotTime) {
+                        Thread.sleep(HALF_SECOND);
                     }
+
+                    long delay = ONE_SECOND - ntpTime % ONE_SECOND;
+                    Thread.sleep(delay);
+                    snapshotTime = ntpTime + delay;
 
                     synchronized (strategies) {
-                        for (Strategy strategy : strategies) {
-                            strategy.process();
+                        if (marketBooks != null) {
+                            dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
+
+                            for (MarketBook marketBook : marketBooks) {
+                                marketBook.takeMarketSnapshot(snapshotTime);
+                            }
+
+                            for (Strategy strategy : strategies) {
+                                strategy.process();
+                            }
                         }
                     }
+
+                } catch (Throwable t) {
+                    dispatcher.getEventReport().report(t);
                 }
-            } catch (Throwable t) {
-                dispatcher.getEventReport().report(t);
             }
         }
     }
@@ -53,17 +59,14 @@ public class StrategyRunner {
 
     private StrategyRunner() {
         dispatcher = Dispatcher.getInstance();
-        ntpClock = dispatcher.getNTPClock();
-        traderAssistant = dispatcher.getTrader().getAssistant();
         strategies = new LinkedList<Strategy>();
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new SnapshotHandler(), 0, 500, TimeUnit.MILLISECONDS);
+        (new Thread(new SnapshotHandler())).start();
     }
 
     public void addListener(Strategy strategy) {
         synchronized (strategies) {
             strategies.add(strategy);
-            marketBooks = traderAssistant.getAllMarketBooks().values();
+            marketBooks = dispatcher.getTrader().getAssistant().getAllMarketBooks().values();
         }
     }
 
