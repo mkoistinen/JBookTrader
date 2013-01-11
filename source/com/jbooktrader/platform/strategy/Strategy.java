@@ -184,6 +184,8 @@ public abstract class Strategy implements Comparable<Strategy> {
                         String msg = "Switching Contract from" + contract.m_symbol + "-" + contract.m_expiry + "to " + newContract.m_symbol + "-" + newContract.m_expiry;
                         eventReport.report(name, msg);
                         contract = newContract;
+                        marketBook = dispatcher.getTrader().getAssistant().createMarketBook(this);   // create new market book for security
+                        // for now, we left the old marketbook in TraderAssistant, because we don't know if another Strategy needs it
                     }
                 }
             }

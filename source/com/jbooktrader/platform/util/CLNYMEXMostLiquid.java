@@ -1,30 +1,34 @@
 package com.jbooktrader.platform.util;
 
-import java.text.*;
-import java.util.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
- * @author marcus
+ * Created with IntelliJ IDEA.
+ * User: marcus
+ * Date: 1/8/13
+ * Time: 11:26 PM
+ * To change this template use File | Settings | File Templates.
  */
-public class NYMEXMostLiquid {
+public class CLNYMEXMostLiquid {
 
-    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 8; // in business days before expiration
+    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 5; // in business days before expiration
 
     /**
      * Given a month, what is the expiration day, based on the following rule
      * - 3 business days prior to the 25th
      * - If the 25th falls on a weekend, 3 business days not counting this weekend
-     * <p/>
+     *
      * - not sure about holidays yet, TBD
      *
-     * @param month Integer month 1-12
+     * @param month  Integer month 1-12
      * @return day of expiration
      */
     public static int getExpireDateForMonthYear(int month, int year) {
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.MONTH, month - 1);
-        cal.set(Calendar.YEAR, year);
-        cal.set(Calendar.DATE, 25); // using this 25th as a rule here
+        cal.set(Calendar.MONTH,month-1);
+        cal.set(Calendar.YEAR,year);
+        cal.set(Calendar.DATE,25); // using this 25th as a rule here
 
         // get to first non weekend day, prior to the 25th
         backupToBusinessDay(cal);
@@ -56,12 +60,12 @@ public class NYMEXMostLiquid {
         // start by selecting current month, and see if it is ok
         int myMonth = mydate.get(Calendar.MONTH) + 1;
         int myYear = mydate.get(Calendar.YEAR);
-        int dateExp = getExpireDateForMonthYear(myMonth, myYear);
+        int dateExp = getExpireDateForMonthYear(myMonth,myYear);
 
         Calendar cutoffDate = Calendar.getInstance();
-        cutoffDate.set(Calendar.YEAR, mydate.get(Calendar.YEAR));
-        cutoffDate.set(Calendar.MONTH, mydate.get(Calendar.MONTH));
-        cutoffDate.set(Calendar.DATE, dateExp);
+        cutoffDate.set(Calendar.YEAR,mydate.get(Calendar.YEAR));
+        cutoffDate.set(Calendar.MONTH,mydate.get(Calendar.MONTH));
+        cutoffDate.set(Calendar.DATE,dateExp);
 
         for (int i = 0; i < VOLUME_CROSSOVER_BEFORE_EXP; i++) {
             backupToBusinessDay(cutoffDate);
@@ -71,22 +75,23 @@ public class NYMEXMostLiquid {
         // check to see if we are far enough away to use this month
 
         if (mydate.compareTo(cutoffDate) < 0) {  // we can use this month
-            contract.set(Calendar.DATE, dateExp);
+            contract.set(Calendar.DATE,dateExp);
         } else {
             // need to use next months
             contract.add(Calendar.MONTH, 1); // next month
             dateExp = getExpireDateForMonthYear(    // replace date with exp date for that month
-                contract.get(Calendar.MONTH) + 1,
-                contract.get(Calendar.YEAR)
+                    contract.get(Calendar.MONTH)+1,
+                    contract.get(Calendar.YEAR)
             );
-            contract.set(Calendar.DATE, dateExp);
+            contract.set(Calendar.DATE,dateExp);
         }
 
         // return contract as a string as required by tws
         // note, nominal feb contract would have expire date in Jan, and we think tws expects jan expire date for Feb nominal contract
-        contract.add(Calendar.MONTH, 1);  // contract is called by the month after's name for NYMEX
+        contract.add(Calendar.MONTH,1);  // contract is called by the month after's name for NYMEX
         // update:  we need to send normal month info, per this link: http://www.interactivebrokers.com/en/trading/expirationLabel.html
         SimpleDateFormat df = new SimpleDateFormat("yyyyMM");
+
         return df.format(contract.getTime());
 
     }
