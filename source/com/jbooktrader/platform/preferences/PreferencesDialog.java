@@ -1,13 +1,14 @@
 package com.jbooktrader.platform.preferences;
 
 import com.jbooktrader.platform.dialog.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.util.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 public class PreferencesDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 25);
@@ -81,7 +82,7 @@ public class PreferencesDialog extends JBTDialog {
 
         JPanel webAcessTab = new JPanel(new SpringLayout());
         tabbedPane.addTab("Web Access", webAcessTab);
-        webAccessCombo = new JComboBox(new String[] {"disabled", "enabled"});
+        webAccessCombo = new JComboBox<String>(new String[]{"disabled", "enabled"});
         webAccessPortSpin = new JSpinner(new SpinnerNumberModel(1, 1, 99999, 1));
         webAccessUser = new JTextField();
         webAccessPasswordField = new JPasswordField();
@@ -90,7 +91,6 @@ public class PreferencesDialog extends JBTDialog {
         add(webAcessTab, WebAccessUser, webAccessUser);
         add(webAcessTab, WebAccessPassword, webAccessPasswordField);
         SpringUtilities.makeCompactGrid(webAcessTab, 4, 2, 12, 12, 8, 8);
-
 
         JPanel timeServerTab = new JPanel(new SpringLayout());
         tabbedPane.addTab("Time Server", timeServerTab);
