@@ -26,8 +26,11 @@ public class EWrapperAdapter implements EWrapper {
     public void tickSize(int tickerId, int field, int size) {
     }
 
-    public void tickOptionComputation(int tickerId, int field, double impliedVol, double delta, double modelPrice, double pvDividend) {
+    public void tickOptionComputation(int tickerId, int field, double impliedVol,
+                                      double delta, double optPrice, double pvDividend,
+                                      double gamma, double vega, double theta, double undPrice) {
     }
+
 
     public void tickGeneric(int tickerId, int tickType, double value) {
     }
@@ -119,5 +122,6 @@ public class EWrapperAdapter implements EWrapper {
     public void tickSnapshotEnd(int reqId) {
     }
 
-
+    public void marketDataType(int reqId, int marketDataType) {
+    }
 }
