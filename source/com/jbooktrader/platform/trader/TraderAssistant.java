@@ -4,8 +4,8 @@ import com.ib.client.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
+import com.jbooktrader.platform.portfolio.*;
 import com.jbooktrader.platform.position.*;
-import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
@@ -13,6 +13,8 @@ import com.jbooktrader.platform.strategy.*;
 
 import javax.swing.*;
 import java.util.*;
+
+import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 
 public class TraderAssistant {
@@ -29,6 +31,7 @@ public class TraderAssistant {
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isOrderExecutionPending;
+    private boolean isMarketDataActive;
 
 
     public TraderAssistant(Trader trader) {
@@ -164,13 +167,13 @@ public class TraderAssistant {
         return marketBook;
     }
 
-    private synchronized void requestMarketData(Strategy strategy) {
+    public synchronized void requestMarketData(Strategy strategy) {
         Contract contract = strategy.getContract();
         String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
         if (!subscribedTickers.contains(ticker)) {
             subscribedTickers.add(ticker);
-            socket.reqContractDetails(strategy.getContract().m_conId, strategy.getContract());
+            socket.reqContractDetails(ticker, strategy.getContract());
             eventReport.report(JBookTrader.APP_NAME, "Requested contract details for instrument " + instrument);
             socket.reqMktDepth(ticker, contract, 10);
             eventReport.report(JBookTrader.APP_NAME, "Requested book data for instrument " + instrument);
@@ -178,6 +181,20 @@ public class TraderAssistant {
             eventReport.report(JBookTrader.APP_NAME, "Requested market data for instrument " + instrument);
         }
     }
+
+    public synchronized void cancelMarketData(Strategy strategy) {
+        Contract contract = strategy.getContract();
+        String instrument = makeInstrument(contract);
+        Integer ticker = tickers.get(instrument);
+        if (subscribedTickers.contains(ticker)) {
+            socket.cancelMktDepth(ticker);
+            eventReport.report(JBookTrader.APP_NAME, "Cancelled book data for instrument " + instrument);
+            socket.cancelMktData(ticker);
+            eventReport.report(JBookTrader.APP_NAME, "Cancelled market data for instrument " + instrument);
+            subscribedTickers.remove(ticker);
+        }
+    }
+
 
     public synchronized void addStrategy(Strategy strategy) {
         strategy.setIndicatorManager(new IndicatorManager());
@@ -209,15 +226,39 @@ public class TraderAssistant {
         isOrderExecutionPending = false;
     }
 
+    public void setIsMarketDataActive(boolean isMarketDataActive) {
+        this.isMarketDataActive = isMarketDataActive;
+    }
+
+    public boolean getIsMarketDataActive() {
+        return isMarketDataActive;
+    }
+
+
     private synchronized void placeOrder(Contract contract, Order order, Strategy strategy) {
         try {
             if (isOrderExecutionPending) {
                 return;
             }
 
+            Mode mode = dispatcher.getMode();
+            if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+                PortfolioManager portfolioManager = dispatcher.getPortfolioManager();
+                if (!portfolioManager.canTrade(strategy.getName(), order.m_action)) {
+                    return;
+                }
+            }
+
+            long remainingTime = strategy.getTradingSchedule().getRemainingTime(strategy.getMarketBook().getSnapshot().getTime());
+            long remainingMinutes = remainingTime / (1000 * 60);
+            if (strategy.getPositionManager().getTargetPosition() != 0 && remainingMinutes < 15) {
+                return;
+            }
+
+
             isOrderExecutionPending = true;
             orderID++;
-            Mode mode = dispatcher.getMode();
+
             if (mode == Mode.Trade || mode == Mode.ForwardTest) {
                 String msg = "Placing order " + orderID;
                 eventReport.report(strategy.getName(), msg);

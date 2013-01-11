@@ -99,6 +99,7 @@ public class Trader extends EWrapperAdapter {
     public void contractDetails(int id, ContractDetails cd) {
         String lineSep = "<br>";
         StringBuilder details = new StringBuilder("Contract details:").append(lineSep);
+        details.append("ID: ").append(id).append(lineSep);
         details.append("Trading class: ").append(cd.m_tradingClass).append(lineSep);
         details.append("Exchanges: ").append(cd.m_validExchanges).append(lineSep);
         details.append("Long name: ").append(cd.m_longName).append(lineSep);
@@ -108,6 +109,17 @@ public class Trader extends EWrapperAdapter {
         details.append("Time zone id: ").append(cd.m_timeZoneId).append(lineSep);
         details.append("Trading hours: ").append(cd.m_tradingHours).append(lineSep);
         details.append("Liquid hours: ").append(cd.m_liquidHours).append(lineSep);
+
+        if (cd.m_liquidHours.contains("closed") || cd.m_liquidHours.contains("CLOSED")) {
+            traderAssistant.getMarketBook(id).setExchangeOpen(false);
+            String msg = "Exchanges " + cd.m_validExchanges + " are either closed or will be closed shortly today ";
+            msg += "for ticker " + cd.m_marketName + ". JBT will continue to operate normally, ";
+            msg += "but no trades for " + cd.m_marketName + " will be placed.";
+            eventReport.report("IB API", msg);
+        } else {
+            traderAssistant.getMarketBook(id).setExchangeOpen(true);
+        }
+
         eventReport.report("IB API", details.toString());
     }
 
@@ -157,6 +169,18 @@ public class Trader extends EWrapperAdapter {
                 String reportMsg = "Removed order " + id + " because IB reported error " + errorCode + ". ";
                 reportMsg += "Another order will be submitted. The strategy will continue to run normally";
                 eventReport.report(JBookTrader.APP_NAME, reportMsg);
+            }
+
+            if (errorCode == 2104) { // Market data farm connection is OK
+                traderAssistant.setIsMarketDataActive(true);
+            }
+
+            if (errorCode == 1100) { // Connectivity between IB and Trader Workstation has been lost.
+                traderAssistant.setIsMarketDataActive(false);
+            }
+
+            if (errorCode == 1101 || errorCode == 1102) { // Connectivity between IB and Trader Workstation has been restored.
+                new Thread(new ResubscriberRunner()).start();
             }
 
             // 200: bad contract
