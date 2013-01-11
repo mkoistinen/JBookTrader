@@ -46,7 +46,7 @@ public enum JBTPreferences {
     OptimizationMapHeight("optimization.map.height", "550"),
 
     // Time Server
-    NTPTimeServer("NTP time server", "ntp2.usno.navy.mil");
+    NTPTimeServer("NTP time server", "pool.ntp.org");
 
     private final String name, defaultValue;
 
