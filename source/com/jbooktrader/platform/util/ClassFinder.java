@@ -8,6 +8,8 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 
 /**
@@ -44,10 +46,34 @@ public class ClassFinder {
                         }
                     }
                 }
+            } else if (url.toString().endsWith(".jar")) {  // classes in jar support, makes deployment easier
+                try {
+                    JarFile jar = new JarFile(file);
+                    Enumeration<JarEntry> entries = jar.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = (JarEntry) entries.nextElement();
+                        String entryPath = entry.getName();
+                        String prefix = "com/jbooktrader/strategy/";
+                        if (entryPath.contains(prefix) && entryPath.endsWith(".class")) {
+                            String className = entryPath.substring(prefix.length(), entryPath.lastIndexOf(".class"));
+                            if (!className.contains("base/")) {  // support nested packages not named base
+                                if (className.contains("/")) {
+                                    className = className.replaceAll("/",".");
+                                }
+                                classNames.add(className);
+                            }
+                        }
+                    }
+
+                } catch (IOException e) {
+                    // ignore errors, move on here.
+                }
             }
         }
 
         Collections.sort(classNames);
+
+
         return classNames;
     }
 
