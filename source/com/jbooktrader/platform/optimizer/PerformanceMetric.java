@@ -4,14 +4,14 @@ package com.jbooktrader.platform.optimizer;
  * @author Eugene Kononov
  */
 public enum PerformanceMetric {
-    Trades("Trades"),
-    Duration("Duration"),
-    Bias("Bias"),
-    PF("PF"),
-    PI("PI"),
-    Kelly("Kelly"),
-    CPI("CPI"),
-    MaxDD("Max DD"),
+    Trades("Trades"), // number of trades
+    Duration("Duration"), // average trade duration in minutes
+    Bias("Bias"), // short/long bias
+    PF("PF"), // profit factor
+    PI("PI"), // performance index
+    Kelly("Kelly"), // Kelly criterion
+    CPI("CPI"), // cumulative performance index
+    MaxDD("Max DD"), // maximum drawdown
     NetProfit("Net Profit");
 
 
