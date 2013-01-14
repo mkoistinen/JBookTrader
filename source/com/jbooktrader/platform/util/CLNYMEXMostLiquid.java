@@ -12,7 +12,7 @@ import java.util.Calendar;
  */
 public class CLNYMEXMostLiquid {
 
-    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 1; // in business days before expiration
+    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 2; // in business days before expiration
 
     /**
      * Given a month, what is the expiration day, based on the following rule
@@ -66,6 +66,9 @@ public class CLNYMEXMostLiquid {
         cutoffDate.set(Calendar.YEAR,mydate.get(Calendar.YEAR));
         cutoffDate.set(Calendar.MONTH,mydate.get(Calendar.MONTH));
         cutoffDate.set(Calendar.DATE,dateExp);
+        cutoffDate.set(Calendar.SECOND,0);
+        cutoffDate.set(Calendar.HOUR,17);
+        cutoffDate.set(Calendar.MINUTE,0);
 
         for (int i = 0; i < VOLUME_CROSSOVER_BEFORE_EXP; i++) {
             backupToBusinessDay(cutoffDate);

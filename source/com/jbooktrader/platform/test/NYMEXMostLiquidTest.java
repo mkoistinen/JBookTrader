@@ -63,7 +63,7 @@ public class NYMEXMostLiquidTest {
         Calendar volXDay = Calendar.getInstance(TimeZone.getTimeZone("EST"));
         volXDay.set(2013, Calendar.JANUARY, 21, 10,0,0);
         String janVolXover = CLNYMEXMostLiquid.getMostLiquidExpiry(volXDay);  // actually this is called the Feb delivery future, exprires in Jan though
-        assertEquals("201302", janVolXover);   // this would fetch the March contract, which expires Feb 20th
+        assertEquals("201303", janVolXover);   // this would fetch the March contract, which expires Feb 20th
 
         volXDay.set(2013, Calendar.JANUARY, 20, 10, 0, 0);
         String notXoverYet = CLNYMEXMostLiquid.getMostLiquidExpiry(volXDay);
