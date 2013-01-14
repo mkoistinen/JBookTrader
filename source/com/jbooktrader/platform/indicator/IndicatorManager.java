@@ -61,10 +61,8 @@ public class IndicatorManager {
 
         if (lastSnapshotTime - previousSnapshotTime > GAP_SIZE) {
             samples = 0;
-            //System.out.println("resetting " + size + " indicators in " + this);
             for (int index = 0; index < size; index++) {
                 indicators.get(index).reset();
-                //System.out.println( "indicator " + indicators.get(index) + " reset");
             }
         }
         previousSnapshotTime = lastSnapshotTime;
