@@ -12,6 +12,7 @@ import java.util.*;
 
 /**
  * Strategy report manager
+ * @author Eugene Kononov
  */
 public class StrategyReportManager {
     private final List<String> strategyReportHeaders;

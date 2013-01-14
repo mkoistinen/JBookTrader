@@ -4,7 +4,8 @@ import java.text.*;
 import java.util.*;
 
 /**
- * "Remaining time" estimator for long-running computational processes.
+ * "Remaining time" estimator for long-running computational processes, such as strategy optimization.
+ * @author Eugene Kononov
  */
 public class ComputationalTimeEstimator {
     private static final long MILLIS_IN_DAY = 1000 * 60 * 60 * 24;

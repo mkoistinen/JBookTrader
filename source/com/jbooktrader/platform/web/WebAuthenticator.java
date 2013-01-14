@@ -6,6 +6,9 @@ import com.sun.net.httpserver.*;
 
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class WebAuthenticator extends BasicAuthenticator {
     private final String authPair;
 
