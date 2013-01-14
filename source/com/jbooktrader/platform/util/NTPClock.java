@@ -36,7 +36,6 @@ public class NTPClock {
                 if (offsetNow != 0) {
                     offset.set(offsetNow);
                 }
-                eventReport.report(JBookTrader.APP_NAME, "NTP clock offset updated. Offset: " + offset + " ms");
             } catch (Exception e) {
                 eventReport.report(JBookTrader.APP_NAME, ERROR_MSG + host.getHostName() + ": " + e.getMessage());
             }
@@ -75,9 +74,10 @@ public class NTPClock {
         String precision = df4.format(Math.pow(2, ntpMsg.getPrecision()) * Math.pow(10, 6));
         msg.append(", precision: ").append(precision).append(" microseconds");
         eventReport.report(JBookTrader.APP_NAME, msg.toString());
+        eventReport.report(JBookTrader.APP_NAME, "NTP clock updated. Offset: " + offset + " ms");
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-        scheduler.scheduleWithFixedDelay(new NTPClockPoller(), 0, 1, TimeUnit.HOURS);
+        scheduler.scheduleWithFixedDelay(new NTPClockPoller(), 0, 15, TimeUnit.MINUTES);
     }
 
     public long getTime() {
