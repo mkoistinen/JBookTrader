@@ -12,7 +12,7 @@ import java.util.Calendar;
  */
 public class CLNYMEXMostLiquid {
 
-    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 5; // in business days before expiration
+    public static final int VOLUME_CROSSOVER_BEFORE_EXP = 1; // in business days before expiration
 
     /**
      * Given a month, what is the expiration day, based on the following rule
@@ -62,7 +62,7 @@ public class CLNYMEXMostLiquid {
         int myYear = mydate.get(Calendar.YEAR);
         int dateExp = getExpireDateForMonthYear(myMonth,myYear);
 
-        Calendar cutoffDate = Calendar.getInstance();
+        Calendar cutoffDate = Calendar.getInstance(mydate.getTimeZone());
         cutoffDate.set(Calendar.YEAR,mydate.get(Calendar.YEAR));
         cutoffDate.set(Calendar.MONTH,mydate.get(Calendar.MONTH));
         cutoffDate.set(Calendar.DATE,dateExp);
@@ -74,7 +74,7 @@ public class CLNYMEXMostLiquid {
 
         // check to see if we are far enough away to use this month
 
-        if (mydate.compareTo(cutoffDate) < 0) {  // we can use this month
+        if (mydate.compareTo(cutoffDate) <= 0) {  // we can use this month
             contract.set(Calendar.DATE,dateExp);
         } else {
             // need to use next months
