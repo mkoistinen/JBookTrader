@@ -32,7 +32,7 @@ public class StrategyRunner {
                     Thread.sleep(delay);
                     snapshotTime = ntpTime + delay;
 
-                    synchronized (strategies) {
+                    synchronized (strategies) {    //ekk need to take another look to see if sync is needed on this level
                         if (marketBooks != null) {
                             dispatcher.fireModelChanged(Event.TimeUpdate, snapshotTime);
 
