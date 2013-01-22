@@ -172,8 +172,9 @@ public abstract class Strategy implements Comparable<Strategy> {
             }
         } else {
             closePosition();// force flat position
+            Mode mode = dispatcher.getMode();
             // check if we have a current position, because it may take time to close, if zero, replace contract if needed
-            if (positionManager.getCurrentPosition() == 0) {
+            if ((mode == Mode.Trade || mode == Mode.ForwardTest) && positionManager.getCurrentPosition() == 0) {
                 // checking only after trading hours, and after positions are all closed
                 Date now = new Date();
                 if (lastContractCheck == null || (lastContractCheck.getTime() < now.getTime() - HOUR_IN_MS)) {
