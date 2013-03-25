@@ -6,7 +6,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.contract.*;
 
 /**
  * @author marcus
@@ -24,17 +24,12 @@ public abstract class StrategyCL extends Strategy {
     protected StrategyCL(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = getNewContract();
+        Contract contract = ContractFactory.makeNYMEXFutureContract("CL", "NYMEX");
         // Define trading schedule
-        TradingSchedule tradingSchedule = new TradingSchedule("10:35", "14:55", "America/New_York");
+        TradingSchedule tradingSchedule = new TradingSchedule("10:05", "15:25", "America/New_York");
         int multiplier = 1000;// contract 1000 barrels
         double bidAskSpread = 0.01; // prevalent spread between best bid and best ask
         Commission commission = CommissionFactory.getBundledNorthAmericaFutureCommission();
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
-    }
-
-    @Override
-    public Contract getNewContract() {
-        return ContractFactory.makeNYMEXFutureContract("CL", "NYMEX");
     }
 }

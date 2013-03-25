@@ -6,7 +6,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.schedule.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.contract.*;
 
 /**
  * @author Eugene Kononov
@@ -24,7 +24,7 @@ public abstract class StrategyYM extends Strategy {
     protected StrategyYM(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = getNewContract();
+        Contract contract = ContractFactory.makeFutureContract("YM", "ECBOT");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:00", "15:55", "America/New_York");
         int multiplier = 5;// contract multiplier
@@ -33,8 +33,4 @@ public abstract class StrategyYM extends Strategy {
         setStrategy(contract, tradingSchedule, multiplier, commission, bidAskSpread);
     }
 
-    @Override
-    public Contract getNewContract() {
-        return ContractFactory.makeFutureContract("YM", "ECBOT");
-    }
 }
