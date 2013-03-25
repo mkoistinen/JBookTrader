@@ -5,7 +5,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
 import com.sun.net.httpserver.*;
 
 import java.io.*;
@@ -33,6 +33,7 @@ public class WebHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         byte[] out;
+        StringBuilder response = new StringBuilder();
         String resource = httpExchange.getRequestURI().getPath();
 
         if (resource.equals("") || resource.equals("/")) {
@@ -40,13 +41,17 @@ public class WebHandler implements HttpHandler {
             List<Strategy> strategies = new ArrayList<Strategy>(dispatcher.getTrader().getAssistant().getAllStrategies());
             Collections.sort(strategies);
 
-            StringBuilder response = new StringBuilder();
             response.append("<html><head><title>");
             response.append(JBookTrader.APP_NAME + ", version " + JBookTrader.VERSION + "</title>");
             response.append("<link rel=stylesheet type=text/css href=JBookTrader.css />");
             response.append("<link rel=\"shortcut icon\" type=image/x-icon href=JBookTrader.ico />");
-            response.append("</head><body><h1>" + JBookTrader.APP_NAME + " - ");
-            response.append("<a href=EventReport.htm target=_new>" + dispatcher.getMode().getName() + "</a></h1><table>");
+
+            response.append("</head>");
+            response.append("<body>");
+            response.append("<h1>" + JBookTrader.APP_NAME + " - ");
+            response.append("[" + "<a href=EventReport.htm target=_new>");
+            response.append(dispatcher.getMode().getName()).append("</a>]</h1>");
+            response.append("<table>");
             response.append("<tr><th>Strategy</th><th>Symbol</th><th>Price</th><th>Position</th><th>Trades</th><th>Net Profit</th></tr>");
 
             int strategyRowCount = 0;
@@ -69,14 +74,34 @@ public class WebHandler implements HttpHandler {
                 addRow(response, cells, strategyRowCount++);
             }
 
-            response.append("</table></body></html>");
+            response.append("</table>");
+            response.append("</body>");
+            response.append("</html>");
+
             out = response.toString().getBytes();
         } else {
-            String path = (resource.endsWith("htm") ? REPORT_DIR : RESOURCE_DIR) + resource;
-            BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path));
-            out = new byte[(int) new File(path).length()];
-            bis.read(out);
-            bis.close();
+            if (resource.endsWith("suspendLiveTrading")) {
+                Dispatcher dispatcher = Dispatcher.getInstance();
+                try {
+                    if (dispatcher.getMode() == Mode.Trade) {
+                        dispatcher.setMode(Mode.ForwardTest);
+                        response.append("JBookTrader running mode has been switched to Forward Test. ");
+                        response.append("If you were trading live and your strategies have open positions, ");
+                        response.append("they must be closed manually in TWS.");
+                    } else {
+                        response.append("JBookTrader running mode was not Trading, so there is nothing to suspend.");
+                    }
+                } catch (Exception e) {
+                    response.append("Could not switch to Forward Test: ").append(e.getMessage());
+                }
+                out = response.toString().getBytes();
+            } else {
+                String path = (resource.endsWith("htm") ? REPORT_DIR : RESOURCE_DIR) + resource;
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path));
+                out = new byte[(int) new File(path).length()];
+                bis.read(out);
+                bis.close();
+            }
         }
 
         httpExchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, out.length);
