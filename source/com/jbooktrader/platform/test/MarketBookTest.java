@@ -39,11 +39,13 @@ public class MarketBookTest {
         marketDepth.update(1, MarketDepthOperation.Update, MarketDepthSide.Ask, 1, 1);
         marketDepth.update(1, MarketDepthOperation.Update, MarketDepthSide.Bid, 1, 1);
 
+        Assert.assertEquals("89-45", marketDepth.getSizes());
+
         MarketSnapshot marketSnapshot = marketDepth.takeMarketSnapshot(0);
         int balance = (int) marketSnapshot.getBalance();
         int price = (int) marketSnapshot.getPrice();
 
-        Assert.assertEquals(balance, 34);
+        Assert.assertEquals(balance, 29);
         Assert.assertEquals(price, 11);
     }
 
