@@ -1,4 +1,4 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.util.ui;
 
 import javax.swing.*;
 import java.awt.*;

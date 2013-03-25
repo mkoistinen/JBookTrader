@@ -1,4 +1,4 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.util.classfinder;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
@@ -8,8 +8,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.jar.*;
 
 
 /**
@@ -51,14 +50,14 @@ public class ClassFinder {
                     JarFile jar = new JarFile(file);
                     Enumeration<JarEntry> entries = jar.entries();
                     while (entries.hasMoreElements()) {
-                        JarEntry entry = (JarEntry) entries.nextElement();
+                        JarEntry entry = entries.nextElement();
                         String entryPath = entry.getName();
                         String prefix = "com/jbooktrader/strategy/";
                         if (entryPath.contains(prefix) && entryPath.endsWith(".class")) {
                             String className = entryPath.substring(prefix.length(), entryPath.lastIndexOf(".class"));
                             if (!className.contains("base/")) {  // support nested packages not named base
                                 if (className.contains("/")) {
-                                    className = className.replaceAll("/",".");
+                                    className = className.replaceAll("/", ".");
                                 }
                                 classNames.add(className);
                             }
@@ -94,7 +93,7 @@ public class ClassFinder {
 
         } catch (ClassCastException cce) {
             throw new JBookTraderException("Class " + name + " does not extend class Strategy.");
-        } catch (ClassNotFoundException cnte) {
+        } catch (ClassNotFoundException cnf) {
             throw new JBookTraderException("Class " + name + " not found");
         } catch (Exception e) {
             throw new JBookTraderException(e.getCause().getMessage());

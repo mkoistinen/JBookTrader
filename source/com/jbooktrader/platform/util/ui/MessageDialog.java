@@ -1,4 +1,4 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.util.ui;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;

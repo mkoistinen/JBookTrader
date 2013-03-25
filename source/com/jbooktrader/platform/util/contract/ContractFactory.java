@@ -1,4 +1,4 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.util.contract;
 
 import com.ib.client.*;
 
@@ -41,7 +41,7 @@ public class ContractFactory {
         return makeFutureContract(symbol, exchange, MostLiquidContract.getMostLiquid());
     }
 
-    public static Contract makeNYMEXFutureContract(String symbol,String exchange) {
+    public static Contract makeNYMEXFutureContract(String symbol, String exchange) {
         return makeFutureContract(symbol, exchange, CLNYMEXMostLiquid.getMostLiquid());
 
     }

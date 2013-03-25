@@ -1,4 +1,4 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.chart;
 
 /**
  * A container holding time and the value.

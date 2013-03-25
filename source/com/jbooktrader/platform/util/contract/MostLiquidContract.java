@@ -1,4 +1,4 @@
-package com.jbooktrader.platform.util;
+package com.jbooktrader.platform.util.contract;
 
 import java.text.*;
 import java.util.*;
