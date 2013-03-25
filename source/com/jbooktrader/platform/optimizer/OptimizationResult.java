@@ -9,8 +9,10 @@ import com.jbooktrader.platform.performance.*;
  */
 public class OptimizationResult {
     private final double netProfit, maxDrawdown, profitFactor, performanceIndex, kellyCriterion, cpi, aveDuration, bias;
+    private double stability;
     private final int trades;
     private final StrategyParams params;
+
 
     public OptimizationResult(StrategyParams params, PerformanceManager performanceManager) {
         this.params = params;
@@ -23,6 +25,10 @@ public class OptimizationResult {
         performanceIndex = performanceManager.getPerformanceIndex();
         aveDuration = performanceManager.getAveDuration();
         bias = performanceManager.getBias();
+    }
+
+    public void setStability(double stability) {
+        this.stability = stability;
     }
 
     public StrategyParams getParams() {
@@ -41,6 +47,8 @@ public class OptimizationResult {
                 return kellyCriterion;
             case CPI:
                 return cpi;
+            case Stability:
+                return stability;
             case MaxDD:
                 return maxDrawdown;
             case NetProfit:

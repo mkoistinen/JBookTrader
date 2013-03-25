@@ -2,7 +2,7 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
 
 import javax.swing.*;
 import java.text.*;
@@ -65,6 +65,7 @@ public class ResultsTableModel extends TableDataModel {
                         item[column + PI.ordinal()] = new DoubleNumericString(df2.format(optimizationResult.get(PI)));
                         item[column + Kelly.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Kelly)));
                         item[column + CPI.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(CPI)));
+                        item[column + Stability.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Stability)));
                         item[column + MaxDD.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(MaxDD)));
                         item[column + NetProfit.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(NetProfit)));
 

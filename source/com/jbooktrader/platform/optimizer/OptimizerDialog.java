@@ -8,7 +8,9 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.classfinder.*;
+import com.jbooktrader.platform.util.format.*;
+import com.jbooktrader.platform.util.ui.*;
 import com.toedter.calendar.*;
 
 import javax.swing.*;
@@ -187,7 +189,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
                     }
 
                     OptimizationMap optimizationMap = new OptimizationMap(OptimizerDialog.this, strategy,
-                        optimizationResults, getSortCriteria());
+                        optimizationResults, getSelectionCriteria());
                     JDialog chartFrame = optimizationMap.getChartFrame();
                     chartFrame.setVisible(true);
                 } catch (Exception ex) {
@@ -499,7 +501,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         return Integer.parseInt(minTradesText.getText());
     }
 
-    public PerformanceMetric getSortCriteria() {
+    public PerformanceMetric getSelectionCriteria() {
         String selectedItem = (String) selectionCriteriaCombo.getSelectedItem();
         return PerformanceMetric.getColumn(selectedItem);
     }

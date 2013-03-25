@@ -1,6 +1,3 @@
-//original
-//    ---------
-
 package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.backtest.*;
@@ -9,7 +6,8 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -27,38 +25,28 @@ import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
  * @author Eugene Kononov
  */
 public abstract class OptimizerRunner implements Runnable {
+    private static final int MAX_SAVED_RESULTS = 100;// max number of results in the optimization results file
+    private static final int MAX_STABILITY_RESULTS = 10000;// max number of results in the optimization results file
     protected final List<OptimizationResult> optimizationResults;
     protected final StrategyParams strategyParams;
-    protected long snapshotCount;
-    protected AtomicBoolean cancelled;
+    protected final AtomicBoolean cancelled;
     protected final int availableProcessors;
-    private static final int MAX_SAVED_RESULTS = 100;// max number of results in the optimization results file
-    private final Constructor<?> strategyConstructor;
     private final ScheduledExecutorService progressExecutor;
-    private ExecutorService optimizationExecutor;
+    private final Constructor<?> strategyConstructor;
     private final CompletionService<List<OptimizationResult>> completionService;
     private final NumberFormat nf2, nf0, gnf0;
     private final String strategyName;
     private final int minTrades;
     private final AtomicLong completedSteps;
     private final OptimizerDialog optimizerDialog;
+    private final int strategiesPerProcessor;
+    protected long snapshotCount;
+    private ExecutorService optimizationExecutor;
     private ResultComparator resultComparator;
     private ComputationalTimeEstimator timeEstimator;
     private List<MarketSnapshot> snapshots;
     private long totalSteps;
     private String totalStrategiesString;
-    private final int strategiesPerProcessor;
-
-    private class ProgressRunner implements Runnable {
-        public void run() {
-            if (!isCancelled()) {
-                long completed = completedSteps.get();
-                if (completed > 0) {
-                    showProgress(completed, "Optimizing " + totalStrategiesString + " strategies");
-                }
-            }
-        }
-    }
 
     protected OptimizerRunner(OptimizerDialog optimizerDialog, Strategy strategy, StrategyParams params) throws JBookTraderException {
         this.optimizerDialog = optimizerDialog;
@@ -85,7 +73,7 @@ public abstract class OptimizerRunner implements Runnable {
             throw new JBookTraderException("Could not find strategy constructor for " + strategy.getClass().getName());
         }
 
-        resultComparator = new ResultComparator(optimizerDialog.getSortCriteria());
+        resultComparator = new ResultComparator(optimizerDialog.getSelectionCriteria());
         minTrades = optimizerDialog.getMinTrades();
         progressExecutor = Executors.newSingleThreadScheduledExecutor();
         optimizationExecutor = Executors.newFixedThreadPool(availableProcessors);
@@ -123,6 +111,51 @@ public abstract class OptimizerRunner implements Runnable {
 
     public List<MarketSnapshot> getSnapshots() {
         return snapshots;
+    }
+
+    public void rateStability() {
+        int maxResults = Math.min(MAX_STABILITY_RESULTS, optimizationResults.size());
+        if (maxResults == 0) {
+            return;
+        }
+
+        PerformanceMetric performanceMetric = optimizerDialog.getSelectionCriteria();
+
+        for (int resultIndex = 0; resultIndex < maxResults; resultIndex++) {
+            OptimizationResult candidateResult = optimizationResults.get(resultIndex);
+            double candidatePerformance = candidateResult.get(performanceMetric);
+            List<StrategyParam> candidateParams = candidateResult.getParams().getAll();
+            double aveNeighborPerformance = 0;
+            int neighbors = 0;
+
+            for (OptimizationResult neighborResult : optimizationResults) {
+                List<StrategyParam> neighborParams = neighborResult.getParams().getAll();
+                boolean isCloseNeighbor = true;
+
+                for (int index = 0; index < candidateParams.size(); index++) {
+                    int neighborValue = neighborParams.get(index).getValue();
+                    int candidateValue = candidateParams.get(index).getValue();
+                    double bandwidth = Math.abs(candidateValue * 0.1);
+
+                    double distance = Math.abs(candidateValue - neighborValue);
+                    if (distance > bandwidth) {
+                        isCloseNeighbor = false;
+                        break;
+                    }
+                }
+
+                if (isCloseNeighbor) {
+                    neighbors++;
+                    aveNeighborPerformance += neighborResult.get(performanceMetric);
+                }
+            }
+
+            if (neighbors > 1) {
+                aveNeighborPerformance /= neighbors;
+                double stability = 100 * (aveNeighborPerformance / candidatePerformance);
+                candidateResult.setStability(stability);
+            }
+        }
     }
 
     void execute(Queue<StrategyParams> tasks) throws JBookTraderException {
@@ -211,6 +244,7 @@ public abstract class OptimizerRunner implements Runnable {
             columns.add(nf2.format(optimizationResult.get(PI)));
             columns.add(nf0.format(optimizationResult.get(Kelly)));
             columns.add(nf0.format(optimizationResult.get(CPI)));
+            columns.add(nf0.format(optimizationResult.get(Stability)));
             columns.add(nf0.format(optimizationResult.get(MaxDD)));
             columns.add(nf0.format(optimizationResult.get(NetProfit)));
 
@@ -276,6 +310,8 @@ public abstract class OptimizerRunner implements Runnable {
             progressExecutor.scheduleWithFixedDelay(new ProgressRunner(), 0, 1, TimeUnit.SECONDS);
             long start = System.currentTimeMillis();
             optimize();
+            optimizerDialog.setProgress("Rating the stability of the top optimization results ...");
+            rateStability();
             progressExecutor.shutdown();
 
             if (!cancelled.get()) {
@@ -294,6 +330,17 @@ public abstract class OptimizerRunner implements Runnable {
             progressExecutor.shutdownNow();
             optimizationExecutor.shutdownNow();
             optimizerDialog.signalCompleted();
+        }
+    }
+
+    private class ProgressRunner implements Runnable {
+        public void run() {
+            if (!isCancelled()) {
+                long completed = completedSteps.get();
+                if (completed > 0) {
+                    showProgress(completed, "Optimizing " + totalStrategiesString + " strategies");
+                }
+            }
         }
     }
 }
