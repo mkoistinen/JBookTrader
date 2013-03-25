@@ -8,8 +8,8 @@ import java.util.*;
  * @author Eugene Kononov
  */
 public class PortfolioManager {
-    private static final long MAX_SHORT_STRATEGIES = 7;
-    private static final long MAX_LONG_STRATEGIES = 7;
+    private static final long MAX_SHORT_STRATEGIES = 4;
+    private static final long MAX_LONG_STRATEGIES = 4;
     private final Set<String> shortStrategies;
     private final Set<String> longStrategies;
 
