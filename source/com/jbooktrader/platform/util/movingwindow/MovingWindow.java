@@ -4,10 +4,10 @@ package com.jbooktrader.platform.util.movingwindow;
  * @author Eugene Kononov
  */
 public class MovingWindow {
-    private final double[] elements;
-    private int start, end;
+    protected final double[] elements;
+    protected int start, end;
     protected boolean isFull;
-    private final int capacity;
+    protected final int capacity;
 
     public MovingWindow(int capacity) {
         this.capacity = capacity;

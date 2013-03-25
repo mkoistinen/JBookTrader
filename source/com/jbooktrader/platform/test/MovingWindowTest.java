@@ -186,4 +186,42 @@ public class MovingWindowTest {
         }
         Assert.assertEquals(-90.78412990032037, mw.getCorrelation(), delta);
     }
+
+    @Test
+    public void testMovingWindowMinMax() {
+        MovingWindowMinMax mw = new MovingWindowMinMax(3);
+
+        Assert.assertEquals(3, mw.getCapacity());
+
+        mw.add(5);
+        mw.add(1);
+        mw.add(3);
+        Assert.assertEquals(5, mw.getMax(), delta);
+        Assert.assertEquals(1, mw.getMin(), delta);
+
+        mw.add(-3);
+        Assert.assertEquals(3, mw.getMax(), delta);
+        Assert.assertEquals(-3, mw.getMin(), delta);
+
+        mw.add(0);
+        Assert.assertEquals(3, mw.getMax(), delta);
+        Assert.assertEquals(-3, mw.getMin(), delta);
+
+        mw.add(1);
+        Assert.assertEquals(1, mw.getMax(), delta);
+        Assert.assertEquals(-3, mw.getMin(), delta);
+
+        mw.add(2);
+        Assert.assertEquals(2, mw.getMax(), delta);
+        Assert.assertEquals(0, mw.getMin(), delta);
+
+        mw.add(3);
+        Assert.assertEquals(3, mw.getMax(), delta);
+        Assert.assertEquals(1, mw.getMin(), delta);
+
+        mw.add(-1);
+        Assert.assertEquals(3, mw.getMax(), delta);
+        Assert.assertEquals(-1, mw.getMin(), delta);
+    }
+
 }
