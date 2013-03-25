@@ -5,7 +5,6 @@ import com.jbooktrader.platform.commission.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
 
 import java.util.*;
 
@@ -122,7 +121,13 @@ public class PerformanceManager {
     }
 
     public double getCPI() {
-        double cpi = getPerformanceIndex() * getProfitFactor() * getKellyCriterion() * 0.1;
+        double cpi = getPerformanceIndex() * getKellyCriterion() * getProfitFactor();
+        cpi *= (getNetProfit() / 10000.0);
+        if (getAveDuration() != 0) {
+            cpi /= Math.sqrt(getAveDuration());
+        } else {
+            cpi = 0;
+        }
         return cpi;
     }
 
