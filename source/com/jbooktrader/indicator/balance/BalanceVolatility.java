@@ -4,8 +4,9 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.util.movingwindow.*;
 
 /**
+ * Balance volatility
+ *
  * @author Eugene Kononov
- *         Balance volatility
  */
 public class BalanceVolatility extends Indicator {
     private final MovingWindowStDev balances;

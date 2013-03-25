@@ -3,7 +3,9 @@ package com.jbooktrader.platform.report;
 import java.io.*;
 import java.util.*;
 
-
+/**
+ * @author Eugene Kononov
+ */
 public class OptimizationReport extends StrategyReport {
 
     public OptimizationReport(String reportName) throws IOException {

@@ -4,6 +4,8 @@ import java.util.*;
 
 /**
  * Comparator for strategy optimization results.
+ *
+ * @author Eugene Kononov
  */
 public class ResultComparator implements Comparator<OptimizationResult> {
     private final PerformanceMetric performanceMetric;

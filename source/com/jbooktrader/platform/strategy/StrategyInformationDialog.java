@@ -6,7 +6,8 @@ import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import java.awt.*;

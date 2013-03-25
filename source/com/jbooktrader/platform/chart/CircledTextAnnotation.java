@@ -12,6 +12,8 @@ import java.awt.geom.*;
  * Defines the shape of the markers which show strategy positions on the
  * performance chart. In this implementation, the shape of a marker is a
  * solid circle whose color indicates the position taken (long, short, or flat)
+ *
+ * @author Eugene Kononov
  */
 public class CircledTextAnnotation extends AbstractXYAnnotation {
     private static final int ANNOTATION_RADIUS = 5;

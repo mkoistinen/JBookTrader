@@ -3,6 +3,7 @@ package com.jbooktrader.platform.optimizer;
 import java.util.*;
 
 /**
+ * @author Eugene Kononov
  */
 public class StrategyParams {
     private final List<StrategyParam> params;

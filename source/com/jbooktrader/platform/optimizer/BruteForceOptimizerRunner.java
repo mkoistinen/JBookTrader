@@ -6,6 +6,7 @@ import com.jbooktrader.platform.strategy.*;
 import java.util.*;
 
 /**
+ * @author Eugene Kononov
  */
 public class BruteForceOptimizerRunner extends OptimizerRunner {
 

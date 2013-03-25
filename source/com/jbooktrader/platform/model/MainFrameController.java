@@ -7,7 +7,8 @@ import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.classfinder.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +19,8 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 /**
  * Acts as a controller in the Model-View-Controller pattern
+ *
+ * @author Eugene Kononov
  */
 public class MainFrameController {
     private final MainFrameDialog mainViewDialog;

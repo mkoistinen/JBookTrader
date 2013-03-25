@@ -4,7 +4,7 @@ import com.ib.client.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.trader.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import java.awt.*;

@@ -5,7 +5,8 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.classfinder.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -20,6 +21,8 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 /**
  * Main application window. All the system logic is intentionally left out if this class,
  * which acts as a simple "view" of the underlying model.
+ *
+ * @author Eugene Kononov
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private final Toolkit toolkit;

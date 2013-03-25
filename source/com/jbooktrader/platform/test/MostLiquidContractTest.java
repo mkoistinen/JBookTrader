@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.test;
 
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.contract.*;
 import org.junit.*;
 
 import java.util.*;

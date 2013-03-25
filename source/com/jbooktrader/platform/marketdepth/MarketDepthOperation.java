@@ -2,6 +2,9 @@ package com.jbooktrader.platform.marketdepth;
 
 import java.util.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public enum MarketDepthOperation {
 
     Insert(0), Update(1), Delete(2);

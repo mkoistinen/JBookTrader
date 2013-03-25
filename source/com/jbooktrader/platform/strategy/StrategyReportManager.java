@@ -4,7 +4,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
 
 import java.io.*;
 import java.text.*;
@@ -12,6 +12,7 @@ import java.util.*;
 
 /**
  * Strategy report manager
+ *
  * @author Eugene Kononov
  */
 public class StrategyReportManager {

@@ -3,8 +3,9 @@ package com.jbooktrader.indicator.price;
 import com.jbooktrader.platform.indicator.*;
 
 /**
+ * Price acceleration
+ *
  * @author Eugene Kononov
- *         Price acceleration
  */
 public class PriceAcceleration extends Indicator {
     private final double fastMultiplier, intermMultiplier, slowMultiplier;

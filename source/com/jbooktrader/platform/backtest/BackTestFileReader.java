@@ -130,14 +130,6 @@ public class BackTestFileReader {
             throw new JBookTraderException(msg);
         }
 
-        /*
-        //ekk
-        if (time - previousTime != 1000) {
-            System.out.println(line);
-        }
-        */
-
-
         double balance = Double.parseDouble(tokens.get(2));
         double price = Double.parseDouble(tokens.get(3));
         int volume = Integer.parseInt(tokens.get(4));

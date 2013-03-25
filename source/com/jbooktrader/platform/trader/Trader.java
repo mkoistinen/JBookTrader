@@ -13,6 +13,8 @@ import java.util.*;
 
 /**
  * This class acts as a "wrapper" in the IB's API terminology.
+ *
+ * @author Eugene Kononov
  */
 public class Trader extends EWrapperAdapter {
     private final EventReport eventReport;

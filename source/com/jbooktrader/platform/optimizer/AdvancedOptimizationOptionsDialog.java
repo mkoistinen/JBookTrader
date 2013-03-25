@@ -2,7 +2,7 @@ package com.jbooktrader.platform.optimizer;
 
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.preferences.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import java.awt.*;

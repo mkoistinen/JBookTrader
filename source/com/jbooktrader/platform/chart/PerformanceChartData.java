@@ -2,7 +2,6 @@ package com.jbooktrader.platform.chart;
 
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.util.*;
 import org.jfree.data.time.*;
 import org.jfree.data.xy.*;
 

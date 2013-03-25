@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.util.movingwindow;
 
 /**
+ * @author Eugene Kononov
  */
 public class MovingWindowMean extends MovingWindow {
     private double sum;

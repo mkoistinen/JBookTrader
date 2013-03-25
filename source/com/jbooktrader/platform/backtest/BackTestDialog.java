@@ -7,7 +7,8 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.classfinder.*;
+import com.jbooktrader.platform.util.ui.*;
 import com.toedter.calendar.*;
 
 import javax.swing.*;

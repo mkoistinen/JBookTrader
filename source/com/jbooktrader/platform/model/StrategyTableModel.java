@@ -4,7 +4,8 @@ import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.performance.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.classfinder.*;
+import com.jbooktrader.platform.util.format.*;
 
 import java.text.*;
 import java.util.*;
@@ -12,6 +13,7 @@ import java.util.*;
 import static com.jbooktrader.platform.model.StrategyTableColumn.*;
 
 /**
+ * @author Eugene Kononov
  */
 public class StrategyTableModel extends TableDataModel {
     private final TraderAssistant traderAssistant;

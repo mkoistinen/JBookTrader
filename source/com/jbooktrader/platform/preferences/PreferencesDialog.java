@@ -2,7 +2,7 @@ package com.jbooktrader.platform.preferences;
 
 import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.startup.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +10,9 @@ import java.awt.event.*;
 
 import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
+/**
+ * @author Eugene Kononov
+ */
 public class PreferencesDialog extends JBTDialog {
     private static final Dimension FIELD_DIMENSION = new Dimension(Integer.MAX_VALUE, 25);
     private final PreferencesHolder prefs;

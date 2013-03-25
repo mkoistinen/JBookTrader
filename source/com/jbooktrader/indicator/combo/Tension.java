@@ -4,8 +4,9 @@ import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 
 /**
+ * Tension of limit order book
+ *
  * @author Eugene Kononov
- *         Tension of limit order book
  */
 public class Tension extends Indicator {
     private final double multiplier;

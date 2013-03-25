@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.marketdepth;
 
 import com.jbooktrader.platform.marketbook.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
 
 import java.text.*;
 import java.util.*;

@@ -3,7 +3,7 @@ package com.jbooktrader.platform.chart;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.strategy.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.ui.*;
 import org.jfree.chart.*;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.block.*;
@@ -26,6 +26,8 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 /**
  * Contour plot of optimization results
+ *
+ * @author Eugene Kononov
  */
 public class OptimizationMap {
     private final PreferencesHolder prefs;

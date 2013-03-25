@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.optimizer;
 
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.format.*;
 
 /**
  * A string wrapper class that has a sorting algorithm for Doubles (including positive infinity).

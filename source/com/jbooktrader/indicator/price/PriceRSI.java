@@ -6,6 +6,8 @@ import com.jbooktrader.platform.indicator.*;
 /**
  * Relative Strength Index of price
  * Specification: http://en.wikipedia.org/wiki/Relative_strength
+ *
+ * @author Eugene Kononov
  */
 public class PriceRSI extends Indicator {
     private final double multiplier;
