@@ -1,8 +1,6 @@
 package com.jbooktrader.platform.test;
 
-import com.jbooktrader.platform.util.CLNYMEXMostLiquid;
-
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.contract.*;
 import org.junit.*;
 
 import java.util.*;
@@ -10,11 +8,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: marcus
- * Date: 1/9/13
- * Time: 12:31 AM
- * To change this template use File | Settings | File Templates.
+ * @author marcus
  */
 public class NYMEXMostLiquidTest {
 
@@ -25,13 +19,11 @@ public class NYMEXMostLiquidTest {
         aSaturday.set(Calendar.MONTH, Calendar.JANUARY);
         aSaturday.set(Calendar.DATE, 5);
 
-        assert(aSaturday.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY);
+        assert (aSaturday.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY);
         CLNYMEXMostLiquid.backupToBusinessDay(aSaturday); // should back up to Friday
-        assert(aSaturday.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY);
+        assert (aSaturday.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY);
         CLNYMEXMostLiquid.backupToBusinessDay(aSaturday);
-        assert(aSaturday.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY);  // should still be Friday
-
-
+        assert (aSaturday.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY);  // should still be Friday
     }
 
     // http://www.cmegroup.com/trading/energy/crude-oil/light-sweet-crude_product_calendar_futures.html
@@ -40,28 +32,26 @@ public class NYMEXMostLiquidTest {
         // test some real NYMEX dates from the CL (Light Sweet Crude index futures
 
         int janExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(1, 2013);  // actually this is called the Feb delivery future, exprires in Jan though
-        assert(janExpire == 22);
+        assert (janExpire == 22);
         int febExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(2, 2013);
-        assert(febExpire == 20);
+        assert (febExpire == 20);
         int marExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(3, 2013);
-        assert(marExpire == 20);
+        assert (marExpire == 20);
         int aprExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(4, 2013);
-        assert(aprExpire == 22);
+        assert (aprExpire == 22);
         int mayExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(5, 2013);
-        assert(mayExpire == 21);
+        assert (mayExpire == 21);
         int junExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(6, 2013);
-        assert(junExpire == 20);
+        assert (junExpire == 20);
         int julExpire = CLNYMEXMostLiquid.getExpireDateForMonthYear(7, 2013);
-        assert(julExpire == 22);
-
-
+        assert (julExpire == 22);
     }
 
     @Test
     public void getVolumeXover1dayPriorToExpire() {
         // test some real NYMEX dates from the CL (Light Sweet Crude index futures
         Calendar volXDay = Calendar.getInstance(TimeZone.getTimeZone("EST"));
-        volXDay.set(2013, Calendar.JANUARY, 21, 10,0,0);
+        volXDay.set(2013, Calendar.JANUARY, 21, 10, 0, 0);
         String janVolXover = CLNYMEXMostLiquid.getMostLiquidExpiry(volXDay);  // actually this is called the Feb delivery future, exprires in Jan though
         assertEquals("201303", janVolXover);   // this would fetch the March contract, which expires Feb 20th
 
@@ -76,8 +66,6 @@ public class NYMEXMostLiquidTest {
         volXDay.set(2013, Calendar.JANUARY, 14, 10, 0, 0);
         janVolXover = CLNYMEXMostLiquid.getMostLiquidExpiry(volXDay);
         assertEquals("201302", janVolXover);
-
-
     }
 
     @Test
@@ -89,7 +77,6 @@ public class NYMEXMostLiquidTest {
 
         String expiry = CLNYMEXMostLiquid.getMostLiquidExpiry(mydate);
         assertTrue("expiration of contract not correct", expiry.equals("201302"));  // note, this is called the Feburary Contract, but expries on Jan 22
-
     }
 
     @Test
@@ -100,9 +87,7 @@ public class NYMEXMostLiquidTest {
         mydate.set(Calendar.DATE, 18);
 
         String expiry = CLNYMEXMostLiquid.getMostLiquidExpiry(mydate);
-        assertEquals("expiration of contract not correct", "201301",expiry);  // note, this is called the Feburary Contract, but expries on Jan 22
-
-
+        assertEquals("expiration of contract not correct", "201301", expiry);  // note, this is called the Feburary Contract, but expries on Jan 22
     }
 
     @Test
@@ -113,9 +98,7 @@ public class NYMEXMostLiquidTest {
         mydate.set(Calendar.DATE, 8);
 
         String expiry = CLNYMEXMostLiquid.getMostLiquidExpiry(mydate);
-        assertEquals("expiration of contract not correct", "201301",expiry);  // note, this is called the Feburary Contract, but expries on Jan 22
-
-
+        assertEquals("expiration of contract not correct", "201301", expiry);  // note, this is called the Feburary Contract, but expries on Jan 22
     }
 
     @Test
@@ -126,11 +109,8 @@ public class NYMEXMostLiquidTest {
         mydate.set(Calendar.DATE, 22);
 
         String expiry = CLNYMEXMostLiquid.getMostLiquidExpiry(mydate);
-        assertEquals("expiration of contract not correct", "201303",expiry);  // note, this is called the Feburary Contract, but expries on Jan 22
-
-
+        assertEquals("expiration of contract not correct", "201303", expiry);  // note, this is called the Feburary Contract, but expries on Jan 22
     }
-
 }
 
 
