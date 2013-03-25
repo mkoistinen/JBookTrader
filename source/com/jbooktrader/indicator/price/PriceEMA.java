@@ -3,6 +3,8 @@ package com.jbooktrader.indicator.price;
 import com.jbooktrader.platform.indicator.*;
 
 /**
+ * Exponential moving average of the price
+ *
  * @author Eugene Kononov
  */
 public class PriceEMA extends Indicator {
@@ -16,7 +18,7 @@ public class PriceEMA extends Indicator {
 
     @Override
     public void reset() {
-        value = 0.0;
+        value = marketBook.getSnapshot().getPrice();
     }
 
     @Override

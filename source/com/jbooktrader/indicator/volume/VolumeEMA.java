@@ -23,7 +23,7 @@ public class VolumeEMA extends Indicator {
 
     @Override
     public void reset() {
-        value = 0;
+        value = marketBook.getSnapshot().getVolume();
     }
 
 }

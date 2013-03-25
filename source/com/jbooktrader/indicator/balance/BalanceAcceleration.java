@@ -3,8 +3,9 @@ package com.jbooktrader.indicator.balance;
 import com.jbooktrader.platform.indicator.*;
 
 /**
+ * Balance acceleration
+ *
  * @author Eugene Kononov
- *         Balance acceleration
  */
 public class BalanceAcceleration extends Indicator {
     private final double fastMultiplier, intermMultiplier, slowMultiplier;
@@ -29,6 +30,6 @@ public class BalanceAcceleration extends Indicator {
 
     @Override
     public void reset() {
-        fast = slow = interm = marketBook.getSnapshot().getBalance();
+        fast = slow = interm = 0;
     }
 }
