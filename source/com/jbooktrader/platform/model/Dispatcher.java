@@ -2,7 +2,7 @@ package com.jbooktrader.platform.model;
 
 
 import com.jbooktrader.platform.model.ModelListener.*;
-import com.jbooktrader.platform.portfolio.*;
+import com.jbooktrader.platform.portfolio.manager.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.trader.*;
@@ -25,10 +25,36 @@ public class Dispatcher {
     private PortfolioManager portfolioManager;
     private NTPClock ntpClock;
     private Mode mode;
+    private String reportsDir, marketDataDir, resourcesDir;
 
     private Dispatcher() {
-        listeners = new ArrayList<ModelListener>();
+        listeners = new ArrayList<>();
     }
+
+    public void init(String homeDir) throws IOException {
+        reportsDir = homeDir + "/reports/";
+        File reportsDirFile = new File(reportsDir);
+        if (!reportsDirFile.exists()) {
+            boolean isCreated = reportsDirFile.mkdir();
+            if (!isCreated) {
+                throw new RuntimeException("Could not create directory " + reportsDir);
+            }
+        }
+
+        marketDataDir = homeDir + "/marketData/";
+        File marketDataDirFile = new File(marketDataDir);
+        if (!marketDataDirFile.exists()) {
+            boolean isCreated = marketDataDirFile.mkdir();
+            if (!isCreated) {
+                throw new RuntimeException("Could not create directory " + marketDataDir);
+            }
+        }
+
+        resourcesDir = homeDir + "/resources/";
+
+        eventReport = new EventReport();
+    }
+
 
     public static synchronized Dispatcher getInstance() {
         if (instance == null) {
@@ -37,8 +63,16 @@ public class Dispatcher {
         return instance;
     }
 
-    public void setReporter() throws IOException {
-        eventReport = new EventReport();
+    public String getReportsDir() {
+        return reportsDir;
+    }
+
+    public String getMarketDataDir() {
+        return marketDataDir;
+    }
+
+    public String getResourcesDir() {
+        return resourcesDir;
     }
 
     public void addListener(ModelListener listener) {
@@ -119,7 +153,7 @@ public class Dispatcher {
             eventReport.enable();
         }
 
-        if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+        if (mode == Mode.Trade || mode == Mode.ForwardTest || mode == Mode.ForceClose) {
             trader.getAssistant().connect();
             MonitoringServer.start();
         } else {

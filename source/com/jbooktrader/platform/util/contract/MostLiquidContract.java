@@ -16,7 +16,7 @@ import java.util.*;
  * @author Eugene Kononov
  */
 public class MostLiquidContract {
-    private static final Map<Integer, Integer> frontMonths = new HashMap<Integer, Integer>();
+    private static final Map<Integer, Integer> frontMonths = new HashMap<>();
 
     static {
         frontMonths.put(Calendar.DECEMBER, Calendar.MARCH);

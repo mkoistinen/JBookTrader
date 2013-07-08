@@ -1,6 +1,6 @@
 package com.jbooktrader.platform.report;
 
-import com.jbooktrader.platform.startup.*;
+import com.jbooktrader.platform.model.*;
 
 import java.io.*;
 
@@ -15,21 +15,10 @@ public abstract class Report {
     protected static final String ROW_START = "<tr>";
     protected static final String ROW_END = "</tr>";
     protected static final String FIELD_BREAK = "<br>";
-
-    private static final String REPORT_DIR;
     private final PrintWriter writer;
 
-    static {
-        String fileSeparator = System.getProperty("file.separator");
-        REPORT_DIR = JBookTrader.getAppPath() + fileSeparator + "reports" + fileSeparator;
-        File reportDir = new File(REPORT_DIR);
-        if (!reportDir.exists()) {
-            reportDir.mkdir();
-        }
-    }
-
     protected Report(String reportName) throws IOException {
-        String fullFileName = REPORT_DIR + reportName + ".htm";
+        String fullFileName = Dispatcher.getInstance().getReportsDir() + reportName + ".htm";
         File reportFile = new File(fullFileName);
         boolean reportExisted = reportFile.exists();
 

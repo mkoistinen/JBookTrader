@@ -66,11 +66,11 @@ public class OptimizationMap {
         chartOptionsPanel.setBorder(border);
 
         JLabel horizontalLabel = new JLabel("Horizontal:", SwingConstants.TRAILING);
-        horizontalCombo = new JComboBox<String>();
+        horizontalCombo = new JComboBox<>();
         horizontalLabel.setLabelFor(horizontalCombo);
 
         JLabel verticalLabel = new JLabel("Vertical:", SwingConstants.TRAILING);
-        verticalCombo = new JComboBox<String>();
+        verticalCombo = new JComboBox<>();
         verticalLabel.setLabelFor(verticalCombo);
 
         StrategyParams params = optimizationResults.get(0).getParams();
@@ -83,13 +83,13 @@ public class OptimizationMap {
         verticalCombo.setSelectedIndex(1);
 
         JLabel caseLabel = new JLabel("Case:", SwingConstants.TRAILING);
-        caseCombo = new JComboBox<String>(new String[]{"Best", "Worst"});
+        caseCombo = new JComboBox<>(new String[]{"Best", "Worst"});
         caseCombo.setSelectedIndex(0);
         caseLabel.setLabelFor(caseCombo);
 
 
         JLabel colorMapLabel = new JLabel("Color map:", SwingConstants.TRAILING);
-        colorMapCombo = new JComboBox<String>(new String[]{"Heat", "Gray"});
+        colorMapCombo = new JComboBox<>(new String[]{"Heat", "Gray"});
         colorMapLabel.setLabelFor(colorMapCombo);
 
         chartOptionsPanel.add(horizontalLabel);
@@ -179,7 +179,7 @@ public class OptimizationMap {
         y = new double[size];
         z = new double[size];
 
-        Map<String, Double> values = new HashMap<String, Double>();
+        Map<String, Double> values = new HashMap<>();
 
 
         int xParameterIndex = (horizontalCombo == null) ? 0 : horizontalCombo.getSelectedIndex();

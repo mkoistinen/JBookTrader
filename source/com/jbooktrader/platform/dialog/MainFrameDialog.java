@@ -20,14 +20,14 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
 
 /**
  * Main application window. All the system logic is intentionally left out if this class,
- * which acts as a simple "view" of the underlying model.
+ * which acts strictly as a "view" of the underlying model.
  *
  * @author Eugene Kononov
  */
 public class MainFrameDialog extends JFrame implements ModelListener {
     private final Toolkit toolkit;
     private JLabel timeLabel;
-    private JMenuItem exitMenuItem, aboutMenuItem, userManualMenuItem, discussionMenuItem, releaseNotesMenuItem, projectHomeMenuItem, preferencesMenuItem;
+    private JMenuItem exitMenuItem, suspendLiveTradingMenuItem, aboutMenuItem, userManualMenuItem, discussionMenuItem, releaseNotesMenuItem, projectHomeMenuItem, preferencesMenuItem;
     private JMenuItem infoMenuItem, tradeMenuItem, backTestMenuItem, forwardTestMenuItem, optimizeMenuItem, chartMenuItem;
     private StrategyTableModel strategyTableModel;
     private JTable strategyTable;
@@ -38,6 +38,12 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         toolkit = Toolkit.getDefaultToolkit();
         init();
         populateStrategies();
+        PreferencesHolder prefs = PreferencesHolder.getInstance();
+        int width = prefs.getInt(MainWindowWidth);
+        int height = prefs.getInt(MainWindowHeight);
+        pack();
+        setSize(width, height);
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
@@ -45,6 +51,11 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         switch (event) {
             case ModeChanged:
                 Mode mode = Dispatcher.getInstance().getMode();
+                if (mode == Mode.Trade) {
+                    suspendLiveTradingMenuItem.setEnabled(true);
+                } else {
+                    suspendLiveTradingMenuItem.setEnabled(false);
+                }
                 if (mode == Mode.Trade || mode == Mode.ForwardTest) {
                     backTestMenuItem.setEnabled(false);
                     optimizeMenuItem.setEnabled(false);
@@ -92,10 +103,6 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         projectHomeMenuItem.addActionListener(action);
     }
 
-    public void strategyTableAction(MouseAdapter action) {
-        strategyTable.addMouseListener(action);
-    }
-
     public void informationAction(ActionListener action) {
         infoMenuItem.addActionListener(action);
     }
@@ -128,6 +135,10 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         exitMenuItem.addActionListener(action);
     }
 
+    public void suspendLiveTradingAction(ActionListener action) {
+        suspendLiveTradingMenuItem.addActionListener(action);
+    }
+
     public void exitAction(WindowAdapter action) {
         addWindowListener(action);
     }
@@ -137,11 +148,16 @@ public class MainFrameDialog extends JFrame implements ModelListener {
     }
 
     private URL getImageURL(String imageFileName) throws JBookTraderException {
-        URL imgURL = ClassLoader.getSystemResource(imageFileName);
+        URL imgURL = getClass().getResource("/resources/" + imageFileName); // load from a jar
         if (imgURL == null) {
-            String msg = "Could not locate " + imageFileName + ". Make sure the /resources directory is in the classpath.";
+            imgURL = getClass().getResource("/" + imageFileName); // load from a directory
+        }
+
+        if (imgURL == null) {
+            String msg = "Could not locate file: " + imageFileName + ". Make sure the /resources directory is in the classpath.";
             throw new JBookTraderException(msg);
         }
+
         return imgURL;
     }
 
@@ -176,30 +192,27 @@ public class MainFrameDialog extends JFrame implements ModelListener {
         // session menu
         JMenu sessionMenu = new JMenu("Session");
         sessionMenu.setMnemonic('S');
-        exitMenuItem = new JMenuItem("Exit");
-        exitMenuItem.setMnemonic('X');
+        suspendLiveTradingMenuItem = new JMenuItem("Suspend Live Trading");
+        suspendLiveTradingMenuItem.setEnabled(false);
+        exitMenuItem = new JMenuItem("Exit", 'X');
+        sessionMenu.add(suspendLiveTradingMenuItem);
+        sessionMenu.addSeparator();
         sessionMenu.add(exitMenuItem);
 
         // configure menu
         JMenu configureMenu = new JMenu("Configure");
         configureMenu.setMnemonic('C');
-        preferencesMenuItem = new JMenuItem("Preferences...");
-        preferencesMenuItem.setMnemonic('P');
+        preferencesMenuItem = new JMenuItem("Preferences...", 'P');
         configureMenu.add(preferencesMenuItem);
 
         // help menu
         JMenu helpMenu = new JMenu("Help");
         helpMenu.setMnemonic('H');
-        userManualMenuItem = new JMenuItem("User Manual");
-        userManualMenuItem.setMnemonic('U');
-        releaseNotesMenuItem = new JMenuItem("Release Notes");
-        releaseNotesMenuItem.setMnemonic('R');
-        discussionMenuItem = new JMenuItem("Discussion Group");
-        discussionMenuItem.setMnemonic('D');
-        projectHomeMenuItem = new JMenuItem("Project Home");
-        projectHomeMenuItem.setMnemonic('P');
-        aboutMenuItem = new JMenuItem("About...");
-        aboutMenuItem.setMnemonic('A');
+        userManualMenuItem = new JMenuItem("User Manual", 'U');
+        releaseNotesMenuItem = new JMenuItem("Release Notes", 'R');
+        discussionMenuItem = new JMenuItem("Discussion Group", 'D');
+        projectHomeMenuItem = new JMenuItem("Project Home", 'P');
+        aboutMenuItem = new JMenuItem("About...", 'A');
         helpMenu.add(userManualMenuItem);
         helpMenu.addSeparator();
         helpMenu.add(releaseNotesMenuItem);
@@ -262,15 +275,8 @@ public class MainFrameDialog extends JFrame implements ModelListener {
 
         statusBar.add(timeLabel, BorderLayout.EAST);
         add(statusBar, BorderLayout.SOUTH);
-
         setTitle(JBookTrader.APP_NAME);
 
         setMinimumSize(new Dimension(600, 200));
-        PreferencesHolder prefs = PreferencesHolder.getInstance();
-        int width = prefs.getInt(MainWindowWidth);
-        int height = prefs.getInt(MainWindowHeight);
-        pack();
-        setSize(width, height);
-        setLocationRelativeTo(null);
     }
 }

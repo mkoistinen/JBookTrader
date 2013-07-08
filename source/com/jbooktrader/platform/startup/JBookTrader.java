@@ -1,7 +1,7 @@
 package com.jbooktrader.platform.startup;
 
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.util.*;
+import com.jbooktrader.platform.util.ui.*;
 
 import javax.swing.*;
 import java.io.*;
@@ -15,17 +15,17 @@ import java.nio.channels.*;
  */
 public class JBookTrader {
     public static final String APP_NAME = "JBookTrader";
-    public static final String VERSION = "8.07";
-    public static final String RELEASE_DATE = "January 9, 2012";
-    private static String appPath;
+    public static final String VERSION = "9.01";
+    public static final String RELEASE_DATE = "July 8, 2013";
+    public static final String COPYRIGHT = "Open Source, BSD license";
 
     /**
      * Instantiates the necessary parts of the application: the application model,
      * views, and controller.
      */
-    private JBookTrader() throws JBookTraderException {
+    private JBookTrader(String homeDir) throws JBookTraderException {
         try {
-            Dispatcher.getInstance().setReporter();
+            Dispatcher.getInstance().init(homeDir);
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
@@ -40,8 +40,6 @@ public class JBookTrader {
 
     /**
      * Starts JBookTrader application.
-     *
-     * @param args
      */
     public static void main(String[] args) {
         try {
@@ -54,18 +52,12 @@ public class JBookTrader {
             }
 
             if (args.length != 1) {
-                String msg = "Exactly one argument must be passed. Usage: JBookTrader <JBookTraderDirectory>";
-                throw new JBookTraderException(msg);
+                throw new RuntimeException("Exactly one argument must be passed, specifying " + APP_NAME + " home directory.");
             }
-            appPath = args[0];
-            new JBookTrader();
+
+            new JBookTrader(args[0]);
         } catch (Throwable t) {
             MessageDialog.showException(t);
         }
     }
-
-    public static String getAppPath() {
-        return appPath;
-    }
-
 }

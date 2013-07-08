@@ -14,22 +14,31 @@ import java.util.*;
  * @author Eugene Kononov
  */
 public class PerformanceChartData {
-    private final TimeSeries netProfit;
+
+    private final List<TimedValue> profits;
     private final BarSize barSize;
     private final List<OHLCDataItem> prices;
     private Bar priceBar;
     private final Map<String, Bar> indicatorBars;
     private final Map<String, List<OHLCDataItem>> indicators;
+    private final String strategyName;
 
-    public PerformanceChartData(BarSize barSize, List<Indicator> indicators) {
+    public PerformanceChartData(BarSize barSize, List<Indicator> indicators, String strategyName) {
         this.barSize = barSize;
-        netProfit = new TimeSeries("Net Profit");
-        prices = new ArrayList<OHLCDataItem>();
-        indicatorBars = new HashMap<String, Bar>();
-        this.indicators = new HashMap<String, List<OHLCDataItem>>();
+
+        profits = new ArrayList<>();
+
+        prices = new ArrayList<>();
+        indicatorBars = new HashMap<>();
+        this.indicators = new HashMap<>();
+        this.strategyName = strategyName;
         for (Indicator indicator : indicators) {
             this.indicators.put(indicator.getKey(), new ArrayList<OHLCDataItem>());
         }
+    }
+
+    public List<TimedValue> getProfits() {
+        return profits;
     }
 
     public List<OHLCDataItem> getPrices() {
@@ -41,11 +50,17 @@ public class PerformanceChartData {
     }
 
     public TimeSeries getProfitAndLossSeries() {
+        TimeSeries netProfit = new TimeSeries(strategyName);
+        double net = 0;
+        for (TimedValue profit : profits) {
+            net += profit.getValue();
+            netProfit.addOrUpdate(new Second(new Date(profit.getTime())), net);
+        }
         return netProfit;
     }
 
     public void update(TimedValue profitAndLoss) {
-        netProfit.addOrUpdate(new Second(new Date(profitAndLoss.getTime())), profitAndLoss.getValue());
+        profits.add(profitAndLoss);
     }
 
     public void update(List<Indicator> indicatorsToUpdate, long time) {

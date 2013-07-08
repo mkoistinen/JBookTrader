@@ -8,6 +8,7 @@ import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.model.ModelListener.*;
 import com.jbooktrader.platform.optimizer.*;
 import com.jbooktrader.platform.performance.*;
+import com.jbooktrader.platform.portfolio.manager.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.schedule.*;
@@ -22,6 +23,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     private final EventReport eventReport;
     private final Dispatcher dispatcher;
     private final String name;
+    private final PortfolioManager portfolioManager;
     private MarketBook marketBook;
     private Contract contract;
     private TradingSchedule tradingSchedule;
@@ -30,6 +32,7 @@ public abstract class Strategy implements Comparable<Strategy> {
     private StrategyReportManager strategyReportManager;
     private IndicatorManager indicatorManager;
     private double bidAskSpread;
+    private boolean isDisabled;
 
     protected Strategy(StrategyParams params) {
         this.params = params;
@@ -40,6 +43,7 @@ public abstract class Strategy implements Comparable<Strategy> {
         name = getClass().getSimpleName();
         dispatcher = Dispatcher.getInstance();
         eventReport = dispatcher.getEventReport();
+        portfolioManager = dispatcher.getPortfolioManager();
     }
 
     /**
@@ -57,16 +61,37 @@ public abstract class Strategy implements Comparable<Strategy> {
      */
     public abstract void setIndicators();
 
-    protected void setPosition(int position) {
-        positionManager.setTargetPosition(position);
+    protected void goLong() {
+        int targetPosition = getPositionManager().getTargetPosition();
+        if (targetPosition <= 0) {
+            int size = portfolioManager.getSize(this);
+            if (size != 0) {
+                positionManager.setTargetPosition(size);
+            }
+        }
     }
+
+    protected void goShort() {
+        int targetPosition = getPositionManager().getTargetPosition();
+        if (targetPosition >= 0) {
+            int size = portfolioManager.getSize(this);
+            if (size != 0) {
+                positionManager.setTargetPosition(-size);
+            }
+        }
+    }
+
+    public void goFlat() {
+        positionManager.setTargetPosition(0);
+    }
+
 
     public double getBidAskSpread() {
         return bidAskSpread;
     }
 
     public void closePosition() {
-        setPosition(0);
+        goFlat();
         if (positionManager.getCurrentPosition() != 0) {
             Mode mode = dispatcher.getMode();
             if (mode == Mode.ForwardTest || mode == Mode.Trade) {
@@ -141,6 +166,10 @@ public abstract class Strategy implements Comparable<Strategy> {
         return contract;
     }
 
+    public void disable() {
+        isDisabled = true;
+    }
+
     public String getSymbol() {
         String symbol = contract.m_symbol;
         if (contract.m_currency != null) {
@@ -155,8 +184,12 @@ public abstract class Strategy implements Comparable<Strategy> {
 
     public void processInstant(boolean isInSchedule) {
         if (isInSchedule) {
-            if (indicatorManager.hasValidIndicators()) {
+            if (dispatcher.getMode() == Mode.ForceClose) {
+                closePosition();
+            } else if (indicatorManager.hasValidIndicators()) {
                 onBookSnapshot();
+            }
+            if (!isDisabled) {
                 positionManager.trade();
             }
         } else {

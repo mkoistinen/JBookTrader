@@ -3,7 +3,6 @@ package com.jbooktrader.platform.position;
 import com.ib.client.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.performance.*;
-import com.jbooktrader.platform.portfolio.*;
 import com.jbooktrader.platform.report.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.trader.*;
@@ -26,7 +25,7 @@ public class PositionManager {
 
     public PositionManager(Strategy strategy) {
         this.strategy = strategy;
-        positionsHistory = new LinkedList<Position>();
+        positionsHistory = new LinkedList<>();
         eventReport = Dispatcher.getInstance().getEventReport();
         traderAssistant = Dispatcher.getInstance().getTrader().getAssistant();
         performanceManager = strategy.getPerformanceManager();
@@ -49,7 +48,7 @@ public class PositionManager {
         this.targetPosition = targetPosition;
         if (targetPosition != currentPosition && isNewTargetPosition) {
             Mode mode = Dispatcher.getInstance().getMode();
-            if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+            if (mode == Mode.ForwardTest || mode == Mode.Trade || mode == Mode.ForceClose) {
                 eventReport.report(strategy.getName(), "Target position is set to " + targetPosition);
             }
         }
@@ -97,14 +96,7 @@ public class PositionManager {
             strategy.getStrategyReportManager().report();
         }
 
-
-        if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-            PortfolioManager portfolioManager = Dispatcher.getInstance().getPortfolioManager();
-            portfolioManager.update(strategy.getName(), currentPosition);
-        }
-
-
-        if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+        if (mode == Mode.ForwardTest || mode == Mode.Trade || mode == Mode.ForceClose) {
             StringBuilder msg = new StringBuilder();
             msg.append("Order ").append(openOrder.getId()).append(" is filled.  ");
             msg.append("Average fill price: ").append(avgFillPrice).append(". ");

@@ -26,8 +26,8 @@ public class OptimizerWorker implements Callable<List<OptimizationResult>> {
     }
 
     public List<OptimizationResult> call() throws JBookTraderException {
-        List<Strategy> strategies = new ArrayList<Strategy>();
-        List<OptimizationResult> optimizationResults = new LinkedList<OptimizationResult>();
+        List<Strategy> strategies = new ArrayList<>();
+        List<OptimizationResult> optimizationResults = new LinkedList<>();
 
         MarketBook marketBook = new MarketBook();
         IndicatorManager indicatorManager = new IndicatorManager();

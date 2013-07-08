@@ -22,16 +22,23 @@ public class BackTestFileReader {
     private long previousTime, time;
     private SimpleDateFormat sdf;
     private String previousDateTimeWithoutSeconds;
+    private final static Map<String, List<MarketSnapshot>> cache = new HashMap<>();
+    private String cacheKey;
 
     public BackTestFileReader(String fileName, MarketSnapshotFilter filter) throws JBookTraderException {
         this.filter = filter;
         previousDateTimeWithoutSeconds = "";
 
+        cacheKey = fileName;
+        if (filter != null) {
+            cacheKey += "," + filter.toString();
+        }
+
         try {
             reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
             fileSize = new File(fileName).length();
-        } catch (FileNotFoundException fnfe) {
-            throw new JBookTraderException("Could not find file " + fileName);
+        } catch (FileNotFoundException fnf) {
+            throw new JBookTraderException("Could not find file: " + fileName);
         }
     }
 
@@ -50,11 +57,17 @@ public class BackTestFileReader {
     }
 
     public List<MarketSnapshot> load(ProgressListener progressListener) throws JBookTraderException {
+
+        if (cache.containsKey(cacheKey)) {
+            return cache.get(cacheKey);
+        }
+
+
         String line = "";
         int lineSeparatorSize = System.getProperty("line.separator").length();
         long sizeRead = 0, lineNumber = 0;
 
-        List<MarketSnapshot> snapshots = new ArrayList<MarketSnapshot>();
+        List<MarketSnapshot> snapshots = new ArrayList<>();
 
         try {
             while ((line = reader.readLine()) != null) {
@@ -100,6 +113,9 @@ public class BackTestFileReader {
             throw new RuntimeException(errorMsg);
         }
 
+        if (!progressListener.isCancelled()) {
+            cache.put(cacheKey, snapshots);
+        }
         return snapshots;
 
     }
@@ -137,7 +153,7 @@ public class BackTestFileReader {
     }
 
     private List<String> fastSplit(String s) {
-        ArrayList<String> tokens = new ArrayList<String>();
+        ArrayList<String> tokens = new ArrayList<>();
         int index, lastIndex = 0;
         while ((index = s.indexOf(',', lastIndex)) != -1) {
             tokens.add(s.substring(lastIndex, index));

@@ -9,7 +9,7 @@ public class StrategyParams {
     private final List<StrategyParam> params;
 
     public StrategyParams() {
-        params = new LinkedList<StrategyParam>();
+        params = new LinkedList<>();
     }
 
     public String getKey() {
@@ -26,7 +26,7 @@ public class StrategyParams {
 
     // copy constructor
     public StrategyParams(StrategyParams params) {
-        this.params = new LinkedList<StrategyParam>();
+        this.params = new LinkedList<>();
         for (StrategyParam param : params.getAll()) {
             StrategyParam paramCopy = new StrategyParam(param);
             this.params.add(paramCopy);

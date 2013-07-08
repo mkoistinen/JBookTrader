@@ -5,7 +5,6 @@ import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
-import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.classfinder.*;
 import com.jbooktrader.platform.util.ui.*;
@@ -85,7 +84,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
                     prefs.set(DateRangeStart, fromDateEditor.getText());
                     prefs.set(DateRangeEnd, toDateEditor.getText());
                     prefs.set(UseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
-                    prefs.set(PerformanceChartBarSize, (String) barSizeCombo.getSelectedItem());
+                    prefs.set(PerformanceChartBarSize, barSizeCombo.getSelectedItem());
                     String historicalFileName = fileNameText.getText();
                     File file = new File(historicalFileName);
                     if (!file.exists()) {
@@ -128,7 +127,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
 
         selectFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser(JBookTrader.getAppPath());
+                JFileChooser fileChooser = new JFileChooser(Dispatcher.getInstance().getMarketDataDir());
                 fileChooser.setDialogTitle("Select Historical Data File");
 
                 String filename = getFileName();
@@ -195,7 +194,7 @@ public class BackTestDialog extends JBTDialog implements ProgressListener {
         SpringUtilities.makeOneLineGrid(dateRangePanel);
 
         JPanel barSizePanel = new JPanel(new SpringLayout());
-        barSizeCombo = new JComboBox<String>();
+        barSizeCombo = new JComboBox<>();
         for (BarSize barSize : BarSize.values()) {
             barSizeCombo.addItem(barSize.getName());
         }

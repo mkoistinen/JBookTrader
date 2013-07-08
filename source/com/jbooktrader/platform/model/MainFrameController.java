@@ -223,6 +223,32 @@ public class MainFrameController {
             }
         });
 
+        mainViewDialog.suspendLiveTradingAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Object[] options = {"Suspend live trading", "Close positions and suspend live trading", "Cancel"};
+                int selectedOption = JOptionPane.showOptionDialog(mainViewDialog, "What would you like to do?",
+                    JBookTrader.APP_NAME, JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, options, options[2]);
+
+                try {
+                    switch (selectedOption) {
+                        case 0:
+                            Dispatcher.getInstance().setMode(Mode.ForwardTest);
+                            MessageDialog.showMessage("Live trading suspended. Running mode set to Forward Test");
+                            break;
+                        case 1:
+                            Dispatcher.getInstance().setMode(Mode.ForceClose);
+                            MessageDialog.showMessage("Request to close open positions and to stop trading has been sent.");
+                            break;
+                        case 2:
+                            // nothing to do, user cancelled
+                            break;
+                    }
+                } catch (Exception ex) {
+                    MessageDialog.showException(ex);
+                }
+            }
+        });
 
         mainViewDialog.discussionAction(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

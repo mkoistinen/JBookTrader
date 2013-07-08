@@ -6,7 +6,6 @@ import com.jbooktrader.platform.dialog.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.preferences.*;
-import com.jbooktrader.platform.startup.*;
 import com.jbooktrader.platform.strategy.*;
 import com.jbooktrader.platform.util.classfinder.*;
 import com.jbooktrader.platform.util.format.*;
@@ -148,9 +147,9 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
                     prefs.set(OptimizerWindowHeight, getSize().height);
                     prefs.set(DataFileName, fileNameText.getText());
                     prefs.set(OptimizerMinTrades, minTradesText.getText());
-                    prefs.set(OptimizerSelectBy, (String) selectionCriteriaCombo.getSelectedItem());
-                    prefs.set(InclusionCriteria, (String) inclusionCriteriaCombo.getSelectedItem());
-                    prefs.set(OptimizerMethod, (String) optimizationMethodCombo.getSelectedItem());
+                    prefs.set(OptimizerSelectBy, selectionCriteriaCombo.getSelectedItem());
+                    prefs.set(InclusionCriteria, inclusionCriteriaCombo.getSelectedItem());
+                    prefs.set(OptimizerMethod, optimizationMethodCombo.getSelectedItem());
                     prefs.set(DateRangeStart, fromDateEditor.getText());
                     prefs.set(DateRangeEnd, toDateEditor.getText());
                     prefs.set(UseDateRange, (useDateRangeCheckBox.isSelected() ? "true" : "false"));
@@ -236,7 +235,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
         selectFileButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser(JBookTrader.getAppPath());
+                JFileChooser fileChooser = new JFileChooser(Dispatcher.getInstance().getMarketDataDir());
                 fileChooser.setDialogTitle("Select Historical Data File");
 
                 String filename = getFileName();
@@ -352,7 +351,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         JPanel optimizationOptionsPanel = new JPanel(new SpringLayout());
 
         JLabel optimizationMethodLabel = new JLabel("Search method:");
-        optimizationMethodCombo = new JComboBox<String>(new String[]{"Brute force", "Divide & Conquer"});
+        optimizationMethodCombo = new JComboBox<>(new String[]{"Brute force", "Divide & Conquer"});
         String optimizerMethod = prefs.get(OptimizerMethod);
         optimizationMethodCombo.setSelectedItem(optimizerMethod);
 
@@ -364,7 +363,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
         JLabel selectionCriteriaLabel = new JLabel("Selection criteria:");
         String[] sortFactors = new String[]{PF.getName(), NetProfit.getName(), Kelly.getName(), PI.getName(), CPI.getName()};
 
-        selectionCriteriaCombo = new JComboBox<String>(sortFactors);
+        selectionCriteriaCombo = new JComboBox<>(sortFactors);
         selectionCriteriaCombo.setSelectedItem(prefs.get(OptimizerSelectBy));
         selectionCriteriaLabel.setLabelFor(selectionCriteriaCombo);
         optimizationOptionsPanel.add(selectionCriteriaLabel);
@@ -372,7 +371,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
 
 
         JLabel inclusionCriteriaLabel = new JLabel("Inclusion criteria:");
-        inclusionCriteriaCombo = new JComboBox<String>(new String[]{"All strategies", "Profitable strategies"});
+        inclusionCriteriaCombo = new JComboBox<>(new String[]{"All strategies", "Profitable strategies"});
         inclusionCriteriaLabel.setLabelFor(inclusionCriteriaCombo);
         optimizationOptionsPanel.add(inclusionCriteriaLabel);
         optimizationOptionsPanel.add(inclusionCriteriaCombo);
@@ -473,7 +472,7 @@ public class OptimizerDialog extends JBTDialog implements ProgressListener {
             setParamTableColumns();
             ResultsTableModel model = new ResultsTableModel(strategy);
             resultsTable.setModel(model);
-            resultsTable.setRowSorter(new TableRowSorter<ResultsTableModel>(model));
+            resultsTable.setRowSorter(new TableRowSorter<>(model));
         } catch (Exception e) {
             MessageDialog.showException(e);
         }

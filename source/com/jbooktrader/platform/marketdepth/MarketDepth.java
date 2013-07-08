@@ -22,9 +22,9 @@ public class MarketDepth {
 
 
     public MarketDepth() {
-        bids = new LinkedList<MarketDepthItem>();
-        asks = new LinkedList<MarketDepthItem>();
-        balances = new LinkedList<Double>();
+        bids = new LinkedList<>();
+        asks = new LinkedList<>();
+        balances = new LinkedList<>();
         df2 = NumberFormatterFactory.getNumberFormatter(2);
     }
 

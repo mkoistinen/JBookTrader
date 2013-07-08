@@ -17,7 +17,7 @@ import static com.jbooktrader.platform.optimizer.PerformanceMetric.*;
  */
 public class ResultsTableModel extends TableDataModel {
     public ResultsTableModel(Strategy strategy) {
-        List<String> columnNames = new LinkedList<String>();
+        List<String> columnNames = new LinkedList<>();
         for (StrategyParam param : strategy.getParams().getAll()) {
             columnNames.add(param.getName());
         }
@@ -65,7 +65,7 @@ public class ResultsTableModel extends TableDataModel {
                         item[column + PI.ordinal()] = new DoubleNumericString(df2.format(optimizationResult.get(PI)));
                         item[column + Kelly.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Kelly)));
                         item[column + CPI.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(CPI)));
-                        item[column + Stability.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(Stability)));
+                        item[column + MaxSL.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(MaxSL)));
                         item[column + MaxDD.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(MaxDD)));
                         item[column + NetProfit.ordinal()] = new DoubleNumericString(df0.format(optimizationResult.get(NetProfit)));
 

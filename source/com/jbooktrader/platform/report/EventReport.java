@@ -73,7 +73,7 @@ public class EventReport extends Report {
 
     private Date getDate() {
         Mode mode = dispatcher.getMode();
-        if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+        if (mode == Mode.ForwardTest || mode == Mode.Trade || mode == Mode.ForceClose) {
             return new Date(dispatcher.getNTPClock().getTime());
         }
         return new Date();

@@ -11,7 +11,7 @@ public class TableDataModel extends AbstractTableModel {
     private String[] schema;
 
     public TableDataModel() {
-        rows = new ArrayList<Object>();
+        rows = new ArrayList<>();
     }
 
     public void addRow(Object[] item) {
@@ -26,9 +26,9 @@ public class TableDataModel extends AbstractTableModel {
         fireTableRowsUpdated(row, row);
     }
 
-    protected void updateRow(int row, EnumMap<StrategyTableColumn, Object> rowData) {
+    protected void updateRow(int row, EnumMap<? extends Enum, Object> rowData) {
         Object[] changedItem = (Object[]) rows.get(row);
-        for (Map.Entry<StrategyTableColumn, Object> entry : rowData.entrySet()) {
+        for (Map.Entry<? extends Enum, Object> entry : rowData.entrySet()) {
             changedItem[entry.getKey().ordinal()] = entry.getValue();
         }
         fireTableRowsUpdated(row, row);

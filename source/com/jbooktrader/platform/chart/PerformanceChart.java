@@ -34,7 +34,7 @@ public class PerformanceChart {
     private static final Paint BACKGROUND_COLOR = new GradientPaint(0, 0, new Color(0, 0, 176), 0, 0, Color.BLACK);
 
     private final Strategy strategy;
-    private final ArrayList<CircledTextAnnotation> annotations = new ArrayList<CircledTextAnnotation>();
+    private final ArrayList<CircledTextAnnotation> annotations = new ArrayList<>();
     private final PreferencesHolder prefs;
     private final List<XYPlot> indicatorPlots;
     private final PerformanceChartData performanceChartData;
@@ -48,7 +48,7 @@ public class PerformanceChart {
     private JCheckBox indicatorVisibilityCheck, tradesVisibilityCheck, pnlVisibilityCheck;
 
     public PerformanceChart(JFrame parent, Strategy strategy) {
-        indicatorPlots = new ArrayList<XYPlot>();
+        indicatorPlots = new ArrayList<>();
         performanceChartData = strategy.getPerformanceManager().getPerformanceChartData();
         prefs = PreferencesHolder.getInstance();
         this.strategy = strategy;
@@ -148,11 +148,11 @@ public class PerformanceChart {
         chartOptionsPanel.setBorder(chartOptionsBorder);
 
         JLabel timeLineLabel = new JLabel("Timeline:", SwingConstants.TRAILING);
-        timeLineCombo = new JComboBox<String>(new String[]{"All Hours", "Trading Hours"});
+        timeLineCombo = new JComboBox<>(new String[]{"All Hours", "Trading Hours"});
         timeLineLabel.setLabelFor(timeLineCombo);
 
         JLabel timeZoneLabel = new JLabel("Time Zone:", SwingConstants.TRAILING);
-        timeZoneCombo = new JComboBox<String>(new String[]{"Exchange", "Local"});
+        timeZoneCombo = new JComboBox<>(new String[]{"Exchange", "Local"});
         timeZoneLabel.setLabelFor(timeZoneCombo);
 
         JLabel visibilityLabel = new JLabel("Show:");

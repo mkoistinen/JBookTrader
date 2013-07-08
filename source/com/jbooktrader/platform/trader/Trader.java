@@ -1,6 +1,7 @@
 package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
+import com.jbooktrader.platform.email.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.model.ModelListener.*;
@@ -34,6 +35,10 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void updateAccountValue(String key, String value, String currency, String accountName) {
         try {
+            if (key.equalsIgnoreCase("AvailableFunds")) {
+                eventReport.report("Account", key + ": " + value);
+            }
+
             if (key.equalsIgnoreCase("AccountCode")) {
                 synchronized (this) {
                     traderAssistant.setAccountCode(value);
@@ -165,13 +170,27 @@ public class Trader extends EWrapperAdapter {
                 eventReport.report(JBookTrader.APP_NAME, "Market data for book " + id + " has been reset.");
             }
 
+
             if (errorCode == 202) { // Order Canceled - reason:Can't handle negative priced order
                 traderAssistant.getOpenOrders().remove(id);
                 traderAssistant.resetOrderExecutionPending();
                 String reportMsg = "Removed order " + id + " because IB reported error " + errorCode + ". ";
-                reportMsg += "Another order will be submitted. The strategy will continue to run normally";
+                reportMsg += "Another order will be submitted. The strategy will continue to run normally.";
                 eventReport.report(JBookTrader.APP_NAME, reportMsg);
             }
+
+            if (errorCode == 201) { // Order rejected: insufficient margin
+                OpenOrder openOrder = traderAssistant.getOpenOrders().get(id);
+                Strategy strategy = openOrder.getStrategy();
+                strategy.disable();
+                traderAssistant.getOpenOrders().remove(id);
+                traderAssistant.resetOrderExecutionPending();
+                String reportMsg = "Removed order " + id + " because it was rejected. Error code: " + errorCode + ". ";
+                reportMsg += "Strategy " + strategy.getName() + " has been disabled. ";
+                reportMsg += "Other strategies will continue to run normally.";
+                eventReport.report(JBookTrader.APP_NAME, reportMsg);
+            }
+
 
             if (errorCode == 2104) { // Market data farm connection is OK
                 traderAssistant.setIsMarketDataActive(true);
@@ -181,10 +200,6 @@ public class Trader extends EWrapperAdapter {
                 traderAssistant.setIsMarketDataActive(false);
             }
 
-            if (errorCode == 1101 || errorCode == 1102) { // Connectivity between IB and Trader Workstation has been restored.
-                new Thread(new ResubscriberRunner()).start();
-            }
-
             // 200: bad contract
             // 309: market depth requested for more than 3 symbols
             boolean isInvalidRequest = (errorCode == 200 || errorCode == 309);
@@ -192,7 +207,10 @@ public class Trader extends EWrapperAdapter {
                 Dispatcher.getInstance().fireModelChanged(Event.Error, "IB reported: " + errorMsg);
             }
 
-
+            boolean isNotificationNeeded = (errorCode < 2103 || errorCode > 2106) && (errorCode != 2100);
+            if (isNotificationNeeded) {
+                Notifier.getInstance().send(msg);
+            }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);

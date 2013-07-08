@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class BackTestFileStripper {
     public static final int SECONDS_IN_HOUR = 3600;
-    public static final int COLUMNS = 5;
+    private static final int COLUMNS = 5;
     private final BufferedReader reader;
     private final PrintWriter writer;
     private static long lineNumber;

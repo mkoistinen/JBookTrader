@@ -16,6 +16,7 @@ public enum StrategyTableColumn {
     PI("PI"),
     Kelly("Kelly"),
     CPI("CPI"),
+    MaxSL("Max SL"),
     MaxDD("Max DD"),
     NetProfit("Net Profit");
 

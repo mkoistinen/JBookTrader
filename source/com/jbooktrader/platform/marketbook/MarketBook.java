@@ -63,10 +63,10 @@ public class MarketBook {
     }
 
     public boolean isGapping(MarketSnapshot newMarketSnapshot) {
-        if (!isEmpty()) {
-            return (newMarketSnapshot.getTime() - marketSnapshot.getTime() > GAP_SIZE);
+        if (isEmpty()) {
+            return false;
         }
-        return false;
+        return (newMarketSnapshot.getTime() - marketSnapshot.getTime() > GAP_SIZE);
     }
 
     public MarketSnapshot getSnapshot() {

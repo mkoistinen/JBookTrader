@@ -19,8 +19,8 @@ import java.util.*;
 public class WebHandler implements HttpHandler {
     private static final DecimalFormat df0 = NumberFormatterFactory.getNumberFormatter(0);
     private static final DecimalFormat df6 = NumberFormatterFactory.getNumberFormatter(6);
-    private static final String RESOURCE_DIR = JBookTrader.getAppPath() + "/resources";
-    private static final String REPORT_DIR = JBookTrader.getAppPath() + "/reports";
+    private static final String reportsDir = Dispatcher.getInstance().getReportsDir();
+    private static final String resourcesDir = Dispatcher.getInstance().getResourcesDir();
 
     private void addRow(StringBuilder response, List<Object> cells, int rowCount) {
         response.append((rowCount % 2 == 0) ? "<tr>" : "<tr class=oddRow>");
@@ -38,7 +38,7 @@ public class WebHandler implements HttpHandler {
 
         if (resource.equals("") || resource.equals("/")) {
             Dispatcher dispatcher = Dispatcher.getInstance();
-            List<Strategy> strategies = new ArrayList<Strategy>(dispatcher.getTrader().getAssistant().getAllStrategies());
+            List<Strategy> strategies = new ArrayList<>(dispatcher.getTrader().getAssistant().getAllStrategies());
             Collections.sort(strategies);
 
             response.append("<html><head><title>");
@@ -59,8 +59,8 @@ public class WebHandler implements HttpHandler {
                 MarketSnapshot marketSnapshot = strategy.getMarketBook().getSnapshot();
                 PerformanceManager pm = strategy.getPerformanceManager();
 
-                List<Object> cells = new ArrayList<Object>();
-                String path = REPORT_DIR + "/" + strategy.getName() + ".htm";
+                List<Object> cells = new ArrayList<>();
+                String path = reportsDir + "/" + strategy.getName() + ".htm";
                 if (new File(path).exists()) {
                     cells.add("<a href=" + strategy.getName() + ".htm target=_new>" + strategy.getName() + "</a>");
                 } else {
@@ -80,7 +80,7 @@ public class WebHandler implements HttpHandler {
 
             out = response.toString().getBytes();
         } else {
-            if (resource.endsWith("suspendLiveTrading")) {
+            if (resource.endsWith("switchToForwardTest")) {
                 Dispatcher dispatcher = Dispatcher.getInstance();
                 try {
                     if (dispatcher.getMode() == Mode.Trade) {
@@ -89,14 +89,28 @@ public class WebHandler implements HttpHandler {
                         response.append("If you were trading live and your strategies have open positions, ");
                         response.append("they must be closed manually in TWS.");
                     } else {
-                        response.append("JBookTrader running mode was not Trading, so there is nothing to suspend.");
+                        response.append("JBookTrader running mode was not Trading, so there is nothing to switch.");
                     }
                 } catch (Exception e) {
                     response.append("Could not switch to Forward Test: ").append(e.getMessage());
                 }
                 out = response.toString().getBytes();
+            } else if (resource.endsWith("switchToForceClose")) {
+                Dispatcher dispatcher = Dispatcher.getInstance();
+                try {
+                    if (dispatcher.getMode() == Mode.Trade) {
+                        dispatcher.setMode(Mode.ForceClose);
+                        response.append("JBookTrader running mode has been switched to Force Close. ");
+                        response.append("Open positions will be closed.");
+                    } else {
+                        response.append("JBookTrader running mode was not Trading, so there is nothing to suspend.");
+                    }
+                } catch (Exception e) {
+                    response.append("Could not switch to Force Close: ").append(e.getMessage());
+                }
+                out = response.toString().getBytes();
             } else {
-                String path = (resource.endsWith("htm") ? REPORT_DIR : RESOURCE_DIR) + resource;
+                String path = (resource.endsWith("htm") ? reportsDir : resourcesDir) + resource;
                 BufferedInputStream bis = new BufferedInputStream(new FileInputStream(path));
                 out = new byte[(int) new File(path).length()];
                 bis.read(out);

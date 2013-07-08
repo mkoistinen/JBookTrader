@@ -38,6 +38,11 @@ public class SpringUtilities {
         makeCompactGrid(parent, 1, parent.getComponentCount(), 0, 0, xPad, 0);
     }
 
+    public static void makeTwoColumnGrid(Container parent) {
+        makeCompactGrid(parent, parent.getComponentCount() / 2, 2, 12, 8, 12, 8);
+    }
+
+
     /**
      * Aligns the first <code>rows</code> * <code>cols</code>
      * components of <code>parent</code> in

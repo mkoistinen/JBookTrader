@@ -21,11 +21,11 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
 
     @Override
     public void optimize() throws JBookTraderException {
-        List<StrategyParams> topParams = new LinkedList<StrategyParams>();
+        List<StrategyParams> topParams = new LinkedList<>();
         StrategyParams startingParams = new StrategyParams(strategyParams);
         topParams.add(startingParams);
         int dimensions = strategyParams.size();
-        HashSet<String> uniqueParams = new HashSet<String>();
+        HashSet<String> uniqueParams = new HashSet<>();
 
         int maxRange = 0;
         for (StrategyParam param : startingParams.getAll()) {
@@ -36,8 +36,8 @@ public class DivideAndConquerOptimizerRunner extends OptimizerRunner {
         int iterationsRemaining = 1 + (int) (Math.log(maxRange) / Math.log(divider));
 
         long completedSteps = 0;
-        LinkedList<StrategyParams> tasks = new LinkedList<StrategyParams>();
-        Queue<StrategyParams> filteredTasks = new LinkedBlockingQueue<StrategyParams>();
+        LinkedList<StrategyParams> tasks = new LinkedList<>();
+        Queue<StrategyParams> filteredTasks = new LinkedBlockingQueue<>();
         PreferencesHolder prefs = PreferencesHolder.getInstance();
         int chunkSize = 100 * prefs.getInt(JBTPreferences.DivideAndConquerCoverage);
         int numberOfCandidates = Math.max(1, (int) (chunkSize / Math.pow(divider, dimensions)));

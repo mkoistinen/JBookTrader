@@ -71,28 +71,14 @@ public class AboutDialog extends JBTDialog {
         aboutPanel.add(releaseDateLabel);
         aboutPanel.add(releaseDateValueLabel);
 
-        JLabel authorLabel = new JLabel("Author:", SwingConstants.TRAILING);
-        JLabel authorValueLabel = new JLabel("Eugene Kononov");
-        authorValueLabel.setForeground(Color.BLACK);
-        authorLabel.setLabelFor(authorValueLabel);
-        aboutPanel.add(authorLabel);
-        aboutPanel.add(authorValueLabel);
+        JLabel copyrightLabel = new JLabel("Copyright:", SwingConstants.TRAILING);
+        JLabel copyrightValueLabel = new JLabel(JBookTrader.COPYRIGHT);
+        copyrightValueLabel.setForeground(Color.BLACK);
+        copyrightLabel.setLabelFor(copyrightValueLabel);
+        aboutPanel.add(copyrightLabel);
+        aboutPanel.add(copyrightValueLabel);
 
-        JLabel emailLabel = new JLabel("Email:", SwingConstants.TRAILING);
-        JLabel emailValueLabel = new JLabel("eugene.kononov@gmail.com");
-        emailValueLabel.setForeground(Color.BLACK);
-        emailLabel.setLabelFor(productValueLabel);
-        aboutPanel.add(emailLabel);
-        aboutPanel.add(emailValueLabel);
-
-        JLabel licenseLabel = new JLabel("License:", SwingConstants.TRAILING);
-        JLabel licenseValueLabel = new JLabel("BSD (Free, open source)");
-        licenseValueLabel.setForeground(Color.BLACK);
-        licenseLabel.setLabelFor(licenseValueLabel);
-        aboutPanel.add(licenseLabel);
-        aboutPanel.add(licenseValueLabel);
-
-        SpringUtilities.makeCompactGrid(aboutPanel, 6, 2, 12, 12, 5, 5);
+        SpringUtilities.makeCompactGrid(aboutPanel, 4, 2, 12, 12, 5, 5);
 
         JLabel serverVersionLabel = new JLabel("Server Version:", SwingConstants.TRAILING);
         String serverVersion = "Disconnected from server";

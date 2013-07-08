@@ -39,8 +39,8 @@ public class StrategyReportManager {
         timeFormat.setTimeZone(timeZone);
 
 
-        strategyReportColumns = new ArrayList<String>();
-        strategyReportHeaders = new ArrayList<String>();
+        strategyReportColumns = new ArrayList<>();
+        strategyReportHeaders = new ArrayList<>();
         strategyReportHeaders.add("Date");
         strategyReportHeaders.add("Time");
         strategyReportHeaders.add("Trade #");
@@ -80,7 +80,7 @@ public class StrategyReportManager {
         strategyReportColumns.add(isCompletedTrade ? df2.format(performanceManager.getNetProfit()) : "&nbsp;");
 
         Mode mode = Dispatcher.getInstance().getMode();
-        boolean useNTPTime = (mode == Mode.ForwardTest || mode == Mode.Trade);
+        boolean useNTPTime = (mode == Mode.ForwardTest || mode == Mode.Trade || mode == Mode.ForceClose);
 
         long now = useNTPTime ? Dispatcher.getInstance().getNTPClock().getTime() : strategy.getMarketBook().getSnapshot().getTime();
         String date = dateFormat.format(now);

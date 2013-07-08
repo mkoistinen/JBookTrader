@@ -10,7 +10,7 @@ public enum MarketDepthOperation {
     Insert(0), Update(1), Delete(2);
 
     private final int value;
-    private static final Map<Integer, MarketDepthOperation> operations = new HashMap<Integer, MarketDepthOperation>();
+    private static final Map<Integer, MarketDepthOperation> operations = new HashMap<>();
 
 
     MarketDepthOperation(int value) {

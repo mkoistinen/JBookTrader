@@ -11,10 +11,9 @@ public enum PerformanceMetric {
     PI("PI"), // performance index
     Kelly("Kelly"), // Kelly criterion
     CPI("CPI"), // cumulative performance index
-    Stability("Stability"), // stability
+    MaxSL("Max SL"), // maximum single loss
     MaxDD("Max DD"), // maximum drawdown
     NetProfit("Net Profit");
-
 
     private final String name;
 

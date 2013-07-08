@@ -4,7 +4,6 @@ import com.ib.client.*;
 import com.jbooktrader.platform.indicator.*;
 import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.model.*;
-import com.jbooktrader.platform.portfolio.*;
 import com.jbooktrader.platform.position.*;
 import com.jbooktrader.platform.preferences.*;
 import com.jbooktrader.platform.report.*;
@@ -28,37 +27,36 @@ public class TraderAssistant {
     private final EventReport eventReport;
     private final Trader trader;
     private final Dispatcher dispatcher;
+    private final String faSubAccount;
+    private final long maxDisconnectionTimeSeconds;
 
     private EClientSocket socket;
     private int nextStrategyID, tickerId, orderID, serverVersion;
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isOrderExecutionPending;
     private boolean isMarketDataActive;
+    private static long disconnectionTime;
 
     public TraderAssistant(Trader trader) {
         this.trader = trader;
         dispatcher = Dispatcher.getInstance();
         eventReport = dispatcher.getEventReport();
-        strategies = new HashMap<Integer, Strategy>();
-        openOrders = new HashMap<Integer, OpenOrder>();
-        tickers = new HashMap<String, Integer>();
-        marketBooks = new HashMap<Integer, MarketBook>();
-        subscribedTickers = new HashSet<Integer>();
-
+        strategies = new HashMap<>();
+        openOrders = new HashMap<>();
+        tickers = new HashMap<>();
+        marketBooks = new HashMap<>();
+        subscribedTickers = new HashSet<>();
+        faSubAccount = PreferencesHolder.getInstance().get(SubAccount);
+        maxDisconnectionTimeSeconds = Long.parseLong(PreferencesHolder.getInstance().get(MaxDisconnectionPeriod));
     }
 
     public Map<Integer, OpenOrder> getOpenOrders() {
         return openOrders;
     }
 
-    public Strategy getStrategy(int strategyId) {
-        return strategies.get(strategyId);
-    }
-
     public Collection<Strategy> getAllStrategies() {
         return strategies.values();
     }
-
 
     public MarketBook getMarketBook(int tickerId) {
         return marketBooks.get(tickerId);
@@ -228,8 +226,21 @@ public class TraderAssistant {
         isOrderExecutionPending = false;
     }
 
-    public void setIsMarketDataActive(boolean isMarketDataActive) {
+    public void setIsMarketDataActive(boolean isMarketDataActive) throws JBookTraderException {
         this.isMarketDataActive = isMarketDataActive;
+        if (!isMarketDataActive) {
+            disconnectionTime = dispatcher.getNTPClock().getTime();
+        }
+
+        if (isMarketDataActive) {
+            long reconnectionTime = dispatcher.getNTPClock().getTime();
+            long elapsedDisconnectionTimeSeconds = (reconnectionTime - disconnectionTime) / 1000;
+            if (disconnectionTime != 0 && elapsedDisconnectionTimeSeconds > maxDisconnectionTimeSeconds) {
+                dispatcher.setMode(Mode.ForceClose);
+            }
+            disconnectionTime = 0;
+        }
+
     }
 
     public boolean getIsMarketDataActive() {
@@ -243,14 +254,6 @@ public class TraderAssistant {
                 return;
             }
 
-            Mode mode = dispatcher.getMode();
-            if (mode == Mode.Trade || mode == Mode.ForwardTest) {
-                PortfolioManager portfolioManager = dispatcher.getPortfolioManager();
-                if (!portfolioManager.canTrade(strategy.getName(), order.m_action)) {
-                    return;
-                }
-            }
-
             long remainingTime = strategy.getTradingSchedule().getRemainingTime(strategy.getMarketBook().getSnapshot().getTime());
             long remainingMinutes = remainingTime / (1000 * 60);
             if (strategy.getPositionManager().getTargetPosition() != 0 && remainingMinutes < 15) {
@@ -261,7 +264,8 @@ public class TraderAssistant {
             isOrderExecutionPending = true;
             orderID++;
 
-            if (mode == Mode.Trade || mode == Mode.ForwardTest) {
+            Mode mode = dispatcher.getMode();
+            if (mode == Mode.Trade || mode == Mode.ForwardTest || mode == Mode.ForceClose) {
                 String msg = "Placing order " + orderID;
                 eventReport.report(strategy.getName(), msg);
             }
@@ -273,7 +277,7 @@ public class TraderAssistant {
             double expectedFillPrice = order.m_action.equalsIgnoreCase("BUY") ? (midPrice + bidAskSpread / 2) : (midPrice - bidAskSpread / 2);
             strategy.getPositionManager().setExpectedFillPrice(expectedFillPrice);
 
-            if (mode == Mode.Trade) {
+            if (mode == Mode.Trade || mode == Mode.ForceClose) {
                 socket.placeOrder(orderID, contract, order);
             } else {
                 Execution execution = new Execution();
@@ -294,6 +298,7 @@ public class TraderAssistant {
         order.m_action = action;
         order.m_totalQuantity = quantity;
         order.m_orderType = "MKT";
+        order.m_account = faSubAccount;
         placeOrder(contract, order, strategy);
     }
 
@@ -303,7 +308,7 @@ public class TraderAssistant {
     }
 
     private void checkAccountType() throws JBookTraderException {
-        socket.reqAccountUpdates(true, "");
+        socket.reqAccountUpdates(true, faSubAccount);
 
         try {
             synchronized (trader) {
@@ -315,7 +320,7 @@ public class TraderAssistant {
             throw new JBookTraderException(ie);
         }
 
-        socket.reqAccountUpdates(false, "");
+        socket.reqAccountUpdates(false, faSubAccount);
         boolean isRealTrading = !accountCode.startsWith("D") && Dispatcher.getInstance().getMode() == Mode.Trade;
         if (isRealTrading) {
             String lineSep = System.getProperty("line.separator");

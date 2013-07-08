@@ -56,9 +56,9 @@ public class Sample extends StrategyES {
 
         double force = balanceVelocity - scale * priceVelocity;
         if (force >= entry && balanceVelocity > 0 && priceVelocity < 0) {
-            setPosition(1);
+            goLong();
         } else if (force <= -exit) {
-            setPosition(0);
+            goFlat();
         }
     }
 }

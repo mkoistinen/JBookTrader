@@ -15,13 +15,15 @@ public class StrategyRunner {
     private Collection<MarketBook> marketBooks;
     private final Dispatcher dispatcher;
     private static StrategyRunner instance;
-    private static long ntpTime, snapshotTime;
+    private static long snapshotTime;
     private static final long ONE_SECOND = 1000;
     private static final long HALF_SECOND = ONE_SECOND / 2;
 
     private class SnapshotHandler implements Runnable {
         public void run() {
             NTPClock ntpClock = dispatcher.getNTPClock();
+            long ntpTime;
+
             while (true) {
                 try {
                     while ((ntpTime = ntpClock.getTime()) < snapshotTime) {
@@ -62,7 +64,7 @@ public class StrategyRunner {
 
     private StrategyRunner() {
         dispatcher = Dispatcher.getInstance();
-        strategies = new LinkedList<Strategy>();
+        strategies = new LinkedList<>();
         (new Thread(new SnapshotHandler())).start();
     }
 

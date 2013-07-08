@@ -29,6 +29,7 @@ public class PerformanceManager {
     private double sumTradeProfit, sumTradeProfitSquared;
     private long timeInMarketStart, timeInMarket;
     private long longTrades, shortTrades;
+    private double maxSingleLoss;
 
     public PerformanceManager(Strategy strategy, int multiplier, Commission commission) {
         this.strategy = strategy;
@@ -37,7 +38,7 @@ public class PerformanceManager {
     }
 
     public void createPerformanceChartData(BarSize barSize, List<Indicator> indicators) {
-        performanceChartData = new PerformanceChartData(barSize, indicators);
+        performanceChartData = new PerformanceChartData(barSize, indicators, strategy.getName());
     }
 
     public PerformanceChartData getPerformanceChartData() {
@@ -60,7 +61,7 @@ public class PerformanceManager {
             return 0;
         }
         // average number of minutes per trade
-        return (double) timeInMarket / (trades * 1000 * 60);
+        return ((double) timeInMarket / trades) / 60000;
     }
 
     public boolean getIsCompletedTrade() {
@@ -121,18 +122,22 @@ public class PerformanceManager {
     }
 
     public double getCPI() {
-        double cpi = getPerformanceIndex() * getKellyCriterion() * getProfitFactor();
-        cpi *= (getNetProfit() / 10000.0);
-        if (getAveDuration() != 0) {
-            cpi /= Math.sqrt(getAveDuration());
+        double performanceIndex = getPerformanceIndex();
+        double kellyCriterion = getKellyCriterion();
+        double aveDuration = getAveDuration();
+
+        if (aveDuration != 0 && performanceIndex > 0 && kellyCriterion > 0) {
+            double netProfit = getNetProfit();
+            double cpi = performanceIndex * (kellyCriterion / 100) * (netProfit / 1000);
+            cpi /= Math.sqrt(Math.sqrt(aveDuration));
+            return cpi;
         } else {
-            cpi = 0;
+            return 0;
         }
-        return cpi;
+
     }
 
     public double getPerformanceIndex() {
-
         double pi = 0;
         if (trades > 0) {
             double stDev = Math.sqrt(trades * sumTradeProfitSquared - sumTradeProfit * sumTradeProfit) / trades;
@@ -140,6 +145,10 @@ public class PerformanceManager {
         }
 
         return pi;
+    }
+
+    public double getMaxSingleLoss() {
+        return Math.abs(maxSingleLoss);
     }
 
     public void updatePositionValue(double price, int position) {
@@ -197,11 +206,18 @@ public class PerformanceManager {
             } else {
                 grossLoss += (-tradeProfit);
             }
+
+            if (tradeProfit < maxSingleLoss) {
+                maxSingleLoss = tradeProfit;
+            }
         }
 
 
         if (Dispatcher.getInstance().getMode() == Mode.BackTest) {
-            performanceChartData.update(new TimedValue(snapshotTime, netProfit));
+            if (isCompletedTrade) {
+                performanceChartData.update(new TimedValue(snapshotTime, tradeProfit));
+            }
+
         }
 
         previousPosition = position;

@@ -17,9 +17,7 @@ import java.util.*;
  * @author Eugene Kononov
  */
 public class BackTestFileWriter {
-    private static final String FILE_SEP = System.getProperty("file.separator");
     private static final String LINE_SEP = System.getProperty("line.separator");
-    private static final String MARKET_DATA_DIR = JBookTrader.getAppPath() + FILE_SEP + "marketData";
     private final DecimalFormat decimalFormat;
     private final SimpleDateFormat dateFormat;
     private PrintWriter writer;
@@ -29,12 +27,7 @@ public class BackTestFileWriter {
         dateFormat = new SimpleDateFormat("MMddyy,HHmmss");
         dateFormat.setTimeZone(timeZone);
 
-        File marketDataDir = new File(MARKET_DATA_DIR);
-        if (!marketDataDir.exists()) {
-            marketDataDir.mkdir();
-        }
-
-        String fileName = MARKET_DATA_DIR + FILE_SEP + strategyName + ".txt";
+        String fileName = Dispatcher.getInstance().getMarketDataDir() + strategyName + ".txt";
         try {
             boolean fileExisted = new File(fileName).exists();
             writer = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));

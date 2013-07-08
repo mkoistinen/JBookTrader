@@ -30,11 +30,7 @@ public class PreferencesHolder {
         return prefs.get(pref.getName(), pref.getDefault());
     }
 
-    public void set(JBTPreferences pref, String propertyValue) {
-        prefs.put(pref.getName(), propertyValue);
-    }
-
-    public void set(JBTPreferences pref, int propertyValue) {
-        set(pref, String.valueOf(propertyValue));
+    public void set(JBTPreferences pref, Object propertyValue) {
+        prefs.put(pref.getName(), String.valueOf(propertyValue));
     }
 }

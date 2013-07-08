@@ -8,8 +8,7 @@ import com.jbooktrader.platform.performance.*;
  * @author Eugene Kononov
  */
 public class OptimizationResult {
-    private final double netProfit, maxDrawdown, profitFactor, performanceIndex, kellyCriterion, cpi, aveDuration, bias;
-    private double stability;
+    private final double netProfit, maxSingleLoss, maxDrawdown, profitFactor, performanceIndex, kellyCriterion, cpi, aveDuration, bias;
     private final int trades;
     private final StrategyParams params;
 
@@ -17,6 +16,7 @@ public class OptimizationResult {
     public OptimizationResult(StrategyParams params, PerformanceManager performanceManager) {
         this.params = params;
         netProfit = performanceManager.getNetProfit();
+        maxSingleLoss = performanceManager.getMaxSingleLoss();
         maxDrawdown = performanceManager.getMaxDrawdown();
         trades = performanceManager.getTrades();
         profitFactor = performanceManager.getProfitFactor();
@@ -25,10 +25,6 @@ public class OptimizationResult {
         performanceIndex = performanceManager.getPerformanceIndex();
         aveDuration = performanceManager.getAveDuration();
         bias = performanceManager.getBias();
-    }
-
-    public void setStability(double stability) {
-        this.stability = stability;
     }
 
     public StrategyParams getParams() {
@@ -47,8 +43,8 @@ public class OptimizationResult {
                 return kellyCriterion;
             case CPI:
                 return cpi;
-            case Stability:
-                return stability;
+            case MaxSL:
+                return maxSingleLoss;
             case MaxDD:
                 return maxDrawdown;
             case NetProfit:

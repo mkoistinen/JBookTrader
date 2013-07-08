@@ -35,12 +35,6 @@ public class CircledTextAnnotation extends AbstractXYAnnotation {
         double anchorX = domainAxis.valueToJava2D(x, dataArea, domainEdge);
         double anchorY = rangeAxis.valueToJava2D(y, dataArea, rangeEdge);
 
-        if (orientation.equals(PlotOrientation.HORIZONTAL)) {
-            double tempAnchor = anchorX;
-            anchorX = anchorY;
-            anchorY = tempAnchor;
-        }
-
         anchorX -= ANNOTATION_RADIUS;
         anchorY -= ANNOTATION_RADIUS;
         double width = ANNOTATION_RADIUS * 2.0;

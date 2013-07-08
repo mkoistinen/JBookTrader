@@ -25,7 +25,7 @@ public class ClassFinder {
      */
     public static List<String> getClasses() {
         URL[] classpath = ((URLClassLoader) ClassLoader.getSystemClassLoader()).getURLs();
-        List<String> classNames = new ArrayList<String>();
+        List<String> classNames = new ArrayList<>();
 
         for (URL url : classpath) {
             File file;
@@ -37,11 +37,14 @@ public class ClassFinder {
             if (file.isDirectory()) {
                 File packageDir = new File(file.getPath() + "/com/jbooktrader/strategy/");
                 if (packageDir.exists()) {
-                    for (File f : packageDir.listFiles()) {
-                        String className = f.getName();
-                        if (className.endsWith(".class")) {
-                            className = className.substring(0, className.lastIndexOf(".class"));
-                            classNames.add(className);
+                    File[] files = packageDir.listFiles();
+                    if (files != null) {
+                        for (File f : files) {
+                            String className = f.getName();
+                            if (className.endsWith(".class")) {
+                                className = className.substring(0, className.lastIndexOf(".class"));
+                                classNames.add(className);
+                            }
                         }
                     }
                 }
@@ -102,7 +105,7 @@ public class ClassFinder {
 
 
     public static List<Strategy> getStrategies() {
-        List<Strategy> strategies = new ArrayList<Strategy>();
+        List<Strategy> strategies = new ArrayList<>();
         List<String> strategyNames = getClasses();
 
         for (String strategyName : strategyNames) {

@@ -21,7 +21,7 @@ public class StrategyTableModel extends TableDataModel {
 
     public StrategyTableModel() {
         StrategyTableColumn[] columns = StrategyTableColumn.values();
-        ArrayList<String> allColumns = new ArrayList<String>();
+        ArrayList<String> allColumns = new ArrayList<>();
         for (StrategyTableColumn column : columns) {
             allColumns.add(column.getColumnName());
         }
@@ -68,7 +68,7 @@ public class StrategyTableModel extends TableDataModel {
 
     public void update(Strategy strategy) {
         int rowIndex = getRowForStrategy(strategy);
-        EnumMap<StrategyTableColumn, Object> row = new EnumMap<StrategyTableColumn, Object>(StrategyTableColumn.class);
+        EnumMap<StrategyTableColumn, Object> row = new EnumMap<>(StrategyTableColumn.class);
 
         MarketBook marketBook = strategy.getMarketBook();
         if (!marketBook.isEmpty()) {
@@ -87,6 +87,7 @@ public class StrategyTableModel extends TableDataModel {
         row.put(PI, df2.format(pm.getPerformanceIndex()));
         row.put(Kelly, df0.format(pm.getKellyCriterion()));
         row.put(CPI, df0.format(pm.getCPI()));
+        row.put(MaxSL, df0.format(pm.getMaxSingleLoss()));
         row.put(MaxDD, df0.format(pm.getMaxDrawdown()));
         row.put(NetProfit, df0.format(pm.getNetProfit()));
 

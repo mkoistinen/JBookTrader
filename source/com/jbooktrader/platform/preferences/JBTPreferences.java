@@ -15,6 +15,25 @@ public enum JBTPreferences {
     WebAccessUser("Web Access User", "admin"),
     WebAccessPassword("Web Access Password", "admin"),
 
+    // Portfolio Manager
+    PositionSizePerStrategy("Position size per strategy", "1"),
+    MaxOpenPositions("Max open positions", "4"),
+
+    // Forced Exit
+    MaxDisconnectionPeriod("Close open positions and stop trading if disconnected from TWS for more than", "120"),
+
+    // Notifications
+    SmtpHost("SMTP Host", "smtp.gmail.com"),
+    SmtpPort("SMTP Port", "465"),
+    SmtpUser("User", "you@gmail.com"),
+    SmtpPassword("Password", "password"),
+    Subject("Subject", "JBookTrader Notifications"),
+    Recipients("Recipients", "you@gmail.com, somebodyelse@gmail.com"),
+    SendTestNotification("Test", "Send a test notification"),
+
+    // Sub-account
+    SubAccount("FA sub-account", ""),
+
     // Data file for backtester and optimizer
     DataFileName("dataFileName"),
 

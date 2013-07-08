@@ -32,7 +32,7 @@ public class IndicatorManager {
 
 
     public IndicatorManager() {
-        indicators = new ArrayList<Indicator>();
+        indicators = new ArrayList<>();
     }
 
     public void setMarketBook(MarketBook marketBook) {
@@ -61,14 +61,14 @@ public class IndicatorManager {
 
         if (lastSnapshotTime - previousSnapshotTime > GAP_SIZE) {
             samples = 0;
-            for (int index = 0; index < size; index++) {
-                indicators.get(index).reset();
+            for (Indicator indicator : indicators) {
+                indicator.reset();
             }
         }
         previousSnapshotTime = lastSnapshotTime;
 
-        for (int index = 0; index < size; index++) {
-            indicators.get(index).calculate();
+        for (Indicator indicator : indicators) {
+            indicator.calculate();
         }
     }
 }
