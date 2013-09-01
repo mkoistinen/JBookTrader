@@ -46,7 +46,6 @@ public class Sample extends StrategyES {
     public void setIndicators() {
         balanceVelocityInd = addIndicator(new BalanceVelocity(1, getParam(PERIOD)));
         priceVelocityInd = addIndicator(new PriceVelocity(1, getParam(PERIOD)));
-
     }
 
     @Override
