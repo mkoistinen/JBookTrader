@@ -202,7 +202,7 @@ public class Trader extends EWrapperAdapter {
 
             // 200: bad contract
             if (errorCode == 200) {
-                traderAssistant.volumeResponse(id, 0);
+                traderAssistant.volumeResponse(id, -1);
             }
 
             // 309: market depth requested for more than 3 symbols
@@ -215,6 +215,16 @@ public class Trader extends EWrapperAdapter {
             if (isNotificationNeeded) {
                 Notifier.getInstance().send(msg);
             }
+        } catch (Throwable t) {
+            // Do not allow exceptions come back to the socket -- it will cause disconnects
+            eventReport.report(t);
+        }
+    }
+
+    @Override
+    public void tickSnapshotEnd(int tickerId) {
+        try {
+            traderAssistant.volumeResponse(tickerId, 0);
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
@@ -249,19 +259,6 @@ public class Trader extends EWrapperAdapter {
             eventReport.report(t);
         }
     }
-
-    @Override
-    public void tickPrice(int tickerId, int tickType, double price, int canAutoExecute) {
-        try {
-            if (tickType == TickType.CLOSE) {
-                traderAssistant.volumeResponseMarketClosed(tickerId);
-            }
-        } catch (Throwable t) {
-            // Do not allow exceptions come back to the socket -- it will cause disconnects
-            eventReport.report(t);
-        }
-    }
-
 
     @Override
     public void nextValidId(int orderId) {

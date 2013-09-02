@@ -6,6 +6,7 @@ package com.jbooktrader.platform.model;
 public enum StrategyTableColumn {
     Strategy("Strategy"),
     Symbol("Symbol"),
+    Expiration("Expiration"),
     DepthBalance("Book"),
     Price("Price"),
     Position("Position"),

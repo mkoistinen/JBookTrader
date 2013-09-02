@@ -22,12 +22,13 @@ import static com.jbooktrader.platform.preferences.JBTPreferences.*;
  * @author Eugene Kononov
  */
 public class TraderAssistant {
+    private final static int CONTRACT_MONTHS = 7;
     private final Map<Integer, Strategy> strategies;
     private final Map<Integer, OpenOrder> openOrders;
     private final Map<String, Integer> tickers;
     private final Map<Integer, Integer> volumes;
     private final Map<Integer, String> expirations;
-    private final Set<Integer> subscribedTickers;
+    private final Map<Integer, String> subscribedTickers;
     private final Map<Integer, MarketBook> marketBooks;
     private final EventReport eventReport;
     private final Trader trader;
@@ -40,9 +41,8 @@ public class TraderAssistant {
     private String accountCode;// used to determine if TWS is running against real or paper trading account
     private boolean isOrderExecutionPending;
     private boolean isMarketDataActive;
-    private static long disconnectionTime;
+    private long disconnectionTime;
     private final BlockingQueue<String> queue;
-    private final int contractMonths = 7;
 
     public TraderAssistant(Trader trader) {
         this.trader = trader;
@@ -54,7 +54,7 @@ public class TraderAssistant {
         volumes = new HashMap<>();
         expirations = new HashMap<>();
         marketBooks = new HashMap<>();
-        subscribedTickers = new HashSet<>();
+        subscribedTickers = new HashMap<>();
         faSubAccount = PreferencesHolder.getInstance().get(SubAccount);
         maxDisconnectionTimeSeconds = Long.parseLong(PreferencesHolder.getInstance().get(MaxDisconnectionPeriod));
         queue = new ArrayBlockingQueue<>(1);
@@ -173,19 +173,12 @@ public class TraderAssistant {
         return marketBook;
     }
 
-    public void volumeResponseMarketClosed(int id) throws InterruptedException {
-        if (queue.peek() == null && expirations.containsKey(id)) {
-            queue.put("closed");
-            String msg = "Unable to determine the most liquid contract because the market for this instrument is closed.";
-            eventReport.report(JBookTrader.APP_NAME, msg);
-            MessageDialog.showMessage(msg);
-        }
-    }
-
     public void volumeResponse(int id, int volume) throws InterruptedException {
         if (queue.peek() == null && expirations.containsKey(id)) {
-            volumes.put(id, volume);
-            if (volumes.size() == contractMonths) {
+            if (!volumes.containsKey(id)) {
+                volumes.put(id, volume);
+            }
+            if (volumes.size() == CONTRACT_MONTHS) {
                 queue.put("done");
             }
         }
@@ -202,79 +195,89 @@ public class TraderAssistant {
 
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMM");
-        int lastTickerId = tickerId + contractMonths;
+        int lastTickerId = tickerId + CONTRACT_MONTHS;
 
         while (tickerId < lastTickerId) {
             tickerId++;
             contract.m_expiry = dateFormat.format(calendar.getTime());
             expirations.put(tickerId, contract.m_expiry);
-            socket.reqMktData(tickerId, contract, "", false);
+            socket.reqMktData(tickerId, contract, "", true);
             calendar.add(Calendar.MONTH, 1);
         }
 
         queue.take();
 
+        String mostLiquidExpiration = null;
         int maxVolume = 0;
-        int mostLiquidTicker = 0;
+        boolean isValidContract = false;
         for (Map.Entry<Integer, Integer> entry : volumes.entrySet()) {
             Integer ticker = entry.getKey();
             Integer volume = entry.getValue();
+            if (volume != -1) {
+                isValidContract = true;
+            }
             if (volume > maxVolume) {
-                mostLiquidTicker = ticker;
+                mostLiquidExpiration = expirations.get(ticker);
                 maxVolume = volume;
             }
-            socket.cancelMktData(ticker);
-
         }
 
-        String mostLiquidExpiration = expirations.get(mostLiquidTicker);
-        expirations.clear();
+        if (!isValidContract) {
+            String msg = "Contract " + contract.m_symbol + " for exchange " + contract.m_exchange + " does not exist.";
+            msg += " Make sure that the ticker symbol and the exchange are specified correctly.";
+            eventReport.report(JBookTrader.APP_NAME, msg);
+            throw new RuntimeException(msg);
+        }
+
+        if (mostLiquidExpiration == null) {
+            String msg = "Unable to determine the most liquid " + contract.m_symbol + " contract because no trading volume was reported. Please try again when trading resumes.";
+            eventReport.report(JBookTrader.APP_NAME, msg);
+            throw new RuntimeException(msg);
+        }
+
         contract.m_expiry = mostLiquidExpiration;
         eventReport.report(JBookTrader.APP_NAME, "The most liquid " + contract.m_symbol + " contract was determined as " + mostLiquidExpiration + ". Volume: " + maxVolume + ".");
     }
-
 
     public synchronized void requestMarketData(Strategy strategy) throws InterruptedException {
 
         Contract contract = strategy.getContract();
         String instrument = makeInstrument(contract);
         Integer ticker = tickers.get(instrument);
-        if (!subscribedTickers.contains(ticker)) {
+        if (!subscribedTickers.containsKey(ticker)) {
             setMostLiquidContract(strategy.getContract());
-            subscribedTickers.add(ticker);
+            subscribedTickers.put(ticker, strategy.getContract().m_expiry);
             socket.reqContractDetails(ticker, strategy.getContract());
             eventReport.report(JBookTrader.APP_NAME, "Requested contract details for instrument " + instrument);
             socket.reqMktDepth(ticker, contract, 10);
             eventReport.report(JBookTrader.APP_NAME, "Requested book data for instrument " + instrument);
             socket.reqMktData(ticker, contract, "", false);
             eventReport.report(JBookTrader.APP_NAME, "Requested market data for instrument " + instrument);
+        } else {
+            strategy.getContract().m_expiry = subscribedTickers.get(ticker);
         }
-    }
-
-    public synchronized void cancelMarketData(Strategy strategy) {
-        Contract contract = strategy.getContract();
-        String instrument = makeInstrument(contract);
-        Integer ticker = tickers.get(instrument);
-        if (subscribedTickers.contains(ticker)) {
-            socket.cancelMktDepth(ticker);
-            eventReport.report(JBookTrader.APP_NAME, "Cancelled book data for instrument " + instrument);
-            socket.cancelMktData(ticker);
-            eventReport.report(JBookTrader.APP_NAME, "Cancelled market data for instrument " + instrument);
-            subscribedTickers.remove(ticker);
-        }
+        Dispatcher.getInstance().fireModelChanged(ModelListener.Event.ExpirationUpdate, strategy);
     }
 
     public synchronized void addStrategy(Strategy strategy) throws InterruptedException {
-        strategy.setIndicatorManager(new IndicatorManager());
-        strategy.setIndicators();
-        nextStrategyID++;
-        strategies.put(nextStrategyID, strategy);
-        Mode mode = dispatcher.getMode();
-        if (mode == Mode.ForwardTest || mode == Mode.Trade) {
-            String msg = "Strategy started. Trading schedule: " + strategy.getTradingSchedule();
-            eventReport.report(strategy.getName(), msg);
-            requestMarketData(strategy);
-            StrategyRunner.getInstance().addListener(strategy);
+        try {
+            Mode mode = dispatcher.getMode();
+            if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+                requestMarketData(strategy);
+            }
+
+            strategy.setIndicatorManager(new IndicatorManager());
+            strategy.setIndicators();
+            nextStrategyID++;
+            strategies.put(nextStrategyID, strategy);
+
+            if (mode == Mode.ForwardTest || mode == Mode.Trade) {
+                String msg = "Strategy started. Trading schedule: " + strategy.getTradingSchedule();
+                eventReport.report(strategy.getName(), msg);
+                StrategyRunner.getInstance().addListener(strategy);
+            }
+        } catch (Exception e) {
+            MessageDialog.showMessage(e.getMessage());
         }
     }
 
