@@ -3,12 +3,11 @@
 ## People who have made code contributions to this project:
 
 * Eugene Kononov
-* Judson Wilson
-* Marcus Williford
+* Florent Guiliani
 * Martin Koistinen
-* florent.guiliani
+* Marcus Williford
+* Judson Wilson
 * srberry1
-
 
 ## The following is the original list of authors from the Google Code project page.
 
