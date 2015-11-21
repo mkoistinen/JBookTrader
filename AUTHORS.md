@@ -9,7 +9,8 @@
 * florent.guiliani
 * srberry1
 
-## This is the original list of authors from the Google Code project page.
+
+## The following is the original list of authors from the Google Code project page.
 
 * eugene.kononov
 * shaggsthestud
