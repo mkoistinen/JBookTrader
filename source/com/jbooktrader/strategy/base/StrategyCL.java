@@ -24,7 +24,7 @@ public abstract class StrategyCL extends Strategy {
     protected StrategyCL(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeNYMEXFutureContract("CL", "NYMEX");
+        Contract contract = ContractFactory.makeFutureContract("CL", "NYMEX");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:05", "15:25", "America/New_York");
         int multiplier = 1000;// contract 1000 barrels

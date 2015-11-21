@@ -14,7 +14,7 @@ public class BackTestStrategyRunner implements Runnable {
     private final BackTestDialog backTestDialog;
     private final Strategy strategy;
 
-    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) {
+    public BackTestStrategyRunner(BackTestDialog backTestDialog, Strategy strategy) throws InterruptedException {
         this.backTestDialog = backTestDialog;
         this.strategy = strategy;
         Dispatcher.getInstance().getTrader().getAssistant().addStrategy(strategy);

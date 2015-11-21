@@ -2,6 +2,7 @@ package com.jbooktrader.platform.trader;
 
 import com.ib.client.*;
 import com.jbooktrader.platform.email.*;
+import com.jbooktrader.platform.marketbook.*;
 import com.jbooktrader.platform.marketdepth.*;
 import com.jbooktrader.platform.model.*;
 import com.jbooktrader.platform.model.ModelListener.*;
@@ -35,10 +36,6 @@ public class Trader extends EWrapperAdapter {
     @Override
     public void updateAccountValue(String key, String value, String currency, String accountName) {
         try {
-            if (key.equalsIgnoreCase("AvailableFunds")) {
-                eventReport.report("Account", key + ": " + value);
-            }
-
             if (key.equalsIgnoreCase("AccountCode")) {
                 synchronized (this) {
                     traderAssistant.setAccountCode(value);
@@ -154,7 +151,10 @@ public class Trader extends EWrapperAdapter {
             }
 
             previousErrorMessage = msg;
-            eventReport.report("IB API", msg);
+            boolean isReportable = (errorCode != 200 && errorCode != 300);
+            if (isReportable) {
+                eventReport.report("IB API", msg);
+            }
 
             // Errors 1101 and 1102 are sent when connectivity is restored.
             boolean isConnectivityRestored = (errorCode == 1101 || errorCode == 1102);
@@ -201,16 +201,30 @@ public class Trader extends EWrapperAdapter {
             }
 
             // 200: bad contract
+            if (errorCode == 200) {
+                traderAssistant.volumeResponse(id, -1);
+            }
+
             // 309: market depth requested for more than 3 symbols
-            boolean isInvalidRequest = (errorCode == 200 || errorCode == 309);
-            if (isInvalidRequest) {
+            if (errorCode == 309) {
                 Dispatcher.getInstance().fireModelChanged(Event.Error, "IB reported: " + errorMsg);
             }
 
-            boolean isNotificationNeeded = (errorCode < 2103 || errorCode > 2106) && (errorCode != 2100);
+
+            boolean isNotificationNeeded = (errorCode < 2103 || errorCode > 2106) && (errorCode != 2100 && errorCode != 200 && errorCode != 300);
             if (isNotificationNeeded) {
                 Notifier.getInstance().send(msg);
             }
+        } catch (Throwable t) {
+            // Do not allow exceptions come back to the socket -- it will cause disconnects
+            eventReport.report(t);
+        }
+    }
+
+    @Override
+    public void tickSnapshotEnd(int tickerId) {
+        try {
+            traderAssistant.volumeResponse(tickerId, 0);
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
@@ -233,15 +247,18 @@ public class Trader extends EWrapperAdapter {
     public void tickSize(int tickerId, int tickType, int size) {
         try {
             if (tickType == TickType.VOLUME && size != 0) {
-                MarketDepth marketDepth = traderAssistant.getMarketBook(tickerId).getMarketDepth();
-                marketDepth.update(size);
+                traderAssistant.volumeResponse(tickerId, size);
+                MarketBook marketBook = traderAssistant.getMarketBook(tickerId);
+                if (marketBook != null) {
+                    MarketDepth marketDepth = traderAssistant.getMarketBook(tickerId).getMarketDepth();
+                    marketDepth.update(size);
+                }
             }
         } catch (Throwable t) {
             // Do not allow exceptions come back to the socket -- it will cause disconnects
             eventReport.report(t);
         }
     }
-
 
     @Override
     public void nextValidId(int orderId) {

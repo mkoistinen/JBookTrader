@@ -19,7 +19,7 @@ public abstract class StrategyGC extends Strategy {
     protected StrategyGC(StrategyParams optimizationParams) throws JBookTraderException {
         super(optimizationParams);
         // Specify the contract to trade
-        Contract contract = ContractFactory.makeNYMEXFutureContract("GC", "NYMEX");
+        Contract contract = ContractFactory.makeFutureContract("GC", "NYMEX");
         // Define trading schedule
         TradingSchedule tradingSchedule = new TradingSchedule("10:05", "15:25", "America/New_York");
         int multiplier = 100;
