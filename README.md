@@ -8,6 +8,6 @@ JBookTrader is written in Java and is intended for software developers. It is no
 
 Before you start working with JBookTrader, please read the JBookTrader User Guide and the documents located in the /docs directory of the distribution.
 
-![Back Testing Screenshot](/resources/readme/backtest.jpg "Back Testing")
-![Charting Screenshot](/resources/readme/chart.jpg "Charting")
-![Optimizing Visualization](/resources/readme/chart.jpg "Optimizing Visualization")
+![Back Testing Screenshot](/resources/readme/backtest.png "Back Testing")
+![Charting Screenshot](/resources/readme/chart.png "Charting")
+![Optimizing Visualization](/resources/readme/chart.png "Optimizing Visualization")
