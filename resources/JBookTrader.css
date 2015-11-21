@@ -1,0 +1,37 @@
+﻿body {
+	background: url(background.png);
+	margin: 12;
+}
+
+h1 {
+	font-size: large;
+	text-align: center;
+}
+
+table {
+	background-color: white;
+	border-style: solid; 
+	border-color: gray;
+	border-width: 1px;
+	border-collapse: collapse;
+	text-align: right;
+	width: 100%;
+}
+
+th {
+	padding-right: 5px;
+	background-color: rgb(255, 204, 51); 
+	text-align: right;
+}
+
+tr.oddRow td {background-color: #edf1ff;}
+td {padding-right: 5px;}
+
+
+
+
+
+
+
+
+

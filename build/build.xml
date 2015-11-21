@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JBookTrader" default="test" basedir="..">
+
+    <property name="compiler.debug" value="on"/>
+    <property name="distDir" value="${basedir}/dist"/>
+    <property name="libDir" value="${basedir}/lib"/>
+    <property name="distJar" value="${distDir}/JBookTrader.jar"/>
+
+    <path id="libraries">
+        <fileset dir="${libDir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="${distDir}"/>
+        <mkdir dir="${distDir}"/>
+        <mkdir dir="${distDir}/tests"/>
+    </target>
+
+    <target name="compile" depends="clean">
+        <javac srcdir="${basedir}/source"
+               includeantruntime="false"
+               destdir="${distDir}"
+               classpathref="libraries"
+               debug="on"
+               source="1.7"/>
+    </target>
+
+    <target name="package" depends="compile">
+        <copy todir="${distDir}/resources">
+            <fileset dir="${basedir}/resources"/>
+        </copy>
+        <jar destfile="${distJar}">
+            <fileset dir="${distDir}"/>
+            <zipgroupfileset dir="${basedir}/lib" includes="*.jar"/>
+            <manifest>
+                <attribute name="Main-Class" value="com.jbooktrader.platform.startup.JBookTrader"/>
+            </manifest>
+        </jar>
+        <delete dir="${distDir}/com"/>
+        <delete dir="${distDir}/resources"/>
+    </target>
+
+    <target name="test" depends="package">
+        <path id="classPath">
+            <pathelement location="${distJar}"/>
+        </path>
+        <junit printsummary="yes" fork="true" haltonfailure="yes">
+            <classpath path="${libDir}">
+                <path refid="classPath"/>
+            </classpath>
+            <batchtest todir="${distDir}/tests">
+                <formatter type="plain"/>
+                <zipfileset src="${distJar}" includes="**/platform/test/*Test.class"/>
+            </batchtest>
+        </junit>
+    </target>
+</project>
