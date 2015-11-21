@@ -8,6 +8,8 @@ JBookTrader is written in Java and is intended for software developers. It is no
 
 Before you start working with JBookTrader, please read the JBookTrader User Guide and the documents located in the /docs directory of the distribution.
 
+    This project was originally hosted here: https://code.google.com/p/jbooktrader/ at the now deprecated Google Code service.
+
 ![Back Testing Screenshot](/resources/readme/backtest.png "Back Testing")
 ![Charting Screenshot](/resources/readme/chart.png "Charting")
 ![Optimizing Visualization](/resources/readme/chart.png "Optimizing Visualization")
